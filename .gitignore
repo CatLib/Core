@@ -1,0 +1,6 @@
+.vs/
+src/CatLib.Core.Tests/bin/
+src/CatLib.Core.Tests/obj/
+src/CatLib.Core/obj/
+src/CatLib.Core/bin/
+TestResults/
