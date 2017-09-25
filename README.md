@@ -21,6 +21,18 @@
 - [依赖注入容器](http://catlib.io/v1/guide/container.html).
 - [基础事件系统](http://catlib.io/v1/guide/events.html).
 
+## 安装CatLib Core
+
+**使用Nuget安装**
+
+```PM
+Install-Package CatLib.Core -Version 1.0.0
+```
+
+**直接下载发布版本**
+
+[下载](https://github.com/CatLib/Core/releases)最新发布版本。
+
 ## 学习CatLib
 
 我们已经准备了各个组件的教程，您只需要进入 [中文文档](http://catlib.io) / [English Document](http://en.catlib.io) 就可以看到她们。
