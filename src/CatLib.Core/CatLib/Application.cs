@@ -24,7 +24,7 @@ namespace CatLib
         /// <summary>
         /// 版本号
         /// </summary>
-        private readonly Version version = new Version("1.0.0");
+        private readonly Version version = new Version("1.0.1");
 
         /// <summary>
         /// 框架启动流程
@@ -139,7 +139,7 @@ namespace CatLib
             App.Handler = this;
             mainThreadId = Thread.CurrentThread.ManagedThreadId;
             RegisterCoreAlias();
-            OnFindType(finder => { return Type.GetType(finder); }, 1);
+            OnFindType(finder => { return Type.GetType(finder); });
             SetDebugLevel(DebugLevels.Prod);
         }
 
