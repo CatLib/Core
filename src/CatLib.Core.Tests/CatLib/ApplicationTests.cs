@@ -10,7 +10,6 @@
  */
 
 using System;
-using CatLib.Events;
 #if UNITY_EDITOR || NUNIT
 using NUnit.Framework;
 using TestClass = NUnit.Framework.TestFixtureAttribute;
@@ -74,7 +73,6 @@ namespace CatLib.Tests
         {
             var app = new Application();
             app.Bootstrap();
-            App.Register(new EventsProvider());
             app.Init();
             app.Bootstrap();
             Assert.AreEqual(Application.StartProcess.Inited, app.Process);
@@ -101,10 +99,11 @@ namespace CatLib.Tests
         public void RepeatRegister()
         {
             var app = MakeApplication();
+            app.Register(new ProviderTest1());
 
             ExceptionAssert.Throws<RuntimeException>(() =>
             {
-                app.Register(new EventsProvider());
+                app.Register(new ProviderTest1());
             });
         }
 
@@ -162,7 +161,6 @@ namespace CatLib.Tests
             app.Bootstrap();
             App.Register(new ProviderTest1());
             App.Register(new ProviderTest2());
-            App.Register(new EventsProvider());
             app.Init();
             Assert.AreEqual(true, prioritiesTest);
         }
@@ -195,7 +193,6 @@ namespace CatLib.Tests
             });
             app.Bootstrap();
             App.Register(new ProviderTest1());
-            App.Register(new EventsProvider());
             app.Init();
 
             App.Register(new ProviderTest2());
@@ -258,7 +255,6 @@ namespace CatLib.Tests
         {
             public void Bootstrap()
             {
-                App.Register(new EventsProvider());
             }
         }
     }

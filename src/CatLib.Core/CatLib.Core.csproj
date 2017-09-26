@@ -45,11 +45,10 @@
     <Compile Include="CatLib\IBootstrap.cs" />
     <Compile Include="CatLib\IServiceProvider.cs" />
     <Compile Include="CatLib\IServiceProviderType.cs" />
-    <Compile Include="Events\Dispatcher.cs" />
-    <Compile Include="Events\EventHandler.cs" />
-    <Compile Include="Events\EventsProvider.cs" />
-    <Compile Include="Events\IDispatcher.cs" />
-    <Compile Include="Events\IEventHandler.cs" />
+    <Compile Include="Support\Dispatcher\Dispatcher.cs" />
+    <Compile Include="Support\Dispatcher\EventHandler.cs" />
+    <Compile Include="Support\Dispatcher\IDispatcher.cs" />
+    <Compile Include="Support\Dispatcher\IEventHandler.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Support\Attribute\ExcludeFromCodeCoverageAttribute.cs" />
     <Compile Include="Support\Attribute\PriorityAttribute.cs" />

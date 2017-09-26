@@ -10,9 +10,8 @@
  */
 
 using System;
-using IEventHandler = CatLib.API.Events.IEventHandler;
 
-namespace CatLib.Events
+namespace CatLib
 {
     /// <summary>
     /// 事件句柄

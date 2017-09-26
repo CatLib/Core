@@ -11,7 +11,6 @@
 
 using System;
 using System.Reflection;
-using CatLib.API.Events;
 
 namespace CatLib
 {

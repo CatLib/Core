@@ -11,7 +11,7 @@
 
 using System;
 
-namespace CatLib.API.Events
+namespace CatLib
 {
     /// <summary>
     /// 调度器

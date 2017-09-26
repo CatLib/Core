@@ -9,7 +9,6 @@
  * Document: http://catlib.io/
  */
 
-using CatLib.API.Events;
 using System;
 using System.Collections.Generic;
 using System.Threading;
@@ -139,6 +138,7 @@ namespace CatLib
             App.Handler = this;
             mainThreadId = Thread.CurrentThread.ManagedThreadId;
             RegisterCoreAlias();
+            RegisterCoreService();
             OnFindType(finder => { return Type.GetType(finder); });
             SetDebugLevel(DebugLevels.Prod);
         }
@@ -392,6 +392,14 @@ namespace CatLib
             {
                 Alias(Type2Service(type), application);
             }
+        }
+
+        /// <summary>
+        /// 注册核心服务
+        /// </summary>
+        private void RegisterCoreService()
+        {
+            this.Singleton<Dispatcher>().Alias<IDispatcher>();
         }
 
         /// <summary>

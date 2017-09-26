@@ -591,6 +591,11 @@
             注册核心别名
             </summary>
         </member>
+        <member name="M:CatLib.Application.RegisterCoreService">
+            <summary>
+            注册核心服务
+            </summary>
+        </member>
         <member name="M:CatLib.Application.GuardDispatcher">
             <summary>
             验证调度器是否有效
@@ -747,37 +752,37 @@
             提供者基础类型
             </summary>
         </member>
-        <member name="T:CatLib.Events.Dispatcher">
+        <member name="T:CatLib.Dispatcher">
             <summary>
             事件调度器
             </summary>
         </member>
-        <member name="F:CatLib.Events.Dispatcher.handlers">
+        <member name="F:CatLib.Dispatcher.handlers">
             <summary>
             事件句柄
             </summary>
         </member>
-        <member name="F:CatLib.Events.Dispatcher.wildcardHandlers">
+        <member name="F:CatLib.Dispatcher.wildcardHandlers">
             <summary>
             通配符事件句柄
             </summary>
         </member>
-        <member name="F:CatLib.Events.Dispatcher.syncRoot">
+        <member name="F:CatLib.Dispatcher.syncRoot">
             <summary>
             同步锁
             </summary>
         </member>
-        <member name="F:CatLib.Events.Dispatcher.breakFlag">
+        <member name="F:CatLib.Dispatcher.breakFlag">
             <summary>
             跳出标记
             </summary>
         </member>
-        <member name="M:CatLib.Events.Dispatcher.#ctor">
+        <member name="M:CatLib.Dispatcher.#ctor">
             <summary>
             调度器
             </summary>
         </member>
-        <member name="M:CatLib.Events.Dispatcher.Trigger(System.String,System.Object)">
+        <member name="M:CatLib.Dispatcher.Trigger(System.String,System.Object)">
             <summary>
             触发一个事件,并获取事件的返回结果
             </summary>
@@ -785,7 +790,7 @@
             <param name="payload">载荷</param>
             <returns>事件结果</returns>
         </member>
-        <member name="M:CatLib.Events.Dispatcher.TriggerHalt(System.String,System.Object)">
+        <member name="M:CatLib.Dispatcher.TriggerHalt(System.String,System.Object)">
             <summary>
             触发一个事件,遇到第一个事件存在处理结果后终止,并获取事件的返回结果
             </summary>
@@ -793,7 +798,7 @@
             <param name="payload">载荷</param>
             <returns>事件结果</returns>
         </member>
-        <member name="M:CatLib.Events.Dispatcher.Dispatch(System.String,System.Object,System.Boolean)">
+        <member name="M:CatLib.Dispatcher.Dispatch(System.String,System.Object,System.Boolean)">
             <summary>
             调度事件
             </summary>
@@ -802,7 +807,7 @@
             <param name="halt">遇到第一个事件存在处理结果后终止</param>
             <returns>处理结果</returns>
         </member>
-        <member name="M:CatLib.Events.Dispatcher.On(System.String,System.Action{System.Object},System.Int32)">
+        <member name="M:CatLib.Dispatcher.On(System.String,System.Action{System.Object},System.Int32)">
             <summary>
             注册一个事件
             </summary>
@@ -811,7 +816,7 @@
             <param name="life">在几次后事件会被自动释放</param>
             <returns>事件句柄</returns>
         </member>
-        <member name="M:CatLib.Events.Dispatcher.Listen(System.String,System.Func{System.Object,System.Object},System.Int32)">
+        <member name="M:CatLib.Dispatcher.Listen(System.String,System.Func{System.Object,System.Object},System.Int32)">
             <summary>
             注册一个事件
             </summary>
@@ -820,78 +825,78 @@
             <param name="life">在几次后事件会被自动释放</param>
             <returns>事件句柄</returns>
         </member>
-        <member name="M:CatLib.Events.Dispatcher.Off(CatLib.Events.EventHandler)">
+        <member name="M:CatLib.Dispatcher.Off(CatLib.EventHandler)">
             <summary>
             移除一个事件
             </summary>
             <param name="handler">事件句柄</param>
         </member>
-        <member name="M:CatLib.Events.Dispatcher.SetWildcardListener(CatLib.Events.EventHandler)">
+        <member name="M:CatLib.Dispatcher.SetWildcardListener(CatLib.EventHandler)">
             <summary>
             设定通配符监听
             </summary>
             <param name="handler">监听句柄</param>
         </member>
-        <member name="M:CatLib.Events.Dispatcher.GetListeners(System.String)">
+        <member name="M:CatLib.Dispatcher.GetListeners(System.String)">
             <summary>
             获取指定事件的事件句柄列表
             </summary>
             <param name="eventName">事件名</param>
             <returns>句柄列表</returns>
         </member>
-        <member name="M:CatLib.Events.Dispatcher.Normalize(System.String)">
+        <member name="M:CatLib.Dispatcher.Normalize(System.String)">
             <summary>
             标准化字符串
             </summary>
             <param name="input">输入</param>
             <returns>输出</returns>
         </member>
-        <member name="T:CatLib.Events.EventHandler">
+        <member name="T:CatLib.EventHandler">
             <summary>
             事件句柄
             </summary>
         </member>
-        <member name="P:CatLib.Events.EventHandler.Life">
+        <member name="P:CatLib.EventHandler.Life">
             <summary>
             剩余的调用次数
             </summary>
         </member>
-        <member name="P:CatLib.Events.EventHandler.IsLife">
+        <member name="P:CatLib.EventHandler.IsLife">
             <summary>
             事件是否是有效的
             </summary>
         </member>
-        <member name="P:CatLib.Events.EventHandler.EventName">
+        <member name="P:CatLib.EventHandler.EventName">
             <summary>
             事件名
             </summary>
         </member>
-        <member name="P:CatLib.Events.EventHandler.IsWildcard">
+        <member name="P:CatLib.EventHandler.IsWildcard">
             <summary>
             是否使用了通配符
             </summary>
         </member>
-        <member name="F:CatLib.Events.EventHandler.dispatcher">
+        <member name="F:CatLib.EventHandler.dispatcher">
             <summary>
             调度器
             </summary>
         </member>
-        <member name="F:CatLib.Events.EventHandler.handler">
+        <member name="F:CatLib.EventHandler.handler">
             <summary>
             事件句柄
             </summary>
         </member>
-        <member name="F:CatLib.Events.EventHandler.isCancel">
+        <member name="F:CatLib.EventHandler.isCancel">
             <summary>
             是否取消事件
             </summary>
         </member>
-        <member name="F:CatLib.Events.EventHandler.count">
+        <member name="F:CatLib.EventHandler.count">
             <summary>
             调用计数
             </summary>
         </member>
-        <member name="M:CatLib.Events.EventHandler.#ctor(CatLib.Events.Dispatcher,System.String,System.Func{System.Object,System.Object},System.Int32,System.Boolean)">
+        <member name="M:CatLib.EventHandler.#ctor(CatLib.Dispatcher,System.String,System.Func{System.Object,System.Object},System.Int32,System.Boolean)">
             <summary>
             创建一个事件句柄
             </summary>
@@ -901,46 +906,31 @@
             <param name="life">生命次数</param>
             <param name="wildcard">是否使用了通配符</param>
         </member>
-        <member name="M:CatLib.Events.EventHandler.Off">
+        <member name="M:CatLib.EventHandler.Off">
             <summary>
             撤销事件监听
             </summary>
             <returns>是否撤销成功</returns>
         </member>
-        <member name="M:CatLib.Events.EventHandler.Is(System.Func{System.Object,System.Object})">
+        <member name="M:CatLib.EventHandler.Is(System.Func{System.Object,System.Object})">
             <summary>
             是否是指定事件句柄
             </summary>
             <param name="handler">事件句柄</param>
             <returns>是否是</returns>
         </member>
-        <member name="M:CatLib.Events.EventHandler.Trigger(System.Object)">
+        <member name="M:CatLib.EventHandler.Trigger(System.Object)">
             <summary>
             激活事件
             </summary>
             <param name="payload">载荷</param>
         </member>
-        <member name="T:CatLib.Events.EventsProvider">
-            <summary>
-            事件服务提供者
-            </summary>
-        </member>
-        <member name="M:CatLib.Events.EventsProvider.Init">
-            <summary>
-            初始化
-            </summary>
-        </member>
-        <member name="M:CatLib.Events.EventsProvider.Register">
-            <summary>
-            注册事件服务
-            </summary>
-        </member>
-        <member name="T:CatLib.API.Events.IDispatcher">
+        <member name="T:CatLib.IDispatcher">
             <summary>
             调度器
             </summary>
         </member>
-        <member name="M:CatLib.API.Events.IDispatcher.Trigger(System.String,System.Object)">
+        <member name="M:CatLib.IDispatcher.Trigger(System.String,System.Object)">
             <summary>
             触发一个事件,并获取事件的返回结果
             </summary>
@@ -948,7 +938,7 @@
             <param name="payload">载荷</param>
             <returns>事件结果</returns>
         </member>
-        <member name="M:CatLib.API.Events.IDispatcher.TriggerHalt(System.String,System.Object)">
+        <member name="M:CatLib.IDispatcher.TriggerHalt(System.String,System.Object)">
             <summary>
             触发一个事件,遇到第一个事件存在处理结果后终止,并获取事件的返回结果
             </summary>
@@ -956,7 +946,7 @@
             <param name="payload">载荷</param>
             <returns>事件结果</returns>
         </member>
-        <member name="M:CatLib.API.Events.IDispatcher.On(System.String,System.Action{System.Object},System.Int32)">
+        <member name="M:CatLib.IDispatcher.On(System.String,System.Action{System.Object},System.Int32)">
             <summary>
             注册一个事件
             </summary>
@@ -965,7 +955,7 @@
             <param name="life">在几次后事件会被自动释放</param>
             <returns>事件句柄</returns>
         </member>
-        <member name="M:CatLib.API.Events.IDispatcher.Listen(System.String,System.Func{System.Object,System.Object},System.Int32)">
+        <member name="M:CatLib.IDispatcher.Listen(System.String,System.Func{System.Object,System.Object},System.Int32)">
             <summary>
             注册一个事件
             </summary>
@@ -974,22 +964,22 @@
             <param name="life">在几次后事件会被自动释放</param>
             <returns>事件句柄</returns>
         </member>
-        <member name="T:CatLib.API.Events.IEventHandler">
+        <member name="T:CatLib.IEventHandler">
             <summary>
             事件句柄
             </summary>
         </member>
-        <member name="M:CatLib.API.Events.IEventHandler.Off">
+        <member name="M:CatLib.IEventHandler.Off">
             <summary>
             取消注册的事件
             </summary>
         </member>
-        <member name="P:CatLib.API.Events.IEventHandler.Life">
+        <member name="P:CatLib.IEventHandler.Life">
             <summary>
             剩余的调用次数，当为0时事件会被释放
             </summary>
         </member>
-        <member name="P:CatLib.API.Events.IEventHandler.IsLife">
+        <member name="P:CatLib.IEventHandler.IsLife">
             <summary>
             事件是否是有效的
             </summary>
