@@ -19,6 +19,7 @@
 `CatLib Core` 是 `CatLib` 的最小可用框架。仅提供最基础的功能，是其他框架开发者作为基础的理想选择。
 
 - [标准库](http://catlib.io/v1/guide/support.html)
+- [CatLib核心](http://catlib.io/v1/guide/application.html)
 - [依赖注入容器](http://catlib.io/v1/guide/container.html).
 - [基础事件系统](http://catlib.io/v1/guide/events.html).
 
