@@ -526,7 +526,17 @@ namespace CatLib
         /// 释放服务
         /// </summary>
         /// <typeparam name="TService">服务名</typeparam>
+        [Obsolete("This function is about to be removed , Please use Release()", true)]
         public static void Releases<TService>() where TService : class
+        {
+            Handler.Release<TService>();
+        }
+
+        /// <summary>
+        /// 释放服务
+        /// </summary>
+        /// <typeparam name="TService">服务名</typeparam>
+        public static void Release<TService>() where TService : class
         {
             Handler.Release<TService>();
         }

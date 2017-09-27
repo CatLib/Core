@@ -363,6 +363,12 @@
             </summary>
             <typeparam name="TService">服务名</typeparam>
         </member>
+        <member name="M:CatLib.App.Release``1">
+            <summary>
+            释放服务
+            </summary>
+            <typeparam name="TService">服务名</typeparam>
+        </member>
         <member name="M:CatLib.App.Instance``1(System.Object)">
             <summary>
             静态化一个服务,实例值会经过解决修饰器
