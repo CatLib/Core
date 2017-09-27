@@ -475,5 +475,23 @@ namespace CatLib.Tests.Support.Util
             Assert.AreEqual("d", data[3]);
             Assert.AreEqual("e", data[4]);
         }
+
+        [TestMethod]
+        public void TestIndexOf()
+        {
+            var data = new[] { 'a', 'b', 'c', 'd', 'e' };
+            var result = Arr.IndexOf(data, new[] { 'c', 'd' });
+
+            Assert.AreEqual(2, result);
+        }
+
+        [TestMethod]
+        public void TestIndexOfString()
+        {
+            var data = new[] { "a", "b", "c", "d", "e" };
+            var result = Arr.IndexOf(data, new[] { "d", "e" });
+
+            Assert.AreEqual(3, result);
+        }
     }
 }

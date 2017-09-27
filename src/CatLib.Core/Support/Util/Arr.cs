@@ -434,5 +434,45 @@ namespace CatLib
             Array.Copy(tmpSource, start, resquested, 0, length.Value);
             return resquested;
         }
+
+        /// <summary>
+        /// 从数组中检索指定的值并返回所在的下标，如果返回-1则代表没有出现
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="source">数组源</param>
+        /// <param name="match">要匹配的值，如果有多个，只有全部的匹配才算匹配</param>
+        /// <returns>如果要检索的值没有出现，则该方法返回 -1</returns>
+        public static int IndexOf<T>(T[] source, params T[] match)
+        {
+            if (match == null || match.Length <= 0
+                || source == null || source.Length <= 0)
+            {
+                return -1;
+            }
+
+            for (int i = 0, n; i < source.Length; i++)
+            {
+                if (!source[i].Equals(match[0]))
+                {
+                    continue;
+                }
+                var isFinded = true;
+                for (n = 0; n < match.Length; n++)
+                {
+                    if (source[i + n].Equals(match[n]))
+                    {
+                        continue;
+                    }
+                    isFinded = false;
+                    break;
+                }
+                if (isFinded)
+                {
+                    return i;
+                }
+            }
+
+            return -1;
+        }
     }
 }
