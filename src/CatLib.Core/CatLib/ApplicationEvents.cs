@@ -17,6 +17,11 @@ namespace CatLib
     public sealed class ApplicationEvents
     {
         /// <summary>
+        /// 当引导完成时
+        /// </summary>
+        public static readonly string OnBootstraped = "CatLib.ApplicationEvents.OnBootstraped";
+
+        /// <summary>
         /// 当初始化进行时
         /// </summary>
         public static readonly string OnIniting = "CatLib.ApplicationEvents.OnIniting";

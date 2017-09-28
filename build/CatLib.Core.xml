@@ -612,6 +612,11 @@
             应用程序事件
             </summary>
         </member>
+        <member name="F:CatLib.ApplicationEvents.OnBootstraped">
+            <summary>
+            当引导完成时
+            </summary>
+        </member>
         <member name="F:CatLib.ApplicationEvents.OnIniting">
             <summary>
             当初始化进行时

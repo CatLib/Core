@@ -176,6 +176,7 @@ namespace CatLib
 
             process = StartProcess.Bootstraped;
             bootstrapped = true;
+            Trigger(ApplicationEvents.OnBootstraped, this);
         }
 
         /// <summary>
