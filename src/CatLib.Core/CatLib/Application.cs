@@ -132,7 +132,6 @@ namespace CatLib
         /// <summary>
         /// 构建一个CatLib实例
         /// </summary>
-        [ExcludeFromCodeCoverage]
         public Application()
         {
             App.Handler = this;
@@ -241,6 +240,7 @@ namespace CatLib
         /// <returns>服务提供者是否已经注册过</returns>
         public bool IsRegisted(IServiceProvider provider)
         {
+            Guard.Requires<ArgumentNullException>(provider != null);
             return serviceProviderTypes.Contains(GetProviderBaseType(provider));
         }
 

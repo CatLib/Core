@@ -20,7 +20,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace CatLib.Tests.Events
 {
     [TestClass]
-    public class EventsProviderTests
+    public class DispatcherTests
     {
         /// <summary>
         /// 生成测试环境
