@@ -61,7 +61,7 @@ namespace CatLib
         /// <returns>处理后的字符串</returns>
         public static string AsteriskWildcard(string pattern)
         {
-            pattern = RegexQuote(pattern);
+            pattern = Regex.Escape(pattern);
             pattern = pattern.Replace(@"\*", ".*?");
 
             return pattern;
@@ -72,14 +72,10 @@ namespace CatLib
         /// </summary>
         /// <param name="str">规定字符串</param>
         /// <returns>处理后的字符串</returns>
+        [Obsolete("Please use Regex.Escape()")]
         public static string RegexQuote(string str)
         {
-            string[] quote = { @"\", ".", "+", "*", "?", "[", "^", "]", "$", "(", ")", "{", "}", "=", "!", "<", ">", "|", ":", "-" };
-            foreach (var q in quote)
-            {
-                str = str.Replace(q, @"\" + q);
-            }
-            return str;
+            return Regex.Escape(str);
         }
 
         /// <summary>

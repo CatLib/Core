@@ -26,15 +26,6 @@ namespace CatLib.API.Stl
     public class StrTests
     {
         [TestMethod]
-        public void TestRegexQuote()
-        {
-            var input = "(.*?) from table";
-            input = Str.RegexQuote(input);
-
-            Assert.AreEqual(@"\(\.\*\?\) from table", input);
-        }
-
-        [TestMethod]
         public void TestAsteriskWildcard()
         {
             var input = "path.?+/hello/wor*d";
