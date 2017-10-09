@@ -73,6 +73,7 @@ namespace CatLib
         /// <param name="str">规定字符串</param>
         /// <returns>处理后的字符串</returns>
         [Obsolete("Please use Regex.Escape()")]
+        [ExcludeFromCodeCoverage]
         public static string RegexQuote(string str)
         {
             return Regex.Escape(str);
@@ -178,7 +179,6 @@ namespace CatLib
                 if ((index = str.IndexOf(subStr, start, length.Value, comparison)) < 0)
                 {
                     break;
-
                 }
                 count++;
                 length -= index + subStr.Length - start;
@@ -264,11 +264,8 @@ namespace CatLib
         /// <returns>剩余部分</returns>
         public static string After(string str, string search)
         {
+            Guard.Requires<ArgumentNullException>(str != null);
             Guard.Requires<ArgumentNullException>(search != null);
-            if (str == null || str.Length <= 0)
-            {
-                return str;
-            }
 
             var index = str.IndexOf(search);
             if (index < 0)

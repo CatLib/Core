@@ -48,11 +48,13 @@
     <Compile Include="Support\QuickList\InternalListTests.cs" />
     <Compile Include="Support\QuickList\QuickListTests.cs" />
     <Compile Include="Support\SortSet\SortSetTests.cs" />
+    <Compile Include="Support\Template\ManagerTests.cs" />
     <Compile Include="Support\Template\SingleManagerTests.cs" />
     <Compile Include="Support\Util\ArrTests.cs" />
     <Compile Include="Support\Util\EnumTests.cs" />
     <Compile Include="Support\Util\ReferenceCountTests.cs" />
     <Compile Include="Support\Util\StrTests.cs" />
+    <Compile Include="Support\Util\SystemTimeTests.cs" />
     <Compile Include="Support\VersionTests.cs" />
   </ItemGroup>
   <ItemGroup>

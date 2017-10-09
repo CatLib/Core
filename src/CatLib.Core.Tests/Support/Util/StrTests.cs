@@ -10,6 +10,7 @@
  */
 
 using System;
+using CatLib.Tests;
 #if UNITY_EDITOR || NUNIT
 using NUnit.Framework;
 using TestClass = NUnit.Framework.TestFixtureAttribute;
@@ -42,6 +43,7 @@ namespace CatLib.API.Stl
             Assert.AreEqual(false, Str.Is("path.?+/hello/w*d", @"hellopath.?+/hello/world"));
             Assert.AreEqual(true, Str.Is("path.?+/hello/w*d", @"path.?+/hello/worlddddddddd"));
             Assert.AreEqual(false, Str.Is("path.?+/hello/w*d", @"path.?+/hello/worldddddddddppppp"));
+            Assert.AreEqual(true, Str.Is("hello", "hello"));
         }
 
         [TestMethod]
@@ -163,6 +165,15 @@ namespace CatLib.API.Stl
 
             result = Str.Pad("hello", 10, "worldtest" , Str.PadTypes.Left);
             Assert.AreEqual("worldhello", result);
+
+            result = Str.Pad("hello", 3, "worldtest", Str.PadTypes.Left);
+            Assert.AreEqual("hello", result);
+
+            result = Str.Pad("hello", 10, null, Str.PadTypes.Left);
+            Assert.AreEqual("     hello", result);
+
+            result = Str.Pad("hello", 10, string.Empty, Str.PadTypes.Left);
+            Assert.AreEqual("     hello", result);
         }
 
         [TestMethod]
@@ -186,6 +197,21 @@ namespace CatLib.API.Stl
 
             result = Str.After("helloworld", "world");
             Assert.AreEqual(string.Empty, result);
+        }
+
+        [TestMethod]
+        public void TestNullAfterString()
+        {
+            ExceptionAssert.Throws<ArgumentNullException>(() =>
+            {
+                Str.After(null, "wor");
+            });
+        }
+
+        [TestMethod]
+        public void TestNotFindAfter()
+        {
+            Assert.AreEqual("hello", Str.After("hello", "wor"));
         }
 
         [TestMethod]
@@ -213,6 +239,9 @@ namespace CatLib.API.Stl
         {
             var result = Str.ReplaceFirst("wor", "god", "helloworld,helloworld");
             Assert.AreEqual("hellogodld,helloworld", result);
+
+            result = Str.ReplaceFirst("worddd", "god", "helloworld,helloworld");
+            Assert.AreEqual("helloworld,helloworld", result);
         }
 
         [TestMethod]
@@ -220,6 +249,9 @@ namespace CatLib.API.Stl
         {
             var result = Str.ReplaceLast("wor", "god", "helloworld,helloworld");
             Assert.AreEqual("helloworld,hellogodld", result);
+
+            result = Str.ReplaceLast("worddd", "god", "helloworld,helloworld");
+            Assert.AreEqual("helloworld,helloworld", result);
         }
 
         [TestMethod]
