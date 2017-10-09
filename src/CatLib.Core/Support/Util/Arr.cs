@@ -459,7 +459,8 @@ namespace CatLib
                 var isFinded = true;
                 for (n = 0; n < match.Length; n++)
                 {
-                    if (source[i + n].Equals(match[n]))
+                    if ((i + n) < source.Length &&
+                          source[i + n].Equals(match[n]))
                     {
                         continue;
                     }

@@ -498,6 +498,14 @@ namespace CatLib.Tests.Stl
             });
         }
 
+        [TestMethod]
+        public void TestContainerCallWithNullParams()
+        {
+            var container = MakeContainer();
+            var result = container.Call(this, "TestContainerCall", null);
+            Assert.AreEqual(0, result);
+        }
+
         /// <summary>
         /// 测试无效的传入参数
         /// </summary>
@@ -508,10 +516,12 @@ namespace CatLib.Tests.Stl
             container.Bind<CallTestClassInject>();
             var cls = new CallTestClass();
 
-            var result = container.Call(cls, "GetNumber", "illegal param");
-            Assert.AreEqual(2, result);
+            ExceptionAssert.Throws<InvalidCastException>(() =>
+            {
+                container.Call(cls, "GetNumber", "illegal param");
+            });
 
-            result = container.Call(cls, "GetNumber", null);
+            var result = container.Call(cls, "GetNumber", null);
             Assert.AreEqual(2, result);
         }
         #endregion
@@ -1303,8 +1313,35 @@ namespace CatLib.Tests.Stl
         public void TestBaseStructChangeInvalid()
         {
             var container = new Container();
-            var result = container.Call(this, "TestContainerCall", "100000000000000000000");
-            Assert.AreEqual(0, result);
+
+            var isThrow = false;
+            try
+            {
+                container.Call(this, "TestContainerCall", "100000000000000000000");
+            }
+            catch (OverflowException)
+            {
+                isThrow = true;
+            }
+
+            Assert.AreEqual(true, isThrow);
+        }
+
+        [TestMethod]
+        public void TestFormatException()
+        {
+            var container = new Container();
+
+            var isThrow = false;
+            try
+            {
+                container.Call(this, "TestContainerCall", new ContainerTest());
+            }
+            catch (InvalidCastException)
+            {
+                isThrow = true;
+            }
+            Assert.AreEqual(true, isThrow);
         }
 
         /// <summary>

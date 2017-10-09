@@ -16,6 +16,7 @@ namespace CatLib
     /// <summary>
     /// 断言异常
     /// </summary>
+    [ExcludeFromCodeCoverage]
     public class AssertException : RuntimeException
     {
         /// <summary>
