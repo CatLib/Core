@@ -96,16 +96,6 @@ namespace CatLib
         }
 
         /// <summary>
-        /// 是否是指定事件句柄
-        /// </summary>
-        /// <param name="handler">事件句柄</param>
-        /// <returns>是否是</returns>
-        internal bool Is(Func<object, object> handler)
-        {
-            return handler == this.handler;
-        }
-
-        /// <summary>
         /// 激活事件
         /// </summary>
         /// <param name="payload">载荷</param>
