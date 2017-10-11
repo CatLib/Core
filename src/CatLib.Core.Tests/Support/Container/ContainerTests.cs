@@ -516,7 +516,7 @@ namespace CatLib.Tests.Stl
             container.Bind<CallTestClassInject>();
             var cls = new CallTestClass();
 
-            ExceptionAssert.Throws<InvalidCastException>(() =>
+            ExceptionAssert.Throws<RuntimeException>(() =>
             {
                 container.Call(cls, "GetNumber", "illegal param");
             });
@@ -1319,7 +1319,7 @@ namespace CatLib.Tests.Stl
             {
                 container.Call(this, "TestContainerCall", "100000000000000000000");
             }
-            catch (OverflowException)
+            catch (RuntimeException)
             {
                 isThrow = true;
             }
@@ -1337,7 +1337,7 @@ namespace CatLib.Tests.Stl
             {
                 container.Call(this, "TestContainerCall", new ContainerTest());
             }
-            catch (InvalidCastException)
+            catch (RuntimeException)
             {
                 isThrow = true;
             }

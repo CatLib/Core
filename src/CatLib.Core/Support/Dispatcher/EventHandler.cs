@@ -34,11 +34,6 @@ namespace CatLib
         internal string EventName { get; private set; }
 
         /// <summary>
-        /// 是否使用了通配符
-        /// </summary>
-        internal bool IsWildcard { get; private set; }
-
-        /// <summary>
         /// 调度器
         /// </summary>
         private readonly Dispatcher dispatcher;
@@ -65,8 +60,7 @@ namespace CatLib
         /// <param name="eventName">事件名</param>
         /// <param name="handler">事件句柄</param>
         /// <param name="life">生命次数</param>
-        /// <param name="wildcard">是否使用了通配符</param>
-        internal EventHandler(Dispatcher dispatcher, string eventName, Func<object, object> handler, int life , bool wildcard)
+        internal EventHandler(Dispatcher dispatcher, string eventName, Func<object, object> handler, int life)
         {
             this.dispatcher = dispatcher;
             this.handler = handler;
@@ -74,7 +68,6 @@ namespace CatLib
             EventName = eventName;
             Life = Math.Max(0, life);
             IsLife = true;
-            IsWildcard = wildcard;
 
             isCancel = false;
             count = 0;

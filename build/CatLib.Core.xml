@@ -602,11 +602,6 @@
             注册核心服务
             </summary>
         </member>
-        <member name="M:CatLib.Application.GuardDispatcher">
-            <summary>
-            验证调度器是否有效
-            </summary>
-        </member>
         <member name="T:CatLib.ApplicationEvents">
             <summary>
             应用程序事件
@@ -882,11 +877,6 @@
             事件名
             </summary>
         </member>
-        <member name="P:CatLib.EventHandler.IsWildcard">
-            <summary>
-            是否使用了通配符
-            </summary>
-        </member>
         <member name="F:CatLib.EventHandler.dispatcher">
             <summary>
             调度器
@@ -907,7 +897,7 @@
             调用计数
             </summary>
         </member>
-        <member name="M:CatLib.EventHandler.#ctor(CatLib.Dispatcher,System.String,System.Func{System.Object,System.Object},System.Int32,System.Boolean)">
+        <member name="M:CatLib.EventHandler.#ctor(CatLib.Dispatcher,System.String,System.Func{System.Object,System.Object},System.Int32)">
             <summary>
             创建一个事件句柄
             </summary>
@@ -915,20 +905,12 @@
             <param name="eventName">事件名</param>
             <param name="handler">事件句柄</param>
             <param name="life">生命次数</param>
-            <param name="wildcard">是否使用了通配符</param>
         </member>
         <member name="M:CatLib.EventHandler.Off">
             <summary>
             撤销事件监听
             </summary>
             <returns>是否撤销成功</returns>
-        </member>
-        <member name="M:CatLib.EventHandler.Is(System.Func{System.Object,System.Object})">
-            <summary>
-            是否是指定事件句柄
-            </summary>
-            <param name="handler">事件句柄</param>
-            <returns>是否是</returns>
         </member>
         <member name="M:CatLib.EventHandler.Trigger(System.Object)">
             <summary>
@@ -4323,7 +4305,7 @@
             <summary>
             转为Linux时间戳
             </summary>
-            <param name="time">DateTime</param>
+            <param name="time">DateTime(本地时间)</param>
             <returns>linux时间戳</returns>
         </member>
         <member name="F:CatLib.SystemTime.UtcTime">

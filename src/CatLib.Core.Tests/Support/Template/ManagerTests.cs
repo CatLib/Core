@@ -69,6 +69,18 @@ namespace CatLib.Tests.Stl
         }
 
         [TestMethod]
+        public void TestRepeatExtend()
+        {
+            var cls = new TestManagerClass();
+
+            cls.Extend(() => null, "test");
+            ExceptionAssert.Throws<RuntimeException>(() =>
+            {
+                cls.Extend(() => null, "test");
+            });
+        }
+
+        [TestMethod]
         public void TestGetExtend()
         {
             var cls = new TestManagerClass();

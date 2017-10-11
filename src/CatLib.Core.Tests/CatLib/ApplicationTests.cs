@@ -23,12 +23,79 @@ namespace CatLib.Tests
     [TestClass]
     public class ApplicationTests
     {
+        public class TestBaseServiceProvider : IServiceProvider
+        {
+            /// <summary>
+            /// 服务提供者初始化
+            /// </summary>
+            public void Init()
+            {
+                
+            }
+
+            /// <summary>
+            /// 当注册服务提供者
+            /// </summary>
+            public void Register()
+            {
+                
+            }
+        }
+
+        public class TestServiceProvider : IServiceProvider, IServiceProviderType
+        {
+            /// <summary>
+            /// 提供者基础类型
+            /// </summary>
+            public Type BaseType
+            {
+                get { return typeof(TestBaseServiceProvider); }
+            }
+
+            /// <summary>
+            /// 服务提供者初始化
+            /// </summary>
+            public void Init()
+            {
+                throw new RuntimeException("TestServiceProvider");
+            }
+
+            /// <summary>
+            /// 当注册服务提供者
+            /// </summary>
+            public void Register()
+            {
+
+            }
+        }
+
         [TestMethod]
         public void RepeatInitTest()
         {
             var app = MakeApplication();
 
             app.Init();
+        }
+
+        [TestMethod]
+        public void TestBaseTypeProvider()
+        {
+            var app = new Application();
+            app.Bootstrap();
+            app.Register(new TestServiceProvider());
+
+            RuntimeException ex = null;
+            try
+            {
+                app.Init();
+            }
+            catch (RuntimeException e)
+            {
+                ex = e;
+            }
+
+            Assert.AreNotEqual(null, ex);
+            Assert.AreEqual("TestServiceProvider", ex.Message);
         }
 
         /// <summary>
@@ -53,6 +120,25 @@ namespace CatLib.Tests
         {
             var app = MakeApplication();
             Assert.AreNotEqual(string.Empty, app.Version);
+        }
+
+        [TestMethod]
+        public void MakeAssemblyClass()
+        {
+            var app = new Application();
+            var lru = app.MakeWith<LruCache<string, string>>(10);
+
+            Assert.AreNotEqual(null, lru);
+        }
+
+        [TestMethod]
+        public void TestOn()
+        {
+            var app = new Application();
+            ExceptionAssert.DoesNotThrow(() =>
+            {
+                app.On("hello", (o) => { });
+            });
         }
 
         /// <summary>

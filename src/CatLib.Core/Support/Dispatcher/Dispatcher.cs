@@ -153,7 +153,7 @@ namespace CatLib
             eventName = Normalize(eventName);
 
             var wildcard = eventName.IndexOf("*") != -1;
-            var eventHandler = new EventHandler(this, wildcard ? Str.AsteriskWildcard(eventName) : eventName, handler, life, wildcard);
+            var eventHandler = new EventHandler(this, wildcard ? Str.AsteriskWildcard(eventName) : eventName, handler, life);
 
             lock (syncRoot)
             {

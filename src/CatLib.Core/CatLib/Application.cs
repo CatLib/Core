@@ -282,7 +282,6 @@ namespace CatLib
         /// <returns>事件结果</returns>
         public object[] Trigger(string eventName, object payload = null)
         {
-            GuardDispatcher();
             return Dispatcher.Trigger(eventName, payload);
         }
 
@@ -294,7 +293,6 @@ namespace CatLib
         /// <returns>事件结果</returns>
         public object TriggerHalt(string eventName, object payload = null)
         {
-            GuardDispatcher();
             return Dispatcher.TriggerHalt(eventName, payload);
         }
 
@@ -307,7 +305,6 @@ namespace CatLib
         /// <returns>事件句柄</returns>
         public IEventHandler On(string eventName, Action<object> handler, int life = 0)
         {
-            GuardDispatcher();
             return Dispatcher.On(eventName, handler, life);
         }
 
@@ -320,7 +317,6 @@ namespace CatLib
         /// <returns>事件句柄</returns>
         public IEventHandler Listen(string eventName, Func<object, object> handler, int life = 0)
         {
-            GuardDispatcher();
             return Dispatcher.Listen(eventName, handler, life);
         }
 
@@ -401,17 +397,6 @@ namespace CatLib
         private void RegisterCoreService()
         {
             this.Singleton<Dispatcher>().Alias<IDispatcher>();
-        }
-
-        /// <summary>
-        /// 验证调度器是否有效
-        /// </summary>
-        private void GuardDispatcher()
-        {
-            if (Dispatcher == null)
-            {
-                throw new RuntimeException("You need register EventsProvider to supported dispatcher");
-            }
         }
     }
 }
