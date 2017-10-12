@@ -59,7 +59,7 @@ namespace CatLib
         /// 类型查询回调
         /// 当类型无法被解决时会尝试去开发者提供的查询器中查询类型
         /// </summary>
-        private readonly SortSet<Func<string, Type> , int> findType;
+        private readonly SortSet<Func<string, Type>, int> findType;
 
         /// <summary>
         /// 同步锁
@@ -519,7 +519,7 @@ namespace CatLib
         /// <param name="finder">查找类型的回调</param>
         /// <param name="priority">查询优先级(值越小越优先)</param>
         /// <returns>当前容器实例</returns>
-        public IContainer OnFindType(Func<string, Type> finder , int priority = int.MaxValue)
+        public IContainer OnFindType(Func<string, Type> finder, int priority = int.MaxValue)
         {
             Guard.NotNull(finder, "finder");
             lock (syncRoot)
@@ -677,8 +677,8 @@ namespace CatLib
         /// <returns>服务实例</returns>
         private object BuildUseConcrete(BindData makeServiceBindData, Type makeServiceType, object[] param)
         {
-            return makeServiceBindData.Concrete != null ? 
-                makeServiceBindData.Concrete(this, param) : 
+            return makeServiceBindData.Concrete != null ?
+                makeServiceBindData.Concrete(this, param) :
                 BuildMake(makeServiceBindData.Service, makeServiceType, false, param);
         }
 
@@ -828,24 +828,18 @@ namespace CatLib
                         continue;
                     }
 
-                    // 这里我们非常明确如果能够被ChangeType那么应用ChangeType出来的值
-                    // 如果不行则尝试从容器中进行查找可以被注入的类型，所以我们拦截了
-                    // 可能出现的异常。
-                    // 这里的转换只用于基础数据类型转换
                     try
                     {
                         myParam.Add(Convert.ChangeType(param[i], info.ParameterType));
-                        continue;
                     }
-                    catch (InvalidCastException)
+                    catch (Exception ex)
                     {
+                        throw new RuntimeException(
+                            string.Format("Params [{0}({1})] can not convert to [{2}] , Service [{3}]",
+                                info.Name, param[i], info.ParameterType, makeServiceBindData.Service
+                            ), ex);
                     }
-                    catch (FormatException)
-                    {
-                    }
-                    catch (OverflowException)
-                    {
-                    }
+                    continue;
                 }
 
                 var needService = Type2Service(info.ParameterType);

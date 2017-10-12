@@ -411,6 +411,14 @@ namespace CatLib.Tests.Support.Util
         }
 
         [TestMethod]
+        public void TestReduceNull()
+        {
+            var result = Arr.Reduce(new[] { "a", "b", "c" }, (v1, v2) => null, "hello");
+
+            Assert.AreEqual(null, result);
+        }
+
+        [TestMethod]
         public void TestSlice()
         {
             var result = Arr.Slice(new[] { "a", "b", "c" }, 1, -1);
@@ -474,6 +482,39 @@ namespace CatLib.Tests.Support.Util
             Assert.AreEqual("c", data[2]);
             Assert.AreEqual("d", data[3]);
             Assert.AreEqual("e", data[4]);
+        }
+
+        [TestMethod]
+        public void TestIndexOf()
+        {
+            var data = new[] { 'a', 'b', 'c', 'd', 'e' };
+            var result = Arr.IndexOf(data, new[] { 'c', 'd' });
+
+            Assert.AreEqual(2, result);
+        }
+
+        [TestMethod]
+        public void TestIndexOfString()
+        {
+            var data = new[] { "a", "b", "c", "d", "e" };
+            var result = Arr.IndexOf(data, new[] { "d", "e" });
+
+            Assert.AreEqual(3, result);
+        }
+
+        [TestMethod]
+        public void TestIndexOfNull()
+        {
+            Assert.AreEqual(-1, Arr.IndexOf(null, new[] {"d", "e"}));
+        }
+
+        [TestMethod]
+        public void TestIndexNotFind()
+        {
+            var data = new[] { "a", "b", "c", "d", "e" };
+            var result = Arr.IndexOf(data, new[] { "e", "d" });
+
+            Assert.AreEqual(-1, result);
         }
     }
 }

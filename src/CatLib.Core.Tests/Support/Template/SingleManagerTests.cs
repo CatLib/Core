@@ -56,7 +56,7 @@ namespace CatLib.Tests.Stl
             var manager = new TestManager();
             manager.Extend(() => new InterfaceImpl());
             var manager2 = manager as Manager<ITestInterface>;
-            Assert.AreNotSame(manager.Default, manager2.Get());
+            Assert.AreNotSame(manager.Default, manager2[null]);
         }
 
         [TestMethod]

@@ -85,5 +85,21 @@ namespace CatLib.Tests.Support.Util
             Assert.AreEqual(true, TestEnums.Hello != null);
             Assert.AreEqual(true, null != TestEnums.Hello);
         }
+
+        [TestMethod]
+        public void TestGetHashCode()
+        {
+            Assert.AreEqual(true, TestEnums.Hello.GetHashCode() == TestEnums.Hello.GetHashCode());
+            Assert.AreEqual(true, TestEnums.Hello.GetHashCode() != TestEnums2.Hello.GetHashCode());
+        }
+
+        [TestMethod]
+        public void TestToString()
+        {
+            if ("hello" != TestEnums.Hello)
+            {
+                Assert.Fail();
+            }
+        }
     }
 }

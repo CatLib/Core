@@ -9,12 +9,11 @@
  * Document: http://catlib.io/
  */
 
-using CatLib.API.Events;
 using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
-namespace CatLib.Events
+namespace CatLib
 {
     /// <summary>
     /// 事件调度器
@@ -154,7 +153,7 @@ namespace CatLib.Events
             eventName = Normalize(eventName);
 
             var wildcard = eventName.IndexOf("*") != -1;
-            var eventHandler = new EventHandler(this, wildcard ? Str.AsteriskWildcard(eventName) : eventName, handler, life, wildcard);
+            var eventHandler = new EventHandler(this, wildcard ? Str.AsteriskWildcard(eventName) : eventName, handler, life);
 
             lock (syncRoot)
             {

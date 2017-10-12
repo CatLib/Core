@@ -17,13 +17,18 @@ namespace CatLib
     public sealed class ApplicationEvents
     {
         /// <summary>
+        /// 当引导完成时
+        /// </summary>
+        public static readonly string OnBootstraped = "CatLib.ApplicationEvents.OnBootstraped";
+
+        /// <summary>
         /// 当初始化进行时
         /// </summary>
-        public static readonly string OnIniting = "CatLib.Application.OnIniting";
+        public static readonly string OnIniting = "CatLib.ApplicationEvents.OnIniting";
 
         /// <summary>
         /// 当程序启动完成
         /// </summary>
-        public static readonly string OnStartCompleted = "CatLib.Application.OnStartCompleted";
+        public static readonly string OnStartCompleted = "CatLib.ApplicationEvents.OnStartCompleted";
     }
 }

@@ -10,9 +10,8 @@
  */
 
 using System;
-using IEventHandler = CatLib.API.Events.IEventHandler;
 
-namespace CatLib.Events
+namespace CatLib
 {
     /// <summary>
     /// 事件句柄
@@ -33,11 +32,6 @@ namespace CatLib.Events
         /// 事件名
         /// </summary>
         internal string EventName { get; private set; }
-
-        /// <summary>
-        /// 是否使用了通配符
-        /// </summary>
-        internal bool IsWildcard { get; private set; }
 
         /// <summary>
         /// 调度器
@@ -66,8 +60,7 @@ namespace CatLib.Events
         /// <param name="eventName">事件名</param>
         /// <param name="handler">事件句柄</param>
         /// <param name="life">生命次数</param>
-        /// <param name="wildcard">是否使用了通配符</param>
-        internal EventHandler(Dispatcher dispatcher, string eventName, Func<object, object> handler, int life , bool wildcard)
+        internal EventHandler(Dispatcher dispatcher, string eventName, Func<object, object> handler, int life)
         {
             this.dispatcher = dispatcher;
             this.handler = handler;
@@ -75,7 +68,6 @@ namespace CatLib.Events
             EventName = eventName;
             Life = Math.Max(0, life);
             IsLife = true;
-            IsWildcard = wildcard;
 
             isCancel = false;
             count = 0;
@@ -94,16 +86,6 @@ namespace CatLib.Events
 
             dispatcher.Off(this);
             isCancel = true;
-        }
-
-        /// <summary>
-        /// 是否是指定事件句柄
-        /// </summary>
-        /// <param name="handler">事件句柄</param>
-        /// <returns>是否是</returns>
-        internal bool Is(Func<object, object> handler)
-        {
-            return handler == this.handler;
         }
 
         /// <summary>

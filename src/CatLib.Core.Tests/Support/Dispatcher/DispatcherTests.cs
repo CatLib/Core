@@ -9,8 +9,6 @@
  * Document: http://catlib.io/
  */
 
-using CatLib.API.Events;
-using CatLib.Events;
 #if UNITY_EDITOR || NUNIT
 using NUnit.Framework;
 using TestClass = NUnit.Framework.TestFixtureAttribute;
@@ -22,7 +20,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace CatLib.Tests.Events
 {
     [TestClass]
-    public class EventsProviderTests
+    public class DispatcherTests
     {
         /// <summary>
         /// 生成测试环境
@@ -33,7 +31,6 @@ namespace CatLib.Tests.Events
             var app = new Application();
 
             app.Bootstrap();
-            app.Register(new EventsProvider());
             app.Init();
 
             return app;

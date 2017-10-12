@@ -100,6 +100,29 @@ namespace CatLib.Tests
             Assert.AreSame(obj, obj2);
         }
 
+        [TestMethod]
+        public void TestInstance()
+        {
+            var container = MakeContainer();
+            var obj = new TestClassService();
+            container.Instance<TestClassService>(obj);
+
+            Assert.AreSame(obj, container.Make<TestClassService>());
+        }
+
+        [TestMethod]
+        public void TestRelease()
+        {
+            var container = MakeContainer();
+            var obj = new TestClassService();
+            container.Instance<TestClassService>(obj);
+
+            Assert.AreSame(obj, container.Make<TestClassService>());
+            container.Release<TestClassService>();
+            // 因为被释放后容器会容器会自动推测出所需类的实例
+            Assert.AreNotSame(obj, container.Make<TestClassService>());
+        }
+
         /// <summary>
         /// 生成容器
         /// </summary>

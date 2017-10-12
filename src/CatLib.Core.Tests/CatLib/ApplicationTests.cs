@@ -10,7 +10,6 @@
  */
 
 using System;
-using CatLib.Events;
 #if UNITY_EDITOR || NUNIT
 using NUnit.Framework;
 using TestClass = NUnit.Framework.TestFixtureAttribute;
@@ -24,12 +23,79 @@ namespace CatLib.Tests
     [TestClass]
     public class ApplicationTests
     {
+        public class TestBaseServiceProvider : IServiceProvider
+        {
+            /// <summary>
+            /// 服务提供者初始化
+            /// </summary>
+            public void Init()
+            {
+                
+            }
+
+            /// <summary>
+            /// 当注册服务提供者
+            /// </summary>
+            public void Register()
+            {
+                
+            }
+        }
+
+        public class TestServiceProvider : IServiceProvider, IServiceProviderType
+        {
+            /// <summary>
+            /// 提供者基础类型
+            /// </summary>
+            public Type BaseType
+            {
+                get { return typeof(TestBaseServiceProvider); }
+            }
+
+            /// <summary>
+            /// 服务提供者初始化
+            /// </summary>
+            public void Init()
+            {
+                throw new RuntimeException("TestServiceProvider");
+            }
+
+            /// <summary>
+            /// 当注册服务提供者
+            /// </summary>
+            public void Register()
+            {
+
+            }
+        }
+
         [TestMethod]
         public void RepeatInitTest()
         {
             var app = MakeApplication();
 
             app.Init();
+        }
+
+        [TestMethod]
+        public void TestBaseTypeProvider()
+        {
+            var app = new Application();
+            app.Bootstrap();
+            app.Register(new TestServiceProvider());
+
+            RuntimeException ex = null;
+            try
+            {
+                app.Init();
+            }
+            catch (RuntimeException e)
+            {
+                ex = e;
+            }
+
+            Assert.AreNotEqual(null, ex);
+            Assert.AreEqual("TestServiceProvider", ex.Message);
         }
 
         /// <summary>
@@ -56,6 +122,25 @@ namespace CatLib.Tests
             Assert.AreNotEqual(string.Empty, app.Version);
         }
 
+        [TestMethod]
+        public void MakeAssemblyClass()
+        {
+            var app = new Application();
+            var lru = app.MakeWith<LruCache<string, string>>(10);
+
+            Assert.AreNotEqual(null, lru);
+        }
+
+        [TestMethod]
+        public void TestOn()
+        {
+            var app = new Application();
+            ExceptionAssert.DoesNotThrow(() =>
+            {
+                app.On("hello", (o) => { });
+            });
+        }
+
         /// <summary>
         /// 获取当前启动流程
         /// </summary>
@@ -74,7 +159,6 @@ namespace CatLib.Tests
         {
             var app = new Application();
             app.Bootstrap();
-            App.Register(new EventsProvider());
             app.Init();
             app.Bootstrap();
             Assert.AreEqual(Application.StartProcess.Inited, app.Process);
@@ -101,10 +185,11 @@ namespace CatLib.Tests
         public void RepeatRegister()
         {
             var app = MakeApplication();
+            app.Register(new ProviderTest1());
 
             ExceptionAssert.Throws<RuntimeException>(() =>
             {
-                app.Register(new EventsProvider());
+                app.Register(new ProviderTest1());
             });
         }
 
@@ -162,7 +247,6 @@ namespace CatLib.Tests
             app.Bootstrap();
             App.Register(new ProviderTest1());
             App.Register(new ProviderTest2());
-            App.Register(new EventsProvider());
             app.Init();
             Assert.AreEqual(true, prioritiesTest);
         }
@@ -195,7 +279,6 @@ namespace CatLib.Tests
             });
             app.Bootstrap();
             App.Register(new ProviderTest1());
-            App.Register(new EventsProvider());
             app.Init();
 
             App.Register(new ProviderTest2());
@@ -258,7 +341,6 @@ namespace CatLib.Tests
         {
             public void Bootstrap()
             {
-                App.Register(new EventsProvider());
             }
         }
     }
