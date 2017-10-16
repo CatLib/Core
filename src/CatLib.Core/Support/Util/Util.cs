@@ -51,9 +51,9 @@ namespace CatLib
         /// </summary>
         /// <param name="seed">种子</param>
         /// <returns>随机生成器</returns>
-        public static Random MakeRandom(int? seed = null)
+        public static System.Random MakeRandom(int? seed = null)
         {
-            return new Random(seed.GetValueOrDefault(MakeSeed()));
+            return new System.Random(seed.GetValueOrDefault(MakeSeed()));
         }
 
         /// <summary>
