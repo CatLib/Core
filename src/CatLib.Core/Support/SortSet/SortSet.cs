@@ -13,7 +13,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
-using Random = System.Random;
 
 namespace CatLib
 {
@@ -221,7 +220,7 @@ namespace CatLib
         /// <summary>
         /// 随机数发生器
         /// </summary>
-        private readonly Random random = new Random();
+        private readonly System.Random random = new System.Random();
 
         /// <summary>
         /// 有序集的基数

@@ -11,13 +11,8 @@
 
 using System;
 using System.Collections.Generic;
-#if UNITY_EDITOR || NUNIT
-using NUnit.Framework;
-using TestClass = NUnit.Framework.TestFixtureAttribute;
-using TestMethod = NUnit.Framework.TestAttribute;
-#else
+using System.Reflection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-#endif
 
 namespace CatLib.Tests.Stl
 {
@@ -1342,6 +1337,57 @@ namespace CatLib.Tests.Stl
                 isThrow = true;
             }
             Assert.AreEqual(true, isThrow);
+        }
+
+        internal class TestNoConstructorAccessClass
+        {
+            private TestNoConstructorAccessClass() { }
+        }
+
+        [TestMethod]
+        public void TestNoConstructorAccessClassFunction()
+        {
+            var container = MakeContainer();
+            container.Singleton<TestNoConstructorAccessClass>();
+
+            var isThrow = false;
+            try
+            {
+                container.Make<TestNoConstructorAccessClass>();
+            }catch(RuntimeException ex)
+            {
+                isThrow = ex.InnerException.GetType() == typeof(MissingMethodException);
+            }
+            Assert.AreEqual(true, isThrow);
+        }
+
+        internal class TestConstructorExceptionClass
+        {
+            public TestConstructorExceptionClass()
+            {
+                throw new Exception("TestConstructorExceptionClass");
+            }
+        }
+
+        [TestMethod]
+        public void TestConstructorExceptionFunction()
+        {
+            var container = MakeContainer();
+            container.Singleton<TestConstructorExceptionClass>();
+
+            var isThrow = false;
+            var isException = false;
+            try
+            {
+                container.Make<TestConstructorExceptionClass>();
+            }
+            catch (RuntimeException ex)
+            {
+                isThrow = ex.InnerException.GetType() == typeof(TargetInvocationException);
+                isException = ex.InnerException.InnerException.Message == "TestConstructorExceptionClass";
+            }
+            Assert.AreEqual(true, isThrow);
+            Assert.AreEqual(true, isException);
         }
 
         /// <summary>

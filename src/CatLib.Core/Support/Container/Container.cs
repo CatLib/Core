@@ -706,7 +706,14 @@ namespace CatLib
             var constructor = makeServiceType.GetConstructors();
             if (constructor.Length <= 0)
             {
-                return Activator.CreateInstance(makeServiceType);
+                try
+                {
+                    return Activator.CreateInstance(makeServiceType);
+                }
+                catch (Exception ex)
+                {
+                    throw ThrowBuildFaild(makeServiceType, ex);
+                }
             }
 
             var parameter = new List<ParameterInfo>(constructor[constructor.Length - 1].GetParameters());
@@ -716,7 +723,25 @@ namespace CatLib
                 param = GetDependencies(makeServiceBindData, parameter, param);
             }
 
-            return Activator.CreateInstance(makeServiceType, param);
+            try
+            {
+                return Activator.CreateInstance(makeServiceType, param);
+            }
+            catch (Exception ex)
+            {
+                throw ThrowBuildFaild(makeServiceType, ex);
+            }
+        }
+
+        /// <summary>
+        /// 触发编译异常
+        /// </summary>
+        /// <param name="makeServiceType">构造的服务类型</param>
+        /// <param name="ex">异常</param>
+        /// <returns>运行时异常</returns>
+        private RuntimeException ThrowBuildFaild(Type makeServiceType, Exception ex)
+        {
+            return new RuntimeException("Build [" + makeServiceType + "] faild", ex);
         }
 
         /// <summary>
