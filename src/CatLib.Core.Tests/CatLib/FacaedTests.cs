@@ -10,14 +10,7 @@
  */
 
 using System;
-
-#if UNITY_EDITOR || NUNIT
-using NUnit.Framework;
-using TestClass = NUnit.Framework.TestFixtureAttribute;
-using TestMethod = NUnit.Framework.TestAttribute;
-#else
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-#endif
 
 namespace CatLib.Tests
 {
@@ -62,12 +55,10 @@ namespace CatLib.Tests
         {
             App.Handler = null;
 
-#if !UNITY_EDITOR
             ExceptionAssert.Throws<NullReferenceException>(() =>
             {
                 var f = TestClassFacaed.Instance;
             });
-#endif
         }
     }
 }
