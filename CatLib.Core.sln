@@ -1,13 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26430.16
+VisualStudioVersion = 15.0.26430.13
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CatLib.Core", "src\CatLib.Core\CatLib.Core.csproj", "{4204658E-81FD-4106-A347-890CD369C8A4}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CatLib.Core.Tests", "src\CatLib.Core.Tests\CatLib.Core.Tests.csproj", "{3C9F4024-910C-4881-A04D-34A6C3A09019}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CatLib.Core.NetStandard", "src\CatLib.Core\CatLib.Core.NetStandard.csproj", "{2C230A63-D06D-44CB-8735-4E033A5A2B75}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CatLib.Core.NetStandard", "src\CatLib.Core.NetStandard\CatLib.Core.NetStandard.csproj", "{2C230A63-D06D-44CB-8735-4E033A5A2B75}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

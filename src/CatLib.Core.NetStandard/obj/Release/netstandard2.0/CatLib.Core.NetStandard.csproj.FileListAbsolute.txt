@@ -1,0 +1,7 @@
+D:\Private\CatLib.Core\build\NetStandard2.0\netstandard2.0\CatLib.Core.deps.json
+D:\Private\CatLib.Core\build\NetStandard2.0\netstandard2.0\CatLib.Core.dll
+D:\Private\CatLib.Core\build\NetStandard2.0\netstandard2.0\CatLib.Core.pdb
+D:\Private\CatLib.Core\build\NetStandard2.0\netstandard2.0\CatLib.Core.xml
+D:\Private\CatLib.Core\src\CatLib.Core.NetStandard\obj\Release\netstandard2.0\CatLib.Core.NetStandard.AssemblyInfo.cs
+D:\Private\CatLib.Core\src\CatLib.Core.NetStandard\obj\Release\netstandard2.0\CatLib.Core.dll
+D:\Private\CatLib.Core\src\CatLib.Core.NetStandard\obj\Release\netstandard2.0\CatLib.Core.pdb
