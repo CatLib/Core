@@ -11,15 +11,7 @@
 
 using System;
 using CatLib.Tests;
-#if UNITY_EDITOR || NUNIT
-using NUnit.Framework;
-using TestClass = NUnit.Framework.TestFixtureAttribute;
-using TestMethod = NUnit.Framework.TestAttribute;
-using TestInitialize = NUnit.Framework.SetUpAttribute;
-using TestCleanup = NUnit.Framework.TearDownAttribute;
-#else
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-#endif
 
 namespace CatLib.API.Stl
 {

@@ -1,0 +1,99 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <Version>1.1.1</Version>
+    <Company>CatLib</Company>
+    <Authors>CatLib</Authors>
+    <Description>CatLib Core</Description>
+    <Copyright>Copyright © CatLib 2017</Copyright>
+    <AssemblyName>CatLib.Core</AssemblyName>
+    <RootNamespace>CatLib.Core</RootNamespace>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageId>CatLib.Core.NetStandard</PackageId>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <OutputPath>..\..\build\NetStandard2.0\</OutputPath>
+    <DocumentationFile>..\..\build\NetStandard2.0\netstandard2.0\CatLib.Core.xml</DocumentationFile>
+    <DefineConstants>TRACE;RELEASE;NETSTANDARD2_0;CATLIB;RELEASE;NETSTANDARD2_0</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DefineConstants>TRACE;DEBUG;NETSTANDARD2_0;CATLIB;</DefineConstants>
+    <DocumentationFile></DocumentationFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="..\CatLib.Core\Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="..\CatLib.Core\CatLib\App.cs" Link="CatLib\App.cs" />
+    <Compile Include="..\CatLib.Core\CatLib\Application.cs" Link="CatLib\Application.cs" />
+    <Compile Include="..\CatLib.Core\CatLib\ApplicationEvents.cs" Link="CatLib\ApplicationEvents.cs" />
+    <Compile Include="..\CatLib.Core\CatLib\DebugLevels.cs" Link="CatLib\DebugLevels.cs" />
+    <Compile Include="..\CatLib.Core\CatLib\Facade.cs" Link="CatLib\Facade.cs" />
+    <Compile Include="..\CatLib.Core\CatLib\IApplication.cs" Link="CatLib\IApplication.cs" />
+    <Compile Include="..\CatLib.Core\CatLib\IBootstrap.cs" Link="CatLib\IBootstrap.cs" />
+    <Compile Include="..\CatLib.Core\CatLib\IServiceProvider.cs" Link="CatLib\IServiceProvider.cs" />
+    <Compile Include="..\CatLib.Core\CatLib\IServiceProviderType.cs" Link="CatLib\IServiceProviderType.cs" />
+    <Compile Include="..\CatLib.Core\Support\Attribute\ExcludeFromCodeCoverageAttribute.cs" Link="Support\Attribute\ExcludeFromCodeCoverageAttribute.cs" />
+    <Compile Include="..\CatLib.Core\Support\Attribute\PriorityAttribute.cs" Link="Support\Attribute\PriorityAttribute.cs" />
+    <Compile Include="..\CatLib.Core\Support\Container\BindData.cs" Link="Support\Container\BindData.cs" />
+    <Compile Include="..\CatLib.Core\Support\Container\Container.cs" Link="Support\Container\Container.cs" />
+    <Compile Include="..\CatLib.Core\Support\Container\ContainerExtend.cs" Link="Support\Container\ContainerExtend.cs" />
+    <Compile Include="..\CatLib.Core\Support\Container\GivenData.cs" Link="Support\Container\GivenData.cs" />
+    <Compile Include="..\CatLib.Core\Support\Container\IContainer.cs" Link="Support\Container\IContainer.cs" />
+    <Compile Include="..\CatLib.Core\Support\Container\InjectAttribute.cs" Link="Support\Container\InjectAttribute.cs" />
+    <Compile Include="..\CatLib.Core\Support\Container\Internal\IBindData.cs" Link="Support\Container\Internal\IBindData.cs" />
+    <Compile Include="..\CatLib.Core\Support\Container\Internal\IGivenData.cs" Link="Support\Container\Internal\IGivenData.cs" />
+    <Compile Include="..\CatLib.Core\Support\Dispatcher\Dispatcher.cs" Link="Support\Dispatcher\Dispatcher.cs" />
+    <Compile Include="..\CatLib.Core\Support\Dispatcher\EventHandler.cs" Link="Support\Dispatcher\EventHandler.cs" />
+    <Compile Include="..\CatLib.Core\Support\Dispatcher\IDispatcher.cs" Link="Support\Dispatcher\IDispatcher.cs" />
+    <Compile Include="..\CatLib.Core\Support\Dispatcher\IEventHandler.cs" Link="Support\Dispatcher\IEventHandler.cs" />
+    <Compile Include="..\CatLib.Core\Support\Exception\AssertException.cs" Link="Support\Exception\AssertException.cs" />
+    <Compile Include="..\CatLib.Core\Support\Exception\RuntimeException.cs" Link="Support\Exception\RuntimeException.cs" />
+    <Compile Include="..\CatLib.Core\Support\FilterChain\FilterChain.cs" Link="Support\FilterChain\FilterChain.cs" />
+    <Compile Include="..\CatLib.Core\Support\FilterChain\IFilterChain.cs" Link="Support\FilterChain\IFilterChain.cs" />
+    <Compile Include="..\CatLib.Core\Support\Guard\Guard.cs" Link="Support\Guard\Guard.cs" />
+    <Compile Include="..\CatLib.Core\Support\LruCache\CacheNode.cs" Link="Support\LruCache\CacheNode.cs" />
+    <Compile Include="..\CatLib.Core\Support\LruCache\ILruCache.cs" Link="Support\LruCache\ILruCache.cs" />
+    <Compile Include="..\CatLib.Core\Support\LruCache\LruCache.cs" Link="Support\LruCache\LruCache.cs" />
+    <Compile Include="..\CatLib.Core\Support\QuickList\InternalList.cs" Link="Support\QuickList\InternalList.cs" />
+    <Compile Include="..\CatLib.Core\Support\QuickList\IQuickList.cs" Link="Support\QuickList\IQuickList.cs" />
+    <Compile Include="..\CatLib.Core\Support\QuickList\QuickList.cs" Link="Support\QuickList\QuickList.cs" />
+    <Compile Include="..\CatLib.Core\Support\SortSet\ISortSet.cs" Link="Support\SortSet\ISortSet.cs" />
+    <Compile Include="..\CatLib.Core\Support\SortSet\SortSet.cs" Link="Support\SortSet\SortSet.cs" />
+    <Compile Include="..\CatLib.Core\Support\Template\IManager.cs" Link="Support\Template\IManager.cs" />
+    <Compile Include="..\CatLib.Core\Support\Template\ISingleManager.cs" Link="Support\Template\ISingleManager.cs" />
+    <Compile Include="..\CatLib.Core\Support\Template\Manager.cs" Link="Support\Template\Manager.cs" />
+    <Compile Include="..\CatLib.Core\Support\Template\SingleManager.cs" Link="Support\Template\SingleManager.cs" />
+    <Compile Include="..\CatLib.Core\Support\Util\Arr.cs" Link="Support\Util\Arr.cs" />
+    <Compile Include="..\CatLib.Core\Support\Util\Enum.cs" Link="Support\Util\Enum.cs" />
+    <Compile Include="..\CatLib.Core\Support\Util\IAwait.cs" Link="Support\Util\IAwait.cs" />
+    <Compile Include="..\CatLib.Core\Support\Util\IReferenceCount.cs" Link="Support\Util\IReferenceCount.cs" />
+    <Compile Include="..\CatLib.Core\Support\Util\ReferenceCount.cs" Link="Support\Util\ReferenceCount.cs" />
+    <Compile Include="..\CatLib.Core\Support\Util\Str.cs" Link="Support\Util\Str.cs" />
+    <Compile Include="..\CatLib.Core\Support\Util\SystemTime.cs" Link="Support\Util\SystemTime.cs" />
+    <Compile Include="..\CatLib.Core\Support\Util\Util.cs" Link="Support\Util\Util.cs" />
+    <Compile Include="..\CatLib.Core\Support\Util\Version.cs" Link="Support\Util\Version.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="..\CatLib.Core\Properties\" />
+    <Folder Include="CatLib\" />
+    <Folder Include="Support\Attribute\" />
+    <Folder Include="Support\Container\Internal\" />
+    <Folder Include="Support\Dispatcher\" />
+    <Folder Include="Support\Exception\" />
+    <Folder Include="Support\FilterChain\" />
+    <Folder Include="Support\Guard\" />
+    <Folder Include="Support\LruCache\" />
+    <Folder Include="Support\QuickList\" />
+    <Folder Include="Support\SortSet\" />
+    <Folder Include="Support\Template\" />
+    <Folder Include="Support\Util\" />
+  </ItemGroup>
+
+</Project>
