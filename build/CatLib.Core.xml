@@ -9,6 +9,11 @@
             CatLib实例
             </summary>
         </member>
+        <member name="E:CatLib.App.OnNewApplication">
+            <summary>
+            当新建Application时
+            </summary>
+        </member>
         <member name="F:CatLib.App.instance">
             <summary>
             CatLib实例
