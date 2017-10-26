@@ -46,19 +46,5 @@ namespace CatLib.Tests
             //double run
             Assert.AreEqual(obj, TestClassFacaed.Instance);
         }
-
-        /// <summary>
-        /// 无Application支持下测试
-        /// </summary>
-        [TestMethod]
-        public void NullApplicationFacadeTest()
-        {
-            App.Handler = null;
-
-            ExceptionAssert.Throws<NullReferenceException>(() =>
-            {
-                var f = TestClassFacaed.Instance;
-            });
-        }
     }
 }
