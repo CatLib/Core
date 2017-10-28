@@ -43,29 +43,11 @@ namespace CatLib.Tests.Stl
         }
 
         [TestMethod]
-        public void TestCoverToManagerGet()
-        {
-            var manager = new TestManager();
-            manager.Extend(() => new InterfaceImpl());
-            var manager2 = manager as Manager<ITestInterface>;
-            Assert.AreNotSame(manager.Default, manager2[null]);
-        }
-
-        [TestMethod]
         public void TestCoverToSingleManagerGet()
         {
             var manager = new TestManager();
             manager.Extend(() => new InterfaceImpl());
             var manager2 = manager as SingleManager<ITestInterface>;
-            Assert.AreSame(manager.Default, manager2.Get());
-        }
-
-        [TestMethod]
-        public void TestCoverToInterfaceManagerGet()
-        {
-            var manager = new TestManager();
-            manager.Extend(() => new InterfaceImpl());
-            var manager2 = manager as IManager<ITestInterface>;
             Assert.AreSame(manager.Default, manager2.Get());
         }
 

@@ -73,9 +73,13 @@
     <Compile Include="Support\QuickList\QuickList.cs" />
     <Compile Include="Support\SortSet\ISortSet.cs" />
     <Compile Include="Support\SortSet\SortSet.cs" />
+    <Compile Include="Support\Template\IManaged.cs" />
     <Compile Include="Support\Template\IManager.cs" />
+    <Compile Include="Support\Template\ISingleManaged.cs" />
     <Compile Include="Support\Template\ISingleManager.cs" />
+    <Compile Include="Support\Template\Managed.cs" />
     <Compile Include="Support\Template\Manager.cs" />
+    <Compile Include="Support\Template\SingleManaged.cs" />
     <Compile Include="Support\Template\SingleManager.cs" />
     <Compile Include="Support\Util\Arr.cs" />
     <Compile Include="Support\Util\Enum.cs" />

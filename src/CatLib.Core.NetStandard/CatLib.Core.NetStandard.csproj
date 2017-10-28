@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <Version>1.1.2</Version>
+    <Version>1.1.3</Version>
     <Company>CatLib</Company>
     <Authors>CatLib</Authors>
     <Description>- CatLib是渐进式的框架，可以无缝和现有框架融合。无论您的项目处于哪个阶段您都可以轻易的接入CatLib。
@@ -28,23 +28,10 @@
     <RepositoryUrl>https://github.com/CatLib/Core</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageTags>CatLib,Framework</PackageTags>
-    <PackageReleaseNotes>开发者体验改善:
-
-- 错误提示对开发者更加友好和直观
-
-- 更加完善的单元测试覆盖
-
-
-
-Bug修复:
-
-- 兼容合并源码时会导致的类型错误
-
-
-
-其他调整:
-
-- 移除了NUnit的单元测试支持</PackageReleaseNotes>
+    <PackageReleaseNotes>- 增加了新的模版方法：Managed 和 SingleManaged 用于扩展不对外开放的管理器。
+- App增加OnNewApplication事件
+- 已过时了一些接口并提供了相应替换方案。
+- 一些内部bug的修正</PackageReleaseNotes>
     <PackageLicenseUrl>https://github.com/CatLib/Core/blob/master/LICENSE</PackageLicenseUrl>
     <NeutralLanguage>zh</NeutralLanguage>
   </PropertyGroup>
@@ -101,9 +88,13 @@ Bug修复:
     <Compile Include="..\CatLib.Core\Support\QuickList\QuickList.cs" Link="Support\QuickList\QuickList.cs" />
     <Compile Include="..\CatLib.Core\Support\SortSet\ISortSet.cs" Link="Support\SortSet\ISortSet.cs" />
     <Compile Include="..\CatLib.Core\Support\SortSet\SortSet.cs" Link="Support\SortSet\SortSet.cs" />
+    <Compile Include="..\CatLib.Core\Support\Template\IManaged.cs" Link="Support\Template\IManaged.cs" />
     <Compile Include="..\CatLib.Core\Support\Template\IManager.cs" Link="Support\Template\IManager.cs" />
+    <Compile Include="..\CatLib.Core\Support\Template\ISingleManaged.cs" Link="Support\Template\ISingleManaged.cs" />
     <Compile Include="..\CatLib.Core\Support\Template\ISingleManager.cs" Link="Support\Template\ISingleManager.cs" />
+    <Compile Include="..\CatLib.Core\Support\Template\Managed.cs" Link="Support\Template\Managed.cs" />
     <Compile Include="..\CatLib.Core\Support\Template\Manager.cs" Link="Support\Template\Manager.cs" />
+    <Compile Include="..\CatLib.Core\Support\Template\SingleManaged.cs" Link="Support\Template\SingleManaged.cs" />
     <Compile Include="..\CatLib.Core\Support\Template\SingleManager.cs" Link="Support\Template\SingleManager.cs" />
     <Compile Include="..\CatLib.Core\Support\Util\Arr.cs" Link="Support\Util\Arr.cs" />
     <Compile Include="..\CatLib.Core\Support\Util\Enum.cs" Link="Support\Util\Enum.cs" />
