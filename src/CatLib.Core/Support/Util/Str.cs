@@ -418,14 +418,13 @@ namespace CatLib
             {
                 if (separatorRegex.IsMatch(result))
                 {
-                    if (!separatorRegex.RightToLeft)
-                    {
-                        separatorRegex = new Regex(separatorRegex.ToString(), separatorRegex.Options | RegexOptions.RightToLeft);
-                    }
-                    index = separatorRegex.Match(result).Index;
+                    index = (separatorRegex.RightToLeft
+                        ? separatorRegex.Match(result)
+                        : Regex.Match(result, separatorRegex.ToString(),
+                            separatorRegex.Options | RegexOptions.RightToLeft)).Index;
                 }
             }
-            else if (str.IndexOf(separatorStr, StringComparison.Ordinal) != end)
+            else if (!string.IsNullOrEmpty(separatorStr) && str.IndexOf(separatorStr, StringComparison.Ordinal) != end)
             {
                 index = result.LastIndexOf(separatorStr, StringComparison.Ordinal);
             }
