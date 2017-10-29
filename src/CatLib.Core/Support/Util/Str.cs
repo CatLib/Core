@@ -382,56 +382,6 @@ namespace CatLib
         }
 
         /// <summary>
-        /// 将字符串转化为kebabCase（连字符串表达式）
-        /// </summary>
-        /// <param name="str">要转换的字符串</param>
-        /// <returns>转换后的字符串</returns>
-        public static string KebabCase(string str)
-        {
-            return null;
-        }
-
-        /// <summary>
-        /// 将字符串转化为snakeCase
-        /// </summary>
-        /// <param name="str">要转换的字符串</param>
-        /// <returns>转换后的字符串</returns>
-        public static string SnakeCase(string str)
-        {
-            return null;
-        }
-
-        /// <summary>
-        /// 转为camelCase（驼峰式小写）
-        /// </summary>
-        /// <param name="str">要转换的字符串</param>
-        /// <returns>转换后的字符串</returns>
-        public static string CamelCase(string str)
-        {
-            return null;
-        }
-
-        /// <summary>
-        /// 转为StudlyCaps（驼峰式大写）
-        /// </summary>
-        /// <param name="str">要转换的字符串</param>
-        /// <returns>转换后的字符串</returns>
-        public static string StudlyCaps(string str)
-        {
-            return null;
-        }
-
-        /// <summary>
-        /// 将将latin-1补充字母转换为基本拉丁字母并删除组合变音标记
-        /// </summary>
-        /// <param name="str">要转换的字符串</param>
-        /// <returns>转换后的字符串</returns>
-        public static string Deburr(string str)
-        {
-            return null;
-        }
-
-        /// <summary>
         /// 如果长度超过给定的最大字符串长度，则截断字符串。 截断的字符串的最后一个字符将替换为缺省字符串
         /// </summary>
         /// <param name="str">要阶段的字符串</param>
@@ -439,18 +389,7 @@ namespace CatLib
         /// <param name="separator">临近的分隔符，如果设定则截断长度为截断长度最近的分隔符位置</param>
         /// <param name="end">缺省字符</param>
         /// <returns>截断后的字符串</returns>
-        public static string Trunc(string str, int length, string separator = null, string end = "...")
-        {
-            return null;
-        }
-
-        /// <summary>
-        /// 将字符串分割成其字词的数组。
-        /// </summary>
-        /// <param name="str">要拆分的字符串</param>
-        /// <param name="pattern">匹配单词的模式</param>
-        /// <returns>拆分后的单词</returns>
-        public static string[] Words(string str, string pattern)
+        public static string Truncate(string str, int length, string separator = null, string end = "...")
         {
             return null;
         }

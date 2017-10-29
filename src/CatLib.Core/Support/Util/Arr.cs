@@ -504,16 +504,5 @@ namespace CatLib
                 return true;
             });
         }
-
-        /// <summary>
-        /// 取出各数组中全等的元素
-        /// </summary>
-        /// <typeparam name="T">数组类型</typeparam>
-        /// <param name="elements">规定数组</param>
-        /// <returns>全等的元素</returns>
-        public static T[] Intersection<T>(params T[][] elements)
-        {
-            return null;
-        }
     }
 }

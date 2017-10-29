@@ -4038,33 +4038,9 @@
             <param name="match">数组需要排除掉的值</param>
             <returns>过滤后的数组</returns>
         </member>
-        <member name="M:CatLib.Arr.Zip``1(``0[][])">
-            <summary>
-            创建一组分组元素，其中第一个元素包含给定数组的第一个元素，第二个元素包含给定数组的第二个元素，依此类推。
-            </summary>
-            <typeparam name="T">数组类型</typeparam>
-            <param name="elements">规定数组</param>
-            <returns>分组后的数组</returns>
-        </member>
-        <member name="M:CatLib.Arr.UnZip``1(``0[][])">
-            <summary>
-            将Zip的数组重新分配到预定位置
-            </summary>
-            <typeparam name="T">数组类型</typeparam>
-            <param name="elements">规定数组</param>
-            <returns>反分组后的数组</returns>
-        </member>
-        <member name="M:CatLib.Arr.Xor``1(``0[][])">
-            <summary>
-            比较数组的对称差异
-            </summary>
-            <typeparam name="T">数组类型</typeparam>
-            <param name="elements">规定数组</param>
-            <returns>差异</returns>
-        </member>
         <member name="M:CatLib.Arr.Intersection``1(``0[][])">
             <summary>
-            去除数组中全等的元素
+            取出各数组中全等的元素
             </summary>
             <typeparam name="T">数组类型</typeparam>
             <param name="elements">规定数组</param>
@@ -4424,6 +4400,24 @@
             <param name="separator">临近的分隔符，如果设定则截断长度为截断长度最近的分隔符位置</param>
             <param name="end">缺省字符</param>
             <returns>截断后的字符串</returns>
+        </member>
+        <member name="F:CatLib.Str.hasUnicodeWord">
+            <summary>
+            是否拥有Unicode字母
+            </summary>
+        </member>
+        <member name="F:CatLib.Str.asciiWords">
+            <summary>
+            ascii 单词
+            </summary>
+        </member>
+        <member name="M:CatLib.Str.Words(System.String,System.String)">
+            <summary>
+            将字符串分割成其字词的数组。
+            </summary>
+            <param name="str">要拆分的字符串</param>
+            <param name="pattern">匹配单词的模式</param>
+            <returns>拆分后的单词</returns>
         </member>
         <member name="T:CatLib.SystemTime">
             <summary>
