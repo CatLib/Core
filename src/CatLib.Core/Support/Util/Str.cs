@@ -386,12 +386,57 @@ namespace CatLib
         /// </summary>
         /// <param name="str">要阶段的字符串</param>
         /// <param name="length">阶段长度</param>
-        /// <param name="separator">临近的分隔符，如果设定则截断长度为截断长度最近的分隔符位置</param>
-        /// <param name="end">缺省字符</param>
+        /// <param name="separator">临近的分隔符，如果设定则截断长度为截断长度最近的分隔符位置,如果传入的是一个正则表达式那么使用正则匹配。</param>
+        /// <param name="mission">缺省字符</param>
         /// <returns>截断后的字符串</returns>
-        public static string Truncate(string str, int length, string separator = null, string end = "...")
+        public static string Truncate(string str, int length, object separator = null, string mission = null)
         {
-            return null;
+            if (str == null || length > str.Length)
+            {
+                return str;
+            }
+
+            mission = mission ?? "...";
+            var end = length - mission.Length;
+
+            if (end < 1)
+            {
+                return mission;
+            }
+
+            var result = str.Substring(0, end);
+
+            if (separator == null)
+            {
+                return result + mission;
+            }
+
+            var separatorRegex = separator as Regex;
+            var separatorStr = separator.ToString();
+            var index = -1;
+            if (separatorRegex != null)
+            {
+                if (separatorRegex.IsMatch(result))
+                {
+                    if (!separatorRegex.RightToLeft)
+                    {
+                        separatorRegex = new Regex(separatorRegex.ToString(), separatorRegex.Options | RegexOptions.RightToLeft);
+                    }
+                    index = separatorRegex.Match(result).Index;
+                }
+            }
+            else if (str.IndexOf(separatorStr, StringComparison.Ordinal) != end)
+            {
+                index = result.LastIndexOf(separatorStr, StringComparison.Ordinal);
+            }
+
+            if (index > -1)
+            {
+                result = result.Substring(0, index);
+            }
+
+            return result + mission;
         }
     }
 }
+
