@@ -4024,10 +4024,51 @@
             <summary>
             从数组中检索指定的值并返回所在的下标，如果返回-1则代表没有出现
             </summary>
-            <typeparam name="T"></typeparam>
-            <param name="source">数组源</param>
+            <typeparam name="T">数组类型</typeparam>
+            <param name="source">规定数组</param>
             <param name="match">要匹配的值，如果有多个，只有全部的匹配才算匹配</param>
             <returns>如果要检索的值没有出现，则该方法返回 -1</returns>
+        </member>
+        <member name="M:CatLib.Arr.Difference``1(``0[],``0[])">
+            <summary>
+            排除掉数组中的指定值
+            </summary>
+            <typeparam name="T">数组类型</typeparam>
+            <param name="source">需要过滤的数组</param>
+            <param name="match">数组需要排除掉的值</param>
+            <returns>过滤后的数组</returns>
+        </member>
+        <member name="M:CatLib.Arr.Zip``1(``0[][])">
+            <summary>
+            创建一组分组元素，其中第一个元素包含给定数组的第一个元素，第二个元素包含给定数组的第二个元素，依此类推。
+            </summary>
+            <typeparam name="T">数组类型</typeparam>
+            <param name="elements">规定数组</param>
+            <returns>分组后的数组</returns>
+        </member>
+        <member name="M:CatLib.Arr.UnZip``1(``0[][])">
+            <summary>
+            将Zip的数组重新分配到预定位置
+            </summary>
+            <typeparam name="T">数组类型</typeparam>
+            <param name="elements">规定数组</param>
+            <returns>反分组后的数组</returns>
+        </member>
+        <member name="M:CatLib.Arr.Xor``1(``0[][])">
+            <summary>
+            比较数组的对称差异
+            </summary>
+            <typeparam name="T">数组类型</typeparam>
+            <param name="elements">规定数组</param>
+            <returns>差异</returns>
+        </member>
+        <member name="M:CatLib.Arr.Intersection``1(``0[][])">
+            <summary>
+            去除数组中全等的元素
+            </summary>
+            <typeparam name="T">数组类型</typeparam>
+            <param name="elements">规定数组</param>
+            <returns>全等的元素</returns>
         </member>
         <member name="T:CatLib.Enum">
             <summary>
@@ -4338,6 +4379,51 @@
             <param name="length">字符串长度</param>
             <param name="seed">种子</param>
             <returns>随机的字符串</returns>
+        </member>
+        <member name="M:CatLib.Str.KebabCase(System.String)">
+            <summary>
+            将字符串转化为kebabCase（连字符串表达式）
+            </summary>
+            <param name="str">要转换的字符串</param>
+            <returns>转换后的字符串</returns>
+        </member>
+        <member name="M:CatLib.Str.SnakeCase(System.String)">
+            <summary>
+            将字符串转化为snakeCase
+            </summary>
+            <param name="str">要转换的字符串</param>
+            <returns>转换后的字符串</returns>
+        </member>
+        <member name="M:CatLib.Str.CamelCase(System.String)">
+            <summary>
+            转为camelCase（驼峰式小写）
+            </summary>
+            <param name="str">要转换的字符串</param>
+            <returns>转换后的字符串</returns>
+        </member>
+        <member name="M:CatLib.Str.StudlyCaps(System.String)">
+            <summary>
+            转为StudlyCaps（驼峰式大写）
+            </summary>
+            <param name="str">要转换的字符串</param>
+            <returns>转换后的字符串</returns>
+        </member>
+        <member name="M:CatLib.Str.Deburr(System.String)">
+            <summary>
+            将将latin-1补充字母转换为基本拉丁字母并删除组合变音标记
+            </summary>
+            <param name="str">要转换的字符串</param>
+            <returns>转换后的字符串</returns>
+        </member>
+        <member name="M:CatLib.Str.Trunc(System.String,System.Int32,System.String,System.String)">
+            <summary>
+            如果长度超过给定的最大字符串长度，则截断字符串。 截断的字符串的最后一个字符将替换为缺省字符串
+            </summary>
+            <param name="str">要阶段的字符串</param>
+            <param name="length">阶段长度</param>
+            <param name="separator">临近的分隔符，如果设定则截断长度为截断长度最近的分隔符位置</param>
+            <param name="end">缺省字符</param>
+            <returns>截断后的字符串</returns>
         </member>
         <member name="T:CatLib.SystemTime">
             <summary>

@@ -10,6 +10,7 @@
  */
 
 using System;
+using System.Diagnostics;
 
 namespace CatLib
 {
@@ -438,8 +439,8 @@ namespace CatLib
         /// <summary>
         /// 从数组中检索指定的值并返回所在的下标，如果返回-1则代表没有出现
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="source">数组源</param>
+        /// <typeparam name="T">数组类型</typeparam>
+        /// <param name="source">规定数组</param>
         /// <param name="match">要匹配的值，如果有多个，只有全部的匹配才算匹配</param>
         /// <returns>如果要检索的值没有出现，则该方法返回 -1</returns>
         public static int IndexOf<T>(T[] source, params T[] match)
@@ -474,6 +475,45 @@ namespace CatLib
             }
 
             return -1;
+        }
+
+        /// <summary>
+        /// 排除掉数组中的指定值
+        /// </summary>
+        /// <typeparam name="T">数组类型</typeparam>
+        /// <param name="source">需要过滤的数组</param>
+        /// <param name="match">数组需要排除掉的值</param>
+        /// <returns>过滤后的数组</returns>
+        public static T[] Difference<T>(T[] source, params T[] match)
+        {
+            Guard.Requires<ArgumentNullException>(source != null);
+            if (match == null)
+            {
+                return source;
+            }
+
+            return Filter(source, (val) =>
+            {
+                foreach (var t in match)
+                {
+                    if (val.Equals(t))
+                    {
+                        return false;
+                    }
+                }
+                return true;
+            });
+        }
+
+        /// <summary>
+        /// 取出各数组中全等的元素
+        /// </summary>
+        /// <typeparam name="T">数组类型</typeparam>
+        /// <param name="elements">规定数组</param>
+        /// <returns>全等的元素</returns>
+        public static T[] Intersection<T>(params T[][] elements)
+        {
+            return null;
         }
     }
 }
