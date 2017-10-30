@@ -304,6 +304,9 @@ namespace CatLib.API.Stl
 
             str = Str.Truncate("喵h喵e越l来l越l漂o亮!了", 12, "l");
             Assert.AreEqual("喵h喵e越l来...", str);
+
+            str = Str.Truncate("喵h喵e越l来l越l漂o亮!了", 12);
+            Assert.AreEqual("喵h喵e越l来l越...", str);
         }
     }
 }

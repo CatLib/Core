@@ -386,7 +386,7 @@ namespace CatLib
         /// <para>eg: Str.Truncate("hello world , the sun is shine",15," ") => hello world...</para>
         /// </summary>
         /// <param name="str">要截断的字符串</param>
-        /// <param name="length">截断长度</param>
+        /// <param name="length">截断长度(含缺省字符长度)</param>
         /// <param name="separator">临近的分隔符，如果设定则截断长度为截断长度最近的分隔符位置,如果传入的是一个正则表达式那么使用正则匹配。</param>
         /// <param name="mission">缺省字符</param>
         /// <returns>截断后的字符串</returns>
