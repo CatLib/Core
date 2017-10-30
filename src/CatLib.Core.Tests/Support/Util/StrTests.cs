@@ -261,5 +261,12 @@ namespace CatLib.API.Stl
 
             Assert.AreEqual(16, str.Length);
         }
+
+        [TestMethod]
+        public void TestTruncate()
+        {
+            var str = Str.Truncate("hello world , the sum is shine", 11);
+            Assert.AreEqual("hello wo...", str);
+        }
     }
 }
