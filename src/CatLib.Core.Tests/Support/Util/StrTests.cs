@@ -265,8 +265,17 @@ namespace CatLib.API.Stl
         [TestMethod]
         public void TestTruncate()
         {
-            var str = Str.Truncate("hello world , the sum is shine", 11);
+            var str = Str.Truncate("hello world , the sun is shine", 11);
             Assert.AreEqual("hello wo...", str);
+
+            str = Str.Truncate("hello world , the sun is shine", 11, " ");
+            Assert.AreEqual("hello...", str);
+
+            str = Str.Truncate("hello world , the sun is shine", 15, " ");
+            Assert.AreEqual("hello world...", str);
+
+            str = Str.Truncate("hello world sun sname", 15, " ");
+            Assert.AreEqual("hello world..." , str);
         }
     }
 }
