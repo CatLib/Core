@@ -4038,14 +4038,6 @@
             <param name="match">数组需要排除掉的值</param>
             <returns>过滤后的数组</returns>
         </member>
-        <member name="M:CatLib.Arr.Intersection``1(``0[][])">
-            <summary>
-            取出各数组中全等的元素
-            </summary>
-            <typeparam name="T">数组类型</typeparam>
-            <param name="elements">规定数组</param>
-            <returns>全等的元素</returns>
-        </member>
         <member name="T:CatLib.Enum">
             <summary>
             自定义枚举
@@ -4356,68 +4348,15 @@
             <param name="seed">种子</param>
             <returns>随机的字符串</returns>
         </member>
-        <member name="M:CatLib.Str.KebabCase(System.String)">
-            <summary>
-            将字符串转化为kebabCase（连字符串表达式）
-            </summary>
-            <param name="str">要转换的字符串</param>
-            <returns>转换后的字符串</returns>
-        </member>
-        <member name="M:CatLib.Str.SnakeCase(System.String)">
-            <summary>
-            将字符串转化为snakeCase
-            </summary>
-            <param name="str">要转换的字符串</param>
-            <returns>转换后的字符串</returns>
-        </member>
-        <member name="M:CatLib.Str.CamelCase(System.String)">
-            <summary>
-            转为camelCase（驼峰式小写）
-            </summary>
-            <param name="str">要转换的字符串</param>
-            <returns>转换后的字符串</returns>
-        </member>
-        <member name="M:CatLib.Str.StudlyCaps(System.String)">
-            <summary>
-            转为StudlyCaps（驼峰式大写）
-            </summary>
-            <param name="str">要转换的字符串</param>
-            <returns>转换后的字符串</returns>
-        </member>
-        <member name="M:CatLib.Str.Deburr(System.String)">
-            <summary>
-            将将latin-1补充字母转换为基本拉丁字母并删除组合变音标记
-            </summary>
-            <param name="str">要转换的字符串</param>
-            <returns>转换后的字符串</returns>
-        </member>
-        <member name="M:CatLib.Str.Trunc(System.String,System.Int32,System.String,System.String)">
+        <member name="M:CatLib.Str.Truncate(System.String,System.Int32,System.Object,System.String)">
             <summary>
             如果长度超过给定的最大字符串长度，则截断字符串。 截断的字符串的最后一个字符将替换为缺省字符串
             </summary>
             <param name="str">要阶段的字符串</param>
             <param name="length">阶段长度</param>
-            <param name="separator">临近的分隔符，如果设定则截断长度为截断长度最近的分隔符位置</param>
-            <param name="end">缺省字符</param>
+            <param name="separator">临近的分隔符，如果设定则截断长度为截断长度最近的分隔符位置,如果传入的是一个正则表达式那么使用正则匹配。</param>
+            <param name="mission">缺省字符</param>
             <returns>截断后的字符串</returns>
-        </member>
-        <member name="F:CatLib.Str.hasUnicodeWord">
-            <summary>
-            是否拥有Unicode字母
-            </summary>
-        </member>
-        <member name="F:CatLib.Str.asciiWords">
-            <summary>
-            ascii 单词
-            </summary>
-        </member>
-        <member name="M:CatLib.Str.Words(System.String,System.String)">
-            <summary>
-            将字符串分割成其字词的数组。
-            </summary>
-            <param name="str">要拆分的字符串</param>
-            <param name="pattern">匹配单词的模式</param>
-            <returns>拆分后的单词</returns>
         </member>
         <member name="T:CatLib.SystemTime">
             <summary>
