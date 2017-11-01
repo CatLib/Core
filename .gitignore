@@ -6,3 +6,4 @@ src/CatLib.Core/bin/
 src/CatLib.Core.NetStandard/obj/
 src/CatLib.Core.NetStandard/bin/
 TestResults/
+build/
