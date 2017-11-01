@@ -10,6 +10,7 @@
  */
 
 using System;
+using System.Text.RegularExpressions;
 using CatLib.Tests;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -260,6 +261,52 @@ namespace CatLib.API.Stl
             }
 
             Assert.AreEqual(16, str.Length);
+        }
+
+        [TestMethod]
+        public void TestTruncate()
+        {
+            var str = Str.Truncate("hello world , the sun is shine", 11);
+            Assert.AreEqual("hello wo...", str);
+
+            str = Str.Truncate("hello world , the sun is shine", 11, " ");
+            Assert.AreEqual("hello...", str);
+
+            str = Str.Truncate("hello world , the sun is shine", 15, " ");
+            Assert.AreEqual("hello world...", str);
+
+            str = Str.Truncate("hello world sun sname", 15, " ");
+            Assert.AreEqual("hello world..." , str);
+
+            var regex = new Regex("orl");
+            str = Str.Truncate("hello worldrldddorl sun sname", 15, regex);
+            Assert.AreEqual("hello w...", str);
+
+            regex = new Regex("rld");
+            str = Str.Truncate("hello worldrldddorl sun sname", 17, regex);
+            Assert.AreEqual("hello world...", str);
+
+            str = Str.Truncate(null, 17, regex);
+            Assert.AreEqual(null, str);
+
+            str = Str.Truncate("hello world", 17, regex);
+            Assert.AreEqual("hello world", str);
+
+            regex = new Regex("rld", RegexOptions.RightToLeft);
+            str = Str.Truncate("hello worldrldddorl sun sname", 17, regex);
+            Assert.AreEqual("hello world...", str);
+
+            str = Str.Truncate("hel", 2);
+            Assert.AreEqual(str, "...");
+
+            str = Str.Truncate("", -1);
+            Assert.AreEqual(str, "...");
+
+            str = Str.Truncate("喵h喵e越l来l越l漂o亮!了", 12, "l");
+            Assert.AreEqual("喵h喵e越l来...", str);
+
+            str = Str.Truncate("喵h喵e越l来l越l漂o亮!了", 12);
+            Assert.AreEqual("喵h喵e越l来l越...", str);
         }
     }
 }

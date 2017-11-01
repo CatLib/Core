@@ -12,19 +12,27 @@
 namespace CatLib
 {
     /// <summary>
-    /// 管理器
+    /// 管理器（拓展解决方案为单例）
     /// </summary>
-    public interface ISingleManager<TInterface> : IManager<TInterface>
+    public interface ISingleManager<TInterface> : ISingleManaged<TInterface>
     {
+        /// <summary>
+        /// 获取解决方案
+        /// </summary>
+        /// <param name="name">解决方案名</param>
+        /// <returns>解决方案</returns>
+        TInterface Get(string name = null);
+
+        /// <summary>
+        /// 获取解决方案
+        /// </summary>
+        /// <param name="name">解决方案名</param>
+        /// <returns>解决方案</returns>
+        TInterface this[string name] { get; }
+
         /// <summary>
         /// 获取默认的解决方案
         /// </summary>
         TInterface Default { get; }
-
-        /// <summary>
-        /// 释放解决方案
-        /// </summary>
-        /// <param name="name">解决方案名</param>
-        void Release(string name = null);
     }
 }

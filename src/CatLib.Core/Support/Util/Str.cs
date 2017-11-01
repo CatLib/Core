@@ -380,5 +380,63 @@ namespace CatLib
 
             return requested;
         }
+
+        /// <summary>
+        /// 如果长度超过给定的最大字符串长度，则截断字符串。 截断的字符串的最后一个字符将替换为缺省字符串
+        /// <para>eg: Str.Truncate("hello world , the sun is shine",15," ") => hello world...</para>
+        /// </summary>
+        /// <param name="str">要截断的字符串</param>
+        /// <param name="length">截断长度(含缺省字符长度)</param>
+        /// <param name="separator">临近的分隔符，如果设定则截断长度为截断长度最近的分隔符位置,如果传入的是一个正则表达式那么使用正则匹配。</param>
+        /// <param name="mission">缺省字符</param>
+        /// <returns>截断后的字符串</returns>
+        public static string Truncate(string str, int length, object separator = null, string mission = null)
+        {
+            if (str == null || length > str.Length)
+            {
+                return str;
+            }
+
+            mission = mission ?? "...";
+            var end = length - mission.Length;
+
+            if (end < 1)
+            {
+                return mission;
+            }
+
+            var result = str.Substring(0, end);
+
+            if (separator == null)
+            {
+                return result + mission;
+            }
+
+            var separatorRegex = separator as Regex;
+            var separatorStr = separator.ToString();
+            var index = -1;
+            if (separatorRegex != null)
+            {
+                if (separatorRegex.IsMatch(result))
+                {
+                    index = (separatorRegex.RightToLeft
+                        ? separatorRegex.Match(result)
+                        : Regex.Match(result, separatorRegex.ToString(),
+                            separatorRegex.Options | RegexOptions.RightToLeft)).Index;
+                }
+            }
+            else if (!string.IsNullOrEmpty(separatorStr) && str.IndexOf(separatorStr, StringComparison.Ordinal) != end)
+            {
+                index = result.LastIndexOf(separatorStr, StringComparison.Ordinal);
+            }
+
+            if (index > -1)
+            {
+                result = result.Substring(0, index);
+            }
+
+            return result + mission;
+        }
     }
 }
+

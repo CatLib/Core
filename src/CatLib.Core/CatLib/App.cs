@@ -21,6 +21,11 @@ namespace CatLib
     public sealed class App
     {
         /// <summary>
+        /// 当新建Application时
+        /// </summary>
+        public static event Action<IApplication> OnNewApplication;
+
+        /// <summary>
         /// CatLib实例
         /// </summary>
         private static IApplication instance;
@@ -32,15 +37,19 @@ namespace CatLib
         {
             get
             {
-                if (instance != null)
+                if (instance == null)
                 {
-                    return instance;
+                    new Application();
                 }
-                throw new NullReferenceException("Application is not instance.");
+                return instance;
             }
             set
             {
                 instance = value;
+                if (OnNewApplication != null)
+                {
+                    OnNewApplication.Invoke(instance);
+                }
             }
         }
 

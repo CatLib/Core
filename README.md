@@ -28,13 +28,13 @@
 **使用Nuget安装**
 
 ```PM
-Install-Package CatLib.Core -Version 1.1.1
+Install-Package CatLib.Core -Version 1.1.3
 ```
 
 **使用Nuget安装（NetStandard）**
 
 ```PM
-Install-Package CatLib.Core.NetStandard -Version 1.1.2
+Install-Package CatLib.Core.NetStandard -Version 1.1.3
 ```
 
 **直接下载发布版本**

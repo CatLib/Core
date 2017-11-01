@@ -507,5 +507,19 @@ namespace CatLib.Tests.Support.Util
 
             Assert.AreEqual(-1, result);
         }
+
+        [TestMethod]
+        public void TestDifference()
+        {
+            var data = new[] { "a", "b", "c", "d", "e" };
+            var result = Arr.Difference(data, new[] {"e", "d"});
+
+            Assert.AreEqual(3, result.Length);
+            Assert.AreEqual("a", result[0]);
+            Assert.AreEqual("b", result[1]);
+            Assert.AreEqual("c", result[2]);
+        }
+
+
     }
 }
