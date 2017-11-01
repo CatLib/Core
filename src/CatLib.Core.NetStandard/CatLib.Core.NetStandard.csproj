@@ -31,6 +31,8 @@
     <PackageReleaseNotes>- 增加了新的模版方法：Managed 和 SingleManaged 用于扩展不对外开放的管理器。
 - App增加OnNewApplication事件
 - 已过时了一些接口并提供了相应替换方案。
+- 增加了Str.Truncate可以用于裁剪字符串
+- 增加了Arr.Difference用于排除指定的值
 - 一些内部bug的修正</PackageReleaseNotes>
     <PackageLicenseUrl>https://github.com/CatLib/Core/blob/master/LICENSE</PackageLicenseUrl>
     <NeutralLanguage>zh</NeutralLanguage>
