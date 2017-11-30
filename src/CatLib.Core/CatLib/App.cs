@@ -158,7 +158,7 @@ namespace CatLib
         /// <param name="eventName">事件名称</param>
         /// <param name="payload">载荷</param>
         /// <returns>事件结果</returns>
-        public static object Trigger(string eventName, object payload = null)
+        public static object[] Trigger(string eventName, object payload = null)
         {
             return Handler.Trigger(eventName, payload);
         }
