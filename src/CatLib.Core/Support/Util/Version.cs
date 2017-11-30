@@ -17,13 +17,28 @@ namespace CatLib
     /// <summary>
     /// 版本（遵循semver）
     /// </summary>
-    public sealed class Version
+    public class Version
     {
         /// <summary>
         /// 版本匹配正则式
         /// </summary>
-        private static readonly Regex versionMatcher = new Regex(
-            @"^(?<major>((?![0])\d+?|[0]))\.(?<minor>((?![0])\d+?|[0]))\.(?<revised>((?![0])\d+?|[0]))(?:-(?!\.)(?<pre_release>([a-zA-Z]\w*?|(?![0])\d+?|[0])(\.([a-zA-Z]\w*?|(?![0])\d+?|[0]))*?))?(?:\+(?!\.)(?<build_metadata>([a-zA-Z]\w*?|(?![0])\d+?|[0])(\.([a-zA-Z]\w*?|(?![0])\d+?|[0]))*?))?$");
+        private static Regex versionMatcher;
+
+        /// <summary>
+        /// 版本匹配正则式
+        /// </summary>
+        private static Regex VersionMatcher
+        {
+            get
+            {
+                if (versionMatcher == null)
+                {
+                    versionMatcher = new Regex(
+                        @"^(?<major>((?![0])\d+?|[0]))\.(?<minor>((?![0])\d+?|[0]))\.(?<revised>((?![0])\d+?|[0]))(?:-(?!\.)(?<pre_release>([a-zA-Z]\w*?|(?![0])\d+?|[0])(\.([a-zA-Z]\w*?|(?![0])\d+?|[0]))*?))?(?:\+(?!\.)(?<build_metadata>([a-zA-Z]\w*?|(?![0])\d+?|[0])(\.([a-zA-Z]\w*?|(?![0])\d+?|[0]))*?))?$");
+                }
+                return versionMatcher;
+            }
+        }
 
         /// <summary>
         /// 原始版本信息
@@ -38,7 +53,7 @@ namespace CatLib
         /// <summary>
         /// 版本信息
         /// </summary>
-        private struct VersionData
+        private class VersionData
         {
             /// <summary>
             /// 主版本号
@@ -71,7 +86,7 @@ namespace CatLib
             /// <param name="version"></param>
             public VersionData(string version)
             {
-                var match = versionMatcher.Match(version);
+                var match = VersionMatcher.Match(version);
                 Major = int.Parse(match.Groups["major"].ToString());
                 Minor = int.Parse(match.Groups["minor"].ToString());
                 Revised = int.Parse(match.Groups["revised"].ToString());
@@ -86,7 +101,7 @@ namespace CatLib
         /// <param name="major">主版本号</param>
         /// <param name="minor">次版本号</param>
         /// <param name="revised">修订版本号</param>
-        public Version(int major, int minor, int revised) 
+        public Version(int major, int minor, int revised)
             : this(major + "." + minor + "." + revised)
         {
         }
@@ -97,9 +112,7 @@ namespace CatLib
         /// <param name="version">版本号</param>
         public Version(string version)
         {
-            GuardVersion(version);
             this.version = version;
-            current = new VersionData(version);
         }
 
         /// <summary>
@@ -112,6 +125,12 @@ namespace CatLib
         /// <returns>比较结果</returns>
         public int Compare(string version)
         {
+            if (current == null)
+            {
+                GuardVersion(this.version);
+                current = new VersionData(this.version);
+            }
+
             GuardVersion(version);
 
             var compared = new VersionData(version);
@@ -213,7 +232,7 @@ namespace CatLib
         /// <param name="version">输入版本</param>
         private void GuardVersion(string version)
         {
-            if (!versionMatcher.IsMatch(version))
+            if (!VersionMatcher.IsMatch(version))
             {
                 throw new RuntimeException("version is invalid");
             }
