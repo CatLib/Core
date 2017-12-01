@@ -41,6 +41,13 @@ namespace CatLib
         bool IsStatic(string service);
 
         /// <summary>
+        /// 是否是别名
+        /// </summary>
+        /// <param name="name">名字</param>
+        /// <returns>是否是别名</returns>
+        bool IsAlias(string name);
+
+        /// <summary>
         /// 绑定一个服务
         /// </summary>
         /// <param name="service">服务名</param>
@@ -133,6 +140,62 @@ namespace CatLib
         object Call(object instance, MethodInfo methodInfo, params object[] param);
 
         /// <summary>
+        /// 以依赖注入的形式调用一个方法
+        /// </summary>
+        /// <param name="method">方法</param>
+        void Call<T1>(Action<T1> method);
+
+        /// <summary>
+        /// 以依赖注入的形式调用一个方法
+        /// </summary>
+        /// <param name="method">方法</param>
+        void Call<T1, T2>(Action<T1, T2> method);
+
+        /// <summary>
+        /// 以依赖注入的形式调用一个方法
+        /// </summary>
+        /// <param name="method">方法</param>
+        void Call<T1, T2, T3>(Action<T1, T2, T3> method);
+
+        /// <summary>
+        /// 以依赖注入的形式调用一个方法
+        /// </summary>
+        /// <param name="method">方法</param>
+        void Call<T1, T2, T3, T4>(Action<T1, T2, T3, T4> method);
+
+        /// <summary>
+        /// 包装一个依赖注入形式调用的一个方法
+        /// </summary>
+        /// <param name="method">方法</param>
+        /// <param name="param">方法参数</param>
+        /// <returns>包装方法</returns>
+        Action Wrap<T1>(Action<T1> method, params object[] param);
+
+        /// <summary>
+        /// 包装一个依赖注入形式调用的一个方法
+        /// </summary>
+        /// <param name="method">方法</param>
+        /// <param name="param">方法参数</param>
+        /// <returns>包装方法</returns>
+        Action Wrap<T1, T2>(Action<T1, T2> method, params object[] param);
+
+        /// <summary>
+        /// 包装一个依赖注入形式调用的一个方法
+        /// </summary>
+        /// <param name="method">方法</param>
+        /// <param name="param">方法参数</param>
+        /// <returns>包装方法</returns>
+        Action Wrap<T1, T2, T3>(Action<T1, T2, T3> method, params object[] param);
+
+        /// <summary>
+        /// 包装一个依赖注入形式调用的一个方法
+        /// </summary>
+        /// <param name="method">方法</param>
+        /// <param name="param">方法参数</param>
+        /// <returns>包装方法</returns>
+        Action Wrap<T1, T2, T3, T4>(Action<T1, T2, T3, T4> method, params object[] param);
+
+        /// <summary>
         /// 构造服务,允许传入参数来决定构造函数的值
         /// </summary>
         /// <param name="service">服务名或别名</param>
@@ -153,6 +216,13 @@ namespace CatLib
         /// <param name="service">服务名或者别名</param>
         /// <returns>服务实例，如果构造失败那么返回null</returns>
 		object this[string service] { get; }
+
+        /// <summary>
+        /// 获取一个回调，当执行回调可以生成指定的服务
+        /// </summary>
+        /// <param name="service">服务名或别名</param>
+        /// <returns>回调方案</returns>
+        Func<object> Factory(string service);
 
         /// <summary>
         /// 为服务设定一个别名

@@ -197,6 +197,16 @@ namespace CatLib
         }
 
         /// <summary>
+        /// 是否是别名
+        /// </summary>
+        /// <param name="name">名字</param>
+        /// <returns>是否是别名</returns>
+        public bool IsAlias(string name)
+        {
+            return aliases.ContainsKey(name);
+        }
+
+        /// <summary>
         /// 为服务设定一个别名
         /// </summary>
         /// <param name="alias">别名</param>
@@ -330,8 +340,8 @@ namespace CatLib
         /// 绑定一个方法
         /// </summary>
         /// <param name="method">
-        /// 通过这个名字可以调用方法
-        /// <para>这个名字可以重复</para>
+        /// 方法名（可以被用于调用）
+        /// <para>名字可以重复,如果存在多个重复名字那么调用时同名的绑定的方法都将会被调用</para>
         /// </param>
         /// <param name="target">方法调用目标</param>
         /// <param name="call">在方法调用目标中被调用的方法</param>
