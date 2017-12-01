@@ -47,6 +47,8 @@
     <Compile Include="CatLib\IServiceProviderType.cs" />
     <Compile Include="Support\Container\Bindable.cs" />
     <Compile Include="Support\Container\IBindable.cs" />
+    <Compile Include="Support\Container\IMethodBindData.cs" />
+    <Compile Include="Support\Container\MethodBindData.cs" />
     <Compile Include="Support\Container\MethodContainer.cs" />
     <Compile Include="Support\Dispatcher\Dispatcher.cs" />
     <Compile Include="Support\Dispatcher\EventHandler.cs" />

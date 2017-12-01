@@ -19,13 +19,13 @@ namespace CatLib
         /// <summary>
         /// 依赖注入容器
         /// </summary>
-        private IContainer container;
+        private Container container;
 
         /// <summary>
         /// 构建一个新的方法容器
         /// </summary>
         /// <param name="container"></param>
-        internal MethodContainer(IContainer container)
+        internal MethodContainer(Container container)
         {
             this.container = container;
         }
@@ -37,9 +37,9 @@ namespace CatLib
         /// <param name="target">方法调用目标</param>
         /// <param name="call">在方法调用目标中被调用的方法</param>
         /// <returns></returns>
-        public int BindMethod(string method, object target, string call)
+        public IMethodBindData BindMethod(string method, object target, string call)
         {
-            return 0;
+            return null;
         }        
     }
 }

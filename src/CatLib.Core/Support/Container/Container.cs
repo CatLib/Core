@@ -62,6 +62,11 @@ namespace CatLib
         private readonly SortSet<Func<string, Type>, int> findType;
 
         /// <summary>
+        /// 方法容器
+        /// </summary>
+        private readonly MethodContainer methodContainer;
+
+        /// <summary>
         /// 同步锁
         /// </summary>
         private readonly object syncRoot = new object();
@@ -91,6 +96,7 @@ namespace CatLib
             findType = new SortSet<Func<string, Type>, int>();
             injectTarget = typeof(InjectAttribute);
             buildStack = new Stack<string>();
+            methodContainer = new MethodContainer(this);
         }
 
         /// <summary>
@@ -321,6 +327,21 @@ namespace CatLib
         }
 
         /// <summary>
+        /// 绑定一个方法
+        /// </summary>
+        /// <param name="method">
+        /// 通过这个名字可以调用方法
+        /// <para>这个名字可以重复</para>
+        /// </param>
+        /// <param name="target">方法调用目标</param>
+        /// <param name="call">在方法调用目标中被调用的方法</param>
+        /// <returns>方法绑定数据</returns>
+        public IMethodBindData BindMethod(string method, object target, string call)
+        {
+            return methodContainer.BindMethod(method, target, call);
+        }
+
+        /// <summary>
         /// 以依赖注入形式调用一个方法
         /// </summary>
         /// <param name="instance">方法对象</param>
@@ -359,6 +380,46 @@ namespace CatLib
                 param = parameter.Count > 0 ? GetDependencies(bindData, parameter, param) : new object[] { };
                 return methodInfo.Invoke(instance, param);
             }
+        }
+
+        /// <summary>
+        /// 以依赖注入的形式调用一个方法
+        /// </summary>
+        /// <param name="method">方法</param>
+        public void Call<T1>(Action<T1> method)
+        {
+            Guard.Requires<ArgumentNullException>(method != null);
+            Call(method.Target, method.Method);
+        }
+
+        /// <summary>
+        /// 以依赖注入的形式调用一个方法
+        /// </summary>
+        /// <param name="method">方法</param>
+        public void Call<T1, T2>(Action<T1, T2> method)
+        {
+            Guard.Requires<ArgumentNullException>(method != null);
+            Call(method.Target, method.Method);
+        }
+
+        /// <summary>
+        /// 以依赖注入的形式调用一个方法
+        /// </summary>
+        /// <param name="method">方法</param>
+        public void Call<T1, T2, T3>(Action<T1, T2, T3> method)
+        {
+            Guard.Requires<ArgumentNullException>(method != null);
+            Call(method.Target, method.Method);
+        }
+
+        /// <summary>
+        /// 以依赖注入的形式调用一个方法
+        /// </summary>
+        /// <param name="method">方法</param>
+        public void Call<T1, T2, T3, T4>(Action<T1, T2, T3, T4> method)
+        {
+            Guard.Requires<ArgumentNullException>(method != null);
+            Call(method.Target, method.Method);
         }
 
         /// <summary>
@@ -421,6 +482,16 @@ namespace CatLib
         public object this[string service]
         {
             get { return Make(service); }
+        }
+
+        /// <summary>
+        /// 获取一个回调，当执行回调可以生成指定的服务
+        /// </summary>
+        /// <param name="service">服务名或别名</param>
+        /// <returns>回调方案</returns>
+        public Func<object> Factory(string service)
+        {
+            return () => Make(service);
         }
 
         /// <summary>

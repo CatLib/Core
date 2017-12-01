@@ -54,7 +54,7 @@ namespace CatLib
         /// </summary>
         /// <param name="container">依赖注入容器</param>
         /// <param name="service">服务名</param>
-        internal Bindable(Container container, string service)
+        protected Bindable(Container container, string service)
         {
             Container = container;
             Service = service;

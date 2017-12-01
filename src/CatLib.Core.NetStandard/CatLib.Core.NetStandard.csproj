@@ -74,7 +74,9 @@
     <Compile Include="..\CatLib.Core\Support\Container\IBindData.cs" Link="Support\Container\IBindData.cs" />
     <Compile Include="..\CatLib.Core\Support\Container\IContainer.cs" Link="Support\Container\IContainer.cs" />
     <Compile Include="..\CatLib.Core\Support\Container\IGivenData.cs" Link="Support\Container\IGivenData.cs" />
+    <Compile Include="..\CatLib.Core\Support\Container\IMethodBindData.cs" Link="Support\Container\IMethodBindData.cs" />
     <Compile Include="..\CatLib.Core\Support\Container\InjectAttribute.cs" Link="Support\Container\InjectAttribute.cs" />
+    <Compile Include="..\CatLib.Core\Support\Container\MethodBindData.cs" Link="Support\Container\MethodBindData.cs" />
     <Compile Include="..\CatLib.Core\Support\Container\MethodContainer.cs" Link="Support\Container\MethodContainer.cs" />
     <Compile Include="..\CatLib.Core\Support\Dispatcher\Dispatcher.cs" Link="Support\Dispatcher\Dispatcher.cs" />
     <Compile Include="..\CatLib.Core\Support\Dispatcher\EventHandler.cs" Link="Support\Dispatcher\EventHandler.cs" />

@@ -442,6 +442,22 @@ namespace CatLib.Tests.Stl
         }
 
         /// <summary>
+        /// 调用方法注入测试
+        /// </summary>
+        [TestMethod]
+        public void CheckDelegateCall()
+        {
+            var container = MakeContainer();
+            container.Instance<Container>(container);
+
+            container.Call((Container cls, int n) =>
+            {
+                Console.WriteLine(cls);
+                Assert.AreNotEqual(null, cls);
+            });
+        }
+
+        /// <summary>
         /// 可以调用方法
         /// </summary>
         [TestMethod]
