@@ -69,10 +69,11 @@
     <Compile Include="..\CatLib.Core\Support\Container\Container.cs" Link="Support\Container\Container.cs" />
     <Compile Include="..\CatLib.Core\Support\Container\ContainerExtend.cs" Link="Support\Container\ContainerExtend.cs" />
     <Compile Include="..\CatLib.Core\Support\Container\GivenData.cs" Link="Support\Container\GivenData.cs" />
+    <Compile Include="..\CatLib.Core\Support\Container\IBindData.cs" Link="Support\Container\IBindData.cs" />
     <Compile Include="..\CatLib.Core\Support\Container\IContainer.cs" Link="Support\Container\IContainer.cs" />
+    <Compile Include="..\CatLib.Core\Support\Container\IGivenData.cs" Link="Support\Container\IGivenData.cs" />
     <Compile Include="..\CatLib.Core\Support\Container\InjectAttribute.cs" Link="Support\Container\InjectAttribute.cs" />
-    <Compile Include="..\CatLib.Core\Support\Container\Internal\IBindData.cs" Link="Support\Container\Internal\IBindData.cs" />
-    <Compile Include="..\CatLib.Core\Support\Container\Internal\IGivenData.cs" Link="Support\Container\Internal\IGivenData.cs" />
+    <Compile Include="..\CatLib.Core\Support\Container\MethodContainer.cs" Link="Support\Container\MethodContainer.cs" />
     <Compile Include="..\CatLib.Core\Support\Dispatcher\Dispatcher.cs" Link="Support\Dispatcher\Dispatcher.cs" />
     <Compile Include="..\CatLib.Core\Support\Dispatcher\EventHandler.cs" Link="Support\Dispatcher\EventHandler.cs" />
     <Compile Include="..\CatLib.Core\Support\Dispatcher\IDispatcher.cs" Link="Support\Dispatcher\IDispatcher.cs" />
@@ -113,7 +114,6 @@
     <Folder Include="..\CatLib.Core\Properties\" />
     <Folder Include="CatLib\" />
     <Folder Include="Support\Attribute\" />
-    <Folder Include="Support\Container\Internal\" />
     <Folder Include="Support\Dispatcher\" />
     <Folder Include="Support\Exception\" />
     <Folder Include="Support\FilterChain\" />

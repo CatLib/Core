@@ -45,6 +45,7 @@
     <Compile Include="CatLib\IBootstrap.cs" />
     <Compile Include="CatLib\IServiceProvider.cs" />
     <Compile Include="CatLib\IServiceProviderType.cs" />
+    <Compile Include="Support\Container\MethodContainer.cs" />
     <Compile Include="Support\Dispatcher\Dispatcher.cs" />
     <Compile Include="Support\Dispatcher\EventHandler.cs" />
     <Compile Include="Support\Dispatcher\IDispatcher.cs" />
@@ -58,8 +59,8 @@
     <Compile Include="Support\Container\GivenData.cs" />
     <Compile Include="Support\Container\IContainer.cs" />
     <Compile Include="Support\Container\InjectAttribute.cs" />
-    <Compile Include="Support\Container\Internal\IBindData.cs" />
-    <Compile Include="Support\Container\Internal\IGivenData.cs" />
+    <Compile Include="Support\Container\IBindData.cs" />
+    <Compile Include="Support\Container\IGivenData.cs" />
     <Compile Include="Support\Exception\AssertException.cs" />
     <Compile Include="Support\Exception\RuntimeException.cs" />
     <Compile Include="Support\FilterChain\FilterChain.cs" />
