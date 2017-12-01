@@ -14,15 +14,15 @@ namespace CatLib
     /// <summary>
     /// 绑定关系临时数据,用于支持链式调用
     /// </summary>
-    internal sealed class GivenData : IGivenData
+    internal sealed class GivenData<TReturn> : IGivenData<TReturn> where TReturn : class, IBindable<TReturn>
     {
         /// <summary>
         /// 绑定数据
         /// </summary>
-        private readonly BindData bindData;
-        
+        private readonly Bindable<TReturn> bindable;
+
         /// <summary>
-        /// 服务容器
+        /// 父级容器
         /// </summary>
         private readonly Container container;
 
@@ -34,12 +34,12 @@ namespace CatLib
         /// <summary>
         /// 绑定关系临时数据
         /// </summary>
-        /// <param name="container">服务容器</param>
-        /// <param name="bindData">服务绑定数据</param>
-        internal GivenData(Container container, BindData bindData)
+        /// <param name="container">依赖注入容器</param>
+        /// <param name="bindable">可绑定数据</param>
+        internal GivenData(Container container, Bindable<TReturn> bindable)
         {
-            this.bindData = bindData;
             this.container = container;
+            this.bindable = bindable;
         }
 
         /// <summary>
@@ -47,7 +47,7 @@ namespace CatLib
         /// </summary>
         /// <param name="needs">需求什么服务</param>
         /// <returns>绑定关系实例</returns>
-        internal IGivenData Needs(string needs)
+        internal IGivenData<TReturn> Needs(string needs)
         {
             this.needs = needs;
             return this;
@@ -58,10 +58,10 @@ namespace CatLib
         /// </summary>
         /// <param name="service">给与的服务名或别名</param>
         /// <returns>服务绑定数据</returns>
-        public IBindData Given(string service)
+        public TReturn Given(string service)
         {
             Guard.NotEmptyOrNull(service , "service");
-            return bindData.AddContextual(needs, service);
+            return bindable.AddContextual(needs, service) as TReturn;
         }
 
         /// <summary>
@@ -69,7 +69,7 @@ namespace CatLib
         /// </summary>
         /// <typeparam name="T">给与的服务名或别名</typeparam>
         /// <returns>服务绑定数据</returns>
-        public IBindData Given<T>()
+        public TReturn Given<T>()
         {
             return Given(container.Type2Service(typeof(T)));
         }

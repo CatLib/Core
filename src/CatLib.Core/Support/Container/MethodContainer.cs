@@ -9,9 +9,7 @@
  * Document: http://catlib.io/
  */
 
-using System.Reflection;
-
-namespace CatLib.Core.Support.Container
+namespace CatLib
 {
     /// <summary>
     /// 方法容器
@@ -35,12 +33,13 @@ namespace CatLib.Core.Support.Container
         /// <summary>
         /// 绑定一个方法
         /// </summary>
-        /// <param name="name">通过这个名字可以调用方法</param>
-        /// <param name="method">被调用的方法</param>
+        /// <param name="method">通过这个名字可以调用方法</param>
+        /// <param name="target">方法调用目标</param>
+        /// <param name="call">在方法调用目标中被调用的方法</param>
         /// <returns></returns>
-        public int BindMethod(string name, MethodInfo method)
+        public int BindMethod(string method, object target, string call)
         {
             return 0;
-        }
+        }        
     }
 }

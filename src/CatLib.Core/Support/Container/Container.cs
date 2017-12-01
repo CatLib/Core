@@ -761,7 +761,7 @@ namespace CatLib
         /// <param name="makeServiceInstance">服务实例</param>
         /// <returns>服务实例</returns>
         /// <exception cref="RuntimeException">属性是必须的或者注入类型和需求类型不一致</exception>
-        private void AttrInject(BindData makeServiceBindData, object makeServiceInstance)
+        private void AttrInject<T>(Bindable<T> makeServiceBindData, object makeServiceInstance) where T : class , IBindable<T>
         {
             if (makeServiceInstance == null)
             {
@@ -814,7 +814,7 @@ namespace CatLib
         /// <param name="makeServiceBindData">请求注入操作的服务绑定数据</param>
         /// <param name="service">希望构造的服务名或者别名</param>
         /// <returns>解决结果</returns>
-        private object ResolveNonClassAttr(BindData makeServiceBindData, string service)
+        private object ResolveNonClassAttr<T>(Bindable<T> makeServiceBindData, string service) where T : class, IBindable<T>
         {
             return Make(makeServiceBindData.GetContextual(service));
         }
@@ -825,7 +825,7 @@ namespace CatLib
         /// <param name="makeServiceBindData">请求注入操作的服务绑定数据</param>
         /// <param name="service">希望构造的服务名或者别名</param>
         /// <returns>解决结果</returns>
-        private object ResloveClassAttr(BindData makeServiceBindData, string service)
+        private object ResloveClassAttr<T>(Bindable<T> makeServiceBindData, string service) where T : class, IBindable<T>
         {
             return Make(makeServiceBindData.GetContextual(service));
         }
@@ -838,7 +838,7 @@ namespace CatLib
         /// <param name="param">输入的构造参数列表</param>
         /// <returns>服务所需参数的解决结果</returns>
         /// <exception cref="RuntimeException">生成的实例类型和需求类型不一致</exception>
-        private object[] GetDependencies(BindData makeServiceBindData, IList<ParameterInfo> paramInfo, IList<object> param)
+        private object[] GetDependencies<T>(Bindable<T> makeServiceBindData, IList<ParameterInfo> paramInfo, IList<object> param) where T : class, IBindable<T>
         {
             var myParam = new List<object>();
 
@@ -914,7 +914,7 @@ namespace CatLib
         /// <param name="makeServiceBindData">请求注入操作的服务绑定数据</param>
         /// <param name="service">希望解决的服务名或者别名</param>
         /// <returns>解决结果</returns>
-        private object ResolveNonClass(BindData makeServiceBindData, string service)
+        private object ResolveNonClass<T>(Bindable<T> makeServiceBindData, string service) where T : class, IBindable<T>
         {
             return Make(makeServiceBindData.GetContextual(service));
         }
@@ -925,7 +925,7 @@ namespace CatLib
         /// <param name="makeServiceBindData">请求注入操作的服务绑定数据</param>
         /// <param name="service">希望解决的服务名或者别名</param>
         /// <returns>解决结果</returns>
-        private object ResloveClass(BindData makeServiceBindData, string service)
+        private object ResloveClass<T>(Bindable<T> makeServiceBindData, string service) where T : class, IBindable<T>
         {
             return Make(makeServiceBindData.GetContextual(service));
         }
