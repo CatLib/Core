@@ -423,6 +423,74 @@ namespace CatLib
         }
 
         /// <summary>
+        /// 包装一个依赖注入形式调用的一个方法
+        /// </summary>
+        /// <param name="method">方法</param>
+        /// <param name="param">方法参数</param>
+        /// <returns>包装方法</returns>
+        public Action Wrap<T1>(Action<T1> method, params object[] param)
+        {
+            return () =>
+            {
+                if (method != null)
+                {
+                    Call(method.Target, method.Method, param);
+                }
+            };
+        }
+
+        /// <summary>
+        /// 包装一个依赖注入形式调用的一个方法
+        /// </summary>
+        /// <param name="method">方法</param>
+        /// <param name="param">方法参数</param>
+        /// <returns>包装方法</returns>
+        public Action Wrap<T1, T2>(Action<T1, T2> method, params object[] param)
+        {
+            return () =>
+            {
+                if (method != null)
+                {
+                    Call(method.Target, method.Method, param);
+                }
+            };
+        }
+
+        /// <summary>
+        /// 包装一个依赖注入形式调用的一个方法
+        /// </summary>
+        /// <param name="method">方法</param>
+        /// <param name="param">方法参数</param>
+        /// <returns>包装方法</returns>
+        public Action Wrap<T1, T2, T3>(Action<T1, T2, T3> method, params object[] param)
+        {
+            return () =>
+            {
+                if (method != null)
+                {
+                    Call(method.Target, method.Method, param);
+                }
+            };
+        }
+
+        /// <summary>
+        /// 包装一个依赖注入形式调用的一个方法
+        /// </summary>
+        /// <param name="method">方法</param>
+        /// <param name="param">方法参数</param>
+        /// <returns>包装方法</returns>
+        public Action Wrap<T1, T2, T3, T4>(Action<T1, T2, T3, T4> method, params object[] param)
+        {
+            return () =>
+            {
+                if (method != null)
+                {
+                    Call(method.Target, method.Method, param);
+                }
+            };
+        }
+
+        /// <summary>
         /// 构造服务
         /// </summary>
         /// <param name="service">服务名或别名</param>
