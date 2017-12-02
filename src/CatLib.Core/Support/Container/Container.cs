@@ -587,7 +587,7 @@ namespace CatLib
                     {
                         throw new RuntimeException("Service [" + service + "] is not Singleton(Static) Bind.");
                     }
-                    instance = ((BindData)bindData).ExecResolvingDecorator(instance);
+                    instance = ((BindData)bindData).TriggerResolving(instance);
                 }
                 else
                 {
@@ -620,7 +620,7 @@ namespace CatLib
                 }
 
                 var bindData = GetBindFillable(service);
-                bindData.ExecReleaseDecorator(instance);
+                bindData.TriggerRelease(instance);
                 TriggerOnRelease(bindData, instance);
                 instances.Remove(service);
             }
@@ -1012,6 +1012,17 @@ namespace CatLib
         /// <returns>解决结果</returns>
         protected object ResolvePrimitive<T>(Bindable<T> makeServiceBindData, string service , ParameterInfo baseParam) where T : class, IBindable<T>
         {
+            var newServiceBind = GetBind(makeServiceBindData.GetContextual("@" + baseParam.Name));
+            if (newServiceBind != null)
+            {
+                return Make(newServiceBind.Service);
+            }
+
+            if (baseParam.DefaultValue != DBNull.Value)
+            {
+                return baseParam.DefaultValue;
+            }
+
             return Make(makeServiceBindData.GetContextual(service));
         }
 
@@ -1173,7 +1184,7 @@ namespace CatLib
             }
             else
             {
-                buildInstance = TriggerOnResolving(bindData, bindData.ExecResolvingDecorator(buildInstance));
+                buildInstance = TriggerOnResolving(bindData, bindData.TriggerResolving(buildInstance));
             }
 
             return buildInstance;

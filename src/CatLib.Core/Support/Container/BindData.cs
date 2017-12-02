@@ -136,7 +136,7 @@ namespace CatLib
         /// </summary>
         /// <param name="obj">服务实例</param>
         /// <returns>修饰后的服务实例</returns>
-        internal object ExecResolvingDecorator(object obj)
+        internal object TriggerResolving(object obj)
         {
             if (resolving == null)
             {
@@ -153,7 +153,7 @@ namespace CatLib
         /// 执行服务释放处理器
         /// </summary>
         /// <param name="obj">服务实例</param>
-        internal void ExecReleaseDecorator(object obj)
+        internal void TriggerRelease(object obj)
         {
             if (release == null)
             {

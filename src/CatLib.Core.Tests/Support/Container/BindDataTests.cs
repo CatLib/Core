@@ -174,7 +174,7 @@ namespace CatLib.Tests.Stl
 
             bindData.OnResolving((bind, obj) => null);
 
-            var data = bindData.ExecResolvingDecorator(new Container());
+            var data = bindData.TriggerResolving(new Container());
             Assert.AreEqual(null, data);
         }
 

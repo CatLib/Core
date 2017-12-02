@@ -39,7 +39,7 @@ namespace CatLib
         /// <param name="container">依赖注入容器</param>
         /// <param name="target">调用源</param>
         /// <param name="method">调用方法名</param>
-        internal EventMethod(IContainer container, object target, string method)
+        public EventMethod(IContainer container, object target, string method)
         {
             this.container = container;
             this.target = target;
