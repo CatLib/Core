@@ -62,6 +62,11 @@ namespace CatLib
         private readonly SortSet<Func<string, Type>, int> findType;
 
         /// <summary>
+        /// 类型查询回调缓存
+        /// </summary>
+        private readonly Dictionary<string, Type> findTypeCache;
+
+        /// <summary>
         /// 方法容器
         /// </summary>
         private readonly MethodContainer methodContainer;
@@ -89,19 +94,22 @@ namespace CatLib
         /// <summary>
         /// 构造一个容器
         /// </summary>
-        public Container()
+        /// <param name="prime">初始预计服务数量</param>
+        public Container(int prime = 32)
         {
-            tags = new Dictionary<string, List<string>>();
-            aliases = new Dictionary<string, string>();
-            aliasesReverse = new Dictionary<string, List<string>>();
-            instances = new Dictionary<string, object>();
-            binds = new Dictionary<string, BindData>();
-            resolving = new List<Func<IBindData, object, object>>();
-            release = new List<Action<IBindData, object>>();
+            prime = Math.Max(8, prime);
+            tags = new Dictionary<string, List<string>>((int)(prime * 0.25));
+            aliases = new Dictionary<string, string>(prime * 4);
+            aliasesReverse = new Dictionary<string, List<string>>(prime * 4);
+            instances = new Dictionary<string, object>(prime * 4);
+            binds = new Dictionary<string, BindData>(prime * 4);
+            resolving = new List<Func<IBindData, object, object>>((int)(prime * 0.25));
+            release = new List<Action<IBindData, object>>((int)(prime * 0.25));
             findType = new SortSet<Func<string, Type>, int>();
+            findTypeCache = new Dictionary<string, Type>(prime * 4);
             injectTarget = typeof(InjectAttribute);
-            buildStack = new Stack<string>();
-            userParamsStack = new Stack<object[]>();
+            buildStack = new Stack<string>(32);
+            userParamsStack = new Stack<object[]>(32);
             methodContainer = new MethodContainer(this);
         }
 
@@ -189,6 +197,38 @@ namespace CatLib
         public bool HasBind(string service)
         {
             return GetBind(service) != null;
+        }
+
+        /// <summary>
+        /// 是否拥有服务
+        /// </summary>
+        /// <param name="service">服务名或者别名</param>
+        /// <returns>是否拥有服务</returns>
+        public bool HasService(string service)
+        {
+            Guard.NotEmptyOrNull(service, "service");
+            lock (syncRoot)
+            {
+                service = NormalizeService(service);
+                service = AliasToService(service);
+                return HasBind(service) || HasInstance(service) || GetServiceType(service) != null;
+            }
+        }
+
+        /// <summary>
+        /// 是否已经静态化
+        /// </summary>
+        /// <param name="service">服务名或别名</param>
+        /// <returns>是否已经静态化</returns>
+        public bool HasInstance(string service)
+        {
+            Guard.NotEmptyOrNull(service, "service");
+            lock (syncRoot)
+            {
+                service = NormalizeService(service);
+                service = AliasToService(service);
+                return instances.ContainsKey(service);
+            }
         }
 
         /// <summary>
@@ -775,7 +815,7 @@ namespace CatLib
                 }
                 catch (Exception ex)
                 {
-                    throw MakeBuildFaildException(makeServiceType, ex);
+                    throw MakeBuildFaildException(makeServiceBindData.Service, makeServiceType, ex);
                 }
             }
 
@@ -792,7 +832,7 @@ namespace CatLib
             }
             catch (Exception ex)
             {
-                throw MakeBuildFaildException(makeServiceType, ex);
+                throw MakeBuildFaildException(makeServiceBindData.Service, makeServiceType, ex);
             }
         }
 
@@ -988,8 +1028,13 @@ namespace CatLib
         /// <returns>解决结果</returns>
         protected object ResolveAttrPrimitive<T>(Bindable<T> makeServiceBindData, string service, PropertyInfo baseParam) where T : class, IBindable<T>
         {
-            var result = SpeculationServiceByParamName(makeServiceBindData, baseParam.Name);
+            service = makeServiceBindData.GetContextual(service);
+            if (HasService(service))
+            {
+                return Make(service);
+            }
 
+            var result = SpeculationServiceByParamName(makeServiceBindData, baseParam.Name);
             if(result != null)
             {
                 return result;
@@ -1019,17 +1064,21 @@ namespace CatLib
         /// <returns>解决结果</returns>
         protected object ResolvePrimitive<T>(Bindable<T> makeServiceBindData, string service , ParameterInfo baseParam) where T : class, IBindable<T>
         {
-            var result = SpeculationServiceByParamName(makeServiceBindData, baseParam.Name);
+            service = makeServiceBindData.GetContextual(service);
+            if (HasService(service))
+            {
+                return Make(service);
+            }
 
+            var result = SpeculationServiceByParamName(makeServiceBindData, baseParam.Name);
             if(result != null)
             {
                 return result;
             }
 
-            if (baseParam.IsOptional 
-                && baseParam.DefaultValue != DBNull.Value)
+            if (baseParam.IsOptional)
             {
-                return baseParam.DefaultValue;
+                return baseParam.DefaultValue != DBNull.Value ? baseParam.DefaultValue : null;
             }
 
             throw MakeUnresolvablePrimitiveException(baseParam.Name, baseParam.Member.DeclaringType);
@@ -1044,9 +1093,18 @@ namespace CatLib
         /// <returns>解决结果</returns>
         protected object ResloveClass<T>(Bindable<T> makeServiceBindData, string service, ParameterInfo baseParam) where T : class, IBindable<T>
         {
-            // 如果是可选的且是绑定解决异常那么我们就使用默认值
-            // baseParam.IsOptional
-            return Make(makeServiceBindData.GetContextual(service));
+            try
+            {
+                return Make(makeServiceBindData.GetContextual(service));
+            }
+            catch (UnresolvableException ex)
+            {
+                if (baseParam.IsOptional)
+                {
+                    return baseParam.DefaultValue != DBNull.Value ? baseParam.DefaultValue : null;
+                }
+                throw ex;
+            }
         }
 
         /// <summary>
@@ -1058,12 +1116,8 @@ namespace CatLib
         /// <returns>推测的服务</returns>
         protected object SpeculationServiceByParamName<T>(Bindable<T> makeServiceBindData, string paramName) where T : class, IBindable<T>
         {
-            var newServiceBind = GetBind(makeServiceBindData.GetContextual("@" + paramName));
-            if (newServiceBind != null)
-            {
-                return Make(newServiceBind.Service);
-            }
-            return null;
+            var service = makeServiceBindData.GetContextual("@" + paramName);
+            return HasService(service) ? Make(service) : null;
         }
 
         /// <summary>
@@ -1108,16 +1162,17 @@ namespace CatLib
         /// <summary>
         /// 生成一个编译失败异常
         /// </summary>
+        /// <param name="makeService">构造的服务名字</param>
         /// <param name="makeServiceType">构造的服务类型</param>
         /// <param name="innerException">内部异常</param>
         /// <returns>运行时异常</returns>
-        protected UnresolvableException MakeBuildFaildException(Type makeServiceType, Exception innerException)
+        protected UnresolvableException MakeBuildFaildException(string makeService, Type makeServiceType, Exception innerException)
         {
-            var message = "Target [" + makeServiceType + "] build faild.";
+            var message = "Target [" +(makeServiceType != null ? makeServiceType.ToString() : "NULL") + "] build faild. Service [" + makeService + "]";
             if (buildStack.Count > 0)
             {
                 var previous = string.Join(", ", buildStack.ToArray());
-                message = "Target [" + makeServiceType + "] build faild while building [" + previous + "].";
+                message = "Target [" + (makeServiceType != null ? makeServiceType.ToString() : "NULL") + "] build faild. Service [" + makeService + "] . While building [" + previous + "].";
             }
             return new UnresolvableException(message, innerException);
         }
@@ -1179,21 +1234,43 @@ namespace CatLib
         }
 
         /// <summary>
+        /// 守卫解决实例状态
+        /// </summary>
+        /// <param name="instance">服务实例</param>
+        /// <param name="makeService">服务名</param>
+        /// <param name="makeServiceType">服务类型</param>
+        protected void GuardResolveInstance(object instance,string makeService, Type makeServiceType)
+        {
+            if (instance == null)
+            {
+                throw MakeBuildFaildException(makeService, makeServiceType, null);
+            }
+        }
+
+        /// <summary>
         /// 获取通过服务名获取服务的类型
         /// </summary>
         /// <param name="service">服务名</param>
         /// <returns>服务类型</returns>
         protected Type GetServiceType(string service)
         {
+            Type result;
+
+            if (findTypeCache.TryGetValue(service, out result))
+            {
+                return result;
+            }
+
             foreach (var finder in findType)
             {
                 var type = finder.Invoke(service);
                 if (type != null)
                 {
-                    return type;
+                    return findTypeCache[service] = type;
                 }
             }
-            return null;
+
+            return findTypeCache[service] = null;
         }
 
         /// <summary>
@@ -1208,7 +1285,9 @@ namespace CatLib
         {
             var bindData = GetBindFillable(makeService);
             var buildInstance = isFromMake ? BuildUseConcrete(bindData, makeServiceType, userParams)
-                : Build(bindData, makeServiceType ?? GetServiceType(bindData.Service), userParams);
+                : Build(bindData, makeServiceType ?? (makeServiceType = GetServiceType(bindData.Service)), userParams);
+
+            GuardResolveInstance(buildInstance, makeService, makeServiceType);
 
             //只有是来自于make函数的调用时才执行di，包装，以及修饰
             if (!isFromMake)

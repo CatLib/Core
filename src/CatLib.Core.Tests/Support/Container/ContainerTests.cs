@@ -606,8 +606,9 @@ namespace CatLib.Tests.Stl
         public void TestContainerCallWithNullParams()
         {
             var container = MakeContainer();
+            container.Instance("@num", 777);
             var result = container.Call(this, "TestContainerCall", null);
-            Assert.AreEqual(0, result);
+            Assert.AreEqual(777, result);
         }
 
         /// <summary>
@@ -744,9 +745,10 @@ namespace CatLib.Tests.Stl
         {
             var container = MakeContainer();
             container.Bind<NoClassAttrInject>();
+            container.Bind("@Time", (c, p) => 100, false);
 
             var result = container.Make<NoClassAttrInject>();
-            Assert.AreEqual(0, result.Time);
+            Assert.AreEqual(100, result.Time);
         }
 
         /// <summary>
@@ -799,8 +801,9 @@ namespace CatLib.Tests.Stl
             var container = MakeContainer();
             container.Bind<MakeTestNoParamClass>();
             container.Bind<MakeTestClassDependency>();
+            container.Instance("@i", 77);
             var result = container.Make<MakeTestNoParamClass>();
-            Assert.AreEqual(0, result.I);
+            Assert.AreEqual(77, result.I);
             Assert.AreNotEqual(null, result.Dependency);
 
             var result2 = container.MakeWith<MakeTestNoParamClass>(100);
@@ -1454,14 +1457,16 @@ namespace CatLib.Tests.Stl
         public void TestBaseStructChangeInvalid()
         {
             var container = new Container();
-            Assert.AreEqual(0, container.Call(this, "TestContainerCall", "100000000000000000000"));
+            container.Instance<int>(10000);
+            Assert.AreEqual(10000, container.Call(this, "TestContainerCall", "100000000000000000000"));
         }
 
         [TestMethod]
         public void TestFormatException()
         {
             var container = new Container();
-            Assert.AreEqual(0, container.Call(this, "TestContainerCall", new ContainerTest()));
+            container.Instance("@num", 10);
+            Assert.AreEqual(10, container.Call(this, "TestContainerCall", new ContainerTest()));
         }
 
         internal class TestNoConstructorAccessClass

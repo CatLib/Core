@@ -78,6 +78,7 @@
     <Compile Include="..\CatLib.Core\Support\Container\InjectAttribute.cs" Link="Support\Container\InjectAttribute.cs" />
     <Compile Include="..\CatLib.Core\Support\Container\MethodBindData.cs" Link="Support\Container\MethodBindData.cs" />
     <Compile Include="..\CatLib.Core\Support\Container\MethodContainer.cs" Link="Support\Container\MethodContainer.cs" />
+    <Compile Include="..\CatLib.Core\Support\Container\UnresolvableException.cs" Link="Support\Container\UnresolvableException.cs" />
     <Compile Include="..\CatLib.Core\Support\Events\Dispatcher.cs" Link="Support\Events\Dispatcher.cs" />
     <Compile Include="..\CatLib.Core\Support\Events\EventHandler.cs" Link="Support\Events\EventHandler.cs" />
     <Compile Include="..\CatLib.Core\Support\Events\IDispatcher.cs" Link="Support\Events\IDispatcher.cs" />
@@ -127,6 +128,7 @@
     <Folder Include="Support\SortSet\" />
     <Folder Include="Support\Template\" />
     <Folder Include="Support\Util\" />
+    <Folder Include="Support\Container\" />
   </ItemGroup>
 
 </Project>

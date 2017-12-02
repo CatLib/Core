@@ -50,6 +50,7 @@
     <Compile Include="Support\Container\IMethodBindData.cs" />
     <Compile Include="Support\Container\MethodBindData.cs" />
     <Compile Include="Support\Container\MethodContainer.cs" />
+    <Compile Include="Support\Container\UnresolvableException.cs" />
     <Compile Include="Support\Events\Dispatcher.cs" />
     <Compile Include="Support\Events\EventHandler.cs" />
     <Compile Include="Support\Events\IDispatcher.cs" />
