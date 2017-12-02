@@ -119,6 +119,18 @@ namespace CatLib
         }
 
         /// <summary>
+        /// 为服务设定一个别名
+        /// </summary>
+        /// <typeparam name="TService">服务名</typeparam>
+        /// <param name="container">服务容器</param>
+        /// <param name="alias">别名</param>
+        /// <returns>服务容器</returns>
+        public static IContainer Alias<TService>(this IContainer container, string alias)
+        {
+            return container.Alias(alias, container.Type2Service(typeof(TService)));
+        }
+
+        /// <summary>
         /// 构造一个服务，允许传入构造参数
         /// </summary>
         /// <typeparam name="TService">服务名</typeparam>
@@ -146,7 +158,7 @@ namespace CatLib
         /// </summary>
         /// <typeparam name="TConvert">服务实例转换到的类型</typeparam>
         /// <param name="container">服务容器</param>
-        /// <param name="service">服务名</param>
+        /// <param name="service">服务名或者别名</param>
         /// <returns>服务实例</returns>
         public static TConvert Make<TConvert>(this IContainer container, string service)
         {
@@ -154,11 +166,34 @@ namespace CatLib
         }
 
         /// <summary>
+        /// 获取一个回调，当执行回调可以生成指定的服务
+        /// </summary>
+        /// <typeparam name="TService">服务名</typeparam>
+        /// <param name="container">服务容器</param>
+        /// <returns>回调方案</returns>
+        public static Func<TService> Factory<TService>(this IContainer container)
+        {
+            return () => (TService)container.Factory(container.Type2Service(typeof(TService))).Invoke();
+        }
+
+        /// <summary>
+        /// 获取一个回调，当执行回调可以生成指定的服务
+        /// </summary>
+        /// <typeparam name="TService">服务名</typeparam>
+        /// <param name="container">服务容器</param>
+        /// <param name="service">服务名或者别名</param>
+        /// <returns>回调方案</returns>
+        public static Func<TService> Factory<TService>(this IContainer container, string service)
+        {
+            return () => (TService)container.Factory(service).Invoke();
+        }
+
+        /// <summary>
         /// 释放服务
         /// </summary>
         /// <typeparam name="TService">服务名</typeparam>
         /// <param name="container">服务容器</param>
-        public static void Release<TService>(this IContainer container) where TService : class
+        public static void Release<TService>(this IContainer container)
         {
             container.Release(container.Type2Service(typeof(TService)));
         }
@@ -169,7 +204,7 @@ namespace CatLib
         /// <typeparam name="TService">服务名</typeparam>
         /// <param name="container">服务容器</param>
         /// <param name="instance">实例值</param>
-        public static void Instance<TService>(this IContainer container, object instance) where TService : class
+        public static void Instance<TService>(this IContainer container, object instance)
         {
             container.Instance(container.Type2Service(typeof(TService)), instance);
         }

@@ -450,11 +450,104 @@ namespace CatLib.Tests.Stl
             var container = MakeContainer();
             container.Instance<Container>(container);
 
-            container.Call((Container cls, int n) =>
+            container.Call((Container cls) =>
             {
-                Console.WriteLine(cls);
                 Assert.AreNotEqual(null, cls);
             });
+
+            container.Call((Container cls1, Container cls2) =>
+            {
+                Assert.AreNotEqual(null, cls1);
+                Assert.AreNotEqual(null, cls2);
+            });
+
+            container.Call((Container cls1, Container cls2, Container cls3) =>
+            {
+                Assert.AreNotEqual(null, cls1);
+                Assert.AreNotEqual(null, cls2);
+                Assert.AreNotEqual(null, cls3);
+            });
+
+            container.Call((Container cls1, Container cls2, Container cls3, Container cls4) =>
+            {
+                Assert.AreNotEqual(null, cls1);
+                Assert.AreNotEqual(null, cls2);
+                Assert.AreNotEqual(null, cls3);
+                Assert.AreNotEqual(null, cls4);
+
+                Assert.AreSame(cls1, cls4);
+            });
+        }
+
+        [TestMethod]
+        public void CheckWrapCall()
+        {
+            var container = MakeContainer();
+            container.Instance<Container>(container);
+
+            var callCount = 0;
+            var wrap = container.Wrap((Container cls) =>
+            {
+                Assert.AreNotEqual(null, cls);
+                callCount++;
+            });
+            wrap.Invoke();
+
+            wrap = container.Wrap((Container cls1, Container cls2) =>
+            {
+                Assert.AreNotEqual(null, cls1);
+                Assert.AreNotEqual(null, cls2);
+                callCount++;
+            });
+            wrap.Invoke();
+
+            wrap = container.Wrap((Container cls1, Container cls2, Container cls3) =>
+            {
+                Assert.AreNotEqual(null, cls1);
+                Assert.AreNotEqual(null, cls2);
+                Assert.AreNotEqual(null, cls3);
+                callCount++;
+            });
+            wrap.Invoke();
+
+            wrap = container.Wrap((Container cls1, Container cls2, Container cls3, Container cls4) =>
+            {
+                Assert.AreNotEqual(null, cls1);
+                Assert.AreNotEqual(null, cls2);
+                Assert.AreNotEqual(null, cls3);
+                Assert.AreNotEqual(null, cls4);
+
+                Assert.AreSame(cls1, cls4);
+                callCount++;
+            });
+            wrap.Invoke();
+
+            Assert.AreEqual(4, callCount);
+        }
+
+        [TestMethod]
+        public void TestFactory()
+        {
+            var container = MakeContainer();
+            container.Instance<Container>(container);
+            container.Instance("hello", 123);
+
+            var fac = container.Factory<Container>();
+            Assert.AreEqual(container.Make<Container>(), fac.Invoke());
+
+            var fac2 = container.Factory<int>("hello");
+            Assert.AreEqual(123, fac2.Invoke());
+        }
+
+        [TestMethod]
+        public void TestIsAlias()
+        {
+            var container = MakeContainer();
+            container.Instance<Container>(container);
+            container.Alias<Container>("123");
+
+            Assert.AreEqual(true, container.IsAlias("123"));
+            Assert.AreEqual(false, container.IsAlias(container.Type2Service(typeof(Container))));
         }
 
         /// <summary>

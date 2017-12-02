@@ -337,21 +337,6 @@ namespace CatLib
         }
 
         /// <summary>
-        /// 绑定一个方法
-        /// </summary>
-        /// <param name="method">
-        /// 方法名（可以被用于调用）
-        /// <para>名字可以重复,如果存在多个重复名字那么调用时同名的绑定的方法都将会被调用</para>
-        /// </param>
-        /// <param name="target">方法调用目标</param>
-        /// <param name="call">在方法调用目标中被调用的方法</param>
-        /// <returns>方法绑定数据</returns>
-        public IMethodBindData BindMethod(string method, object target, string call)
-        {
-            return methodContainer.BindMethod(method, target, call);
-        }
-
-        /// <summary>
         /// 以依赖注入形式调用一个方法
         /// </summary>
         /// <param name="instance">方法对象</param>
