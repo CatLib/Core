@@ -1111,7 +1111,7 @@ namespace CatLib
         /// <param name="makeServiceType">构造的服务类型</param>
         /// <param name="innerException">内部异常</param>
         /// <returns>运行时异常</returns>
-        protected RuntimeException MakeBuildFaildException(Type makeServiceType, Exception innerException)
+        protected UnresolvableException MakeBuildFaildException(Type makeServiceType, Exception innerException)
         {
             var message = "Target [" + makeServiceType + "] build faild.";
             if (buildStack.Count > 0)
@@ -1119,7 +1119,7 @@ namespace CatLib
                 var previous = string.Join(", ", buildStack.ToArray());
                 message = "Target [" + makeServiceType + "] build faild while building [" + previous + "].";
             }
-            return new RuntimeException(message, innerException);
+            return new UnresolvableException(message, innerException);
         }
 
         /// <summary>
