@@ -68,18 +68,6 @@ namespace CatLib
         }
 
         /// <summary>
-        /// 为每个正则表达式语法中的字符前增加一个反斜线。 
-        /// </summary>
-        /// <param name="str">规定字符串</param>
-        /// <returns>处理后的字符串</returns>
-        [Obsolete("Please use Regex.Escape()")]
-        [ExcludeFromCodeCoverage]
-        public static string RegexQuote(string str)
-        {
-            return Regex.Escape(str);
-        }
-
-        /// <summary>
         /// 根据长度将字符串分割到数组中
         /// </summary>
         /// <param name="str">要分割的字符串</param>

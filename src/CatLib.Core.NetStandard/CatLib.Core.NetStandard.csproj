@@ -78,10 +78,10 @@
     <Compile Include="..\CatLib.Core\Support\Container\InjectAttribute.cs" Link="Support\Container\InjectAttribute.cs" />
     <Compile Include="..\CatLib.Core\Support\Container\MethodBindData.cs" Link="Support\Container\MethodBindData.cs" />
     <Compile Include="..\CatLib.Core\Support\Container\MethodContainer.cs" Link="Support\Container\MethodContainer.cs" />
-    <Compile Include="..\CatLib.Core\Support\Dispatcher\Dispatcher.cs" Link="Support\Dispatcher\Dispatcher.cs" />
-    <Compile Include="..\CatLib.Core\Support\Dispatcher\EventHandler.cs" Link="Support\Dispatcher\EventHandler.cs" />
-    <Compile Include="..\CatLib.Core\Support\Dispatcher\IDispatcher.cs" Link="Support\Dispatcher\IDispatcher.cs" />
-    <Compile Include="..\CatLib.Core\Support\Dispatcher\IEventHandler.cs" Link="Support\Dispatcher\IEventHandler.cs" />
+    <Compile Include="..\CatLib.Core\Support\Events\Dispatcher.cs" Link="Support\Events\Dispatcher.cs" />
+    <Compile Include="..\CatLib.Core\Support\Events\EventHandler.cs" Link="Support\Events\EventHandler.cs" />
+    <Compile Include="..\CatLib.Core\Support\Events\IDispatcher.cs" Link="Support\Events\IDispatcher.cs" />
+    <Compile Include="..\CatLib.Core\Support\Events\IEventHandler.cs" Link="Support\Events\IEventHandler.cs" />
     <Compile Include="..\CatLib.Core\Support\Exception\AssertException.cs" Link="Support\Exception\AssertException.cs" />
     <Compile Include="..\CatLib.Core\Support\Exception\RuntimeException.cs" Link="Support\Exception\RuntimeException.cs" />
     <Compile Include="..\CatLib.Core\Support\FilterChain\FilterChain.cs" Link="Support\FilterChain\FilterChain.cs" />
@@ -118,7 +118,7 @@
     <Folder Include="..\CatLib.Core\Properties\" />
     <Folder Include="CatLib\" />
     <Folder Include="Support\Attribute\" />
-    <Folder Include="Support\Dispatcher\" />
+    <Folder Include="Support\Events\" />
     <Folder Include="Support\Exception\" />
     <Folder Include="Support\FilterChain\" />
     <Folder Include="Support\Guard\" />

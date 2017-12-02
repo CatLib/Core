@@ -735,7 +735,7 @@ namespace CatLib.Tests.Stl
         {
             var container = MakeContainer();
 
-            //container.OnFindType(Type.GetType); 不要使用这种写法否则域将不是这个程序集
+            //container.OnFindType(Type.GetServiceType); 不要使用这种写法否则域将不是这个程序集
             container.OnFindType((str) =>
             {
                 return Type.GetType(str);

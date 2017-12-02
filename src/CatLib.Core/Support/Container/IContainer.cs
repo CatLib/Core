@@ -15,7 +15,7 @@ using System.Reflection;
 namespace CatLib
 {
     /// <summary>
-    /// 容器接口
+    /// 依赖注入容器
     /// </summary>
     public interface IContainer
     {
@@ -126,18 +126,18 @@ namespace CatLib
         /// </summary>
         /// <param name="instance">方法对象</param>
         /// <param name="method">方法名</param>
-        /// <param name="param">方法参数</param>
+        /// <param name="userParams">用户传入的参数</param>
         /// <returns>方法返回值</returns>
-        object Call(object instance, string method, params object[] param);
+        object Call(object instance, string method, params object[] userParams);
 
         /// <summary>
         /// 以依赖注入形式调用一个方法
         /// </summary>
         /// <param name="instance">方法对象</param>
         /// <param name="methodInfo">方法信息</param>
-        /// <param name="param">方法参数</param>
+        /// <param name="userParams">用户传入的参数</param>
         /// <returns>方法返回值</returns>
-        object Call(object instance, MethodInfo methodInfo, params object[] param);
+        object Call(object instance, MethodInfo methodInfo, params object[] userParams);
 
         /// <summary>
         /// 以依赖注入的形式调用一个方法
@@ -167,41 +167,41 @@ namespace CatLib
         /// 包装一个依赖注入形式调用的一个方法
         /// </summary>
         /// <param name="method">方法</param>
-        /// <param name="param">方法参数</param>
+        /// <param name="userParams">用户传入的参数</param>
         /// <returns>包装方法</returns>
-        Action Wrap<T1>(Action<T1> method, params object[] param);
+        Action Wrap<T1>(Action<T1> method, params object[] userParams);
 
         /// <summary>
         /// 包装一个依赖注入形式调用的一个方法
         /// </summary>
         /// <param name="method">方法</param>
-        /// <param name="param">方法参数</param>
+        /// <param name="userParams">用户传入的参数</param>
         /// <returns>包装方法</returns>
-        Action Wrap<T1, T2>(Action<T1, T2> method, params object[] param);
+        Action Wrap<T1, T2>(Action<T1, T2> method, params object[] userParams);
 
         /// <summary>
         /// 包装一个依赖注入形式调用的一个方法
         /// </summary>
         /// <param name="method">方法</param>
-        /// <param name="param">方法参数</param>
+        /// <param name="userParams">用户传入的参数</param>
         /// <returns>包装方法</returns>
-        Action Wrap<T1, T2, T3>(Action<T1, T2, T3> method, params object[] param);
+        Action Wrap<T1, T2, T3>(Action<T1, T2, T3> method, params object[] userParams);
 
         /// <summary>
         /// 包装一个依赖注入形式调用的一个方法
         /// </summary>
         /// <param name="method">方法</param>
-        /// <param name="param">方法参数</param>
+        /// <param name="userParams">用户传入的参数</param>
         /// <returns>包装方法</returns>
-        Action Wrap<T1, T2, T3, T4>(Action<T1, T2, T3, T4> method, params object[] param);
+        Action Wrap<T1, T2, T3, T4>(Action<T1, T2, T3, T4> method, params object[] userParams);
 
         /// <summary>
         /// 构造服务,允许传入参数来决定构造函数的值
         /// </summary>
         /// <param name="service">服务名或别名</param>
-        /// <param name="param">构造参数</param>
+        /// <param name="userParams">用户传入的参数</param>
         /// <returns>服务实例，如果构造失败那么返回null</returns>
-        object MakeWith(string service, params object[] param);
+        object MakeWith(string service, params object[] userParams);
 
         /// <summary>
         /// 构造服务

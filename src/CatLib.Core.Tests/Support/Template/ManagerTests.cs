@@ -21,7 +21,7 @@ namespace CatLib.Tests.Stl
         {
             public Func<TestManagerClass> GetResolvePublic(string name)
             {
-                return GetResolve(name);
+                return GetExtend(name);
             }
         }
 

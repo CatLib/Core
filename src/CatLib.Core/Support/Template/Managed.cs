@@ -65,17 +65,6 @@ namespace CatLib
         }
 
         /// <summary>
-        /// 获取解决方案
-        /// </summary>
-        /// <param name="name">名字</param>
-        /// <returns>拓展</returns>
-        [Obsolete("Please use GetExtend()")]
-        protected Func<TInterface> GetResolve(string name)
-        {
-            return GetExtend(name);
-        }
-
-        /// <summary>
         /// 获取解决方案拓展
         /// </summary>
         /// <param name="name">名字</param>

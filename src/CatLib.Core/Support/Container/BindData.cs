@@ -17,7 +17,7 @@ namespace CatLib
     /// <summary>
     /// 服务绑定数据
     /// </summary>    
-    internal sealed class BindData : Bindable<IBindData>, IBindData
+    public sealed class BindData : Bindable<IBindData>, IBindData
     {
         /// <summary>
         /// 服务实现，执行这个委托将会获得服务实例
@@ -46,7 +46,7 @@ namespace CatLib
         /// <param name="service">服务名</param>
         /// <param name="concrete">服务实现</param>
         /// <param name="isStatic">服务是否是静态的</param>
-        internal BindData(Container container, string service, Func<IContainer, object[], object> concrete, bool isStatic)
+        public BindData(Container container, string service, Func<IContainer, object[], object> concrete, bool isStatic)
             :base(container, service)
         {
             Concrete = concrete;
