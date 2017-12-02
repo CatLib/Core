@@ -503,5 +503,21 @@ namespace CatLib
                 return true;
             });
         }
+
+        /// <summary>
+        /// 移除并返回指定下标的数组元素
+        /// </summary>
+        /// <typeparam name="T">数组类型</typeparam>
+        /// <param name="source">规定数组</param>
+        /// <param name="index">数组下标</param>
+        /// <returns>被移除的元素</returns>
+        public static T RemoveAt<T>(ref T[] source, int index)
+        {
+            Guard.Requires<ArgumentNullException>(source != null);
+            Guard.Requires<ArgumentNullException>(index < source.Length);
+
+            var result = Splice(ref source, index, 1);
+            return result.Length > 0 ? result[0] : default(T);
+        }
     }
 }

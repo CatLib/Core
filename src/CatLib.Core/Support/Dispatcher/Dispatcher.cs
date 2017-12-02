@@ -41,10 +41,16 @@ namespace CatLib
         private readonly object breakFlag = false;
 
         /// <summary>
+        /// 依赖注入容器
+        /// </summary>
+        private IContainer container;
+
+        /// <summary>
         /// 调度器
         /// </summary>
-        public Dispatcher()
+        public Dispatcher(IContainer container)
         {
+            this.container = container;
             handlers = new Dictionary<string, List<EventHandler>>();
             wildcardHandlers = new Dictionary<Regex, List<EventHandler>>();
             syncRoot = new object();

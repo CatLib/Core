@@ -965,47 +965,79 @@ namespace CatLib
         }
 
         /// <summary>
+        /// 从用户传入的参数中获取依赖
+        /// </summary>
+        /// <param name="baseParam">基础参数</param>
+        /// <param name="userParams">用户传入参数</param>
+        /// <returns>合适的注入参数</returns>
+        private object GetGetDependenciesFromUserParams(ParameterInfo baseParam, ref object[] userParams)
+        {
+            if (userParams == null)
+            {
+                return null;
+            }
+
+            if (userParams.Length > 255)
+            {
+                throw new RuntimeException("Too many parameters , must be less than 255");
+            }
+
+            for (var n = 0; n < userParams.Length; n++)
+            {
+                var userParam = userParams[n];
+                if (baseParam.ParameterType.IsInstanceOfType(userParam))
+                {
+                    return Arr.RemoveAt(ref userParams, n);
+                }
+
+                try
+                {
+                    if (baseParam.ParameterType.IsPrimitive)
+                    {
+                        var result = Convert.ChangeType(userParam, baseParam.ParameterType);
+                        Arr.RemoveAt(ref userParams, n);
+                        return result;
+                    }
+                }
+                catch (Exception)
+                {
+                    /*
+                    throw new RuntimeException(
+                        string.Format("Params [{0}({1})] can not convert to [{2}] , Service [{3}]",
+                            baseParam.Name, userParam, baseParam.ParameterType, service
+                        ), ex);*/
+                }
+            }
+
+            return null;
+        }
+
+        /// <summary>
         /// 获取依赖解决结果
         /// </summary>
         /// <param name="makeServiceBindData">服务绑定数据</param>
-        /// <param name="paramInfo">服务实例的参数信息</param>
-        /// <param name="param">输入的构造参数列表</param>
+        /// <param name="baseParams">服务实例的参数信息</param>
+        /// <param name="userParams">输入的构造参数列表</param>
         /// <returns>服务所需参数的解决结果</returns>
         /// <exception cref="RuntimeException">生成的实例类型和需求类型不一致</exception>
-        private object[] GetDependencies<T>(Bindable<T> makeServiceBindData, IList<ParameterInfo> paramInfo, IList<object> param) where T : class, IBindable<T>
+        private object[] GetDependencies<T>(Bindable<T> makeServiceBindData, IList<ParameterInfo> baseParams, object[] userParams) where T : class, IBindable<T>
         {
-            var myParam = new List<object>();
+            var results = new List<object>();
 
-            for (var i = 0; i < paramInfo.Count; i++)
+            foreach (var baseParam in baseParams)
             {
-                var info = paramInfo[i];
-                if (param != null && i < param.Count)
+                var instance = GetGetDependenciesFromUserParams(baseParam, ref userParams);
+                if (instance != null)
                 {
-                    if (info.ParameterType.IsInstanceOfType(param[i]))
-                    {
-                        myParam.Add(param[i]);
-                        continue;
-                    }
-
-                    try
-                    {
-                        myParam.Add(Convert.ChangeType(param[i], info.ParameterType));
-                    }
-                    catch (Exception ex)
-                    {
-                        throw new RuntimeException(
-                            string.Format("Params [{0}({1})] can not convert to [{2}] , Service [{3}]",
-                                info.Name, param[i], info.ParameterType, makeServiceBindData.Service
-                            ), ex);
-                    }
+                    results.Add(instance);
                     continue;
                 }
 
-                var needService = Type2Service(info.ParameterType);
+                var needService = Type2Service(baseParam.ParameterType);
                 InjectAttribute injectAttr = null;
-                if (info.IsDefined(injectTarget, false))
+                if (baseParam.IsDefined(injectTarget, false))
                 {
-                    var propertyAttrs = info.GetCustomAttributes(injectTarget, false);
+                    var propertyAttrs = baseParam.GetCustomAttributes(injectTarget, false);
                     if (propertyAttrs.Length > 0)
                     {
                         injectAttr = (InjectAttribute)propertyAttrs[0];
@@ -1016,8 +1048,7 @@ namespace CatLib
                     }
                 }
 
-                object instance;
-                if (info.ParameterType.IsClass || info.ParameterType.IsInterface)
+                if (baseParam.ParameterType.IsClass || baseParam.ParameterType.IsInterface)
                 {
                     instance = ResloveClass(makeServiceBindData, needService);
                 }
@@ -1028,18 +1059,18 @@ namespace CatLib
 
                 if (injectAttr != null && injectAttr.Required && instance == null)
                 {
-                    throw new RuntimeException("[" + makeServiceBindData.Service + "] Required [" + info.ParameterType + "] Service.");
+                    throw new RuntimeException("[" + makeServiceBindData.Service + "] Required [" + baseParam.ParameterType + "] Service.");
                 }
 
-                if (instance != null && !info.ParameterType.IsInstanceOfType(instance))
+                if (instance != null && !baseParam.ParameterType.IsInstanceOfType(instance))
                 {
-                    throw new RuntimeException("[" + makeServiceBindData.Service + "] Attr inject type must be [" + info.ParameterType + "] , But instance is [" + instance.GetType() + "] Make service is [" + needService + "].");
+                    throw new RuntimeException("[" + makeServiceBindData.Service + "] Attr inject type must be [" + baseParam.ParameterType + "] , But instance is [" + instance.GetType() + "] Make service is [" + needService + "].");
                 }
 
-                myParam.Add(instance);
+                results.Add(instance);
             }
 
-            return myParam.ToArray();
+            return results.ToArray();
         }
 
         /// <summary>

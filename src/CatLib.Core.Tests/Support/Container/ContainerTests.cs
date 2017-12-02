@@ -620,11 +620,7 @@ namespace CatLib.Tests.Stl
             container.Bind<CallTestClassInject>();
             var cls = new CallTestClass();
 
-            ExceptionAssert.Throws<RuntimeException>(() =>
-            {
-                container.Call(cls, "GetNumber", "illegal param");
-            });
-
+            Assert.AreEqual(2, container.Call(cls, "GetNumber", "illegal param"));
             var result = container.Call(cls, "GetNumber", null);
             Assert.AreEqual(2, result);
         }
@@ -1417,35 +1413,14 @@ namespace CatLib.Tests.Stl
         public void TestBaseStructChangeInvalid()
         {
             var container = new Container();
-
-            var isThrow = false;
-            try
-            {
-                container.Call(this, "TestContainerCall", "100000000000000000000");
-            }
-            catch (RuntimeException)
-            {
-                isThrow = true;
-            }
-
-            Assert.AreEqual(true, isThrow);
+            Assert.AreEqual(0, container.Call(this, "TestContainerCall", "100000000000000000000"));
         }
 
         [TestMethod]
         public void TestFormatException()
         {
             var container = new Container();
-
-            var isThrow = false;
-            try
-            {
-                container.Call(this, "TestContainerCall", new ContainerTest());
-            }
-            catch (RuntimeException)
-            {
-                isThrow = true;
-            }
-            Assert.AreEqual(true, isThrow);
+            Assert.AreEqual(0, container.Call(this, "TestContainerCall", new ContainerTest()));
         }
 
         internal class TestNoConstructorAccessClass
