@@ -988,7 +988,14 @@ namespace CatLib
         /// <returns>解决结果</returns>
         protected object ResolveAttrPrimitive<T>(Bindable<T> makeServiceBindData, string service, PropertyInfo baseParam) where T : class, IBindable<T>
         {
-            return Make(makeServiceBindData.GetContextual(service));
+            var result = SpeculationServiceByParamName(makeServiceBindData, baseParam.Name);
+
+            if(result != null)
+            {
+                return result;
+            }
+
+            throw MakeUnresolvablePrimitiveException(baseParam.Name, baseParam.DeclaringType);
         }
 
         /// <summary>
@@ -1012,18 +1019,20 @@ namespace CatLib
         /// <returns>解决结果</returns>
         protected object ResolvePrimitive<T>(Bindable<T> makeServiceBindData, string service , ParameterInfo baseParam) where T : class, IBindable<T>
         {
-            var newServiceBind = GetBind(makeServiceBindData.GetContextual("@" + baseParam.Name));
-            if (newServiceBind != null)
+            var result = SpeculationServiceByParamName(makeServiceBindData, baseParam.Name);
+
+            if(result != null)
             {
-                return Make(newServiceBind.Service);
+                return result;
             }
 
-            if (baseParam.DefaultValue != DBNull.Value)
+            if (baseParam.IsOptional 
+                && baseParam.DefaultValue != DBNull.Value)
             {
                 return baseParam.DefaultValue;
             }
 
-            return Make(makeServiceBindData.GetContextual(service));
+            throw MakeUnresolvablePrimitiveException(baseParam.Name, baseParam.Member.DeclaringType);
         }
 
         /// <summary>
@@ -1035,7 +1044,26 @@ namespace CatLib
         /// <returns>解决结果</returns>
         protected object ResloveClass<T>(Bindable<T> makeServiceBindData, string service, ParameterInfo baseParam) where T : class, IBindable<T>
         {
+            // 如果是可选的且是绑定解决异常那么我们就使用默认值
+            // baseParam.IsOptional
             return Make(makeServiceBindData.GetContextual(service));
+        }
+
+        /// <summary>
+        /// 根据参数名字来推测服务
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="makeServiceBindData">请求注入操作的服务绑定数据</param>
+        /// <param name="paramName">参数名</param>
+        /// <returns>推测的服务</returns>
+        protected object SpeculationServiceByParamName<T>(Bindable<T> makeServiceBindData, string paramName) where T : class, IBindable<T>
+        {
+            var newServiceBind = GetBind(makeServiceBindData.GetContextual("@" + paramName));
+            if (newServiceBind != null)
+            {
+                return Make(newServiceBind.Service);
+            }
+            return null;
         }
 
         /// <summary>
@@ -1092,6 +1120,18 @@ namespace CatLib
                 message = "Target [" + makeServiceType + "] build faild while building [" + previous + "].";
             }
             return new RuntimeException(message, innerException);
+        }
+
+        /// <summary>
+        /// 生成一个未能解决基本类型的异常
+        /// </summary>
+        /// <param name="name">变量名</param>
+        /// <param name="declaringClass">变量所属类</param>
+        /// <returns>运行时异常</returns>
+        protected RuntimeException MakeUnresolvablePrimitiveException(string name, Type declaringClass)
+        {
+            var message = "Unresolvable dependency , resolving [" + name + "] in class [" + declaringClass + "]";
+            return new RuntimeException(message);
         }
 
         /// <summary>
