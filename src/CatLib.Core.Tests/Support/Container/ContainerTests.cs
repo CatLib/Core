@@ -624,6 +624,25 @@ namespace CatLib.Tests.Stl
             var result = container.Call(cls, "GetNumber", null);
             Assert.AreEqual(2, result);
         }
+
+        [TestMethod]
+        public void TestOverflowParamNum()
+        {
+            var container = MakeContainer();
+            var cls = new CallTestClass();
+
+            var isThrow = false;
+            try
+            {
+                container.Call(cls, "GetNumber", new object[256]);
+            }
+            catch (Exception ex)
+            {
+                isThrow = true;
+            }
+
+            Assert.AreEqual(true, isThrow);
+        }
         #endregion
 
         #region Make
