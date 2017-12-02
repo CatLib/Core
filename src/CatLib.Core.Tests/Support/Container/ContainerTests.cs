@@ -643,6 +643,28 @@ namespace CatLib.Tests.Stl
 
             Assert.AreEqual(true, isThrow);
         }
+
+        class SimpleTestClass1 { }
+        class SimpleTestClass2 { }
+
+        [TestMethod]
+        public void TestLooseParameters()
+        {
+            var container = MakeContainer();
+            container.Bind<SimpleTestClass1>();
+            container.Bind<SimpleTestClass2>();
+
+            var objOut = new object();
+            var call = container.Wrap((object obj, SimpleTestClass1 cls1, int num, SimpleTestClass2 cls2) =>
+            {
+                Assert.AreSame(objOut, obj);
+                Assert.AreNotEqual(null, cls1);
+                Assert.AreNotEqual(null, cls2);
+                Assert.AreEqual(100, num);
+            }, objOut, (long)100);
+
+            call.Invoke();
+        }
         #endregion
 
         #region Make
