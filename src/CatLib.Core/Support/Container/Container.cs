@@ -335,7 +335,7 @@ namespace CatLib
         /// <param name="service">服务名</param>
         /// <param name="concrete">服务实现</param>
         /// <param name="isStatic">服务是否是静态的</param>
-        /// <param name="bindData">服务绑定数据</param>
+        /// <param name="bindData">如果绑定失败则返回历史绑定对象</param>
         /// <returns>服务绑定数据</returns>
         public bool BindIf(string service, Func<IContainer, object[], object> concrete, bool isStatic, out IBindData bindData)
         {
@@ -350,6 +350,7 @@ namespace CatLib
         /// <param name="service">服务名</param>
         /// <param name="concrete">服务实现</param>
         /// <param name="isStatic">服务是否是静态的</param>
+        /// <param name="bindData">如果绑定失败则返回历史绑定对象</param>
         /// <returns>服务绑定数据</returns>
         public bool BindIf(string service, Type concrete, bool isStatic, out IBindData bindData)
         {
@@ -372,7 +373,7 @@ namespace CatLib
             return Bind(service, (c, param) =>
             {
                 var container = (Container)c;
-                return container.Resolve(service, concrete, false, param);
+                return container.Build(service, concrete, false, param);
             }, isStatic);
         }
 
@@ -454,35 +455,7 @@ namespace CatLib
         /// <returns>服务实例，如果构造失败那么返回null</returns>
         public object MakeWith(string service, params object[] userParams)
         {
-            Guard.NotEmptyOrNull(service, "service");
-            lock (syncRoot)
-            {
-                service = NormalizeService(service);
-                service = AliasToService(service);
-
-                object instance;
-                if (instances.TryGetValue(service, out instance))
-                {
-                    return instance;
-                }
-
-                if (buildStack.Contains(service))
-                {
-                    throw new RuntimeException("Circular dependency detected while for [" + service + "].");
-                }
-
-                buildStack.Push(service);
-                userParamsStack.Push(userParams);
-                try
-                {
-                    return Resolve(service, null, true, userParams);
-                }
-                finally
-                {
-                    userParamsStack.Pop();
-                    buildStack.Pop();
-                }
-            }
+            return Resolve(service, userParams);
         }
 
         /// <summary>
@@ -971,6 +944,21 @@ namespace CatLib
         }
 
         /// <summary>
+        /// 获取编译堆栈调试消息
+        /// </summary>
+        /// <returns></returns>
+        protected virtual string GetBuildStackDebugMessage()
+        {
+            if (buildStack.Count <= 0)
+            {
+                return string.Empty;
+            }
+
+            var previous = string.Join(", ", buildStack.ToArray());
+            return " While building [" + previous + "].";
+        }
+
+        /// <summary>
         /// 生成一个编译失败异常
         /// </summary>
         /// <param name="makeService">构造的服务名字</param>
@@ -988,13 +976,8 @@ namespace CatLib
             {
                 message = "Service [" + makeService + "] is not exists.";
             }
-            
-            if (buildStack.Count > 0)
-            {
-                var previous = string.Join(", ", buildStack.ToArray());
-                message += " While building [" + previous + "].";
-            }
 
+            message += GetBuildStackDebugMessage();
             return new UnresolvableException(message, innerException);
         }
 
@@ -1008,6 +991,18 @@ namespace CatLib
         {
             var message = "Unresolvable primitive dependency , resolving [" + name + "] in class [" + declaringClass + "]";
             return new UnresolvableException(message);
+        }
+
+        /// <summary>
+        /// 生成一个出现循环依赖的异常
+        /// </summary>
+        /// <param name="service">当前服务名</param>
+        /// <returns>运行时异常</returns>
+        protected virtual RuntimeException MakeCircularDependencyException(string service)
+        {
+            var message = "Circular dependency detected while for [" + service + "].";
+            message += GetBuildStackDebugMessage();
+            return new RuntimeException(message);
         }
 
         /// <summary>
@@ -1182,18 +1177,72 @@ namespace CatLib
         }
 
         /// <summary>
+        /// 获取别名最终对应的服务名
+        /// </summary>
+        /// <param name="service">服务名或别名</param>
+        /// <returns>最终映射的服务名</returns>
+        protected virtual string AliasToService(string service)
+        {
+            string alias;
+            return aliases.TryGetValue(service, out alias) ? alias : service;
+        }
+
+        /// <summary>
         /// 解决服务
+        /// </summary>
+        /// <param name="service">服务名或别名</param>
+        /// <param name="userParams">用户传入的构造参数</param>
+        /// <returns>服务实例，如果构造失败那么返回null</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="service"/>为<c>null</c>或者空字符串</exception>
+        /// <exception cref="RuntimeException">出现循环依赖</exception>
+        /// <exception cref="UnresolvableException">无法解决服务</exception>
+        /// <returns>服务实例</returns>
+        private object Resolve(string service, params object[] userParams)
+        {
+            Guard.NotEmptyOrNull(service, "service");
+            lock (syncRoot)
+            {
+                service = NormalizeService(service);
+                service = AliasToService(service);
+
+                object instance;
+                if (instances.TryGetValue(service, out instance))
+                {
+                    return instance;
+                }
+
+                if (buildStack.Contains(service))
+                {
+                    throw new RuntimeException("Circular dependency detected while for [" + service + "].");
+                }
+
+                buildStack.Push(service);
+                userParamsStack.Push(userParams);
+                try
+                {
+                    return Build(service, null, true, userParams);
+                }
+                finally
+                {
+                    userParamsStack.Pop();
+                    buildStack.Pop();
+                }
+            }
+        }
+
+        /// <summary>
+        /// 编译服务
         /// </summary>
         /// <param name="makeService">服务名</param>
         /// <param name="makeServiceType">服务类型</param>
         /// <param name="isFromMake">是否直接调用自Make函数</param>
         /// <param name="userParams">用户传入的构造参数</param>
         /// <returns>服务实例</returns>
-        private object Resolve(string makeService, Type makeServiceType, bool isFromMake, params object[] userParams)
+        private object Build(string makeService, Type makeServiceType, bool isFromMake, params object[] userParams)
         {
             var bindData = GetBindFillable(makeService);
             var buildInstance = isFromMake ? BuildUseConcrete(bindData, makeServiceType, userParams)
-                : Build(bindData, makeServiceType ?? (makeServiceType = GetServiceType(bindData.Service)), userParams);
+                : CreateInstance(bindData, makeServiceType ?? (makeServiceType = GetServiceType(bindData.Service)), userParams);
 
             GuardResolveInstance(buildInstance, makeService, makeServiceType);
 
@@ -1226,7 +1275,7 @@ namespace CatLib
         /// <param name="makeServiceType">服务类型</param>
         /// <param name="userParams">用户传入的构造参数</param>
         /// <returns>服务实例</returns>
-        private object Build(BindData makeServiceBindData, Type makeServiceType, object[] userParams)
+        private object CreateInstance(BindData makeServiceBindData, Type makeServiceType, object[] userParams)
         {
             userParams = userParams ?? new object[] { };
 
@@ -1278,18 +1327,7 @@ namespace CatLib
         {
             return makeServiceBindData.Concrete != null ?
                 makeServiceBindData.Concrete(this, param) :
-                Resolve(makeServiceBindData.Service, makeServiceType, false, param);
-        }
-
-        /// <summary>
-        /// 获取别名最终对应的服务名
-        /// </summary>
-        /// <param name="service">服务名或别名</param>
-        /// <returns>最终映射的服务名</returns>
-        private string AliasToService(string service)
-        {
-            string alias;
-            return aliases.TryGetValue(service, out alias) ? alias : service;
+                Build(makeServiceBindData.Service, makeServiceType, false, param);
         }
 
         /// <summary>
