@@ -425,6 +425,12 @@ namespace CatLib
         public static T[] Reverse<T>(T[] source, int start = 0, int? length = null)
         {
             Guard.Requires<ArgumentNullException>(source != null);
+
+            if (source.Length == 1)
+            {
+                return source;
+            }
+
             Util.NormalizationPosition(source.Length, ref start, ref length);
             var tmpSource = new T[source.Length];
             Array.Copy(source, tmpSource, source.Length);
@@ -506,6 +512,7 @@ namespace CatLib
 
         /// <summary>
         /// 移除并返回指定下标的数组元素
+        /// <para>如果下标传入的是负数那么将会从末尾移除</para>
         /// </summary>
         /// <typeparam name="T">数组类型</typeparam>
         /// <param name="source">规定数组</param>
