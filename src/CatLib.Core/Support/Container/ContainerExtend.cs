@@ -19,6 +19,122 @@ namespace CatLib
     public static class ContainerExtend
     {
         /// <summary>
+        /// 以依赖注入的形式调用一个方法
+        /// </summary>
+        /// <param name="container">服务容器</param>
+        /// <param name="method">方法</param>
+        public static void Call<T1>(this IContainer container, Action<T1> method)
+        {
+            Guard.Requires<ArgumentNullException>(method != null);
+            container.Call(method.Target, method.Method);
+        }
+
+        /// <summary>
+        /// 以依赖注入的形式调用一个方法
+        /// </summary>
+        /// <param name="container">服务容器</param>
+        /// <param name="method">方法</param>
+        public static void Call<T1, T2>(this IContainer container, Action<T1, T2> method)
+        {
+            Guard.Requires<ArgumentNullException>(method != null);
+            container.Call(method.Target, method.Method);
+        }
+
+        /// <summary>
+        /// 以依赖注入的形式调用一个方法
+        /// </summary>
+        /// <param name="container">服务容器</param>
+        /// <param name="method">方法</param>
+        public static void Call<T1, T2, T3>(this IContainer container, Action<T1, T2, T3> method)
+        {
+            Guard.Requires<ArgumentNullException>(method != null);
+            container.Call(method.Target, method.Method);
+        }
+
+        /// <summary>
+        /// 以依赖注入的形式调用一个方法
+        /// </summary>
+        /// <param name="container">服务容器</param>
+        /// <param name="method">方法</param>
+        public static void Call<T1, T2, T3, T4>(this IContainer container, Action<T1, T2, T3, T4> method)
+        {
+            Guard.Requires<ArgumentNullException>(method != null);
+            container.Call(method.Target, method.Method);
+        }
+
+        /// <summary>
+        /// 包装一个依赖注入形式调用的一个方法
+        /// </summary>
+        /// <param name="container">服务容器</param>
+        /// <param name="method">方法</param>
+        /// <param name="userParams">用户传入的参数</param>
+        /// <returns>包装方法</returns>
+        public static Action Wrap<T1>(this IContainer container, Action<T1> method, params object[] userParams)
+        {
+            return () =>
+            {
+                if (method != null)
+                {
+                    container.Call(method.Target, method.Method, userParams);
+                }
+            };
+        }
+
+        /// <summary>
+        /// 包装一个依赖注入形式调用的一个方法
+        /// </summary>
+        /// <param name="container">服务容器</param>
+        /// <param name="method">方法</param>
+        /// <param name="userParams">用户传入的参数</param>
+        /// <returns>包装方法</returns>
+        public static Action Wrap<T1, T2>(this IContainer container, Action<T1, T2> method, params object[] userParams)
+        {
+            return () =>
+            {
+                if (method != null)
+                {
+                    container.Call(method.Target, method.Method, userParams);
+                }
+            };
+        }
+
+        /// <summary>
+        /// 包装一个依赖注入形式调用的一个方法
+        /// </summary>
+        /// <param name="container">服务容器</param>
+        /// <param name="method">方法</param>
+        /// <param name="userParams">用户传入的参数</param>
+        /// <returns>包装方法</returns>
+        public static Action Wrap<T1, T2, T3>(this IContainer container, Action<T1, T2, T3> method, params object[] userParams)
+        {
+            return () =>
+            {
+                if (method != null)
+                {
+                    container.Call(method.Target, method.Method, userParams);
+                }
+            };
+        }
+
+        /// <summary>
+        /// 包装一个依赖注入形式调用的一个方法
+        /// </summary>
+        /// <param name="container">服务容器</param>
+        /// <param name="method">方法</param>
+        /// <param name="userParams">用户传入的参数</param>
+        /// <returns>包装方法</returns>
+        public static Action Wrap<T1, T2, T3, T4>(this IContainer container, Action<T1, T2, T3, T4> method, params object[] userParams)
+        {
+            return () =>
+            {
+                if (method != null)
+                {
+                    container.Call(method.Target, method.Method, userParams);
+                }
+            };
+        }
+
+        /// <summary>
         /// 以单例的形式绑定一个服务
         /// </summary>
         /// <param name="container">服务容器</param>

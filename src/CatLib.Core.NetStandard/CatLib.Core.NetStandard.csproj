@@ -105,6 +105,7 @@
     <Compile Include="..\CatLib.Core\Support\Template\SingleManaged.cs" Link="Support\Template\SingleManaged.cs" />
     <Compile Include="..\CatLib.Core\Support\Template\SingleManager.cs" Link="Support\Template\SingleManager.cs" />
     <Compile Include="..\CatLib.Core\Support\Util\Arr.cs" Link="Support\Util\Arr.cs" />
+    <Compile Include="..\CatLib.Core\Support\Util\Dict.cs" Link="Support\Util\Dict.cs" />
     <Compile Include="..\CatLib.Core\Support\Util\Enum.cs" Link="Support\Util\Enum.cs" />
     <Compile Include="..\CatLib.Core\Support\Util\IAwait.cs" Link="Support\Util\IAwait.cs" />
     <Compile Include="..\CatLib.Core\Support\Util\IReferenceCount.cs" Link="Support\Util\IReferenceCount.cs" />
@@ -127,7 +128,6 @@
     <Folder Include="Support\QuickList\" />
     <Folder Include="Support\SortSet\" />
     <Folder Include="Support\Template\" />
-    <Folder Include="Support\Util\" />
     <Folder Include="Support\Container\" />
   </ItemGroup>
 

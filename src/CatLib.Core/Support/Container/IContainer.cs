@@ -147,62 +147,6 @@ namespace CatLib
         object Call(object instance, MethodInfo methodInfo, params object[] userParams);
 
         /// <summary>
-        /// 以依赖注入的形式调用一个方法
-        /// </summary>
-        /// <param name="method">方法</param>
-        void Call<T1>(Action<T1> method);
-
-        /// <summary>
-        /// 以依赖注入的形式调用一个方法
-        /// </summary>
-        /// <param name="method">方法</param>
-        void Call<T1, T2>(Action<T1, T2> method);
-
-        /// <summary>
-        /// 以依赖注入的形式调用一个方法
-        /// </summary>
-        /// <param name="method">方法</param>
-        void Call<T1, T2, T3>(Action<T1, T2, T3> method);
-
-        /// <summary>
-        /// 以依赖注入的形式调用一个方法
-        /// </summary>
-        /// <param name="method">方法</param>
-        void Call<T1, T2, T3, T4>(Action<T1, T2, T3, T4> method);
-
-        /// <summary>
-        /// 包装一个依赖注入形式调用的一个方法
-        /// </summary>
-        /// <param name="method">方法</param>
-        /// <param name="userParams">用户传入的参数</param>
-        /// <returns>包装方法</returns>
-        Action Wrap<T1>(Action<T1> method, params object[] userParams);
-
-        /// <summary>
-        /// 包装一个依赖注入形式调用的一个方法
-        /// </summary>
-        /// <param name="method">方法</param>
-        /// <param name="userParams">用户传入的参数</param>
-        /// <returns>包装方法</returns>
-        Action Wrap<T1, T2>(Action<T1, T2> method, params object[] userParams);
-
-        /// <summary>
-        /// 包装一个依赖注入形式调用的一个方法
-        /// </summary>
-        /// <param name="method">方法</param>
-        /// <param name="userParams">用户传入的参数</param>
-        /// <returns>包装方法</returns>
-        Action Wrap<T1, T2, T3>(Action<T1, T2, T3> method, params object[] userParams);
-
-        /// <summary>
-        /// 包装一个依赖注入形式调用的一个方法
-        /// </summary>
-        /// <param name="method">方法</param>
-        /// <param name="userParams">用户传入的参数</param>
-        /// <returns>包装方法</returns>
-        Action Wrap<T1, T2, T3, T4>(Action<T1, T2, T3, T4> method, params object[] userParams);
-
-        /// <summary>
         /// 构造服务,允许传入参数来决定构造函数的值
         /// </summary>
         /// <param name="service">服务名或别名</param>
