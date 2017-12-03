@@ -61,7 +61,7 @@ namespace CatLib
         /// <param name="concrete">服务实体</param>
         /// <param name="isStatic">服务是否静态化</param>
         /// <returns>服务绑定数据</returns>
-        bool Bind(string service, Func<IContainer, object[], object> concrete, bool isStatic, out IBindData bindData);
+        IBindData Bind(string service, Func<IContainer, object[], object> concrete, bool isStatic);
 
         /// <summary>
         /// 绑定一个服务
@@ -70,27 +70,27 @@ namespace CatLib
         /// <param name="concrete">服务实现</param>
         /// <param name="isStatic">服务是否静态化</param>
         /// <returns>服务绑定数据</returns>
-        bool Bind(string service, Type concrete, bool isStatic, out IBindData bindData);
+        IBindData Bind(string service, Type concrete, bool isStatic);
 
         /// <summary>
         /// 如果服务不存在那么则绑定服务
-        /// <para>如果返回值为null说明没有绑定服务</para>
         /// </summary>
         /// <param name="service">服务名</param>
         /// <param name="concrete">服务实现</param>
         /// <param name="isStatic">服务是否是静态的</param>
-        /// <returns>服务绑定数据</returns>
-        IBindData BindIf(string service, Func<IContainer, object[], object> concrete, bool isStatic);
+        /// <param name="bindData">如果绑定失败则返回历史绑定对象</param>
+        /// <returns>是否成功绑定</returns>
+        bool BindIf(string service, Func<IContainer, object[], object> concrete, bool isStatic, out IBindData bindData);
 
         /// <summary>
         /// 如果服务不存在那么则绑定服务
-        /// <para>如果返回值为null说明没有绑定服务</para>
         /// </summary>
         /// <param name="service">服务名</param>
         /// <param name="concrete">服务实现</param>
         /// <param name="isStatic">服务是否是静态的</param>
-        /// <returns>服务绑定数据</returns>
-        IBindData BindIf(string service, Type concrete, bool isStatic);
+        /// <param name="bindData">如果绑定失败则返回历史绑定对象</param>
+        /// <returns>是否成功绑定</returns>
+        bool BindIf(string service, Type concrete, bool isStatic, out IBindData bindData);
 
         /// <summary>
         /// 为一个及以上的服务定义一个标记
@@ -123,12 +123,6 @@ namespace CatLib
         /// 清空容器的所有实例，绑定，别名，标签，解决器
         /// </summary>
         void Flush();
-
-        /// <summary>
-        /// 当静态服务被释放时
-        /// </summary>
-        /// <param name="action">处理释放时的回调</param>
-        IContainer OnRelease(Action<IBindData, object> action);
 
         /// <summary>
         /// 以依赖注入形式调用一个方法
@@ -184,12 +178,35 @@ namespace CatLib
         IContainer OnResolving(Func<IBindData, object, object> func);
 
         /// <summary>
+        /// 当静态服务被释放时
+        /// </summary>
+        /// <param name="action">处理释放时的回调</param>
+        IContainer OnRelease(Action<IBindData, object> action);
+
+        /// <summary>
         /// 当查找类型无法找到时会尝试去调用开发者提供的查找类型函数
         /// </summary>
         /// <param name="func">查找类型的回调</param>
         /// <param name="priority">查询优先级(值越小越优先)</param>
         /// <returns>当前容器实例</returns>
         IContainer OnFindType(Func<string, Type> func, int priority = int.MaxValue);
+
+        /// <summary>
+        /// 当一个已经被解决的服务，发生重定义时触发
+        /// </summary>
+        /// <param name="service">服务名</param>
+        /// <param name="callback">回调</param>
+        /// <returns>服务容器</returns>
+        IContainer OnRebound(string service, Action<IContainer, object> callback);
+
+        /// <summary>
+        /// 关注指定的服务，当服务触发重定义时调用指定对象的指定方法
+        /// <param>调用是以依赖注入的形式进行的</param>
+        /// </summary>
+        /// <param name="service">关注的服务名</param>
+        /// <param name="target">当服务发生重定义时调用的目标</param>
+        /// <param name="method">方法名</param>
+        void Watch(string service, object target, string method);
 
         /// <summary>
         /// 类型转为服务名

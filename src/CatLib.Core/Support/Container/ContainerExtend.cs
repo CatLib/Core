@@ -203,6 +203,64 @@ namespace CatLib
         }
 
         /// <summary>
+        /// 如果服务不存在那么则绑定服务
+        /// </summary>
+        /// <typeparam name="TService">服务名</typeparam>
+        /// <typeparam name="TAlias">服务别名</typeparam>
+        /// <param name="container">服务容器</param>
+        /// <param name="bindData">如果绑定失败则返回历史绑定对象</param>
+        /// <returns>是否完成绑定</returns>
+        public static bool SingletonIf<TService, TAlias>(this IContainer container, out IBindData bindData)
+        {
+            if (container.BindIf(container.Type2Service(typeof(TService)), typeof(TService), true, out bindData))
+            {
+                bindData.Alias(container.Type2Service(typeof(TAlias)));
+                return true;
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// 如果服务不存在那么则绑定服务
+        /// </summary>
+        /// <typeparam name="TService">服务名，同时也是服务实现</typeparam>
+        /// <param name="container">服务容器</param>
+        /// <param name="bindData">如果绑定失败则返回历史绑定对象</param>
+        /// <returns>是否完成绑定</returns>
+        public static bool SingletonIf<TService>(this IContainer container, out IBindData bindData) where TService : class
+        {
+            return container.BindIf(container.Type2Service(typeof(TService)), typeof(TService), true, out bindData);
+        }
+
+        /// <summary>
+        /// 如果服务不存在那么则绑定服务
+        /// </summary>
+        /// <typeparam name="TService">服务名</typeparam>
+        /// <param name="container">服务容器</param>
+        /// <param name="concrete">服务实现</param>
+        /// <param name="bindData">如果绑定失败则返回历史绑定对象</param>
+        /// <returns>是否完成绑定</returns>
+        public static bool SingletonIf<TService>(this IContainer container, Func<IContainer, object[], object> concrete, out IBindData bindData)
+            where TService : class
+        {
+            return container.BindIf(container.Type2Service(typeof(TService)), concrete, true, out bindData);
+        }
+
+        /// <summary>
+        /// 如果服务不存在那么则绑定服务
+        /// </summary>
+        /// <param name="container">服务容器</param>
+        /// <param name="service">服务名</param>
+        /// <param name="concrete">服务实现</param>
+        /// <param name="bindData">如果绑定失败则返回历史绑定对象</param>
+        /// <returns>是否完成绑定</returns>
+        public static bool SingletonIf(this IContainer container, string service,
+            Func<IContainer, object[], object> concrete, out IBindData bindData)
+        {
+            return container.BindIf(service, concrete, true, out bindData);
+        }
+
+        /// <summary>
         /// 常规绑定一个服务
         /// </summary>
         /// <typeparam name="TService">服务名</typeparam>
@@ -250,6 +308,64 @@ namespace CatLib
             Func<IContainer, object[], object> concrete)
         {
             return container.Bind(service, concrete, false);
+        }
+
+        /// <summary>
+        /// 如果服务不存在那么则绑定服务
+        /// </summary>
+        /// <typeparam name="TService">服务名</typeparam>
+        /// <typeparam name="TAlias">服务别名</typeparam>
+        /// <param name="container">服务容器</param>
+        /// <param name="bindData">如果绑定失败则返回历史绑定对象</param>
+        /// <returns>是否完成绑定</returns>
+        public static bool BindIf<TService, TAlias>(this IContainer container, out IBindData bindData)
+        {
+            if (container.BindIf(container.Type2Service(typeof(TService)), typeof(TService), false, out bindData))
+            {
+                bindData.Alias(container.Type2Service(typeof(TAlias)));
+                return true;
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// 如果服务不存在那么则绑定服务
+        /// </summary>
+        /// <typeparam name="TService">服务名，同时也是服务实现</typeparam>
+        /// <param name="container">服务容器</param>
+        /// <param name="bindData">如果绑定失败则返回历史绑定对象</param>
+        /// <returns>是否完成绑定</returns>
+        public static bool BindIf<TService>(this IContainer container,out IBindData bindData) where TService : class
+        {
+            return container.BindIf(container.Type2Service(typeof(TService)), typeof(TService), false, out bindData);
+        }
+
+        /// <summary>
+        /// 如果服务不存在那么则绑定服务
+        /// </summary>
+        /// <typeparam name="TService">服务名</typeparam>
+        /// <param name="container">服务容器</param>
+        /// <param name="concrete">服务实现</param>
+        /// <param name="bindData">如果绑定失败则返回历史绑定对象</param>
+        /// <returns>是否完成绑定</returns>
+        public static bool BindIf<TService>(this IContainer container, Func<IContainer, object[], object> concrete,out IBindData bindData)
+            where TService : class
+        {
+            return container.BindIf(container.Type2Service(typeof(TService)), concrete, false, out bindData);
+        }
+
+        /// <summary>
+        /// 如果服务不存在那么则绑定服务
+        /// </summary>
+        /// <param name="container">服务容器</param>
+        /// <param name="service">服务名</param>
+        /// <param name="concrete">服务实现</param>
+        /// <param name="bindData">如果绑定失败则返回历史绑定对象</param>
+        /// <returns>是否完成绑定</returns>
+        public static bool BindIf(this IContainer container, string service,
+            Func<IContainer, object[], object> concrete,out IBindData bindData)
+        {
+            return container.BindIf(service, concrete, false, out bindData);
         }
 
         /// <summary>

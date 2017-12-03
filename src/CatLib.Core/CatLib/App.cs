@@ -258,10 +258,11 @@ namespace CatLib
         /// <param name="service">服务名</param>
         /// <param name="concrete">服务实现</param>
         /// <param name="isStatic">服务是否是静态的</param>
+        /// <param name="bindData">如果绑定失败则返回历史绑定对象</param>
         /// <returns>服务绑定数据</returns>
-        public static IBindData BindIf(string service, Func<IContainer, object[], object> concrete, bool isStatic)
+        public static bool BindIf(string service, Func<IContainer, object[], object> concrete, bool isStatic, out IBindData bindData)
         {
-            return Handler.BindIf(service, concrete, isStatic);
+            return Handler.BindIf(service, concrete, isStatic, out bindData);
         }
 
         /// <summary>
@@ -270,10 +271,11 @@ namespace CatLib
         /// <param name="service">服务名</param>
         /// <param name="concrete">服务实现</param>
         /// <param name="isStatic">服务是否是静态的</param>
+        /// <param name="bindData">如果绑定失败则返回历史绑定对象</param>
         /// <returns>服务绑定数据</returns>
-        public static IBindData BindIf(string service, Type concrete, bool isStatic)
+        public static bool BindIf(string service, Type concrete, bool isStatic, out IBindData bindData)
         {
-            return Handler.BindIf(service, concrete, isStatic);
+            return Handler.BindIf(service, concrete, isStatic, out bindData);
         }
 
         /// <summary>
@@ -352,7 +354,7 @@ namespace CatLib
         /// 以依赖注入的形式调用一个方法
         /// </summary>
         /// <param name="method">方法</param>
-        public void Call<T1>(Action<T1> method)
+        public static void Call<T1>(Action<T1> method)
         {
             Handler.Call(method);
         }
@@ -361,7 +363,7 @@ namespace CatLib
         /// 以依赖注入的形式调用一个方法
         /// </summary>
         /// <param name="method">方法</param>
-        public void Call<T1, T2>(Action<T1, T2> method)
+        public static void Call<T1, T2>(Action<T1, T2> method)
         {
             Handler.Call(method);
         }
@@ -370,7 +372,7 @@ namespace CatLib
         /// 以依赖注入的形式调用一个方法
         /// </summary>
         /// <param name="method">方法</param>
-        public void Call<T1, T2, T3>(Action<T1, T2, T3> method)
+        public static void Call<T1, T2, T3>(Action<T1, T2, T3> method)
         {
             Handler.Call(method);
         }
@@ -379,7 +381,7 @@ namespace CatLib
         /// 以依赖注入的形式调用一个方法
         /// </summary>
         /// <param name="method">方法</param>
-        public void Call<T1, T2, T3, T4>(Action<T1, T2, T3, T4> method)
+        public static void Call<T1, T2, T3, T4>(Action<T1, T2, T3, T4> method)
         {
             Handler.Call(method);
         }
@@ -390,7 +392,7 @@ namespace CatLib
         /// <param name="method">方法</param>
         /// <param name="userParams">用户传入的参数</param>
         /// <returns>包装方法</returns>
-        public Action Wrap<T1>(Action<T1> method, params object[] userParams)
+        public static Action Wrap<T1>(Action<T1> method, params object[] userParams)
         {
             return Handler.Wrap(method, userParams);
         }
@@ -401,7 +403,7 @@ namespace CatLib
         /// <param name="method">方法</param>
         /// <param name="userParams">用户传入的参数</param>
         /// <returns>包装方法</returns>
-        public Action Wrap<T1, T2>(Action<T1, T2> method, params object[] userParams)
+        public static Action Wrap<T1, T2>(Action<T1, T2> method, params object[] userParams)
         {
             return Handler.Wrap(method, userParams);
         }
@@ -412,7 +414,7 @@ namespace CatLib
         /// <param name="method">方法</param>
         /// <param name="userParams">用户传入的参数</param>
         /// <returns>包装方法</returns>
-        public Action Wrap<T1, T2, T3>(Action<T1, T2, T3> method, params object[] userParams)
+        public static Action Wrap<T1, T2, T3>(Action<T1, T2, T3> method, params object[] userParams)
         {
             return Handler.Wrap(method, userParams);
         }
@@ -423,7 +425,7 @@ namespace CatLib
         /// <param name="method">方法</param>
         /// <param name="userParams">用户传入的参数</param>
         /// <returns>包装方法</returns>
-        public Action Wrap<T1, T2, T3, T4>(Action<T1, T2, T3, T4> method, params object[] userParams)
+        public static Action Wrap<T1, T2, T3, T4>(Action<T1, T2, T3, T4> method, params object[] userParams)
         {
             return Handler.Wrap(method, userParams);
         }
@@ -566,6 +568,58 @@ namespace CatLib
         }
 
         /// <summary>
+        /// 如果服务不存在那么则绑定服务
+        /// </summary>
+        /// <typeparam name="TService">服务名</typeparam>
+        /// <typeparam name="TAlias">服务别名</typeparam>
+        /// <param name="container">服务容器</param>
+        /// <param name="bindData">如果绑定失败则返回历史绑定对象</param>
+        /// <returns>是否完成绑定</returns>
+        public static bool SingletonIf<TService, TAlias>(out IBindData bindData)
+        {
+            return Handler.SingletonIf<TService, TAlias>(out bindData);
+        }
+
+        /// <summary>
+        /// 如果服务不存在那么则绑定服务
+        /// </summary>
+        /// <typeparam name="TService">服务名，同时也是服务实现</typeparam>
+        /// <param name="container">服务容器</param>
+        /// <param name="bindData">如果绑定失败则返回历史绑定对象</param>
+        /// <returns>是否完成绑定</returns>
+        public static bool SingletonIf<TService>(out IBindData bindData) where TService : class
+        {
+            return Handler.SingletonIf<TService>(out bindData);
+        }
+
+        /// <summary>
+        /// 如果服务不存在那么则绑定服务
+        /// </summary>
+        /// <typeparam name="TService">服务名</typeparam>
+        /// <param name="container">服务容器</param>
+        /// <param name="concrete">服务实现</param>
+        /// <param name="bindData">如果绑定失败则返回历史绑定对象</param>
+        /// <returns>是否完成绑定</returns>
+        public static bool SingletonIf<TService>(Func<IContainer, object[], object> concrete, out IBindData bindData)
+            where TService : class
+        {
+            return Handler.SingletonIf<TService>(concrete, out bindData);
+        }
+
+        /// <summary>
+        /// 如果服务不存在那么则绑定服务
+        /// </summary>
+        /// <param name="container">服务容器</param>
+        /// <param name="service">服务名</param>
+        /// <param name="concrete">服务实现</param>
+        /// <param name="bindData">如果绑定失败则返回历史绑定对象</param>
+        /// <returns>是否完成绑定</returns>
+        public static bool SingletonIf(string service, Func<IContainer, object[], object> concrete, out IBindData bindData)
+        {
+            return Handler.SingletonIf(service, concrete, out bindData);
+        }
+
+        /// <summary>
         /// 常规绑定一个服务
         /// </summary>
         /// <typeparam name="TService">服务名</typeparam>
@@ -608,6 +662,58 @@ namespace CatLib
             Func<IContainer, object[], object> concrete)
         {
             return Handler.Bind(service, concrete);
+        }
+
+        /// <summary>
+        /// 如果服务不存在那么则绑定服务
+        /// </summary>
+        /// <typeparam name="TService">服务名</typeparam>
+        /// <typeparam name="TAlias">服务别名</typeparam>
+        /// <param name="container">服务容器</param>
+        /// <param name="bindData">如果绑定失败则返回历史绑定对象</param>
+        /// <returns>是否完成绑定</returns>
+        public static bool BindIf<TService, TAlias>(out IBindData bindData)
+        {
+            return Handler.BindIf<TService, TAlias>(out bindData);
+        }
+
+        /// <summary>
+        /// 如果服务不存在那么则绑定服务
+        /// </summary>
+        /// <typeparam name="TService">服务名，同时也是服务实现</typeparam>
+        /// <param name="container">服务容器</param>
+        /// <param name="bindData">如果绑定失败则返回历史绑定对象</param>
+        /// <returns>是否完成绑定</returns>
+        public static bool BindIf<TService>(out IBindData bindData) where TService : class
+        {
+            return Handler.BindIf<TService>(out bindData);
+        }
+
+        /// <summary>
+        /// 如果服务不存在那么则绑定服务
+        /// </summary>
+        /// <typeparam name="TService">服务名</typeparam>
+        /// <param name="container">服务容器</param>
+        /// <param name="concrete">服务实现</param>
+        /// <param name="bindData">如果绑定失败则返回历史绑定对象</param>
+        /// <returns>是否完成绑定</returns>
+        public static bool BindIf<TService>(Func<IContainer, object[], object> concrete, out IBindData bindData)
+            where TService : class
+        {
+            return Handler.BindIf<TService>(concrete, out bindData);
+        }
+
+        /// <summary>
+        /// 如果服务不存在那么则绑定服务
+        /// </summary>
+        /// <param name="container">服务容器</param>
+        /// <param name="service">服务名</param>
+        /// <param name="concrete">服务实现</param>
+        /// <param name="bindData">如果绑定失败则返回历史绑定对象</param>
+        /// <returns>是否完成绑定</returns>
+        public static bool BindIf(string service, Func<IContainer, object[], object> concrete, out IBindData bindData)
+        {
+            return Handler.BindIf(service, concrete, out bindData);
         }
 
         /// <summary>

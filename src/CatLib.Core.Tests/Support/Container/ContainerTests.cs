@@ -139,10 +139,13 @@ namespace CatLib.Tests.Stl
         public void CanBindIf()
         {
             var container = MakeContainer();
-            var bind = container.BindIf("CanBindIf", (cont, param) => "Hello", true);
-            var bind2 = container.BindIf("CanBindIf", (cont, param) => "World", false);
+            IBindData bind1, bind2;
+            var result1 = container.BindIf("CanBindIf", (cont, param) => "Hello", true, out bind1);
+            var result2 = container.BindIf("CanBindIf", (cont, param) => "World", false,out bind2);
 
-            Assert.AreSame(bind, bind2);
+            Assert.AreSame(bind1, bind2);
+            Assert.AreEqual(true, result1);
+            Assert.AreEqual(false, result2);
         }
 
         /// <summary>
@@ -152,10 +155,13 @@ namespace CatLib.Tests.Stl
         public void CanBindIfByType()
         {
             var container = MakeContainer();
-            var bind = container.BindIf("CanBindIf", typeof(ContainerTest), true);
-            var bind2 = container.BindIf("CanBindIf", typeof(ContainerTest), false);
+            IBindData bind1, bind2;
+            var result1 = container.BindIf("CanBindIf", typeof(ContainerTest), true, out bind1);
+            var result2 = container.BindIf("CanBindIf", typeof(ContainerTest), false, out bind2);
 
-            Assert.AreSame(bind, bind2);
+            Assert.AreSame(bind1, bind2);
+            Assert.AreEqual(true, result1);
+            Assert.AreEqual(false, result2);
         }
 
         /// <summary>
@@ -1503,9 +1509,6 @@ namespace CatLib.Tests.Stl
         }
         #endregion
 
-        /// <summary>
-        /// 已存在的静态对象在注册新的OnResolving时会自动触发
-        /// </summary>
         [TestMethod]
         public void OnResolvingExistsObject()
         {
@@ -1517,11 +1520,10 @@ namespace CatLib.Tests.Stl
             container.OnResolving((bind, obj) =>
             {
                 isCall = true;
-                Assert.AreSame(data, obj);
                 return obj;
             });
 
-            Assert.AreEqual(true, isCall);
+            Assert.AreEqual(false, isCall);
         }
 
         /// <summary>
