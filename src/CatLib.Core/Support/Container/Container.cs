@@ -233,7 +233,7 @@ namespace CatLib
         /// </summary>
         /// <param name="service">服务名或别名</param>
         /// <returns>是否已经被解决过</returns>
-        public bool Resolved(string service)
+        public bool IsResolved(string service)
         {
             Guard.NotEmptyOrNull(service, "service");
             lock (syncRoot)
@@ -538,10 +538,17 @@ namespace CatLib
                     bindData = MakeEmptyBindData(service);
                 }
 
+                var isResolved = IsResolved(service);
+
                 Release(service);
 
                 instance = TriggerOnResolving(bindData, instance);
                 instances.Add(service, instance);
+
+                if (isResolved)
+                {
+                    TriggerOnRebound(service);
+                }
             }
         }
 
@@ -617,14 +624,14 @@ namespace CatLib
         /// <summary>
         /// 当静态服务被释放时
         /// </summary>
-        /// <param name="action">处理释放时的回调</param>
+        /// <param name="callback">处理释放时的回调</param>
         /// <returns>当前容器实例</returns>
-        public IContainer OnRelease(Action<IBindData, object> action)
+        public IContainer OnRelease(Action<IBindData, object> callback)
         {
-            Guard.NotNull(action, "action");
+            Guard.NotNull(callback, "callback");
             lock (syncRoot)
             {
-                release.Add(action);
+                release.Add(callback);
             }
             return this;
         }
@@ -632,20 +639,20 @@ namespace CatLib
         /// <summary>
         /// 当服务被解决时，生成的服务会经过注册的回调函数
         /// </summary>
-        /// <param name="func">回调函数</param>
+        /// <param name="callback">回调函数</param>
         /// <returns>当前容器对象</returns>
-        public IContainer OnResolving(Func<IBindData, object, object> func)
+        public IContainer OnResolving(Func<IBindData, object, object> callback)
         {
-            Guard.NotNull(func, "func");
+            Guard.NotNull(callback, "callback");
             lock (syncRoot)
             {
-                resolving.Add(func);
+                resolving.Add(callback);
 
                 var result = new Dictionary<string, object>();
                 foreach (var data in instances)
                 {
                     var bindData = GetBindFillable(data.Key);
-                    result[data.Key] = func.Invoke(bindData, data.Value);
+                    result[data.Key] = callback.Invoke(bindData, data.Value);
                 }
                 foreach (var data in result)
                 {
@@ -659,10 +666,24 @@ namespace CatLib
         /// <summary>
         /// 当一个已经被解决的服务，发生重定义时触发
         /// </summary>
-        /// <param name="func">回调</param>
+        /// <param name="service">服务名</param>
+        /// <param name="callback">回调</param>
         /// <returns>服务容器</returns>
-        public IContainer OnRebound(Action<IContainer, object> func)
+        public IContainer OnRebound(string service, Action<IContainer, object> callback)
         {
+            Guard.NotNull(callback, "callback");
+            lock (syncRoot)
+            {
+                service = NormalizeService(service);
+                service = AliasToService(service);
+
+                List<Action<IContainer, object>> list;
+                if (!rebound.TryGetValue(service, out list))
+                {
+                    rebound[service] = list = new List<Action<IContainer, object>>();
+                }
+                list.Add(callback);
+            }
             return this;
         }
 
@@ -914,16 +935,24 @@ namespace CatLib
         protected virtual void TriggerOnRebound(string service)
         {
             var instance = Make(service);
-
+            foreach (var callback in GetOnReboundCallbacks(service))
+            {
+                callback(this, instance);
+            }
         }
 
         /// <summary>
-        /// 
+        /// 获取重定义的服务所对应的回调
         /// </summary>
-        /// <returns></returns>
-        protected virtual IEnumerable<Action<IContainer, object>> GetOnReboundCallbacks()
+        /// <returns>回调列表</returns>
+        protected virtual IEnumerable<Action<IContainer, object>> GetOnReboundCallbacks(string service)
         {
-            return new Action<IContainer, object>[]{};
+            List<Action<IContainer, object>> result;
+            if (!rebound.TryGetValue(service, out result))
+            {
+                return new Action<IContainer, object>[] { };
+            }
+            return result;
         }
 
         /// <summary>
