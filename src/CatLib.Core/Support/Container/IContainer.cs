@@ -61,7 +61,7 @@ namespace CatLib
         /// <param name="concrete">服务实体</param>
         /// <param name="isStatic">服务是否静态化</param>
         /// <returns>服务绑定数据</returns>
-        IBindData Bind(string service, Func<IContainer, object[], object> concrete, bool isStatic);
+        bool Bind(string service, Func<IContainer, object[], object> concrete, bool isStatic, out IBindData bindData);
 
         /// <summary>
         /// 绑定一个服务
@@ -70,7 +70,7 @@ namespace CatLib
         /// <param name="concrete">服务实现</param>
         /// <param name="isStatic">服务是否静态化</param>
         /// <returns>服务绑定数据</returns>
-        IBindData Bind(string service, Type concrete, bool isStatic);
+        bool Bind(string service, Type concrete, bool isStatic, out IBindData bindData);
 
         /// <summary>
         /// 如果服务不存在那么则绑定服务

@@ -335,11 +335,13 @@ namespace CatLib
         /// <param name="service">服务名</param>
         /// <param name="concrete">服务实现</param>
         /// <param name="isStatic">服务是否是静态的</param>
+        /// <param name="bindData">服务绑定数据</param>
         /// <returns>服务绑定数据</returns>
-        public IBindData BindIf(string service, Func<IContainer, object[], object> concrete, bool isStatic)
+        public bool BindIf(string service, Func<IContainer, object[], object> concrete, bool isStatic, out IBindData bindData)
         {
             var bind = GetBind(service);
-            return bind ?? Bind(service, concrete, isStatic);
+            bindData = bind ?? Bind(service, concrete, isStatic);
+            return bind == null;
         }
 
         /// <summary>
@@ -349,10 +351,11 @@ namespace CatLib
         /// <param name="concrete">服务实现</param>
         /// <param name="isStatic">服务是否是静态的</param>
         /// <returns>服务绑定数据</returns>
-        public IBindData BindIf(string service, Type concrete, bool isStatic)
+        public bool BindIf(string service, Type concrete, bool isStatic, out IBindData bindData)
         {
             var bind = GetBind(service);
-            return bind ?? Bind(service, concrete, isStatic);
+            bindData = bind ?? Bind(service, concrete, isStatic);
+            return bind == null;
         }
 
         /// <summary>
@@ -713,7 +716,7 @@ namespace CatLib
         /// 解除绑定服务
         /// </summary>
         /// <param name="service">服务名或者别名</param>
-        public void UnBind(string service)
+        public void Unbind(string service)
         {
             lock (syncRoot)
             {

@@ -133,7 +133,7 @@ namespace CatLib
         /// </summary>
         protected override void ReleaseBind()
         {
-            Container.UnBind(Service);
+            Container.Unbind(Service);
         }
 
         /// <summary>
