@@ -203,13 +203,13 @@ namespace CatLib
         }
 
         /// <summary>
-        /// 是否已经绑定了服务（只有进行过bind才视作绑定）
+        /// 是否已经绑定了服务
         /// </summary>
         /// <param name="service">服务名或别名</param>
         /// <returns>服务是否被绑定</returns>
         public bool HasBind(string service)
         {
-            return GetBind(service) != null;
+            return GetBind(service) != null || HasInstance(service);
         }
 
         /// <summary>
@@ -256,7 +256,7 @@ namespace CatLib
             {
                 service = NormalizeService(service);
                 service = AliasToService(service);
-                return HasBind(service) || HasInstance(service) || GetServiceType(service) != null;
+                return HasBind(service) || GetServiceType(service) != null;
             }
         }
 
@@ -407,6 +407,11 @@ namespace CatLib
                 var bindData = new BindData(this, service, concrete, isStatic);
                 binds.Add(service, bindData);
 
+                if (IsResolved(service))
+                {
+                    TriggerOnRebound(service);
+                }
+
                 return bindData;
             }
         }
@@ -414,24 +419,24 @@ namespace CatLib
         /// <summary>
         /// 以依赖注入形式调用一个方法
         /// </summary>
-        /// <param name="instance">方法对象</param>
+        /// <param name="target">方法对象</param>
         /// <param name="methodInfo">方法信息</param>
         /// <param name="userParams">用户传入的参数</param>
         /// <returns>方法返回值</returns>
-        /// <exception cref="ArgumentNullException"><paramref name="instance"/>,<paramref name="methodInfo"/>为<c>null</c></exception>
-        public object Call(object instance, MethodInfo methodInfo, params object[] userParams)
+        /// <exception cref="ArgumentNullException"><paramref name="target"/>,<paramref name="methodInfo"/>为<c>null</c></exception>
+        public object Call(object target, MethodInfo methodInfo, params object[] userParams)
         {
-            Guard.NotNull(instance, "instance");
+            Guard.NotNull(target, "instance");
             Guard.NotNull(methodInfo, "methodInfo");
 
-            var type = instance.GetType();
+            var type = target.GetType();
             var parameter = new List<ParameterInfo>(methodInfo.GetParameters());
 
             lock (syncRoot)
             {
                 var bindData = GetBindFillable(Type2Service(type));
                 userParams = parameter.Count > 0 ? GetDependencies(bindData, parameter, userParams) : new object[] { };
-                return methodInfo.Invoke(instance, userParams);
+                return methodInfo.Invoke(target, userParams);
             }
         }
 
@@ -647,18 +652,6 @@ namespace CatLib
             lock (syncRoot)
             {
                 resolving.Add(callback);
-
-                var result = new Dictionary<string, object>();
-                foreach (var data in instances)
-                {
-                    var bindData = GetBindFillable(data.Key);
-                    result[data.Key] = callback.Invoke(bindData, data.Value);
-                }
-                foreach (var data in result)
-                {
-                    instances[data.Key] = data.Value;
-                }
-                result.Clear();
             }
             return this;
         }
@@ -685,6 +678,25 @@ namespace CatLib
                 list.Add(callback);
             }
             return this;
+        }
+
+        /// <summary>
+        /// 关注指定的服务，当服务触发重定义时调用指定对象的指定方法
+        /// <param>调用是以依赖注入的形式进行的</param>
+        /// </summary>
+        /// <param name="service">关注的服务名</param>
+        /// <param name="target">当服务发生重定义时调用的目标</param>
+        /// <param name="method">方法名</param>
+        public void Watch(string service, object target, string method)
+        {
+            Guard.Requires<ArgumentNullException>(target != null);
+            Guard.NotEmptyOrNull(method, "method");
+
+            OnRebound(service, (container, instance) =>
+            {
+                var methodInfo = target.GetType().GetMethod(method);
+                Call(target, methodInfo, container, instance);
+            });
         }
 
         /// <summary>

@@ -74,6 +74,7 @@ namespace CatLib
 
         /// <summary>
         /// 如果服务不存在那么则绑定服务
+        /// <para>如果返回值为null说明没有绑定服务</para>
         /// </summary>
         /// <param name="service">服务名</param>
         /// <param name="concrete">服务实现</param>
@@ -83,6 +84,7 @@ namespace CatLib
 
         /// <summary>
         /// 如果服务不存在那么则绑定服务
+        /// <para>如果返回值为null说明没有绑定服务</para>
         /// </summary>
         /// <param name="service">服务名</param>
         /// <param name="concrete">服务实现</param>
