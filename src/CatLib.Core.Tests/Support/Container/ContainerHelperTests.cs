@@ -9,6 +9,7 @@
  * Document: http://catlib.io/
  */
 
+using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace CatLib.Tests
@@ -110,11 +111,15 @@ namespace CatLib.Tests
             var container = MakeContainer();
             var obj = new TestClassService();
             container.Instance<TestClassService>(obj);
+            container.OnFindType((str) =>
+            {
+                return Type.GetType(str);
+            });
 
             Assert.AreSame(obj, container.Make<TestClassService>());
             container.Release<TestClassService>();
             // 因为被释放后容器会容器会自动推测出所需类的实例
-            Assert.AreNotSame(obj, container.Make<TestClassService>());
+            Assert.AreSame(obj.GetType(), container.Make<TestClassService>().GetType());
         }
 
         /// <summary>

@@ -206,7 +206,11 @@ namespace CatLib.Tests.Stl
 
             Assert.AreEqual("hello world", container.Make("CanUnBind").ToString());
             bindData.UnBind();
-            Assert.AreEqual(null, container.Make("CanUnBind"));
+
+            ExceptionAssert.Throws<UnresolvableException>(() =>
+            {
+                container.Make("CanUnBind");
+            });
         }
 
         /// <summary>

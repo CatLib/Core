@@ -108,7 +108,12 @@ namespace CatLib.Tests.Stl
             container.Tag("hello", "world");
             container.Tag("hello", "world2");
 
+            container.Bind("world", (c, p) => "hello");
+            container.Bind("world2", (c, p) => "world");
+
             Assert.AreEqual(2, container.Tagged("hello").Length);
+            Assert.AreEqual("hello", container.Tagged("hello")[0]);
+            Assert.AreEqual("world", container.Tagged("hello")[1]);
         }
 
         /// <summary>
@@ -677,13 +682,13 @@ namespace CatLib.Tests.Stl
             [Inject]
             public MakeTestClassDependency Dependency { get; set; }
 
-            [Inject(Required = true)]
+            [Inject]
             public MakeTestClassDependency DependencyRequired { get; set; }
 
             [Inject("AliasName")]
             public MakeTestClassDependency2 DependencyAlias { get; set; }
 
-            [Inject("AliasNameRequired", Required = true)]
+            [Inject("AliasNameRequired")]
             public MakeTestClassDependency DependencyAliasRequired { get; set; }
 
             public MakeTestClass(MakeTestClassDependency dependency)
@@ -766,6 +771,7 @@ namespace CatLib.Tests.Stl
             });
 
             container.Bind<MakeTestClassDependency>().Alias("AliasNameRequired");
+            container.Bind<MakeTestClassDependency2>().Alias("AliasName");
             var result = container.Make<MakeTestClass>();
 
             Assert.AreNotEqual(null, result);
@@ -820,6 +826,7 @@ namespace CatLib.Tests.Stl
             var container = MakeContainer();
             container.Bind<MakeTestClass>();
             container.Bind<MakeTestClassDependency>().Alias("AliasNameRequired");
+            container.Bind<MakeTestClassDependency2>().Alias("AliasName");
 
             var result = container.Make<MakeTestClass>();
             Assert.AreEqual(typeof(MakeTestClass), result.GetType());
@@ -894,6 +901,7 @@ namespace CatLib.Tests.Stl
             var container = MakeContainer();
             container.Bind<MakeTestClass>();
             container.Bind<MakeTestClassDependency>().Alias("AliasNameRequired");
+            container.Bind<MakeTestClassDependency2>().Alias("AliasName");
 
             var result1 = container.Make<MakeTestClass>();
             var result2 = container.Make<MakeTestClass>();
@@ -902,7 +910,7 @@ namespace CatLib.Tests.Stl
             Assert.AreNotSame(result1.Dependency, result1.DependencyRequired);
             Assert.AreNotSame(null, result1.DependencyRequired);
             Assert.AreNotSame(null, result1.DependencyAliasRequired);
-            Assert.AreSame(null, result1.DependencyAlias);
+            Assert.AreNotEqual(null, result1.DependencyAlias);
         }
 
         /// <summary>
@@ -1023,7 +1031,7 @@ namespace CatLib.Tests.Stl
         {
             private IMsg msg;
             public TestMakeParamInjectAttrRequiredClass(
-                [Inject(Required = true)]IMsg msg)
+                IMsg msg)
             {
                 this.msg = msg;
             }
@@ -1121,9 +1129,9 @@ namespace CatLib.Tests.Stl
             Assert.AreNotEqual(null, result.Cls);
             Assert.AreEqual(typeof(string).ToString(), result.Cls.GetMsg());
 
-            container.Bind<GenericClass<string>>((app, param) => null);
+            container.Bind<GenericClass<string>>((app, param) => new GenericClass<string>());
             result = container.Make<TestMakeGenericInject>();
-            Assert.AreEqual(null, result.Cls);
+            Assert.AreNotEqual(null, result.Cls);
 
         }
 
@@ -1193,8 +1201,11 @@ namespace CatLib.Tests.Stl
             {
                 return Type.GetType(str);
             });
-            var result = container.Make<TestInjectBase>();
-            Assert.AreEqual(null, result);
+
+            ExceptionAssert.Throws<UnresolvableException>(() =>
+            {
+                container.Make<TestInjectBase>();
+            });
         }
 
         /// <summary>
@@ -1415,8 +1426,16 @@ namespace CatLib.Tests.Stl
             container.Flush();
 
             Assert.AreEqual(true, isCallTest);
-            Assert.AreEqual(null, container.Make("TestInstance2"));
-            Assert.AreEqual(null, container.Make("Test"));
+
+            ExceptionAssert.Throws<UnresolvableException>(() =>
+            {
+                container.Make("TestInstance2");
+            });
+
+            ExceptionAssert.Throws<UnresolvableException>(() =>
+            {
+                container.Make("Test");
+            });
         }
 
         [TestMethod]

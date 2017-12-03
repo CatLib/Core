@@ -27,12 +27,6 @@ namespace CatLib
         public string Alias { get; private set; }
 
         /// <summary>
-        /// 是否是必须的
-        /// 如果约束为必须当依赖注入失败时则会引发一个异常
-        /// </summary>
-        public bool Required { get; set; }
-
-        /// <summary>
         /// 声明注入
         /// </summary>
         /// <param name="alias">依赖服务的别名或者服务名</param>

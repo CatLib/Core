@@ -858,8 +858,7 @@ namespace CatLib
                     continue;
                 }
 
-                InjectAttribute injectAttr = null;
-                var needService = GetPropertyNeedsService(property, ref injectAttr);
+                var needService = GetPropertyNeedsService(property);
 
                 object instance;
                 if (property.PropertyType.IsClass 
@@ -872,14 +871,9 @@ namespace CatLib
                     instance = ResolveAttrPrimitive(makeServiceBindData, needService, property);
                 }
 
-                if (!CheckInjectAttrRequired(injectAttr, instance))
-                {
-                    throw new RuntimeException("[" + makeServiceBindData.Service + "] Attr [" + property.PropertyType + "] Required [" + needService + "] Service.");
-                }
-
                 if (!CheckInstanceIsInstanceOfType(property.PropertyType, instance))
                 {
-                    throw new RuntimeException("[" + makeServiceBindData.Service + "] Attr inject type must be [" + property.PropertyType + "] , But instance is [" + instance.GetType() + "] , Make service is [" + needService + "].");
+                    throw new UnresolvableException("[" + makeServiceBindData.Service + "] Attr inject type must be [" + property.PropertyType + "] , But instance is [" + instance.GetType() + "] , Make service is [" + needService + "].");
                 }
 
                 property.SetValue(makeServiceInstance, instance, null);
@@ -907,8 +901,7 @@ namespace CatLib
                     continue;
                 }
 
-                InjectAttribute injectAttr = null;
-                var needService = GetParamNeedsService(baseParam, ref injectAttr);
+                var needService = GetParamNeedsService(baseParam);
             
                 if (baseParam.ParameterType.IsClass 
                     || baseParam.ParameterType.IsInterface)
@@ -920,14 +913,9 @@ namespace CatLib
                     instance = ResolvePrimitive(makeServiceBindData, needService, baseParam);
                 }
 
-                if (!CheckInjectAttrRequired(injectAttr, instance))
-                {
-                    throw new RuntimeException("[" + makeServiceBindData.Service + "] Required [" + baseParam.ParameterType + "] Service.");
-                }
-
                 if (!CheckInstanceIsInstanceOfType(baseParam.ParameterType, instance))
                 {
-                    throw new RuntimeException("[" + makeServiceBindData.Service + "] Params inject type must be [" + baseParam.ParameterType + "] , But instance is [" + instance.GetType() + "] Make service is [" + needService + "].");
+                    throw new UnresolvableException("[" + makeServiceBindData.Service + "] Params inject type must be [" + baseParam.ParameterType + "] , But instance is [" + instance.GetType() + "] Make service is [" + needService + "].");
                 }
 
                 results.Add(instance);
@@ -985,11 +973,10 @@ namespace CatLib
         /// 获取字段需求服务
         /// </summary>
         /// <param name="property">字段</param>
-        /// <param name="injectAttr">依赖注入标记</param>
         /// <returns>需求的服务名</returns>
-        protected string GetPropertyNeedsService(PropertyInfo property, ref InjectAttribute injectAttr)
+        protected string GetPropertyNeedsService(PropertyInfo property)
         {
-            injectAttr = (InjectAttribute)property.GetCustomAttributes(injectTarget, false)[0];
+            var injectAttr = (InjectAttribute)property.GetCustomAttributes(injectTarget, false)[0];
             return string.IsNullOrEmpty(injectAttr.Alias)
                 ? Type2Service(property.PropertyType)
                 : injectAttr.Alias;
@@ -999,9 +986,8 @@ namespace CatLib
         /// 获取参数需求服务
         /// </summary>
         /// <param name="baseParam">当前正在解决的变量</param>
-        /// <param name="injectAttr">依赖注入标记</param>
         /// <returns>需求的服务名</returns>
-        protected string GetParamNeedsService(ParameterInfo baseParam, ref InjectAttribute injectAttr)
+        protected string GetParamNeedsService(ParameterInfo baseParam)
         {
             var needService = Type2Service(baseParam.ParameterType);
             if (baseParam.IsDefined(injectTarget, false))
@@ -1009,7 +995,7 @@ namespace CatLib
                 var propertyAttrs = baseParam.GetCustomAttributes(injectTarget, false);
                 if (propertyAttrs.Length > 0)
                 {
-                    injectAttr = (InjectAttribute)propertyAttrs[0];
+                    var injectAttr = (InjectAttribute)propertyAttrs[0];
                     if (!string.IsNullOrEmpty(injectAttr.Alias))
                     {
                         needService = injectAttr.Alias;
@@ -1168,12 +1154,22 @@ namespace CatLib
         /// <returns>运行时异常</returns>
         protected UnresolvableException MakeBuildFaildException(string makeService, Type makeServiceType, Exception innerException)
         {
-            var message = "Target [" +(makeServiceType != null ? makeServiceType.ToString() : "NULL") + "] build faild. Service [" + makeService + "]";
+            string message;
+            if (makeServiceType != null)
+            {
+                message = "Target [" + makeServiceType + "] build faild. Service is [" + makeService + "]";
+            }
+            else
+            {
+                message = "Service [" + makeService + "] is not exists.";
+            }
+            
             if (buildStack.Count > 0)
             {
                 var previous = string.Join(", ", buildStack.ToArray());
-                message = "Target [" + (makeServiceType != null ? makeServiceType.ToString() : "NULL") + "] build faild. Service [" + makeService + "] . While building [" + previous + "].";
+                message += " While building [" + previous + "].";
             }
+
             return new UnresolvableException(message, innerException);
         }
 
@@ -1208,17 +1204,6 @@ namespace CatLib
         protected bool CheckInstanceIsInstanceOfType(Type type, object instance)
         {
             return instance == null || type.IsInstanceOfType(instance);
-        }
-
-        /// <summary>
-        /// 检查依赖注入的必须标记
-        /// </summary>
-        /// <param name="injectAttr">依赖注入标记</param>
-        /// <param name="instance">生成的实例</param>
-        /// <returns>是否通过检查</returns>
-        protected bool CheckInjectAttrRequired(InjectAttribute injectAttr, object instance)
-        {
-            return injectAttr == null || !injectAttr.Required || instance != null;
         }
 
         /// <summary>
