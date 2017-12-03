@@ -1023,6 +1023,121 @@ namespace CatLib.Tests.Stl
             Assert.AreEqual("hello", cls.GetMsg());
         }
 
+        public class TestMakeBasePrimitive
+        {
+            [Inject]
+            public int Value { get; set; }
+        }
+
+        [TestMethod]
+        public void TestUnresolvablePrimitiveAttr()
+        {
+            var container = MakeContainer();
+            container.Bind<TestMakeBasePrimitive>();
+
+            ExceptionAssert.Throws<UnresolvableException>(() =>
+            {
+                container.Make<TestMakeBasePrimitive>();
+            });
+        }
+
+        public class TestMakeBasePrimitiveConstructor
+        {
+            public TestMakeBasePrimitiveConstructor(int value)
+            {
+                
+            }
+        }
+
+        [TestMethod]
+        public void TestUnresolvablePrimitiveConstructor()
+        {
+            var container = MakeContainer();
+            container.Bind<TestMakeBasePrimitiveConstructor>();
+            ExceptionAssert.Throws<UnresolvableException>(() =>
+            {
+                container.Make<TestMakeBasePrimitiveConstructor>();
+            });
+        }
+
+        public class TestOptionalPrimitiveClass
+        {
+            public TestOptionalPrimitiveClass(int value = 100)
+            {
+                Assert.AreEqual(100, value);
+            }
+        }
+
+        public class SupportNullContainer : Container
+        {
+            protected override void GuardResolveInstance(object instance, string makeService, Type makeServiceType)
+            {
+                
+            }
+        }
+
+        [TestMethod]
+        public void TestSupportNullValueContainer()
+        {
+            var container = new SupportNullContainer() as IContainer;
+            container.Bind("null", (c, p) => null);
+
+            Assert.AreEqual(null, container.Make("null"));
+        }
+
+        public class TestInjectNullClass
+        {
+            public TestInjectNullClass(TestMakeBasePrimitiveConstructor cls)
+            {
+                Assert.AreEqual(null, cls);
+            }
+        }
+
+        [TestMethod]
+        public void TestInjectNull()
+        {
+            var container = new SupportNullContainer() as IContainer;
+            container.Bind<TestInjectNullClass>();
+
+            container.Make<TestInjectNullClass>();
+        }
+
+        public class TestDefaultValueClass
+        {
+            public TestDefaultValueClass(SupportNullContainer container = null)
+            {
+                Assert.AreEqual(null, container);
+            }
+        }
+
+        [TestMethod]
+        public void TestDefaultValue()
+        {
+            var container = new Container();
+            container.Bind<TestDefaultValueClass>();
+            container.Make<TestDefaultValueClass>();
+        }
+
+        [TestMethod]
+        public void TestAllFalseFindType()
+        {
+            var container = new Container();
+
+            container.OnFindType((str) => null);
+
+            ExceptionAssert.Throws<UnresolvableException>(() =>
+            {
+                container.Make<TestDefaultValueClass>();
+            });
+        }
+
+        [TestMethod]
+        public void TestOptionalPrimitive()
+        {
+            var container = MakeContainer();
+            container.Bind<TestOptionalPrimitiveClass>();
+            container.Make<TestOptionalPrimitiveClass>();
+        }
 
         /// <summary>
         /// 参数注入是必须的

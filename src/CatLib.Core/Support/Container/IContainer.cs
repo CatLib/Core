@@ -34,6 +34,13 @@ namespace CatLib
         bool HasBind(string service);
 
         /// <summary>
+        /// 是否可以生成服务
+        /// </summary>
+        /// <param name="service">服务名或者别名</param>
+        /// <returns>是否可以生成服务</returns>
+        bool CanMake(string service);
+
+        /// <summary>
         /// 服务是否是静态化的,如果服务不存在也将返回false
         /// </summary>
         /// <param name="service">服务名或者别名</param>
