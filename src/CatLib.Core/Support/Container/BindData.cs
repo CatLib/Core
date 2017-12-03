@@ -95,6 +95,11 @@ namespace CatLib
                     resolving = new List<Func<IBindData, object, object>>();
                 }
                 resolving.Add(func);
+
+                if (Container.HasInstance(Service))
+                {
+                    
+                }
             }
             return this;
         }

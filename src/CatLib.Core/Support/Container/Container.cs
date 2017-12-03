@@ -72,6 +72,11 @@ namespace CatLib
         private readonly Dictionary<string, bool> resolved;
 
         /// <summary>
+        /// 重定义事件
+        /// </summary>
+        private readonly Dictionary<string, List<Action<IContainer, object>>> rebound;
+
+        /// <summary>
         /// 方法容器
         /// </summary>
         private readonly MethodContainer methodContainer;
@@ -113,6 +118,7 @@ namespace CatLib
             resolved = new Dictionary<string, bool>(prime * 4);
             findType = new SortSet<Func<string, Type>, int>();
             findTypeCache = new Dictionary<string, Type>(prime * 4);
+            rebound = new Dictionary<string, List<Action<IContainer, object>>>(prime);
             buildStack = new Stack<string>(32);
             userParamsStack = new Stack<object[]>(32);
 
@@ -219,6 +225,22 @@ namespace CatLib
                 service = NormalizeService(service);
                 service = AliasToService(service);
                 return instances.ContainsKey(service);
+            }
+        }
+
+        /// <summary>
+        /// 服务是否已经被解决过
+        /// </summary>
+        /// <param name="service">服务名或别名</param>
+        /// <returns>是否已经被解决过</returns>
+        public bool Resolved(string service)
+        {
+            Guard.NotEmptyOrNull(service, "service");
+            lock (syncRoot)
+            {
+                service = NormalizeService(service);
+                service = AliasToService(service);
+                return resolved.ContainsKey(service) || instances.ContainsKey(service);
             }
         }
 
@@ -572,6 +594,7 @@ namespace CatLib
                 findTypeCache.Clear();
                 buildStack.Clear();
                 userParamsStack.Clear();
+                rebound.Clear();
             }
         }
 
@@ -630,6 +653,16 @@ namespace CatLib
                 }
                 result.Clear();
             }
+            return this;
+        }
+
+        /// <summary>
+        /// 当一个已经被解决的服务，发生重定义时触发
+        /// </summary>
+        /// <param name="func">回调</param>
+        /// <returns>服务容器</returns>
+        public IContainer OnRebound(Action<IContainer, object> func)
+        {
             return this;
         }
 
@@ -875,6 +908,25 @@ namespace CatLib
         }
 
         /// <summary>
+        /// 触发服务重定义事件
+        /// </summary>
+        /// <param name="service">发生重定义的服务</param>
+        protected virtual void TriggerOnRebound(string service)
+        {
+            var instance = Make(service);
+
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        protected virtual IEnumerable<Action<IContainer, object>> GetOnReboundCallbacks()
+        {
+            return new Action<IContainer, object>[]{};
+        }
+
+        /// <summary>
         /// 生成一个编译失败异常
         /// </summary>
         /// <param name="makeService">构造的服务名字</param>
@@ -1117,6 +1169,8 @@ namespace CatLib
             {
                 buildInstance = TriggerOnResolving(bindData, bindData.TriggerResolving(buildInstance));
             }
+
+            resolved[makeService] = true;
 
             return buildInstance;
         }
