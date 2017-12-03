@@ -578,7 +578,7 @@ namespace CatLib.Tests.Stl
         [TestMethod]
         public void CanCallMethodNoParam()
         {
-            var container = MakeContainer();
+            var container = MakeContainer() as IContainer;
             container.Bind<CallTestClassInject>();
             var cls = new CallTestClass();
 

@@ -135,6 +135,24 @@ namespace CatLib
         }
 
         /// <summary>
+        /// 以依赖注入形式调用一个方法
+        /// </summary>
+        /// <param name="container">服务容器</param>
+        /// <param name="instance">方法对象</param>
+        /// <param name="method">方法名</param>
+        /// <param name="userParams">用户传入的参数</param>
+        /// <returns>方法返回值</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="instance"/>,<paramref name="method"/>为<c>null</c>或者空字符串</exception>
+        public static object Call(this IContainer container, object instance, string method, params object[] userParams)
+        {
+            Guard.NotNull(instance, "instance");
+            Guard.NotEmptyOrNull(method, "method");
+
+            var methodInfo = instance.GetType().GetMethod(method);
+            return container.Call(instance, methodInfo, userParams);
+        }
+
+        /// <summary>
         /// 以单例的形式绑定一个服务
         /// </summary>
         /// <param name="container">服务容器</param>

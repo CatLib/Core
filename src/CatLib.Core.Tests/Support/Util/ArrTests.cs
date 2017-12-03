@@ -461,7 +461,7 @@ namespace CatLib.Tests.Support.Util
             result = Arr.Reverse(data);
 
             Assert.AreEqual(1, result.Length);
-            Assert.AreEqual("a", data);
+            Assert.AreEqual("a", data[0]);
         }
 
         [TestMethod]

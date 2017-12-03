@@ -67,6 +67,11 @@ namespace CatLib
         private readonly Dictionary<string, Type> findTypeCache;
 
         /// <summary>
+        /// 已经被解决过的服务名
+        /// </summary>
+        private readonly Dictionary<string, bool> resolved;
+
+        /// <summary>
         /// 方法容器
         /// </summary>
         private readonly MethodContainer methodContainer;
@@ -105,11 +110,13 @@ namespace CatLib
             binds = new Dictionary<string, BindData>(prime * 4);
             resolving = new List<Func<IBindData, object, object>>((int)(prime * 0.25));
             release = new List<Action<IBindData, object>>((int)(prime * 0.25));
+            resolved = new Dictionary<string, bool>(prime * 4);
             findType = new SortSet<Func<string, Type>, int>();
             findTypeCache = new Dictionary<string, Type>(prime * 4);
-            injectTarget = typeof(InjectAttribute);
             buildStack = new Stack<string>(32);
             userParamsStack = new Stack<object[]>(32);
+
+            injectTarget = typeof(InjectAttribute);
             methodContainer = new MethodContainer(this);
         }
 
@@ -386,23 +393,6 @@ namespace CatLib
         /// 以依赖注入形式调用一个方法
         /// </summary>
         /// <param name="instance">方法对象</param>
-        /// <param name="method">方法名</param>
-        /// <param name="userParams">用户传入的参数</param>
-        /// <returns>方法返回值</returns>
-        /// <exception cref="ArgumentNullException"><paramref name="instance"/>,<paramref name="method"/>为<c>null</c>或者空字符串</exception>
-        public object Call(object instance, string method, params object[] userParams)
-        {
-            Guard.NotNull(instance, "instance");
-            Guard.NotEmptyOrNull(method, "method");
-
-            var methodInfo = instance.GetType().GetMethod(method);
-            return Call(instance, methodInfo, userParams);
-        }
-
-        /// <summary>
-        /// 以依赖注入形式调用一个方法
-        /// </summary>
-        /// <param name="instance">方法对象</param>
         /// <param name="methodInfo">方法信息</param>
         /// <param name="userParams">用户传入的参数</param>
         /// <returns>方法返回值</returns>
@@ -565,26 +555,23 @@ namespace CatLib
         {
             lock (syncRoot)
             {
-                var releaseList = new string[instances.Count];
-                var i = 0;
-                foreach (var instance in instances)
-                {
-                    releaseList[i++] = instance.Key;
-                }
-                foreach (var service in releaseList)
+                foreach (var service in Dict.Keys(instances))
                 {
                     Release(service);
                 }
 
-                binds.Clear();
-                instances.Clear();
+                tags.Clear();
                 aliases.Clear();
                 aliasesReverse.Clear();
-                tags.Clear();
+                instances.Clear();
+                binds.Clear();
                 resolving.Clear();
                 release.Clear();
+                resolved.Clear();
                 findType.Clear();
                 findTypeCache.Clear();
+                buildStack.Clear();
+                userParamsStack.Clear();
             }
         }
 
@@ -1087,7 +1074,6 @@ namespace CatLib
 
             return results.ToArray();
         }
-
 
         /// <summary>
         /// 制作一个空的绑定数据

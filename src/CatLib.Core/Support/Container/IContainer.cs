@@ -132,15 +132,6 @@ namespace CatLib
         /// 以依赖注入形式调用一个方法
         /// </summary>
         /// <param name="instance">方法对象</param>
-        /// <param name="method">方法名</param>
-        /// <param name="userParams">用户传入的参数</param>
-        /// <returns>方法返回值</returns>
-        object Call(object instance, string method, params object[] userParams);
-
-        /// <summary>
-        /// 以依赖注入形式调用一个方法
-        /// </summary>
-        /// <param name="instance">方法对象</param>
         /// <param name="methodInfo">方法信息</param>
         /// <param name="userParams">用户传入的参数</param>
         /// <returns>方法返回值</returns>

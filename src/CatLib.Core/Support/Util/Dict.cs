@@ -27,7 +27,8 @@ namespace CatLib
         /// <param name="source">规定字典</param>
         /// <param name="predicate">回调函数</param>
         /// <returns>需求字典</returns>
-        public static IDictionary<TKey, TValue> Filter<TKey, TValue>(IDictionary<TKey, TValue> source, Predicate<KeyValuePair<TKey, TValue>> predicate)
+        public static IDictionary<TKey, TValue> Filter<TKey, TValue>(IDictionary<TKey, TValue> source,
+            Func<TKey, TValue, bool> predicate)
         {
             Guard.Requires<ArgumentNullException>(source != null);
             Guard.Requires<ArgumentNullException>(predicate != null);
@@ -35,7 +36,7 @@ namespace CatLib
 
             foreach (var result in source)
             {
-                if (predicate.Invoke(result))
+                if (predicate.Invoke(result.Key, result.Value))
                 {
                     elements[result.Key] = result.Value;
                 }
@@ -51,7 +52,7 @@ namespace CatLib
         /// <typeparam name="TValue">字典值类型</typeparam>
         /// <param name="source">规定字典</param>
         /// <param name="predicate">回调函数</param>
-        public static void Remove<TKey, TValue>(IDictionary<TKey, TValue> source, Predicate<KeyValuePair<TKey, TValue>> predicate)
+        public static void Remove<TKey, TValue>(IDictionary<TKey, TValue> source, Func<TKey, TValue, bool> predicate)
         {
             Guard.Requires<ArgumentNullException>(source != null);
             Guard.Requires<ArgumentNullException>(predicate != null);
@@ -59,7 +60,7 @@ namespace CatLib
             var list = new List<TKey>();
             foreach (var result in source)
             {
-                if (predicate.Invoke(result))
+                if (predicate.Invoke(result.Key, result.Value))
                 {
                     list.Add(result.Key);
                 }
@@ -130,13 +131,13 @@ namespace CatLib
         }
 
         /// <summary>
-        /// 将数组值传入用户自定义函数，自定义函数返回的值作为新的数组值
+        /// 将字典值传入用户自定义函数，自定义函数返回的值作为新的字典值
         /// </summary>
-        /// <typeparam name="TKey">数组键类型</typeparam>
-        /// <typeparam name="TValue">数组值类型</typeparam>
-        /// <param name="source">规定数组</param>
+        /// <typeparam name="TKey">字典键类型</typeparam>
+        /// <typeparam name="TValue">字典值类型</typeparam>
+        /// <param name="source">规定字典</param>
         /// <param name="callback">自定义函数</param>
-        /// <returns>处理后的数组</returns>
+        /// <returns>处理后的字典</returns>
         public static IDictionary<TKey, TValue> Map<TKey, TValue>(IDictionary<TKey, TValue> source, Func<TKey, TValue, TValue> callback)
         {
             Guard.Requires<ArgumentNullException>(source != null);
@@ -152,26 +153,45 @@ namespace CatLib
         }
 
         /// <summary>
-        /// 使用点（.）来访问深度字典
+        /// 获取字典的键数组
         /// </summary>
-        /// <param name="dict">规定字典</param>
-        /// <param name="key">键，支持使用点（.）来进行深度访问</param>
-        /// <param name="def">默认值</param>
-        /// <returns>字典值</returns>
-        public static object Dot(IDictionary<string, object> dict, string key, object def = null)
+        /// <typeparam name="TKey">字典键类型</typeparam>
+        /// <typeparam name="TValue">字典值类型</typeparam>
+        /// <param name="source">规定字典</param>
+        /// <returns>字典的键数组</returns>
+        public static TKey[] Keys<TKey, TValue>(IDictionary<TKey, TValue> source)
         {
-            if (dict == null)
+            Guard.Requires<ArgumentNullException>(source != null);
+
+            var keys = new TKey[source.Count];
+            var i = 0;
+            foreach (var item in source)
             {
-                return def;
+                keys[i++] = item.Key;
             }
 
-            if (key == null)
+            return keys;
+        }
+
+        /// <summary>
+        /// 获取字典的值数组
+        /// </summary>
+        /// <typeparam name="TKey">字典键类型</typeparam>
+        /// <typeparam name="TValue">字典值类型</typeparam>
+        /// <param name="source">规定字典</param>
+        /// <returns>字典的值数组</returns>
+        public static TValue[] Values<TKey, TValue>(IDictionary<TKey, TValue> source)
+        {
+            Guard.Requires<ArgumentNullException>(source != null);
+
+            var keys = new TValue[source.Count];
+            var i = 0;
+            foreach (var item in source)
             {
-                return dict;
+                keys[i++] = item.Value;
             }
 
-            var keyArr = Arr.Reverse(key.Split('.'));
-            return GetValueByDepthArray(dict, ref keyArr) ?? def;
+            return keys;
         }
 
         /// <summary>
@@ -183,7 +203,18 @@ namespace CatLib
         /// <returns>字典值</returns>
         public static object Get(IDictionary<string, object> dict, string key, object def = null)
         {
-            return Dot(dict, key, def);
+            if (dict == null)
+            {
+                return def;
+            }
+
+            if (string.IsNullOrEmpty(key))
+            {
+                return dict;
+            }
+
+            var keyArr = Arr.Reverse(key.Split('.'));
+            return GetValueByDepthArray(dict, ref keyArr) ?? def;
         }
 
         /// <summary>
@@ -202,6 +233,20 @@ namespace CatLib
         }
 
         /// <summary>
+        /// 使用点（.）来访问深度字典，并移除其中一个值
+        /// </summary>
+        /// <param name="dict">规定字典</param>
+        /// <param name="key">键，支持使用点（.）来进行深度访问</param>
+        public static bool Remove(IDictionary<string, object> dict, string key)
+        {
+            Guard.Requires<ArgumentNullException>(dict != null);
+            Guard.Requires<ArgumentNullException>(key != null);
+
+            var keyArr = Arr.Reverse(key.Split('.'));
+            return RemoveValueByDepthArray(dict, ref keyArr);
+        }
+
+        /// <summary>
         /// 通过深度数组来访问字典
         /// </summary>
         /// <param name="dict">规定字典</param>
@@ -209,19 +254,20 @@ namespace CatLib
         /// <returns>字典值</returns>
         private static object GetValueByDepthArray(IDictionary<string, object> dict, ref string[] keys)
         {
-            object result;
-            if (!dict.TryGetValue(Arr.Pop(ref keys), out result) || keys.Length <= 0)
+            while (true)
             {
-                return result;
-            }
+                object result;
+                if (!dict.TryGetValue(Arr.Pop(ref keys), out result) || keys.Length <= 0)
+                {
+                    return result;
+                }
 
-            dict = result as IDictionary<string, object>;
-            if (dict == null)
-            {
-                return null;
+                dict = result as IDictionary<string, object>;
+                if (dict == null)
+                {
+                    return null;
+                }
             }
-
-            return GetValueByDepthArray(dict, ref keys);
         }
 
         /// <summary>
@@ -232,20 +278,62 @@ namespace CatLib
         /// <param name="value">设定值</param>
         private static void SetValueByDepthArray(IDictionary<string, object> dict, ref string[] keys, object value)
         {
-            if (keys.Length <= 1)
+            while (true)
             {
-                dict[Arr.Pop(ref keys)] = value;
-                return;
-            }
+                if (keys.Length <= 1)
+                {
+                    dict[Arr.Pop(ref keys)] = value;
+                    return;
+                }
 
-            object result;
-            var key = Arr.Pop(ref keys);
-            if (!dict.TryGetValue(key, out result) || !(result is IDictionary<string, object>))
+                object result;
+                var key = Arr.Pop(ref keys);
+                if (!dict.TryGetValue(key, out result) || !(result is IDictionary<string, object>))
+                {
+                    dict[key] = result = new Dictionary<string, object>();
+                }
+
+                dict = (IDictionary<string, object>)result;
+            }
+        }
+
+        /// <summary>
+        /// 通过深度数组来移除数组中的一个值
+        /// </summary>
+        /// <param name="dict">规定字典</param>
+        /// <param name="keys">深度数组（深度数组以倒序传入）</param>
+        private static bool RemoveValueByDepthArray(IDictionary<string, object> dict, ref string[] keys)
+        {
+            var perv = new Stack<KeyValuePair<string, IDictionary<string, object>>>(keys.Length);
+            while (true)
             {
-                dict[key] = result = new Dictionary<string, object>();
-            }
+                if (keys.Length <= 1)
+                {
+                    dict.Remove(Arr.Pop(ref keys));
+                    while (perv.Count > 0)
+                    {
+                        var data = perv.Pop();
+                        var tmpDict = (IDictionary<string, object>)data.Value[data.Key];
+                        if (tmpDict.Count <= 0)
+                        {
+                            data.Value.Remove(data.Key);
+                            continue;
+                        }
+                        break;
+                    }
+                    return true;
+                }
 
-            SetValueByDepthArray((IDictionary<string, object>) result, ref keys, value);
+                object result;
+                var key = Arr.Pop(ref keys);
+                if (!dict.TryGetValue(key, out result) || !(result is IDictionary<string, object>))
+                {
+                    return false;
+                }
+
+                perv.Push(new KeyValuePair<string, IDictionary<string, object>>(key, dict));
+                dict = (IDictionary<string, object>)result;
+            }
         }
     }
 }
