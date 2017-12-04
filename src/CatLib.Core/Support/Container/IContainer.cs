@@ -197,7 +197,7 @@ namespace CatLib
         /// <param name="service">服务名</param>
         /// <param name="callback">回调</param>
         /// <returns>服务容器</returns>
-        IContainer OnRebound(string service, Action<IContainer, object> callback);
+        IContainer OnRebound(string service, Action<object> callback);
 
         /// <summary>
         /// 关注指定的服务，当服务触发重定义时调用指定对象的指定方法

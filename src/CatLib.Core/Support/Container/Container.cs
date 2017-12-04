@@ -74,7 +74,7 @@ namespace CatLib
         /// <summary>
         /// 重定义事件
         /// </summary>
-        private readonly Dictionary<string, List<Action<IContainer, object>>> rebound;
+        private readonly Dictionary<string, List<Action<object>>> rebound;
 
         /// <summary>
         /// 方法容器
@@ -118,7 +118,7 @@ namespace CatLib
             resolved = new Dictionary<string, bool>(prime * 4);
             findType = new SortSet<Func<string, Type>, int>();
             findTypeCache = new Dictionary<string, Type>(prime * 4);
-            rebound = new Dictionary<string, List<Action<IContainer, object>>>(prime);
+            rebound = new Dictionary<string, List<Action<object>>>(prime);
             buildStack = new Stack<string>(32);
             userParamsStack = new Stack<object[]>(32);
 
@@ -638,7 +638,7 @@ namespace CatLib
         /// <param name="service">服务名</param>
         /// <param name="callback">回调</param>
         /// <returns>服务容器</returns>
-        public IContainer OnRebound(string service, Action<IContainer, object> callback)
+        public IContainer OnRebound(string service, Action<object> callback)
         {
             Guard.NotNull(callback, "callback");
             lock (syncRoot)
@@ -646,10 +646,10 @@ namespace CatLib
                 service = NormalizeService(service);
                 service = AliasToService(service);
 
-                List<Action<IContainer, object>> list;
+                List<Action<object>> list;
                 if (!rebound.TryGetValue(service, out list))
                 {
-                    rebound[service] = list = new List<Action<IContainer, object>>();
+                    rebound[service] = list = new List<Action<object>>();
                 }
                 list.Add(callback);
             }
@@ -668,10 +668,10 @@ namespace CatLib
             Guard.Requires<ArgumentNullException>(target != null);
             Guard.NotEmptyOrNull(method, "method");
 
-            OnRebound(service, (container, instance) =>
+            OnRebound(service, (instance) =>
             {
                 var methodInfo = target.GetType().GetMethod(method);
-                Call(target, methodInfo, container, instance);
+                Call(target, methodInfo, instance);
             });
         }
 
@@ -925,7 +925,7 @@ namespace CatLib
             var instance = Make(service);
             foreach (var callback in GetOnReboundCallbacks(service))
             {
-                callback(this, instance);
+                callback(instance);
             }
         }
 
@@ -933,12 +933,12 @@ namespace CatLib
         /// 获取重定义的服务所对应的回调
         /// </summary>
         /// <returns>回调列表</returns>
-        protected virtual IEnumerable<Action<IContainer, object>> GetOnReboundCallbacks(string service)
+        protected virtual IEnumerable<Action<object>> GetOnReboundCallbacks(string service)
         {
-            List<Action<IContainer, object>> result;
+            List<Action<object>> result;
             if (!rebound.TryGetValue(service, out result))
             {
-                return new Action<IContainer, object>[] { };
+                return new Action<object>[] { };
             }
             return result;
         }

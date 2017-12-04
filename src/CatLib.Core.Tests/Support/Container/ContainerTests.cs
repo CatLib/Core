@@ -1665,6 +1665,45 @@ namespace CatLib.Tests.Stl
             return num;
         }
 
+        #region Rebound
+        [TestMethod]
+        public void TestOnRebound()
+        {
+            var container = new Container();
+            var callRebound = false;
+            container.OnRebound("TestService", (instance) =>
+            {
+                Assert.AreEqual(300, instance);
+                callRebound = true;
+            });
+
+            container.Bind("TestService", (c, p) => 100).UnBind();
+            var bind = container.Bind("TestService", (c, p) => 200);
+            container.Make("TestService");
+            bind.UnBind();
+            container.Bind("TestService", (c, p) => 300);
+
+            Assert.AreEqual(true, callRebound);
+        }
+
+        [TestMethod]
+        public void TestOnReboundWithInstance()
+        {
+            var container = new Container();
+            var callRebound = false;
+            container.OnRebound("TestService", (instance) =>
+            {
+                Assert.AreEqual(300, instance);
+                callRebound = true;
+            });
+
+            container.Instance("TestService", 100);
+            container.Instance("TestService", 300);
+
+            Assert.AreEqual(true, callRebound);
+        }
+        #endregion
+
         /// <summary>
         /// 生成容器
         /// </summary>
