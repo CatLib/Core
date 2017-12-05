@@ -970,7 +970,7 @@ namespace CatLib
             string message;
             if (makeServiceType != null)
             {
-                message = "Target [" + makeServiceType + "] build faild. Service is [" + makeService + "]";
+                message = "Target [" + makeServiceType + "] build faild. Service is [" + makeService + "].";
             }
             else
             {
