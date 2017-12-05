@@ -1702,6 +1702,34 @@ namespace CatLib.Tests.Stl
 
             Assert.AreEqual(true, callRebound);
         }
+
+        public class TestWatchCLass
+        {
+            public int value;
+
+            public IContainer container;
+
+            public void OnChange(int instance,IContainer container)
+            {
+                value = instance;
+                this.container = container;
+            }
+        }
+
+        [TestMethod]
+        public void TestWatch()
+        {
+            var container = new Container();
+
+            container.Instance<IContainer>(container);
+            var cls = new TestWatchCLass();
+            container.Watch("WatchService", cls, "OnChange");
+            container.Instance("WatchService", 100);
+            container.Instance("WatchService", 200);
+
+            Assert.AreEqual(200, cls.value);
+            Assert.AreSame(container, cls.container);
+        }
         #endregion
 
         /// <summary>

@@ -949,11 +949,6 @@ namespace CatLib
         /// <returns></returns>
         protected virtual string GetBuildStackDebugMessage()
         {
-            if (buildStack.Count <= 0)
-            {
-                return string.Empty;
-            }
-
             var previous = string.Join(", ", buildStack.ToArray());
             return " While building [" + previous + "].";
         }
@@ -1213,7 +1208,7 @@ namespace CatLib
 
                 if (buildStack.Contains(service))
                 {
-                    throw new RuntimeException("Circular dependency detected while for [" + service + "].");
+                    throw MakeCircularDependencyException(service);
                 }
 
                 buildStack.Push(service);
