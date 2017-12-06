@@ -122,6 +122,23 @@ namespace CatLib.Tests
             Assert.AreSame(obj.GetType(), container.Make<TestClassService>().GetType());
         }
 
+        [TestMethod]
+        public void TestBindIf()
+        {
+            var app = new Application();
+            IBindData bindData;
+            Assert.AreEqual(true, App.BindIf("TestBind", (c, p) => 1, out bindData));
+            Assert.AreEqual(false, App.BindIf("TestBind", (c, p) => 2, out bindData));
+            Assert.AreEqual(1, app["TestBind"]);
+
+            Assert.AreEqual(true, App.BindIf<object>(out bindData));
+            Assert.AreEqual(typeof(object), app.Make<object>().GetType());
+
+            Assert.AreEqual(true, App.BindIf<int>((c, p) => 100, out bindData));
+        }
+
+
+
         /// <summary>
         /// 生成容器
         /// </summary>
