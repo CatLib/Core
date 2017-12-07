@@ -436,19 +436,9 @@ namespace CatLib
         /// <param name="service">服务名或别名</param>
         /// <param name="userParams">用户传入的参数</param>
         /// <returns>服务实例，如果构造失败那么返回null</returns>
-        public static object MakeWith(string service, params object[] userParams)
+        public static object Make(string service, params object[] userParams)
         {
-            return Handler.MakeWith(service, userParams);
-        }
-
-        /// <summary>
-        /// 构造服务
-        /// </summary>
-        /// <param name="service">服务名或别名</param>
-        /// <returns>服务实例，如果构造失败那么返回null</returns>
-        public static object Make(string service)
-        {
-            return Handler.Make(service);
+            return Handler.Make(service, userParams);
         }
 
         /// <summary>
@@ -703,17 +693,6 @@ namespace CatLib
         public static bool BindIf(string service, Func<IContainer, object[], object> concrete, out IBindData bindData)
         {
             return Handler.BindIf(service, concrete, out bindData);
-        }
-
-        /// <summary>
-        /// 构造一个服务，允许传入构造参数
-        /// </summary>
-        /// <typeparam name="TService">服务名</typeparam>
-        /// <param name="param">构造参数</param>
-        /// <returns>服务实例</returns>
-        public static TService MakeWith<TService>(params object[] param)
-        {
-            return Handler.MakeWith<TService>(param);
         }
 
         /// <summary>

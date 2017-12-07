@@ -240,7 +240,7 @@ namespace CatLib
         /// <param name="concrete">服务实现</param>
         /// <param name="bindData">如果绑定失败则返回历史绑定对象</param>
         /// <returns>是否完成绑定</returns>
-        public static bool SingletonIf<TService>(this IContainer container, Func<IContainer, object[], object> concrete, out IBindData bindData)  
+        public static bool SingletonIf<TService>(this IContainer container, Func<IContainer, object[], object> concrete, out IBindData bindData)
         {
             return container.BindIf(container.Type2Service(typeof(TService)), concrete, true, out bindData);
         }
@@ -333,7 +333,7 @@ namespace CatLib
         /// <param name="container">服务容器</param>
         /// <param name="bindData">如果绑定失败则返回历史绑定对象</param>
         /// <returns>是否完成绑定</returns>
-        public static bool BindIf<TService>(this IContainer container,out IBindData bindData)
+        public static bool BindIf<TService>(this IContainer container, out IBindData bindData)
         {
             return container.BindIf(container.Type2Service(typeof(TService)), typeof(TService), false, out bindData);
         }
@@ -346,7 +346,7 @@ namespace CatLib
         /// <param name="concrete">服务实现</param>
         /// <param name="bindData">如果绑定失败则返回历史绑定对象</param>
         /// <returns>是否完成绑定</returns>
-        public static bool BindIf<TService>(this IContainer container, Func<IContainer, object[], object> concrete,out IBindData bindData)
+        public static bool BindIf<TService>(this IContainer container, Func<IContainer, object[], object> concrete, out IBindData bindData)
         {
             return container.BindIf(container.Type2Service(typeof(TService)), concrete, false, out bindData);
         }
@@ -360,7 +360,7 @@ namespace CatLib
         /// <param name="bindData">如果绑定失败则返回历史绑定对象</param>
         /// <returns>是否完成绑定</returns>
         public static bool BindIf(this IContainer container, string service,
-            Func<IContainer, object[], object> concrete,out IBindData bindData)
+            Func<IContainer, object[], object> concrete, out IBindData bindData)
         {
             return container.BindIf(service, concrete, false, out bindData);
         }
@@ -378,38 +378,15 @@ namespace CatLib
         }
 
         /// <summary>
-        /// 构造一个服务，允许传入构造参数
-        /// </summary>
-        /// <typeparam name="TService">服务名</typeparam>
-        /// <param name="container">服务容器</param>
-        /// <param name="param">构造参数</param>
-        /// <returns>服务实例</returns>
-        public static TService MakeWith<TService>(this IContainer container, params object[] param)
-        {
-            return (TService) container.MakeWith(container.Type2Service(typeof(TService)), param);
-        }
-
-        /// <summary>
         /// 构造一个服务
         /// </summary>
         /// <typeparam name="TService">服务名</typeparam>
         /// <param name="container">服务容器</param>
+        /// <param name="userParams">用户提供的参数</param>
         /// <returns>服务实例</returns>
-        public static TService Make<TService>(this IContainer container)
+        public static TService Make<TService>(this IContainer container, params object[] userParams)
         {
-            return (TService) container.Make(container.Type2Service(typeof(TService)));
-        }
-
-        /// <summary>
-        /// 构造一个服务
-        /// </summary>
-        /// <typeparam name="TConvert">服务实例转换到的类型</typeparam>
-        /// <param name="container">服务容器</param>
-        /// <param name="service">服务名或者别名</param>
-        /// <returns>服务实例</returns>
-        public static TConvert Make<TConvert>(this IContainer container, string service)
-        {
-            return (TConvert) container.Make(service);
+            return (TService)container.Make(container.Type2Service(typeof(TService)), userParams);
         }
 
         /// <summary>

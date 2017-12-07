@@ -818,7 +818,7 @@ namespace CatLib.Tests.Stl
             Assert.AreEqual(77, result.I);
             Assert.AreNotEqual(null, result.Dependency);
 
-            var result2 = container.MakeWith<MakeTestNoParamClass>(100);
+            var result2 = container.Make<MakeTestNoParamClass>(100);
             Assert.AreEqual(100, result2.I);
             Assert.AreNotEqual(null, result2.Dependency);
         }
@@ -838,7 +838,7 @@ namespace CatLib.Tests.Stl
             Assert.AreEqual(typeof(MakeTestClass), result.GetType());
 
             var dep = new MakeTestClassDependency();
-            var result2 = container.MakeWith<MakeTestClass>(dep);
+            var result2 = container.Make<MakeTestClass>(dep);
             Assert.AreEqual(typeof(MakeTestClass), result2.GetType());
 
             var result3 = container[container.Type2Service(typeof(MakeTestClass))] as MakeTestClass;
@@ -1578,7 +1578,7 @@ namespace CatLib.Tests.Stl
         {
             var container = MakeContainer();
             container.Bind<TestParamsMakeClass>();
-            Assert.AreEqual(typeof(TestParamsMakeClass), container.MakeWith<TestParamsMakeClass>(null).GetType());
+            Assert.AreEqual(typeof(TestParamsMakeClass), container.Make<TestParamsMakeClass>(null).GetType());
         }
 
         [TestMethod]

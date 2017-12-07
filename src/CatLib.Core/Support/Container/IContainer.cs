@@ -134,19 +134,12 @@ namespace CatLib
         object Call(object instance, MethodInfo methodInfo, params object[] userParams);
 
         /// <summary>
-        /// 构造服务,允许传入参数来决定构造函数的值
+        /// 构造服务
         /// </summary>
         /// <param name="service">服务名或别名</param>
         /// <param name="userParams">用户传入的参数</param>
         /// <returns>服务实例，如果构造失败那么返回null</returns>
-        object MakeWith(string service, params object[] userParams);
-
-        /// <summary>
-        /// 构造服务
-        /// </summary>
-        /// <param name="service">服务名或别名</param>
-        /// <returns>服务实例，如果构造失败那么返回null</returns>
-        object Make(string service);
+        object Make(string service, params object[] userParams);
 
         /// <summary>
         /// 构造服务

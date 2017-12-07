@@ -449,25 +449,12 @@ namespace CatLib
         /// </summary>
         /// <param name="service">服务名或别名</param>
         /// <param name="userParams">用户传入的构造参数</param>
-        /// <returns>服务实例，如果构造失败那么返回null</returns>
         /// <exception cref="ArgumentNullException"><paramref name="service"/>为<c>null</c>或者空字符串</exception>
         /// <exception cref="RuntimeException">出现循环依赖</exception>
         /// <returns>服务实例，如果构造失败那么返回null</returns>
-        public object MakeWith(string service, params object[] userParams)
+        public object Make(string service, params object[] userParams)
         {
             return Resolve(service, userParams);
-        }
-
-        /// <summary>
-        /// 构造服务
-        /// </summary>
-        /// <param name="service">服务名或别名</param>
-        /// <exception cref="ArgumentNullException"><paramref name="service"/>为<c>null</c>或者空字符串</exception>
-        /// <exception cref="RuntimeException">出现循环依赖</exception>
-        /// <returns>服务实例，如果构造失败那么返回null</returns>
-        public object Make(string service)
-        {
-            return MakeWith(service);
         }
 
         /// <summary>
@@ -802,7 +789,7 @@ namespace CatLib
             }
 
             var result = SpeculationServiceByParamName(makeServiceBindData, baseParam.Name);
-            if(result != null)
+            if (result != null)
             {
                 return result;
             }
@@ -829,7 +816,7 @@ namespace CatLib
         /// <param name="service">希望解决的服务名或者别名</param>
         /// <param name="baseParam">当前正在解决的变量</param>
         /// <returns>解决结果</returns>
-        protected virtual object ResolvePrimitive<T>(Bindable<T> makeServiceBindData, string service , ParameterInfo baseParam) where T : class, IBindable<T>
+        protected virtual object ResolvePrimitive<T>(Bindable<T> makeServiceBindData, string service, ParameterInfo baseParam) where T : class, IBindable<T>
         {
             service = makeServiceBindData.GetContextual(service);
             if (CanMake(service))
@@ -838,7 +825,7 @@ namespace CatLib
             }
 
             var result = SpeculationServiceByParamName(makeServiceBindData, baseParam.Name);
-            if(result != null)
+            if (result != null)
             {
                 return result;
             }
@@ -1039,7 +1026,7 @@ namespace CatLib
         /// <param name="instance">服务实例</param>
         /// <param name="makeService">服务名</param>
         /// <param name="makeServiceType">服务类型</param>
-        protected virtual void GuardResolveInstance(object instance,string makeService, Type makeServiceType)
+        protected virtual void GuardResolveInstance(object instance, string makeService, Type makeServiceType)
         {
             if (instance == null)
             {
