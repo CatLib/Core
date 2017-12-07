@@ -1239,13 +1239,14 @@ namespace CatLib
             var buildInstance = isFromMake ? BuildUseConcrete(bindData, makeServiceType, userParams)
                 : CreateInstance(bindData, makeServiceType ?? (makeServiceType = GetServiceType(bindData.Service)), userParams);
 
-            GuardResolveInstance(buildInstance, makeService, makeServiceType);
-
-            //只有是来自于make函数的调用时才执行di，包装，以及修饰
+            // 只有是来自于make函数的调用时才执行di，包装，以及修饰
+            // 不要在这个之前执行任何调用否则在返回时这些调用会再次被执行
             if (!isFromMake)
             {
                 return buildInstance;
             }
+
+            GuardResolveInstance(buildInstance, makeService, makeServiceType);
 
             AttributeInject(bindData, buildInstance);
 

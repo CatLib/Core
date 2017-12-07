@@ -135,9 +135,33 @@ namespace CatLib.Tests
             Assert.AreEqual(typeof(object), app.Make<object>().GetType());
 
             Assert.AreEqual(true, App.BindIf<int>((c, p) => 100, out bindData));
+            Assert.AreEqual(true, App.BindIf<double, float>(out bindData));
+
+            Assert.AreEqual(typeof(double), App.Make<double>(App.Type2Service(typeof(float))).GetType());
         }
 
+        [TestMethod]
+        public void TestSingletonIf()
+        {
+            var testObject = new object();
+            var testObject2 = new object();
+            var app = new Application();
+            IBindData bindData;
+            Assert.AreEqual(true, App.SingletonIf("TestBind", (c, p) => new object(), out bindData));
 
+            var makeObject = app["TestBind"];
+            Assert.AreEqual(false, App.SingletonIf("TestBind", (c, p) => testObject2, out bindData));
+            Assert.AreSame(testObject.GetType(), makeObject.GetType());
+            Assert.AreSame(makeObject, app["TestBind"]);
+
+            Assert.AreEqual(true, App.SingletonIf<object>(out bindData));
+            Assert.AreEqual(typeof(object), app.Make<object>().GetType());
+
+            Assert.AreEqual(true, App.SingletonIf<int>((c, p) => 100, out bindData));
+            Assert.AreEqual(true, App.SingletonIf<double, float>(out bindData));
+
+            Assert.AreEqual(typeof(double), App.Make<double>(App.Type2Service(typeof(float))).GetType());
+        }
 
         /// <summary>
         /// 生成容器

@@ -16,6 +16,7 @@ namespace CatLib
     /// <summary>
     /// 未能解决异常
     /// </summary>
+    [ExcludeFromCodeCoverage]
     public class UnresolvableException : RuntimeException
     {
         /// <summary>
