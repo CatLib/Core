@@ -699,21 +699,11 @@ namespace CatLib
         /// 构造一个服务
         /// </summary>
         /// <typeparam name="TService">服务名</typeparam>
+        /// <param name="userParams">用户参数</param>
         /// <returns>服务实例</returns>
-        public static TService Make<TService>()
+        public static TService Make<TService>(params object[] userParams)
         {
-            return Handler.Make<TService>();
-        }
-
-        /// <summary>
-        /// 构造一个服务
-        /// </summary>
-        /// <typeparam name="TConvert">服务实例转换到的类型</typeparam>
-        /// <param name="service">服务名</param>
-        /// <returns>服务实例</returns>
-        public static TConvert Make<TConvert>(string service)
-        {
-            return Handler.Make<TConvert>(service);
+            return Handler.Make<TService>(userParams);
         }
 
         /// <summary>
