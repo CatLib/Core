@@ -1076,7 +1076,7 @@ namespace CatLib.Tests.Stl
 
         public class SupportNullContainer : Container
         {
-            protected override void GuardResolveInstance(object instance, string makeService, Type makeServiceType)
+            protected override void GuardResolveInstance(object instance, string makeService)
             {
                 
             }

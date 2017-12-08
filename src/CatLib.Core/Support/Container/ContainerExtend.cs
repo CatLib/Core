@@ -428,9 +428,9 @@ namespace CatLib
         /// <typeparam name="TService">服务名</typeparam>
         /// <param name="container">服务容器</param>
         /// <param name="instance">实例值</param>
-        public static void Instance<TService>(this IContainer container, object instance)
+        public static object Instance<TService>(this IContainer container, object instance)
         {
-            container.Instance(container.Type2Service(typeof(TService)), instance);
+            return container.Instance(container.Type2Service(typeof(TService)), instance);
         }
 
         /// <summary>

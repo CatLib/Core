@@ -369,7 +369,7 @@ namespace CatLib
             return Bind(service, (c, param) =>
             {
                 var container = (Container)c;
-                return container.Build(service, concrete, false, param);
+                return container.Build(GetBindFillable(service), concrete, false, param);
             }, isStatic);
         }
 
@@ -491,7 +491,8 @@ namespace CatLib
         /// <param name="instance">服务实例，<c>null</c>也是合法的实例值</param>
         /// <exception cref="ArgumentNullException"><paramref name="service"/>为<c>null</c>或者空字符串</exception>
         /// <exception cref="RuntimeException"><paramref name="service"/>的服务在绑定设置中不是静态的</exception>
-        public void Instance(string service, object instance)
+        /// <returns>被修饰器处理后的新的实例</returns>
+        public object Instance(string service, object instance)
         {
             Guard.NotEmptyOrNull(service, "service");
             lock (syncRoot)
@@ -523,6 +524,8 @@ namespace CatLib
                 {
                     TriggerOnRebound(service);
                 }
+
+                return instance;
             }
         }
 
@@ -991,12 +994,11 @@ namespace CatLib
         /// </summary>
         /// <param name="instance">服务实例</param>
         /// <param name="makeService">服务名</param>
-        /// <param name="makeServiceType">服务类型</param>
-        protected virtual void GuardResolveInstance(object instance, string makeService, Type makeServiceType)
+        protected virtual void GuardResolveInstance(object instance, string makeService)
         {
             if (instance == null)
             {
-                throw MakeBuildFaildException(makeService, makeServiceType, null);
+                throw MakeBuildFaildException(makeService, GetServiceType(makeService), null);
             }
         }
 
@@ -1256,7 +1258,8 @@ namespace CatLib
                 userParamsStack.Push(userParams);
                 try
                 {
-                    return Build(service, null, true, userParams);
+                    var bindData = GetBindFillable(service);
+                    return Inject(bindData, Build(bindData, null, true, userParams));
                 }
                 finally
                 {
@@ -1267,42 +1270,38 @@ namespace CatLib
         }
 
         /// <summary>
+        /// 为对象进行依赖注入
+        /// </summary>
+        /// <param name="bindData">绑定数据</param>
+        /// <param name="instance">对象实例</param>
+        /// <returns>注入完成的对象</returns>
+        private object Inject(BindData bindData, object instance)
+        {
+            GuardResolveInstance(instance, bindData.Service);
+
+            AttributeInject(bindData, instance);
+
+            instance = bindData.IsStatic
+                ? Instance(bindData.Service, instance)
+                : TriggerOnResolving(bindData, bindData.TriggerResolving(instance));
+
+            resolved[bindData.Service] = true;
+
+            return instance;
+        }
+
+        /// <summary>
         /// 编译服务
         /// </summary>
-        /// <param name="makeService">服务名</param>
+        /// <param name="bindData">服务绑定数据</param>
         /// <param name="makeServiceType">服务类型</param>
-        /// <param name="isFromMake">是否直接调用自Make函数</param>
+        /// <param name="isFromResolve">是否是被Resolve函数调用的</param>
         /// <param name="userParams">用户传入的构造参数</param>
         /// <returns>服务实例</returns>
-        private object Build(string makeService, Type makeServiceType, bool isFromMake, params object[] userParams)
+        private object Build(BindData bindData, Type makeServiceType, bool isFromResolve, params object[] userParams)
         {
-            var bindData = GetBindFillable(makeService);
-            var buildInstance = isFromMake ? BuildUseConcrete(bindData, makeServiceType, userParams)
-                : CreateInstance(bindData, makeServiceType ?? (makeServiceType = GetServiceType(bindData.Service)), userParams);
-
-            // 只有是来自于make函数的调用时才执行di，包装，以及修饰
-            // 不要在这个之前执行任何调用否则在返回时这些调用会再次被执行
-            if (!isFromMake)
-            {
-                return buildInstance;
-            }
-
-            GuardResolveInstance(buildInstance, makeService, makeServiceType);
-
-            AttributeInject(bindData, buildInstance);
-
-            if (bindData.IsStatic)
-            {
-                Instance(makeService, buildInstance);
-            }
-            else
-            {
-                buildInstance = TriggerOnResolving(bindData, bindData.TriggerResolving(buildInstance));
-            }
-
-            resolved[makeService] = true;
-
-            return buildInstance;
+            return isFromResolve ? BuildUseConcrete(bindData, makeServiceType, userParams)
+                : CreateInstance(bindData, makeServiceType ?? GetServiceType(bindData.Service), userParams);
         }
 
         /// <summary>
@@ -1349,11 +1348,11 @@ namespace CatLib
         /// <param name="makeServiceType">服务类型</param>
         /// <param name="param">构造参数</param>
         /// <returns>服务实例</returns>
-        private object BuildUseConcrete(IBindData makeServiceBindData, Type makeServiceType, object[] param)
+        private object BuildUseConcrete(BindData makeServiceBindData, Type makeServiceType, object[] param)
         {
             return makeServiceBindData.Concrete != null ?
                 makeServiceBindData.Concrete(this, param) :
-                Build(makeServiceBindData.Service, makeServiceType, false, param);
+                Build(makeServiceBindData, makeServiceType, false, param);
         }
 
         /// <summary>

@@ -111,7 +111,7 @@ namespace CatLib
         /// </summary>
         /// <param name="service">服务名或者别名</param>
         /// <param name="instance">服务实例</param>
-        void Instance(string service, object instance);
+        object Instance(string service, object instance);
 
         /// <summary>
         /// 释放某个静态化实例

@@ -303,9 +303,9 @@ namespace CatLib
         /// </summary>
         /// <param name="service">服务名或者别名</param>
         /// <param name="instance">服务实例</param>
-        public static void Instance(string service, object instance)
+        public static object Instance(string service, object instance)
         {
-            Handler.Instance(service, instance);
+            return Handler.Instance(service, instance);
         }
 
         /// <summary>
