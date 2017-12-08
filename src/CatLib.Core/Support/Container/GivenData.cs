@@ -61,7 +61,8 @@ namespace CatLib
         public TReturn Given(string service)
         {
             Guard.NotEmptyOrNull(service , "service");
-            return bindable.AddContextual(needs, service) as TReturn;
+            bindable.AddContextual(needs, service);
+            return bindable as TReturn;
         }
 
         /// <summary>

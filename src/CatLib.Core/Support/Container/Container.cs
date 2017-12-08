@@ -123,7 +123,7 @@ namespace CatLib
             userParamsStack = new Stack<object[]>(32);
 
             injectTarget = typeof(InjectAttribute);
-            methodContainer = new MethodContainer(this);
+            methodContainer = new MethodContainer(this, GetDependencies);
         }
 
         /// <summary>
@@ -195,7 +195,7 @@ namespace CatLib
             Guard.NotEmptyOrNull(service, "service");
             lock (syncRoot)
             {
-                service = NormalizeService(service);
+                service = FormatService(service);
                 service = AliasToService(service);
                 BindData bindData;
                 return binds.TryGetValue(service, out bindData) ? bindData : null;
@@ -222,7 +222,7 @@ namespace CatLib
             Guard.NotEmptyOrNull(service, "service");
             lock (syncRoot)
             {
-                service = NormalizeService(service);
+                service = FormatService(service);
                 service = AliasToService(service);
                 return instances.ContainsKey(service);
             }
@@ -238,7 +238,7 @@ namespace CatLib
             Guard.NotEmptyOrNull(service, "service");
             lock (syncRoot)
             {
-                service = NormalizeService(service);
+                service = FormatService(service);
                 service = AliasToService(service);
                 return resolved.ContainsKey(service) || instances.ContainsKey(service);
             }
@@ -254,7 +254,7 @@ namespace CatLib
             Guard.NotEmptyOrNull(service, "service");
             lock (syncRoot)
             {
-                service = NormalizeService(service);
+                service = FormatService(service);
                 service = AliasToService(service);
                 return HasBind(service) || GetServiceType(service) != null;
             }
@@ -299,8 +299,8 @@ namespace CatLib
                 throw new RuntimeException("Alias is Same as Service Name: [" + alias + "].");
             }
 
-            alias = NormalizeService(alias);
-            service = NormalizeService(service);
+            alias = FormatService(alias);
+            service = FormatService(service);
 
             lock (syncRoot)
             {
@@ -390,7 +390,7 @@ namespace CatLib
         {
             Guard.NotEmptyOrNull(service, "service");
             Guard.NotNull(concrete, "concrete");
-            service = NormalizeService(service);
+            service = FormatService(service);
             lock (syncRoot)
             {
                 if (binds.ContainsKey(service))
@@ -434,14 +434,25 @@ namespace CatLib
             Guard.NotNull(methodInfo, "methodInfo");
 
             var type = target.GetType();
-            var parameter = new List<ParameterInfo>(methodInfo.GetParameters());
+            var parameter = methodInfo.GetParameters();
 
             lock (syncRoot)
             {
                 var bindData = GetBindFillable(Type2Service(type));
-                userParams = parameter.Count > 0 ? GetDependencies(bindData, parameter, userParams) : new object[] { };
+                userParams = parameter.Length > 0 ? GetDependencies(bindData, parameter, userParams) : new object[] { };
                 return methodInfo.Invoke(target, userParams);
             }
+        }
+
+        /// <summary>
+        /// 调用一个已经被绑定的方法
+        /// </summary>
+        /// <param name="method">方法名</param>
+        /// <param name="userParams">用户提供的参数</param>
+        /// <returns>调用结果</returns>
+        public object Invoke(string method, params object[] userParams)
+        {
+            return methodContainer.Invoke(method, userParams);
         }
 
         /// <summary>
@@ -489,7 +500,7 @@ namespace CatLib
             Guard.NotEmptyOrNull(service, "service");
             lock (syncRoot)
             {
-                service = NormalizeService(service);
+                service = FormatService(service);
                 service = AliasToService(service);
 
                 var bindData = GetBind(service);
@@ -529,7 +540,7 @@ namespace CatLib
             Guard.NotEmptyOrNull(service, "service");
             lock (syncRoot)
             {
-                service = NormalizeService(service);
+                service = FormatService(service);
                 service = AliasToService(service);
 
                 object instance;
@@ -620,7 +631,7 @@ namespace CatLib
         }
 
         /// <summary>
-        /// 当一个已经被解决的服务，发生重定义时触发
+        /// 当一个已经被解决的服务发生重定义时触发
         /// </summary>
         /// <param name="service">服务名</param>
         /// <param name="callback">回调</param>
@@ -630,7 +641,7 @@ namespace CatLib
             Guard.NotNull(callback, "callback");
             lock (syncRoot)
             {
-                service = NormalizeService(service);
+                service = FormatService(service);
                 service = AliasToService(service);
 
                 List<Action<object>> list;
@@ -649,27 +660,16 @@ namespace CatLib
         /// </summary>
         /// <param name="service">关注的服务名</param>
         /// <param name="target">当服务发生重定义时调用的目标</param>
-        /// <param name="method">方法名</param>
-        public void Watch(string service, object target, string method)
+        /// <param name="methodInfo">方法信息</param>
+        public void Watch(string service, object target, MethodInfo methodInfo)
         {
             Guard.Requires<ArgumentNullException>(target != null);
-            Guard.NotEmptyOrNull(method, "method");
+            Guard.Requires<ArgumentNullException>(methodInfo != null);
 
             OnRebound(service, (instance) =>
             {
-                var methodInfo = target.GetType().GetMethod(method);
                 Call(target, methodInfo, instance);
             });
-        }
-
-        /// <summary>
-        /// 将类型转为服务名
-        /// </summary>
-        /// <param name="type">类型</param>
-        /// <returns>服务名</returns>
-        public string Type2Service(Type type)
-        {
-            return type.ToString();
         }
 
         /// <summary>
@@ -680,7 +680,7 @@ namespace CatLib
         {
             lock (syncRoot)
             {
-                service = NormalizeService(service);
+                service = FormatService(service);
                 service = AliasToService(service);
 
                 Release(service);
@@ -695,6 +695,16 @@ namespace CatLib
                 }
                 binds.Remove(service);
             }
+        }
+
+        /// <summary>
+        /// 将类型转为服务名
+        /// </summary>
+        /// <param name="type">类型</param>
+        /// <returns>服务名</returns>
+        public virtual string Type2Service(Type type)
+        {
+            return type.ToString();
         }
 
         /// <summary>
@@ -720,21 +730,41 @@ namespace CatLib
                     return Arr.RemoveAt(ref userParams, n);
                 }
 
-                try
+                object result;
+                if (TryChangeType(userParam, baseParam.ParameterType, out result))
                 {
-                    if (baseParam.ParameterType.IsPrimitive && userParam is IConvertible)
-                    {
-                        var result = Convert.ChangeType(userParam, baseParam.ParameterType);
-                        Arr.RemoveAt(ref userParams, n);
-                        return result;
-                    }
-                }
-                catch (Exception)
-                {
+                    Arr.RemoveAt(ref userParams, n);
+                    return result;
                 }
             }
 
             return null;
+        }
+
+        /// <summary>
+        /// 安全的转换参数
+        /// </summary>
+        /// <param name="param">参数</param>
+        /// <param name="conversionType">转换到的类型</param>
+        /// <param name="result">转换后的结果</param>
+        /// <returns>是否转换成功</returns>
+        protected virtual bool TryChangeType(object param, Type conversionType, out object result)
+        {
+            try
+            {
+                if (conversionType.IsPrimitive && param is IConvertible)
+                {
+                    result = Convert.ChangeType(param, conversionType);
+                    return true;
+                }
+            }
+            catch (Exception)
+            {
+                // ignored
+            }
+
+            result = null;
+            return false;
         }
 
         /// <summary>
@@ -780,7 +810,7 @@ namespace CatLib
         /// <param name="service">希望解决的服务名或者别名</param>
         /// <param name="baseParam">当前正在解决的变量</param>
         /// <returns>解决结果</returns>
-        protected virtual object ResolveAttrPrimitive<T>(Bindable<T> makeServiceBindData, string service, PropertyInfo baseParam) where T : class, IBindable<T>
+        protected virtual object ResolveAttrPrimitive(Bindable makeServiceBindData, string service, PropertyInfo baseParam)
         {
             service = makeServiceBindData.GetContextual(service);
             if (CanMake(service))
@@ -804,7 +834,7 @@ namespace CatLib
         /// <param name="service">希望解决的服务名或者别名</param>
         /// <param name="baseParam">当前正在解决的变量</param>
         /// <returns>解决结果</returns>
-        protected virtual object ResloveAttrClass<T>(Bindable<T> makeServiceBindData, string service, PropertyInfo baseParam) where T : class, IBindable<T>
+        protected virtual object ResloveAttrClass(Bindable makeServiceBindData, string service, PropertyInfo baseParam)
         {
             return Make(makeServiceBindData.GetContextual(service));
         }
@@ -816,7 +846,7 @@ namespace CatLib
         /// <param name="service">希望解决的服务名或者别名</param>
         /// <param name="baseParam">当前正在解决的变量</param>
         /// <returns>解决结果</returns>
-        protected virtual object ResolvePrimitive<T>(Bindable<T> makeServiceBindData, string service, ParameterInfo baseParam) where T : class, IBindable<T>
+        protected virtual object ResolvePrimitive(Bindable makeServiceBindData, string service, ParameterInfo baseParam)
         {
             service = makeServiceBindData.GetContextual(service);
             if (CanMake(service))
@@ -845,7 +875,7 @@ namespace CatLib
         /// <param name="service">希望解决的服务名或者别名</param>
         /// <param name="baseParam">当前正在解决的变量</param>
         /// <returns>解决结果</returns>
-        protected virtual object ResloveClass<T>(Bindable<T> makeServiceBindData, string service, ParameterInfo baseParam) where T : class, IBindable<T>
+        protected virtual object ResloveClass(Bindable makeServiceBindData, string service, ParameterInfo baseParam)
         {
             try
             {
@@ -864,70 +894,13 @@ namespace CatLib
         /// <summary>
         /// 根据参数名字来推测服务
         /// </summary>
-        /// <typeparam name="T"></typeparam>
         /// <param name="makeServiceBindData">请求注入操作的服务绑定数据</param>
         /// <param name="paramName">参数名</param>
         /// <returns>推测的服务</returns>
-        protected virtual object SpeculationServiceByParamName<T>(Bindable<T> makeServiceBindData, string paramName) where T : class, IBindable<T>
+        protected virtual object SpeculationServiceByParamName(Bindable makeServiceBindData, string paramName)
         {
             var service = makeServiceBindData.GetContextual("@" + paramName);
             return CanMake(service) ? Make(service) : null;
-        }
-
-        /// <summary>
-        /// 触发全局解决修饰器
-        /// </summary>
-        /// <param name="bindData">服务绑定数据</param>
-        /// <param name="obj">服务实例</param>
-        /// <returns>被修饰器修饰后的服务实例</returns>
-        protected virtual object TriggerOnResolving(IBindData bindData, object obj)
-        {
-            foreach (var func in resolving)
-            {
-                obj = func(bindData, obj);
-            }
-            return obj;
-        }
-
-        /// <summary>
-        /// 触发全局释放修饰器
-        /// </summary>
-        /// <param name="bindData">服务绑定数据</param>
-        /// <param name="obj">服务实例</param>
-        /// <returns>被修饰器修饰后的服务实例</returns>
-        protected virtual void TriggerOnRelease(IBindData bindData, object obj)
-        {
-            foreach (var action in release)
-            {
-                action.Invoke(bindData, obj);
-            }
-        }
-
-        /// <summary>
-        /// 触发服务重定义事件
-        /// </summary>
-        /// <param name="service">发生重定义的服务</param>
-        protected virtual void TriggerOnRebound(string service)
-        {
-            var instance = Make(service);
-            foreach (var callback in GetOnReboundCallbacks(service))
-            {
-                callback(instance);
-            }
-        }
-
-        /// <summary>
-        /// 获取重定义的服务所对应的回调
-        /// </summary>
-        /// <returns>回调列表</returns>
-        protected virtual IEnumerable<Action<object>> GetOnReboundCallbacks(string service)
-        {
-            List<Action<object>> result;
-            if (!rebound.TryGetValue(service, out result))
-            {
-                return new Action<object>[] { };
-            }
-            return result;
         }
 
         /// <summary>
@@ -988,11 +961,11 @@ namespace CatLib
         }
 
         /// <summary>
-        /// 标准化服务名
+        /// 格式化服务名
         /// </summary>
         /// <param name="service">服务名</param>
-        /// <returns>标准化后的服务名</returns>
-        protected virtual string NormalizeService(string service)
+        /// <returns>格式化后的服务名</returns>
+        protected virtual string FormatService(string service)
         {
             return service.Trim();
         }
@@ -1067,7 +1040,7 @@ namespace CatLib
         /// <param name="makeServiceInstance">服务实例</param>
         /// <returns>服务实例</returns>
         /// <exception cref="RuntimeException">属性是必须的或者注入类型和需求类型不一致</exception>
-        protected void AttributeInject<T>(Bindable<T> makeServiceBindData, object makeServiceInstance) where T : class, IBindable<T>
+        protected virtual void AttributeInject(Bindable makeServiceBindData, object makeServiceInstance)
         {
             if (makeServiceInstance == null)
             {
@@ -1112,16 +1085,16 @@ namespace CatLib
         /// <param name="userParams">输入的构造参数列表</param>
         /// <returns>服务所需参数的解决结果</returns>
         /// <exception cref="RuntimeException">生成的实例类型和需求类型不一致</exception>
-        protected object[] GetDependencies<T>(Bindable<T> makeServiceBindData, IList<ParameterInfo> baseParams, object[] userParams) where T : class, IBindable<T>
+        protected virtual object[] GetDependencies(Bindable makeServiceBindData, IList<ParameterInfo> baseParams, object[] userParams)
         {
             var results = new List<object>();
 
             foreach (var baseParam in baseParams)
             {
-                var instance = GetDependenciesFromUserParams(baseParam, ref userParams);
-                if (instance != null)
+                var param = GetDependenciesFromUserParams(baseParam, ref userParams);
+                if (param != null)
                 {
-                    results.Add(instance);
+                    results.Add(param);
                     continue;
                 }
 
@@ -1130,32 +1103,22 @@ namespace CatLib
                 if (baseParam.ParameterType.IsClass
                     || baseParam.ParameterType.IsInterface)
                 {
-                    instance = ResloveClass(makeServiceBindData, needService, baseParam);
+                    param = ResloveClass(makeServiceBindData, needService, baseParam);
                 }
                 else
                 {
-                    instance = ResolvePrimitive(makeServiceBindData, needService, baseParam);
+                    param = ResolvePrimitive(makeServiceBindData, needService, baseParam);
                 }
 
-                if (!CheckInstanceIsInstanceOfType(baseParam.ParameterType, instance))
+                if (!CheckInstanceIsInstanceOfType(baseParam.ParameterType, param))
                 {
-                    throw new UnresolvableException("[" + makeServiceBindData.Service + "] Params inject type must be [" + baseParam.ParameterType + "] , But instance is [" + instance.GetType() + "] Make service is [" + needService + "].");
+                    throw new UnresolvableException("[" + makeServiceBindData.Service + "] Params inject type must be [" + baseParam.ParameterType + "] , But instance is [" + param.GetType() + "] Make service is [" + needService + "].");
                 }
 
-                results.Add(instance);
+                results.Add(param);
             }
 
             return results.ToArray();
-        }
-
-        /// <summary>
-        /// 制作一个空的绑定数据
-        /// </summary>
-        /// <param name="service">服务名</param>
-        /// <returns>空绑定数据</returns>
-        protected BindData MakeEmptyBindData(string service)
-        {
-            return new BindData(this, service, null, false);
         }
 
         /// <summary>
@@ -1167,6 +1130,104 @@ namespace CatLib
         {
             string alias;
             return aliases.TryGetValue(service, out alias) ? alias : service;
+        }
+
+        /// <summary>
+        /// 触发全局解决修饰器
+        /// </summary>
+        /// <param name="bindData">服务绑定数据</param>
+        /// <param name="obj">服务实例</param>
+        /// <returns>被修饰器修饰后的服务实例</returns>
+        private object TriggerOnResolving(IBindData bindData, object obj)
+        {
+            foreach (var func in resolving)
+            {
+                obj = func(bindData, obj);
+            }
+            return obj;
+        }
+
+        /// <summary>
+        /// 触发全局释放修饰器
+        /// </summary>
+        /// <param name="bindData">服务绑定数据</param>
+        /// <param name="obj">服务实例</param>
+        /// <returns>被修饰器修饰后的服务实例</returns>
+        private void TriggerOnRelease(IBindData bindData, object obj)
+        {
+            foreach (var action in release)
+            {
+                action.Invoke(bindData, obj);
+            }
+        }
+
+        /// <summary>
+        /// 触发服务重定义事件
+        /// </summary>
+        /// <param name="service">发生重定义的服务</param>
+        private void TriggerOnRebound(string service)
+        {
+            var instance = Make(service);
+            var bind = GetBind(service);
+
+            Flash(() =>
+            {
+                foreach (var callback in GetOnReboundCallbacks(service))
+                {
+                    callback(instance);
+                }
+            }, Type2Service(typeof(IBindData)), bind);
+        }
+
+        /// <summary>
+        /// 在回调区间内暂时性的静态化一个服务实例
+        /// </summary>
+        /// <param name="callback">回调区间</param>
+        /// <param name="service">服务名</param>
+        /// <param name="instance">实例</param>
+        private void Flash(Action callback, string service, object instance)
+        {
+            lock (syncRoot)
+            {
+                if (HasInstance(service))
+                {
+                    throw new RuntimeException("Flash service [" + service + "] is already exists.");
+                }
+
+                try
+                {
+                    Instance(service, instance);
+                    callback.Invoke();
+                }
+                finally
+                {
+                    Release(service);
+                }
+            }
+        }
+
+        /// <summary>
+        /// 获取重定义的服务所对应的回调
+        /// </summary>
+        /// <returns>回调列表</returns>
+        private IEnumerable<Action<object>> GetOnReboundCallbacks(string service)
+        {
+            List<Action<object>> result;
+            if (!rebound.TryGetValue(service, out result))
+            {
+                return new Action<object>[] { };
+            }
+            return result;
+        }
+
+        /// <summary>
+        /// 制作一个空的绑定数据
+        /// </summary>
+        /// <param name="service">服务名</param>
+        /// <returns>空绑定数据</returns>
+        private BindData MakeEmptyBindData(string service)
+        {
+            return new BindData(this, service, null, false);
         }
 
         /// <summary>
@@ -1184,7 +1245,7 @@ namespace CatLib
             Guard.NotEmptyOrNull(service, "service");
             lock (syncRoot)
             {
-                service = NormalizeService(service);
+                service = FormatService(service);
                 service = AliasToService(service);
 
                 object instance;

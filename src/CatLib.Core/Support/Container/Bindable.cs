@@ -16,12 +16,17 @@ namespace CatLib
     /// <summary>
     /// 可绑定对象
     /// </summary>
-    public abstract class Bindable<TReturn> : IBindable<TReturn> where TReturn : class, IBindable<TReturn>
+    public abstract class Bindable : IBindable
     {
         /// <summary>
         /// 当前绑定的名字
         /// </summary>
         public string Service { get; private set; }
+
+        /// <summary>
+        /// 父级容器
+        /// </summary>
+        protected readonly Container Container;
 
         /// <summary>
         /// 服务关系上下文
@@ -30,24 +35,14 @@ namespace CatLib
         private Dictionary<string, string> contextual;
 
         /// <summary>
-        /// 给与数据
+        /// 同步锁
         /// </summary>
-        private GivenData<TReturn> given;
+        protected readonly object SyncRoot = new object();
 
         /// <summary>
         /// 是否被释放
         /// </summary>
         private bool isDestroy;
-
-        /// <summary>
-        /// 父级容器
-        /// </summary>
-        protected readonly Container Container;
-
-        /// <summary>
-        /// 同步锁
-        /// </summary>
-        protected readonly object SyncRoot = new object();
 
         /// <summary>
         /// 构建一个绑定数据
@@ -59,6 +54,93 @@ namespace CatLib
             Container = container;
             Service = service;
             isDestroy = false;
+        }
+
+        /// <summary>
+        /// 解除绑定
+        /// </summary>
+        public void Unbind()
+        {
+            lock (SyncRoot)
+            {
+                isDestroy = true;
+                ReleaseBind();
+            }
+        }
+
+        /// <summary>
+        /// 为服务增加上下文
+        /// </summary>
+        /// <param name="needs">需求什么服务</param>
+        /// <param name="given">给与什么服务</param>
+        /// <returns>服务绑定数据</returns>
+        internal void AddContextual(string needs, string given)
+        {
+            lock (SyncRoot)
+            {
+                GuardIsDestroy();
+                if (contextual == null)
+                {
+                    contextual = new Dictionary<string, string>();
+                }
+                if (contextual.ContainsKey(needs))
+                {
+                    throw new RuntimeException("Needs [" + needs + "] is already exist.");
+                }
+                contextual.Add(needs, given);
+            }
+        }
+
+        /// <summary>
+        /// 获取上下文的需求关系
+        /// </summary>
+        /// <param name="needs">需求的服务</param>
+        /// <returns>给与的服务</returns>
+        internal string GetContextual(string needs)
+        {
+            if (contextual == null)
+            {
+                return needs;
+            }
+            string contextualNeeds;
+            return contextual.TryGetValue(needs, out contextualNeeds) ? contextualNeeds : needs;
+        }
+
+        /// <summary>
+        /// 解除绑定
+        /// </summary>
+        protected abstract void ReleaseBind();
+
+        /// <summary>
+        /// 守卫是否被释放
+        /// </summary>
+        protected void GuardIsDestroy()
+        {
+            if (isDestroy)
+            {
+                throw new RuntimeException("Current bind has be mark Destroy.");
+            }
+        }
+    }
+
+    /// <summary>
+    /// 可绑定对象
+    /// </summary>
+    internal abstract class Bindable<TReturn> : Bindable, IBindable<TReturn> where TReturn : class, IBindable<TReturn>
+    {
+        /// <summary>
+        /// 给与数据
+        /// </summary>
+        private GivenData<TReturn> given;
+
+        /// <summary>
+        /// 构建一个绑定数据
+        /// </summary>
+        /// <param name="container">依赖注入容器</param>
+        /// <param name="service">服务名</param>
+        protected Bindable(Container container, string service)
+            : base(container, service)
+        {
         }
 
         /// <summary>
@@ -89,73 +171,6 @@ namespace CatLib
         public IGivenData<TReturn> Needs<T>()
         {
             return Needs(Container.Type2Service(typeof(T)));
-        }
-
-        /// <summary>
-        /// 为服务增加上下文
-        /// </summary>
-        /// <param name="needs">需求什么服务</param>
-        /// <param name="given">给与什么服务</param>
-        /// <returns>服务绑定数据</returns>
-        internal Bindable<TReturn> AddContextual(string needs, string given)
-        {
-            lock (SyncRoot)
-            {
-                GuardIsDestroy();
-                if (contextual == null)
-                {
-                    contextual = new Dictionary<string, string>();
-                }
-                if (contextual.ContainsKey(needs))
-                {
-                    throw new RuntimeException("Needs [" + needs + "] is already exist.");
-                }
-                contextual.Add(needs, given);
-                return this;
-            }
-        }
-
-        /// <summary>
-        /// 获取上下文的需求关系
-        /// </summary>
-        /// <param name="needs">需求的服务</param>
-        /// <returns>给与的服务</returns>
-        internal string GetContextual(string needs)
-        {
-            if (contextual == null)
-            {
-                return needs;
-            }
-            string contextualNeeds;
-            return contextual.TryGetValue(needs, out contextualNeeds) ? contextualNeeds : needs;
-        }
-
-        /// <summary>
-        /// 解除绑定
-        /// </summary>
-        public void UnBind()
-        {
-            lock (SyncRoot)
-            {
-                isDestroy = true;
-                ReleaseBind();
-            }
-        }
-
-        /// <summary>
-        /// 解除绑定
-        /// </summary>
-        protected abstract void ReleaseBind();
-
-        /// <summary>
-        /// 守卫是否被释放
-        /// </summary>
-        protected void GuardIsDestroy()
-        {
-            if (isDestroy)
-            {
-                throw new RuntimeException("Current Instance has be mark Destroy.");
-            }
         }
     }
 }

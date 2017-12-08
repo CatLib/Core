@@ -1024,7 +1024,7 @@ namespace CatLib.Tests.Stl
             cls = container.Make<TestMakeParamInjectAttrClass>();
             Assert.AreEqual("hello", cls.GetMsg());
 
-            subBind.UnBind();
+            subBind.Unbind();
             cls = container.Make<TestMakeParamInjectAttrClass>();
             Assert.AreEqual("hello", cls.GetMsg());
         }
@@ -1677,10 +1677,10 @@ namespace CatLib.Tests.Stl
                 callRebound = true;
             });
 
-            container.Bind("TestService", (c, p) => 100).UnBind();
+            container.Bind("TestService", (c, p) => 100).Unbind();
             var bind = container.Bind("TestService", (c, p) => 200);
             container.Make("TestService");
-            bind.UnBind();
+            bind.Unbind();
             container.Bind("TestService", (c, p) => 300);
 
             Assert.AreEqual(true, callRebound);

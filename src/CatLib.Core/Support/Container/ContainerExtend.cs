@@ -138,18 +138,18 @@ namespace CatLib
         /// 以依赖注入形式调用一个方法
         /// </summary>
         /// <param name="container">服务容器</param>
-        /// <param name="instance">方法对象</param>
+        /// <param name="target">方法对象</param>
         /// <param name="method">方法名</param>
         /// <param name="userParams">用户传入的参数</param>
         /// <returns>方法返回值</returns>
-        /// <exception cref="ArgumentNullException"><paramref name="instance"/>,<paramref name="method"/>为<c>null</c>或者空字符串</exception>
-        public static object Call(this IContainer container, object instance, string method, params object[] userParams)
+        /// <exception cref="ArgumentNullException"><paramref name="target"/>,<paramref name="method"/>为<c>null</c>或者空字符串</exception>
+        public static object Call(this IContainer container, object target, string method, params object[] userParams)
         {
-            Guard.NotNull(instance, "instance");
+            Guard.Requires<ArgumentNullException>(target != null);
             Guard.NotEmptyOrNull(method, "method");
 
-            var methodInfo = instance.GetType().GetMethod(method);
-            return container.Call(instance, methodInfo, userParams);
+            var methodInfo = target.GetType().GetMethod(method);
+            return container.Call(target, methodInfo, userParams);
         }
 
         /// <summary>
@@ -431,6 +431,23 @@ namespace CatLib
         public static void Instance<TService>(this IContainer container, object instance)
         {
             container.Instance(container.Type2Service(typeof(TService)), instance);
+        }
+
+        /// <summary>
+        /// 关注指定的服务，当服务触发重定义时调用指定对象的指定方法
+        /// <param>调用是以依赖注入的形式进行的</param>
+        /// </summary>
+        /// <param name="container">服务容器</param>
+        /// <param name="service">关注的服务名</param>
+        /// <param name="target">当服务发生重定义时调用的目标</param>
+        /// <param name="method">方法名</param>
+        public static void Watch(this IContainer container, string service, object target, string method)
+        {
+            Guard.Requires<ArgumentNullException>(target != null);
+            Guard.NotEmptyOrNull(method, "method");
+
+            var methodInfo = target.GetType().GetMethod(method);
+            container.Watch(service, target, methodInfo);
         }
     }
 }

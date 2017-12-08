@@ -194,7 +194,7 @@ namespace CatLib.Tests.Stl
         }
         #endregion
 
-        #region UnBind
+        #region Unbind
         /// <summary>
         /// 能够正常解除绑定
         /// </summary>
@@ -205,7 +205,7 @@ namespace CatLib.Tests.Stl
             var bindData = container.Bind("CanUnBind", (app, param) => "hello world", false);
 
             Assert.AreEqual("hello world", container.Make("CanUnBind").ToString());
-            bindData.UnBind();
+            bindData.Unbind();
 
             ExceptionAssert.Throws<UnresolvableException>(() =>
             {
@@ -221,7 +221,7 @@ namespace CatLib.Tests.Stl
         {
             var container = new Container();
             var bindData = container.Bind("CanUnBind", (app, param) => "hello world", false);
-            bindData.UnBind();
+            bindData.Unbind();
 
             ExceptionAssert.Throws<RuntimeException>(() =>
             {

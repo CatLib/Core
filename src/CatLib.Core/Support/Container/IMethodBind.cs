@@ -14,7 +14,7 @@ namespace CatLib
     /// <summary>
     /// 方法绑定数据
     /// </summary>
-    public interface IMethodBindData : IBindable<IMethodBindData>
+    public interface IMethodBind : IBindable<IMethodBind>
     {
     }
 }

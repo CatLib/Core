@@ -198,8 +198,8 @@ namespace CatLib
         /// </summary>
         /// <param name="service">关注的服务名</param>
         /// <param name="target">当服务发生重定义时调用的目标</param>
-        /// <param name="method">方法名</param>
-        void Watch(string service, object target, string method);
+        /// <param name="methodInfo">方法信息</param>
+        void Watch(string service, object target, MethodInfo methodInfo);
 
         /// <summary>
         /// 类型转为服务名

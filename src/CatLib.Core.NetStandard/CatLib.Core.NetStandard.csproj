@@ -74,9 +74,9 @@
     <Compile Include="..\CatLib.Core\Support\Container\IBindData.cs" Link="Support\Container\IBindData.cs" />
     <Compile Include="..\CatLib.Core\Support\Container\IContainer.cs" Link="Support\Container\IContainer.cs" />
     <Compile Include="..\CatLib.Core\Support\Container\IGivenData.cs" Link="Support\Container\IGivenData.cs" />
-    <Compile Include="..\CatLib.Core\Support\Container\IMethodBindData.cs" Link="Support\Container\IMethodBindData.cs" />
+    <Compile Include="..\CatLib.Core\Support\Container\IMethodBind.cs" Link="Support\Container\IMethodBind.cs" />
     <Compile Include="..\CatLib.Core\Support\Container\InjectAttribute.cs" Link="Support\Container\InjectAttribute.cs" />
-    <Compile Include="..\CatLib.Core\Support\Container\MethodBindData.cs" Link="Support\Container\MethodBindData.cs" />
+    <Compile Include="..\CatLib.Core\Support\Container\MethodBind.cs" Link="Support\Container\MethodBind.cs" />
     <Compile Include="..\CatLib.Core\Support\Container\MethodContainer.cs" Link="Support\Container\MethodContainer.cs" />
     <Compile Include="..\CatLib.Core\Support\Container\UnresolvableException.cs" Link="Support\Container\UnresolvableException.cs" />
     <Compile Include="..\CatLib.Core\Support\Events\Dispatcher.cs" Link="Support\Events\Dispatcher.cs" />
@@ -128,7 +128,6 @@
     <Folder Include="Support\QuickList\" />
     <Folder Include="Support\SortSet\" />
     <Folder Include="Support\Template\" />
-    <Folder Include="Support\Container\" />
   </ItemGroup>
 
 </Project>

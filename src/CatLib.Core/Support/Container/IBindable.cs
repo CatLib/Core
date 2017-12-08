@@ -14,7 +14,7 @@ namespace CatLib
     /// <summary>
     /// 被绑定对象
     /// </summary>
-    public interface IBindable<TReturn>
+    public interface IBindable
     {
         /// <summary>
         /// 当前绑定的名字
@@ -25,8 +25,14 @@ namespace CatLib
         /// 移除绑定
         /// <para>如果进行的是服务绑定 , 那么在解除绑定时如果是静态化物体将会触发释放</para>
         /// </summary>
-        void UnBind();
+        void Unbind();
+    }
 
+    /// <summary>
+    /// 被绑定对象
+    /// </summary>
+    public interface IBindable<TReturn> : IBindable
+    {
         /// <summary>
         /// 当需求某个服务                                                                                                                                                                                                                                                                                                                                                                                  
         /// </summary>

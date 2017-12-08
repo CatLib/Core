@@ -23,12 +23,12 @@ namespace CatLib
         /// <summary>
         /// 调用方法目标 映射到 方法名字
         /// </summary>
-        private Dictionary<object, List<string>> targetToMethodMappings;
+        private Dictionary<object, List<string>> targetToMethodsMappings;
 
         /// <summary>
-        /// 方法映射
+        /// 绑定数据
         /// </summary>
-        private Dictionary<string, MethodInfo> methodMappings;
+        private Dictionary<string, MethodBind> methodMappings;
 
         /// <summary>
         /// 依赖注入容器
@@ -36,14 +36,21 @@ namespace CatLib
         private Container container;
 
         /// <summary>
+        /// 依赖解决器
+        /// </summary>
+        private readonly Func<Bindable, IList<ParameterInfo>, object[], object[]> dependenciesResolved;
+
+        /// <summary>
         /// 构建一个新的方法容器
         /// </summary>
         /// <param name="container"></param>
-        internal MethodContainer(Container container)
+        /// <param name="dependenciesResolved">依赖解决器</param>
+        internal MethodContainer(Container container, Func<Bindable, IList<ParameterInfo>, object[], object[]> dependenciesResolved)
         {
             this.container = container;
-            targetToMethodMappings = new Dictionary<object, List<string>>();
-            methodMappings = new Dictionary<string, MethodInfo>();
+            targetToMethodsMappings = new Dictionary<object, List<string>>();
+            methodMappings = new Dictionary<string, MethodBind>();
+            this.dependenciesResolved = dependenciesResolved;
         }
 
         /// <summary>
@@ -53,23 +60,44 @@ namespace CatLib
         /// <param name="target">方法调用目标</param>
         /// <param name="call">在方法调用目标中被调用的方法</param>
         /// <returns></returns>
-        public IMethodBindData BindMethod(string method, object target, string call)
+        public IMethodBind BindMethod(string method, object target, MethodInfo call)
         {
             Guard.NotEmptyOrNull(method, "method");
             Guard.Requires<ArgumentNullException>(target != null);
-            Guard.NotEmptyOrNull(call, "call");
+            Guard.Requires<ArgumentNullException>(call != null);
             return null;
         }
 
         /// <summary>
-        /// 生成对象中被调用方法的方法信息
+        /// 调用方法
         /// </summary>
-        /// <param name="target">方法调用目标</param>
-        /// <param name="call">在方法调用目标中被调用的方法</param>
-        private MethodInfo MakeMethodInfo(object target, string call)
+        /// <param name="method">方法名</param>
+        /// <param name="userParams">用户传入的参数</param>
+        /// <returns>方法调用结果</returns>
+        public object Invoke(string method, params object[] userParams)
         {
-            return target.GetType().GetMethod(call,
-                BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.FlattenHierarchy);
+            Guard.NotEmptyOrNull(method, "method");
+            MethodBind methodBind;
+
+            if (!methodMappings.TryGetValue(method, out methodBind))
+            {
+                throw MakeMethodNotFoundException(method);
+            }
+
+            var injectParams = methodBind.ParameterInfos.Length > 0
+                ? dependenciesResolved(methodBind, methodBind.ParameterInfos, userParams)
+                : new object[] { };
+
+            return methodBind.MethodInfo.Invoke(methodBind.Target, injectParams);
+        }
+
+        /// <summary>
+        /// 生成一个方法没有找到异常
+        /// </summary>
+        /// <param name="method"></param>
+        private RuntimeException MakeMethodNotFoundException(string method)
+        {
+            return new RuntimeException("Method [" + method + "] is not found.");
         }
     }
 }
