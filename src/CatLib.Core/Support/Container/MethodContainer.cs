@@ -38,14 +38,14 @@ namespace CatLib
         /// <summary>
         /// 依赖解决器
         /// </summary>
-        private readonly Func<Bindable, IList<ParameterInfo>, object[], object[]> dependenciesResolved;
+        private readonly Func<Bindable, ParameterInfo[], object[], object[]> dependenciesResolved;
 
         /// <summary>
         /// 构建一个新的方法容器
         /// </summary>
         /// <param name="container"></param>
         /// <param name="dependenciesResolved">依赖解决器</param>
-        internal MethodContainer(Container container, Func<Bindable, IList<ParameterInfo>, object[], object[]> dependenciesResolved)
+        internal MethodContainer(Container container, Func<Bindable, ParameterInfo[], object[], object[]> dependenciesResolved)
         {
             this.container = container;
             targetToMethodsMappings = new Dictionary<object, List<string>>();
@@ -89,6 +89,14 @@ namespace CatLib
                 : new object[] { };
 
             return methodBind.MethodInfo.Invoke(methodBind.Target, injectParams);
+        }
+
+        /// <summary>
+        /// 清空容器的所有实例，绑定，别名，标签，解决器
+        /// </summary>
+        public void Flush()
+        {
+
         }
 
         /// <summary>

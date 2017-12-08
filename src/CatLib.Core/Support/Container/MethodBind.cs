@@ -21,41 +21,17 @@ namespace CatLib
         /// <summary>
         /// 方法信息
         /// </summary>
-        private readonly MethodInfo methodInfo;
-
-        /// <summary>
-        /// 方法信息
-        /// </summary>
-        public MethodInfo MethodInfo
-        {
-            get { return methodInfo; }
-        }
+        public MethodInfo MethodInfo { get; private set; }
 
         /// <summary>
         /// 调用目标
         /// </summary>
-        private readonly object target;
-
-        /// <summary>
-        /// 调用目标
-        /// </summary>
-        public object Target
-        {
-            get { return target; }
-        }
+        public object Target { get; private set; }
 
         /// <summary>
         /// 参数表
         /// </summary>
-        private readonly ParameterInfo[] parameterInfos;
-
-        /// <summary>
-        /// 参数表
-        /// </summary>
-        public ParameterInfo[] ParameterInfos
-        {
-            get { return parameterInfos; }
-        }
+        public ParameterInfo[] ParameterInfos { get; private set; }
 
         /// <summary>
         /// 构建一个绑定数据
@@ -67,9 +43,9 @@ namespace CatLib
         public MethodBind(Container container, string service, object target, MethodInfo call)
             :base(container, service)
         {
-            this.target = target;
-            methodInfo = call;
-            parameterInfos = methodInfo.GetParameters();
+            Target = target;
+            MethodInfo = call;
+            ParameterInfos = call.GetParameters();
         }
 
         /// <summary>

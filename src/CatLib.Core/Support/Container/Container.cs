@@ -195,7 +195,6 @@ namespace CatLib
             Guard.NotEmptyOrNull(service, "service");
             lock (syncRoot)
             {
-                service = FormatService(service);
                 service = AliasToService(service);
                 BindData bindData;
                 return binds.TryGetValue(service, out bindData) ? bindData : null;
@@ -222,7 +221,6 @@ namespace CatLib
             Guard.NotEmptyOrNull(service, "service");
             lock (syncRoot)
             {
-                service = FormatService(service);
                 service = AliasToService(service);
                 return instances.ContainsKey(service);
             }
@@ -238,7 +236,6 @@ namespace CatLib
             Guard.NotEmptyOrNull(service, "service");
             lock (syncRoot)
             {
-                service = FormatService(service);
                 service = AliasToService(service);
                 return resolved.ContainsKey(service) || instances.ContainsKey(service);
             }
@@ -254,7 +251,6 @@ namespace CatLib
             Guard.NotEmptyOrNull(service, "service");
             lock (syncRoot)
             {
-                service = FormatService(service);
                 service = AliasToService(service);
                 return HasBind(service) || GetServiceType(service) != null;
             }
@@ -500,7 +496,6 @@ namespace CatLib
             Guard.NotEmptyOrNull(service, "service");
             lock (syncRoot)
             {
-                service = FormatService(service);
                 service = AliasToService(service);
 
                 var bindData = GetBind(service);
@@ -540,7 +535,6 @@ namespace CatLib
             Guard.NotEmptyOrNull(service, "service");
             lock (syncRoot)
             {
-                service = FormatService(service);
                 service = AliasToService(service);
 
                 object instance;
@@ -581,6 +575,7 @@ namespace CatLib
                 buildStack.Clear();
                 userParamsStack.Clear();
                 rebound.Clear();
+                methodContainer.Flush();
             }
         }
 
@@ -641,7 +636,6 @@ namespace CatLib
             Guard.NotNull(callback, "callback");
             lock (syncRoot)
             {
-                service = FormatService(service);
                 service = AliasToService(service);
 
                 List<Action<object>> list;
@@ -680,7 +674,6 @@ namespace CatLib
         {
             lock (syncRoot)
             {
-                service = FormatService(service);
                 service = AliasToService(service);
 
                 Release(service);
@@ -1085,7 +1078,7 @@ namespace CatLib
         /// <param name="userParams">输入的构造参数列表</param>
         /// <returns>服务所需参数的解决结果</returns>
         /// <exception cref="RuntimeException">生成的实例类型和需求类型不一致</exception>
-        protected virtual object[] GetDependencies(Bindable makeServiceBindData, IList<ParameterInfo> baseParams, object[] userParams)
+        protected virtual object[] GetDependencies(Bindable makeServiceBindData, ParameterInfo[] baseParams, object[] userParams)
         {
             var results = new List<object>();
 
@@ -1128,6 +1121,7 @@ namespace CatLib
         /// <returns>最终映射的服务名</returns>
         protected virtual string AliasToService(string service)
         {
+            service = FormatService(service);
             string alias;
             return aliases.TryGetValue(service, out alias) ? alias : service;
         }
@@ -1245,7 +1239,6 @@ namespace CatLib
             Guard.NotEmptyOrNull(service, "service");
             lock (syncRoot)
             {
-                service = FormatService(service);
                 service = AliasToService(service);
 
                 object instance;
@@ -1313,16 +1306,14 @@ namespace CatLib
         }
 
         /// <summary>
-        /// 构造服务实现
+        /// 预构造服务实现（准备需要注入的参数）
         /// </summary>
         /// <param name="makeServiceBindData">服务绑定数据</param>
         /// <param name="makeServiceType">服务类型</param>
         /// <param name="userParams">用户传入的构造参数</param>
         /// <returns>服务实例</returns>
-        private object CreateInstance(BindData makeServiceBindData, Type makeServiceType, object[] userParams)
+        private object CreateInstance(Bindable makeServiceBindData, Type makeServiceType, object[] userParams)
         {
-            userParams = userParams ?? new object[] { };
-
             if (makeServiceType == null
                 || makeServiceType.IsAbstract
                 || makeServiceType.IsInterface)
@@ -1331,23 +1322,14 @@ namespace CatLib
             }
 
             var constructor = makeServiceType.GetConstructors();
-            if (constructor.Length <= 0)
+            if (constructor.Length > 0)
             {
-                try
-                {
-                    return Activator.CreateInstance(makeServiceType);
-                }
-                catch (Exception ex)
-                {
-                    throw MakeBuildFaildException(makeServiceBindData.Service, makeServiceType, ex);
-                }
+                var parameter = constructor[constructor.Length - 1].GetParameters();
+                userParams = parameter.Length > 0 ? GetDependencies(makeServiceBindData, parameter, userParams) : null;
             }
-
-            var parameter = new List<ParameterInfo>(constructor[constructor.Length - 1].GetParameters());
-
-            if (parameter.Count > 0)
+            else
             {
-                userParams = GetDependencies(makeServiceBindData, parameter, userParams);
+                userParams = null;
             }
 
             try
@@ -1367,7 +1349,7 @@ namespace CatLib
         /// <param name="makeServiceType">服务类型</param>
         /// <param name="param">构造参数</param>
         /// <returns>服务实例</returns>
-        private object BuildUseConcrete(BindData makeServiceBindData, Type makeServiceType, object[] param)
+        private object BuildUseConcrete(IBindData makeServiceBindData, Type makeServiceType, object[] param)
         {
             return makeServiceBindData.Concrete != null ?
                 makeServiceBindData.Concrete(this, param) :
