@@ -139,7 +139,7 @@ namespace CatLib
             RegisterCoreAlias();
             RegisterCoreService();
             OnFindType(finder => { return Type.GetType(finder); });
-            SetDebugLevel(DebugLevels.Prod);
+            DebugLevel = DebugLevels.Prod;
         }
 
         /// <summary>
@@ -266,12 +266,18 @@ namespace CatLib
         }
 
         /// <summary>
-        /// 设定调试等级
+        /// 调试等级
         /// </summary>
-        /// <param name="level">调试等级</param>
-        public void SetDebugLevel(DebugLevels level)
+        public DebugLevels DebugLevel
         {
-            Instance(Type2Service(typeof(DebugLevels)), level);
+            get
+            {
+                return (DebugLevels)Make(Type2Service(typeof(DebugLevels)));
+            }
+            set
+            {
+                Instance(Type2Service(typeof(DebugLevels)), value);
+            }
         }
 
         /// <summary>

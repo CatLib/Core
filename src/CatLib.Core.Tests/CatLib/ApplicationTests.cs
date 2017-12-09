@@ -145,6 +145,13 @@ namespace CatLib.Tests
             Assert.AreEqual(Application.StartProcess.Inited, app.Process);
         }
 
+        [TestMethod]
+        public void TestDebugLevel()
+        {
+            App.DebugLevel = DebugLevels.Dev;
+            Assert.AreEqual(DebugLevels.Dev, App.DebugLevel);
+        }
+
         /// <summary>
         /// 重复的引导测试
         /// </summary>

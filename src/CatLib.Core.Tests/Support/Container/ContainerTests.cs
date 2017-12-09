@@ -1076,6 +1076,16 @@ namespace CatLib.Tests.Stl
 
         public class SupportNullContainer : Container
         {
+            public string[] GetStack()
+            {
+                return BuildStack.ToArray();
+            }
+
+            public object[][] GetUserParams()
+            {
+                return UserParamsStack.ToArray();
+            }
+
             protected override void GuardResolveInstance(object instance, string makeService)
             {
                 
@@ -1089,6 +1099,24 @@ namespace CatLib.Tests.Stl
             container.Bind("null", (c, p) => null);
 
             Assert.AreEqual(null, container.Make("null"));
+        }
+
+        [TestMethod]
+        public void TestGetStack()
+        {
+            var container = new SupportNullContainer();
+            container.Bind("null", (c, p) =>
+            {
+                Assert.AreEqual(1, container.GetStack().Length);
+                Assert.AreEqual(1, container.GetUserParams().Length);
+                Assert.AreEqual(3, container.GetUserParams()[0].Length);
+                return null;
+            });
+
+            Assert.AreEqual(null, container.Make("null", "123", "hello", 12333));
+
+            Assert.AreEqual(0, container.GetStack().Length);
+            Assert.AreEqual(0, container.GetUserParams().Length);
         }
 
         public class TestInjectNullClass
@@ -1729,6 +1757,28 @@ namespace CatLib.Tests.Stl
 
             Assert.AreEqual(200, cls.value);
             Assert.AreSame(container, cls.container);
+        }
+
+        [TestMethod]
+        public void TestOccupiedKeyInstance()
+        {
+            var container = new Container();
+            container.Instance<IBindData>(null);
+            var cls = new TestWatchCLass();
+            container.Watch("WatchService", cls, "OnChange");
+            container.Instance("WatchService", 100);
+
+            var isThrow = false;
+            try
+            {
+                container.Instance("WatchService", 200);
+            }
+            catch (RuntimeException)
+            {
+                isThrow = true;
+            }
+
+            Assert.AreEqual(true, isThrow);
         }
         #endregion
 

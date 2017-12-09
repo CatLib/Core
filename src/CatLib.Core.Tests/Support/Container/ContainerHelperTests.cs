@@ -136,6 +136,7 @@ namespace CatLib.Tests
 
             Assert.AreEqual(true, App.BindIf<int>((c, p) => 100, out bindData));
             Assert.AreEqual(true, App.BindIf<double, float>(out bindData));
+            Assert.AreEqual(false, App.BindIf<double, float>(out bindData));
 
             Assert.AreEqual(typeof(double), App.Make<double>(App.Type2Service(typeof(float))).GetType());
         }
@@ -159,6 +160,7 @@ namespace CatLib.Tests
 
             Assert.AreEqual(true, App.SingletonIf<int>((c, p) => 100, out bindData));
             Assert.AreEqual(true, App.SingletonIf<double, float>(out bindData));
+            Assert.AreEqual(false, App.SingletonIf<double, float>(out bindData));
 
             Assert.AreEqual(typeof(double), App.Make<double>(App.Type2Service(typeof(float))).GetType());
         }

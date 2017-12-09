@@ -144,12 +144,12 @@ namespace CatLib
         }
 
         /// <summary>
-        /// 设定调试等级
+        /// 调试等级
         /// </summary>
-        /// <param name="level">调试等级</param>
-        public static void SetDebugLevel(DebugLevels level)
+        public static DebugLevels DebugLevel
         {
-            Handler.SetDebugLevel(level);
+            get { return Handler.DebugLevel; }
+            set { Handler.DebugLevel = value; }
         }
 
         /// <summary>
