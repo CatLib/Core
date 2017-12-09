@@ -97,15 +97,31 @@ namespace CatLib
         private readonly Stack<string> buildStack;
 
         /// <summary>
+        /// 编译堆栈
+        /// </summary>
+        protected Stack<string> BuildStack
+        {
+            get { return buildStack; }
+        }
+
+        /// <summary>
         /// 用户参数堆栈
         /// </summary>
         private readonly Stack<object[]> userParamsStack;
 
         /// <summary>
+        /// 用户参数堆栈
+        /// </summary>
+        protected Stack<object[]> UserParamsStack
+        {
+            get { return userParamsStack; }
+        }
+
+        /// <summary>
         /// 构造一个容器
         /// </summary>
         /// <param name="prime">初始预计服务数量</param>
-        public Container(int prime = 32)
+        public Container(int prime = 64)
         {
             prime = Math.Max(8, prime);
             tags = new Dictionary<string, List<string>>((int)(prime * 0.25));
@@ -252,7 +268,7 @@ namespace CatLib
             lock (syncRoot)
             {
                 service = AliasToService(service);
-                return HasBind(service) || GetServiceType(service) != null;
+                return HasBind(service) || SpeculatedServiceType(service) != null;
             }
         }
 
@@ -369,7 +385,7 @@ namespace CatLib
             return Bind(service, (c, param) =>
             {
                 var container = (Container)c;
-                return container.Build(GetBindFillable(service), concrete, false, param);
+                return container.CreateInstance(GetBindFillable(service), concrete, param);
             }, isStatic);
         }
 
@@ -998,16 +1014,16 @@ namespace CatLib
         {
             if (instance == null)
             {
-                throw MakeBuildFaildException(makeService, GetServiceType(makeService), null);
+                throw MakeBuildFaildException(makeService, SpeculatedServiceType(makeService), null);
             }
         }
 
         /// <summary>
-        /// 获取通过服务名获取服务的类型
+        /// 根据服务名推测服务的类型
         /// </summary>
         /// <param name="service">服务名</param>
         /// <returns>服务类型</returns>
-        protected virtual Type GetServiceType(string service)
+        protected virtual Type SpeculatedServiceType(string service)
         {
             Type result;
 
@@ -1259,7 +1275,7 @@ namespace CatLib
                 try
                 {
                     var bindData = GetBindFillable(service);
-                    return Inject(bindData, Build(bindData, null, true, userParams));
+                    return Inject(bindData, Build(bindData, userParams));
                 }
                 finally
                 {
@@ -1293,19 +1309,19 @@ namespace CatLib
         /// <summary>
         /// 编译服务
         /// </summary>
-        /// <param name="bindData">服务绑定数据</param>
-        /// <param name="makeServiceType">服务类型</param>
-        /// <param name="isFromResolve">是否是被Resolve函数调用的</param>
+        /// <param name="makeServiceBindData">服务绑定数据</param>
         /// <param name="userParams">用户传入的构造参数</param>
         /// <returns>服务实例</returns>
-        private object Build(BindData bindData, Type makeServiceType, bool isFromResolve, params object[] userParams)
+        private object Build(BindData makeServiceBindData, object[] userParams)
         {
-            return isFromResolve ? BuildUseConcrete(bindData, makeServiceType, userParams)
-                : CreateInstance(bindData, makeServiceType ?? GetServiceType(bindData.Service), userParams);
+            return makeServiceBindData.Concrete != null
+                ? makeServiceBindData.Concrete(this, userParams)
+                : CreateInstance(makeServiceBindData, SpeculatedServiceType(makeServiceBindData.Service),
+                    userParams);
         }
 
         /// <summary>
-        /// 预构造服务实现（准备需要注入的参数）
+        /// 构造服务实现（准备需要注入的参数）
         /// </summary>
         /// <param name="makeServiceBindData">服务绑定数据</param>
         /// <param name="makeServiceType">服务类型</param>
@@ -1339,20 +1355,6 @@ namespace CatLib
             {
                 throw MakeBuildFaildException(makeServiceBindData.Service, makeServiceType, ex);
             }
-        }
-
-        /// <summary>
-        /// 常规编译一个服务
-        /// </summary>
-        /// <param name="makeServiceBindData">服务绑定数据</param>
-        /// <param name="makeServiceType">服务类型</param>
-        /// <param name="param">构造参数</param>
-        /// <returns>服务实例</returns>
-        private object BuildUseConcrete(BindData makeServiceBindData, Type makeServiceType, object[] param)
-        {
-            return makeServiceBindData.Concrete != null ?
-                makeServiceBindData.Concrete(this, param) :
-                Build(makeServiceBindData, makeServiceType, false, param);
         }
 
         /// <summary>
