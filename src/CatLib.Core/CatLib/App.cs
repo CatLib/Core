@@ -219,6 +219,16 @@ namespace CatLib
         }
 
         /// <summary>
+        /// 是否可以生成服务
+        /// </summary>
+        /// <param name="service">服务名或者别名</param>
+        /// <returns>是否可以生成服务</returns>
+        public static bool CanMake(string service)
+        {
+            return Handler.CanMake(service);
+        }
+
+        /// <summary>
         /// 服务是否是静态化的,如果服务不存在也将返回false
         /// </summary>
         /// <param name="service">服务名或者别名</param>
@@ -226,6 +236,16 @@ namespace CatLib
         public static bool IsStatic(string service)
         {
             return Handler.IsStatic(service);
+        }
+
+        /// <summary>
+        /// 是否是别名
+        /// </summary>
+        /// <param name="name">名字</param>
+        /// <returns>是否是别名</returns>
+        public bool IsAlias(string name)
+        {
+            return Handler.IsAlias(name);
         }
 
         /// <summary>
@@ -505,6 +525,30 @@ namespace CatLib
         }
 
         /// <summary>
+        /// 当一个已经被解决的服务，发生重定义时触发
+        /// </summary>
+        /// <param name="service">服务名</param>
+        /// <param name="callback">回调</param>
+        /// <returns>服务容器</returns>
+        public static IContainer OnRebound(string service, Action<object> callback)
+        {
+            return Handler.OnRebound(service, callback);
+        }
+
+        /// <summary>
+        /// 关注指定的服务，当服务触发重定义时调用指定对象的指定方法
+        /// <para>调用是以依赖注入的形式进行的</para>
+        /// <para>服务的新建（第一次解决服务）操作并不会触发重定义</para>
+        /// </summary>
+        /// <param name="service">关注的服务名</param>
+        /// <param name="target">当服务发生重定义时调用的目标</param>
+        /// <param name="methodInfo">方法信息</param>
+        public static void Watch(string service, object target, MethodInfo methodInfo)
+        {
+            Handler.Watch(service, target, methodInfo);
+        }
+
+        /// <summary>
         /// 类型转为服务名
         /// </summary>
         /// <param name="type">类型</param>
@@ -642,8 +686,7 @@ namespace CatLib
         /// <param name="service">服务名</param>
         /// <param name="concrete">服务实现</param>
         /// <returns>服务绑定数据</returns>
-        public static IBindData Bind(string service,
-            Func<IContainer, object[], object> concrete)
+        public static IBindData Bind(string service, Func<IContainer, object[], object> concrete)
         {
             return Handler.Bind(service, concrete);
         }
