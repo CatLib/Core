@@ -18,7 +18,7 @@ namespace CatLib
     /// CatLib实例
     /// </summary>
     [ExcludeFromCodeCoverage]
-    public sealed class App
+    public static class App
     {
         /// <summary>
         /// 当新建Application时
@@ -243,7 +243,7 @@ namespace CatLib
         /// </summary>
         /// <param name="name">名字</param>
         /// <returns>是否是别名</returns>
-        public bool IsAlias(string name)
+        public static bool IsAlias(string name)
         {
             return Handler.IsAlias(name);
         }
