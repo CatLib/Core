@@ -747,6 +747,50 @@ namespace CatLib
         }
 
         /// <summary>
+        /// 在回调区间内暂时性的静态化一个服务实例
+        /// </summary>
+        /// <param name="callback">回调区间</param>
+        /// <param name="services">服务映射</param>
+        public void Flash(Action callback, params KeyValuePair<string, object>[] services)
+        {
+            if (services.Length <= 0)
+            {
+                callback.Invoke();
+                return;
+            }
+
+            lock (syncRoot)
+            {
+                foreach (var service in services)
+                {
+                    if (HasInstance(service.Key))
+                    {
+                        throw new RuntimeException("Flash service [" + service.Key + "] is already exists.");
+                    }
+                }
+
+                var index = 0;
+                try
+                {
+                    foreach (var service in services)
+                    {
+                        ++index;
+                        Instance(service.Key, service.Value);
+                    }
+
+                    callback.Invoke();
+                }
+                finally
+                {
+                    while (--index >= 0)
+                    {
+                        Release(services[index].Key);
+                    }
+                }
+            }
+        }
+
+        /// <summary>
         /// 从用户传入的参数中获取依赖
         /// </summary>
         /// <param name="baseParam">基础参数</param>
@@ -1219,34 +1263,7 @@ namespace CatLib
                 {
                     callback(instance);
                 }
-            }, Type2Service(typeof(IBindData)), bind);
-        }
-
-        /// <summary>
-        /// 在回调区间内暂时性的静态化一个服务实例
-        /// </summary>
-        /// <param name="callback">回调区间</param>
-        /// <param name="service">服务名</param>
-        /// <param name="instance">实例</param>
-        private void Flash(Action callback, string service, object instance)
-        {
-            lock (syncRoot)
-            {
-                if (HasInstance(service))
-                {
-                    throw new RuntimeException("Flash service [" + service + "] is already exists.");
-                }
-
-                try
-                {
-                    Instance(service, instance);
-                    callback.Invoke();
-                }
-                finally
-                {
-                    Release(service);
-                }
-            }
+            }, new KeyValuePair<string, object>(Type2Service(typeof(IBindData)), bind));
         }
 
         /// <summary>
