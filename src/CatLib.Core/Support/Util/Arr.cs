@@ -526,5 +526,43 @@ namespace CatLib
             var result = Splice(ref source, index, 1);
             return result.Length > 0 ? result[0] : default(T);
         }
+
+        /// <summary>
+        /// 临时性的回调元素，如果遇到异常或者完成回调后会进行回滚元素回调
+        /// </summary>
+        /// <typeparam name="T">数组类型</typeparam>
+        /// <param name="source">规定数组</param>
+        /// <param name="process">顺序回调</param>
+        /// <param name="completed">所有回调完成后</param>
+        /// <param name="rollback">回滚回调</param>
+        public static void Flash<T>(T[] source, Action<T> process, Action<T> rollback, Action completed)
+        {
+            Guard.Requires<ArgumentNullException>(source != null);
+
+            if (source.Length <= 0)
+            {
+                completed.Invoke();
+                return;
+            }
+
+            var index = 0;
+            try
+            {
+                foreach (var result in source)
+                {
+                    ++index;
+                    process.Invoke(result);
+                }
+
+                completed();
+            }
+            finally
+            {
+                while (--index >= 0)
+                {
+                    rollback.Invoke(source[index]);
+                }
+            }
+        }
     }
 }

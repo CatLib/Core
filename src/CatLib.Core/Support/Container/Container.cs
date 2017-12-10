@@ -747,21 +747,15 @@ namespace CatLib
         }
 
         /// <summary>
-        /// 在回调区间内暂时性的静态化一个服务实例
+        /// 在回调区间内暂时性的静态化服务实例
         /// </summary>
         /// <param name="callback">回调区间</param>
-        /// <param name="services">服务映射</param>
-        public void Flash(Action callback, params KeyValuePair<string, object>[] services)
+        /// <param name="serviceMapping">服务映射</param>
+        public void Flash(Action callback, params KeyValuePair<string, object>[] serviceMapping)
         {
-            if (services.Length <= 0)
-            {
-                callback.Invoke();
-                return;
-            }
-
             lock (syncRoot)
             {
-                foreach (var service in services)
+                foreach (var service in serviceMapping)
                 {
                     if (HasInstance(service.Key))
                     {
@@ -769,24 +763,10 @@ namespace CatLib
                     }
                 }
 
-                var index = 0;
-                try
-                {
-                    foreach (var service in services)
-                    {
-                        ++index;
-                        Instance(service.Key, service.Value);
-                    }
-
-                    callback.Invoke();
-                }
-                finally
-                {
-                    while (--index >= 0)
-                    {
-                        Release(services[index].Key);
-                    }
-                }
+                Arr.Flash(serviceMapping,
+                    service => Instance(service.Key, service.Value),
+                    service => Release(service.Key),
+                    callback);
             }
         }
 
@@ -1261,9 +1241,10 @@ namespace CatLib
             {
                 foreach (var callback in GetOnReboundCallbacks(service))
                 {
-                    callback(instance);
+                    callback.Invoke(instance);
                 }
-            }, new KeyValuePair<string, object>(Type2Service(typeof(IBindData)), bind));
+            }, new KeyValuePair<string, object>(Type2Service(typeof(IBindData)), bind),
+               new KeyValuePair<string, object>(Type2Service(typeof(BindData)), bind));
         }
 
         /// <summary>

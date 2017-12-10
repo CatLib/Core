@@ -10,6 +10,7 @@
  */
 
 using System;
+using System.Collections.Generic;
 using System.Reflection;
 
 namespace CatLib
@@ -93,6 +94,15 @@ namespace CatLib
         bool BindIf(string service, Type concrete, bool isStatic, out IBindData bindData);
 
         /// <summary>
+        /// 绑定一个方法到容器
+        /// </summary>
+        /// <param name="method">方法名</param>
+        /// <param name="target">调用目标</param>
+        /// <param name="call">调用方法</param>
+        /// <returns>方法绑定数据</returns>
+        IMethodBind BindMethod(string method, object target, MethodInfo call);
+
+        /// <summary>
         /// 为一个及以上的服务定义一个标记
         /// </summary>
         /// <param name="tag">标记名</param>
@@ -123,6 +133,14 @@ namespace CatLib
         /// 清空容器的所有实例，绑定，别名，标签，解决器
         /// </summary>
         void Flush();
+
+        /// <summary>
+        /// 调用一个已经被绑定的方法
+        /// </summary>
+        /// <param name="method">方法名</param>
+        /// <param name="userParams">用户提供的参数</param>
+        /// <returns>调用结果</returns>
+        object Invoke(string method, params object[] userParams);
 
         /// <summary>
         /// 以依赖注入形式调用一个方法
@@ -201,6 +219,13 @@ namespace CatLib
         /// <param name="target">当服务发生重定义时调用的目标</param>
         /// <param name="methodInfo">方法信息</param>
         void Watch(string service, object target, MethodInfo methodInfo);
+
+        /// <summary>
+        /// 在回调区间内暂时性的静态化服务实例
+        /// </summary>
+        /// <param name="callback">回调区间</param>
+        /// <param name="serviceMapping">服务映射</param>
+        void Flash(Action callback, params KeyValuePair<string, object>[] serviceMapping);
 
         /// <summary>
         /// 类型转为服务名

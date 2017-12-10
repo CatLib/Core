@@ -10,6 +10,7 @@
  */
 
 using System;
+using System.Collections.Generic;
 
 namespace CatLib
 {
@@ -366,6 +367,71 @@ namespace CatLib
         }
 
         /// <summary>
+        /// 绑定一个方法到容器
+        /// </summary>
+        /// <param name="container">服务容器</param>
+        /// <param name="method">方法名</param>
+        /// <param name="callback">调用方法</param>
+        public static IMethodBind BindMethod(this IContainer container, string method, Func<object> callback)
+        {
+            Guard.Requires<ArgumentNullException>(method != null);
+            Guard.Requires<ArgumentNullException>(callback != null);
+            return container.BindMethod(method, callback.Target, callback.Method);
+        }
+
+        /// <summary>
+        /// 绑定一个方法到容器
+        /// </summary>
+        /// <param name="container">服务容器</param>
+        /// <param name="method">方法名</param>
+        /// <param name="callback">调用方法</param>
+        public static IMethodBind BindMethod<T1>(this IContainer container, string method, Func<T1, object> callback)
+        {
+            Guard.Requires<ArgumentNullException>(method != null);
+            Guard.Requires<ArgumentNullException>(callback != null);
+            return container.BindMethod(method, callback.Target, callback.Method);
+        }
+
+        /// <summary>
+        /// 绑定一个方法到容器
+        /// </summary>
+        /// <param name="container">服务容器</param>
+        /// <param name="method">方法名</param>
+        /// <param name="callback">调用方法</param>
+        public static IMethodBind BindMethod<T1, T2>(this IContainer container, string method, Func<T1, T2, object> callback)
+        {
+            Guard.Requires<ArgumentNullException>(method != null);
+            Guard.Requires<ArgumentNullException>(callback != null);
+            return container.BindMethod(method, callback.Target, callback.Method);
+        }
+
+        /// <summary>
+        /// 绑定一个方法到容器
+        /// </summary>
+        /// <param name="container">服务容器</param>
+        /// <param name="method">方法名</param>
+        /// <param name="callback">调用方法</param>
+        public static IMethodBind BindMethod<T1, T2, T3>(this IContainer container, string method, Func<T1, T2, T3, object> callback)
+        {
+            Guard.Requires<ArgumentNullException>(method != null);
+            Guard.Requires<ArgumentNullException>(callback != null);
+            return container.BindMethod(method, callback.Target, callback.Method);
+        }
+
+        /// <summary>
+        /// 绑定一个方法到容器
+        /// </summary>
+        /// <param name="container">服务容器</param>
+        /// <param name="method">方法名</param>
+        /// <param name="callback">调用方法</param>
+        public static IMethodBind BindMethod<T1, T2, T3, T4>(this IContainer container, string method, Func<T1, T2, T3, T4, object> callback)
+        {
+            Guard.Requires<ArgumentNullException>(method != null);
+            Guard.Requires<ArgumentNullException>(callback != null);
+            return container.BindMethod(method, callback.Target, callback.Method);
+        }
+
+        /// <summary>
         /// 为服务设定一个别名
         /// </summary>
         /// <typeparam name="TService">服务名</typeparam>
@@ -448,6 +514,18 @@ namespace CatLib
 
             var methodInfo = target.GetType().GetMethod(method);
             container.Watch(service, target, methodInfo);
+        }
+
+        /// <summary>
+        /// 在回调区间内暂时性的静态化服务实例
+        /// </summary>
+        /// <param name="container">服务容器</param>
+        /// <param name="callback">回调区间</param>
+        /// <param name="service">服务名</param>
+        /// <param name="instance">实例名</param>
+        public static void Flash(this IContainer container, Action callback, string service, object instance)
+        {
+            container.Flash(callback, new KeyValuePair<string, object>(service, instance));
         }
     }
 }

@@ -10,6 +10,7 @@
  */
 
 using System;
+using System.Collections.Generic;
 using System.Reflection;
 
 namespace CatLib
@@ -344,6 +345,17 @@ namespace CatLib
         public static IContainer OnRelease(Action<IBindData, object> action)
         {
             return Handler.OnRelease(action);
+        }
+
+        /// <summary>
+        /// 调用一个已经被绑定的方法
+        /// </summary>
+        /// <param name="method">方法名</param>
+        /// <param name="userParams">用户提供的参数</param>
+        /// <returns>调用结果</returns>
+        public static object Invoke(string method, params object[] userParams)
+        {
+            return Handler.Invoke(method, userParams);
         }
 
         /// <summary>
@@ -739,6 +751,68 @@ namespace CatLib
         }
 
         /// <summary>
+        /// 绑定一个方法到容器
+        /// </summary>
+        /// <param name="method">方法名</param>
+        /// <param name="target">调用目标</param>
+        /// <param name="call">调用方法</param>
+        /// <returns>方法绑定数据</returns>
+        public static IMethodBind BindMethod(string method, object target, MethodInfo call)
+        {
+            return Handler.BindMethod(method, target, call);
+        }
+
+        /// <summary>
+        /// 绑定一个方法到容器
+        /// </summary>
+        /// <param name="method">方法名</param>
+        /// <param name="callback">调用方法</param>
+        public static IMethodBind BindMethod(string method, Func<object> callback)
+        {
+            return Handler.BindMethod(method, callback);
+        }
+
+        /// <summary>
+        /// 绑定一个方法到容器
+        /// </summary>
+        /// <param name="method">方法名</param>
+        /// <param name="callback">调用方法</param>
+        public static IMethodBind BindMethod<T1>(string method, Func<T1, object> callback)
+        {
+            return Handler.BindMethod(method, callback);
+        }
+
+        /// <summary>
+        /// 绑定一个方法到容器
+        /// </summary>
+        /// <param name="method">方法名</param>
+        /// <param name="callback">调用方法</param>
+        public static IMethodBind BindMethod<T1, T2>(string method, Func<T1, T2, object> callback)
+        {
+            return Handler.BindMethod(method, callback);
+        }
+
+        /// <summary>
+        /// 绑定一个方法到容器
+        /// </summary>
+        /// <param name="method">方法名</param>
+        /// <param name="callback">调用方法</param>
+        public static IMethodBind BindMethod<T1, T2, T3>(string method, Func<T1, T2, T3, object> callback)
+        {
+            return Handler.BindMethod(method, callback);
+        }
+
+        /// <summary>
+        /// 绑定一个方法到容器
+        /// </summary>
+        /// <param name="method">方法名</param>
+        /// <param name="callback">调用方法</param>
+        public static IMethodBind BindMethod<T1, T2, T3, T4>(string method, Func<T1, T2, T3, T4, object> callback)
+        {
+            return Handler.BindMethod(method, callback);
+        }
+
+        /// <summary>
         /// 构造一个服务
         /// </summary>
         /// <typeparam name="TService">服务名</typeparam>
@@ -766,6 +840,27 @@ namespace CatLib
         public static void Instance<TService>(object instance)
         {
             Handler.Instance<TService>(instance);
+        }
+
+        /// <summary>
+        /// 在回调区间内暂时性的静态化服务实例
+        /// </summary>
+        /// <param name="callback">回调区间</param>
+        /// <param name="service">服务名</param>
+        /// <param name="instance">实例名</param>
+        public static void Flash(Action callback, string service, object instance)
+        {
+            Handler.Flash(callback, service, instance);
+        }
+
+        /// <summary>
+        /// 在回调区间内暂时性的静态化服务实例
+        /// </summary>
+        /// <param name="callback">回调区间</param>
+        /// <param name="serviceMapping">服务映射</param>
+        public static void Flash(Action callback, params KeyValuePair<string, object>[] serviceMapping)
+        {
+            Handler.Flash(callback, serviceMapping);
         }
     }
 }
