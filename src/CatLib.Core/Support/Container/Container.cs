@@ -433,6 +433,43 @@ namespace CatLib
         }
 
         /// <summary>
+        /// 绑定一个方法到容器
+        /// </summary>
+        /// <param name="method">方法名</param>
+        /// <param name="target">调用目标</param>
+        /// <param name="call">调用方法</param>
+        /// <returns>方法绑定数据</returns>
+        public IMethodBind BindMethod(string method, object target, MethodInfo call)
+        {
+            return methodContainer.Bind(method, target, call);
+        }
+
+        /// <summary>
+        /// 解除绑定的方法
+        /// </summary>
+        /// <param name="target">
+        /// 解除目标
+        /// <para>如果为字符串则作为调用方法名</para>
+        /// <para>如果为<code>IMethodBind</code>则作为指定方法</para>
+        /// <para>如果为其他对象则作为调用目标做全体解除</para>
+        /// </param>
+        public void UnbindMethod(object target)
+        {
+            methodContainer.Unbind(target);
+        }
+
+        /// <summary>
+        /// 调用一个已经被绑定的方法
+        /// </summary>
+        /// <param name="method">方法名</param>
+        /// <param name="userParams">用户提供的参数</param>
+        /// <returns>调用结果</returns>
+        public object Invoke(string method, params object[] userParams)
+        {
+            return methodContainer.Invoke(method, userParams);
+        }
+
+        /// <summary>
         /// 以依赖注入形式调用一个方法
         /// </summary>
         /// <param name="target">方法对象</param>
@@ -454,17 +491,6 @@ namespace CatLib
                 userParams = parameter.Length > 0 ? GetDependencies(bindData, parameter, userParams) : new object[] { };
                 return methodInfo.Invoke(target, userParams);
             }
-        }
-
-        /// <summary>
-        /// 调用一个已经被绑定的方法
-        /// </summary>
-        /// <param name="method">方法名</param>
-        /// <param name="userParams">用户提供的参数</param>
-        /// <returns>调用结果</returns>
-        public object Invoke(string method, params object[] userParams)
-        {
-            return methodContainer.Invoke(method, userParams);
         }
 
         /// <summary>
@@ -801,17 +827,21 @@ namespace CatLib
         protected virtual string GetParamNeedsService(ParameterInfo baseParam)
         {
             var needService = Type2Service(baseParam.ParameterType);
-            if (baseParam.IsDefined(injectTarget, false))
+            if (!baseParam.IsDefined(injectTarget, false))
             {
-                var propertyAttrs = baseParam.GetCustomAttributes(injectTarget, false);
-                if (propertyAttrs.Length > 0)
-                {
-                    var injectAttr = (InjectAttribute)propertyAttrs[0];
-                    if (!string.IsNullOrEmpty(injectAttr.Alias))
-                    {
-                        needService = injectAttr.Alias;
-                    }
-                }
+                return needService;
+            }
+
+            var propertyAttrs = baseParam.GetCustomAttributes(injectTarget, false);
+            if (propertyAttrs.Length <= 0)
+            {
+                return needService;
+            }
+
+            var injectAttr = (InjectAttribute)propertyAttrs[0];
+            if (!string.IsNullOrEmpty(injectAttr.Alias))
+            {
+                needService = injectAttr.Alias;
             }
             return needService;
         }

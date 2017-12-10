@@ -53,6 +53,7 @@ namespace CatLib
         /// </summary>
         protected override void ReleaseBind()
         {
+            Container.UnbindMethod(this);
         }
     }
 }
