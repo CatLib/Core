@@ -1154,7 +1154,7 @@ namespace CatLib
         /// <exception cref="RuntimeException">生成的实例类型和需求类型不一致</exception>
         protected virtual object[] GetDependencies(Bindable makeServiceBindData, ParameterInfo[] baseParams, object[] userParams)
         {
-            var results = new List<object>();
+            var results = new List<object>(baseParams.Length);
 
             foreach (var baseParam in baseParams)
             {
@@ -1226,11 +1226,7 @@ namespace CatLib
 
                 try
                 {
-                    userParams = GetDependencies(makeServiceBindData, parameter, userParams);
-                    if (userParams.Length == parameter.Length)
-                    {
-                        return userParams;
-                    }
+                    return GetDependencies(makeServiceBindData, parameter, userParams);
                 }
                 catch (Exception ex)
                 {
