@@ -1049,9 +1049,9 @@ namespace CatLib
         /// <param name="type">需要实现自的类型</param>
         /// <param name="instance">生成的实例</param>
         /// <returns>是否符合类型</returns>
-        protected virtual bool CheckInstanceIsInstanceOfType(Type type, object instance)
+        protected virtual bool IsInstanceOfType(Type type, object instance)
         {
-            return instance == null || type.IsInstanceOfType(instance);
+            return type.IsInstanceOfType(instance);
         }
 
         /// <summary>
@@ -1062,7 +1062,7 @@ namespace CatLib
         {
             if (count > 255)
             {
-                throw new RuntimeException("Too many parameters , must be less than 255");
+                throw new RuntimeException("Too many parameters , must be less or equal than 255");
             }
         }
 
@@ -1140,7 +1140,7 @@ namespace CatLib
                     instance = ResolveAttrPrimitive(makeServiceBindData, needService, property);
                 }
 
-                if (!CheckInstanceIsInstanceOfType(property.PropertyType, instance))
+                if (!IsInstanceOfType(property.PropertyType, instance))
                 {
                     throw new UnresolvableException("[" + makeServiceBindData.Service + "] Attr inject type must be [" + property.PropertyType + "] , But instance is [" + instance.GetType() + "] , Make service is [" + needService + "].");
                 }
@@ -1182,7 +1182,7 @@ namespace CatLib
                     param = ResolvePrimitive(makeServiceBindData, needService, baseParam);
                 }
 
-                if (!CheckInstanceIsInstanceOfType(baseParam.ParameterType, param))
+                if (!IsInstanceOfType(param))
                 {
                     throw new UnresolvableException("[" + makeServiceBindData.Service + "] Params inject type must be [" + baseParam.ParameterType + "] , But instance is [" + param.GetType() + "] Make service is [" + needService + "].");
                 }
