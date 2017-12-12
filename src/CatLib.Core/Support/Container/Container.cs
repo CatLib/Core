@@ -1182,7 +1182,7 @@ namespace CatLib
                     param = ResolvePrimitive(makeServiceBindData, needService, baseParam);
                 }
 
-                if (!IsInstanceOfType(param))
+                if (!IsInstanceOfType(baseParam.ParameterType, param))
                 {
                     throw new UnresolvableException("[" + makeServiceBindData.Service + "] Params inject type must be [" + baseParam.ParameterType + "] , But instance is [" + param.GetType() + "] Make service is [" + needService + "].");
                 }
