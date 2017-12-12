@@ -1200,6 +1200,55 @@ namespace CatLib
         }
 
         /// <summary>
+        /// 获取构造函数参数
+        /// </summary>
+        /// <param name="makeServiceBindData">服务绑定数据</param>
+        /// <param name="makeServiceType">服务类型</param>
+        /// <param name="userParams">用户传入的构造参数</param>
+        /// <returns>构造函数参数</returns>
+        protected virtual object[] GetConstructorsInjectParams(Bindable makeServiceBindData, Type makeServiceType, object[] userParams)
+        {
+            var constructors = makeServiceType.GetConstructors();
+            if (constructors.Length <= 0)
+            {
+                return null;
+            }
+
+            Exception exception = null;
+            foreach (var constructor in constructors)
+            {
+                var parameter = constructor.GetParameters();
+                if (parameter.Length <= 0)
+                {
+                    return null;
+                }
+
+                try
+                {
+                    userParams = GetDependencies(makeServiceBindData, parameter, userParams);
+                    if (userParams.Length == parameter.Length)
+                    {
+                        return userParams;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    if (exception == null)
+                    {
+                        exception = ex;
+                    }
+                }
+            }
+
+            if (exception != null)
+            {
+                throw exception;
+            }
+
+            return null;
+        }
+
+        /// <summary>
         /// 触发全局解决修饰器
         /// </summary>
         /// <param name="bindData">服务绑定数据</param>
@@ -1365,7 +1414,7 @@ namespace CatLib
                 return null;
             }
 
-            userParams = GetConstructorsParams(makeServiceBindData, makeServiceType, userParams);
+            userParams = GetConstructorsInjectParams(makeServiceBindData, makeServiceType, userParams);
 
             try
             {
@@ -1375,55 +1424,6 @@ namespace CatLib
             {
                 throw MakeBuildFaildException(makeServiceBindData.Service, makeServiceType, ex);
             }
-        }
-
-        /// <summary>
-        /// 获取构造函数参数
-        /// </summary>
-        /// <param name="makeServiceBindData">服务绑定数据</param>
-        /// <param name="makeServiceType">服务类型</param>
-        /// <param name="userParams">用户传入的构造参数</param>
-        /// <returns>构造函数参数</returns>
-        private object[] GetConstructorsParams(Bindable makeServiceBindData, Type makeServiceType, object[] userParams)
-        {
-            var constructors = makeServiceType.GetConstructors();
-            if (constructors.Length <= 0)
-            {
-                return null;   
-            }
-
-            Exception exception = null;
-            foreach (var constructor in constructors)
-            {
-                var parameter = constructor.GetParameters();
-                if (parameter.Length <= 0)
-                {
-                    return null;
-                }
-
-                try
-                {
-                    userParams = GetDependencies(makeServiceBindData, parameter, userParams);
-                    if (userParams.Length == parameter.Length)
-                    {
-                        return userParams;
-                    }
-                }
-                catch (Exception ex)
-                {
-                    if (exception == null)
-                    {
-                        exception = ex;
-                    }
-                }
-            }
-
-            if (exception != null)
-            {
-                throw exception;
-            }
-
-            return null;
         }
 
         /// <summary>
