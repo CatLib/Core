@@ -159,15 +159,12 @@ namespace CatLib
             lock (syncRoot)
             {
                 List<string> list;
-                if (tags.TryGetValue(tag, out list))
+                if (!tags.TryGetValue(tag, out list))
                 {
-                    list.AddRange(service);
+                    tags[tag] = list = new List<string>();
+
                 }
-                else
-                {
-                    list = new List<string>(service);
-                    tags.Add(tag, list);
-                }
+                list.AddRange(service);
             }
         }
 
@@ -183,20 +180,19 @@ namespace CatLib
             Guard.NotEmptyOrNull(tag, "tag");
             lock (syncRoot)
             {
-                List<string> serviceList;
-                if (!tags.TryGetValue(tag, out serviceList))
+                List<string> services;
+                if (!tags.TryGetValue(tag, out services))
                 {
                     throw new RuntimeException("Tag [" + tag + "] is not exist.");
                 }
 
-                var result = new List<object>();
-
-                foreach (var tagService in serviceList)
+                var result = new object[services.Count];
+                for (var i = 0; i < services.Count; i++)
                 {
-                    result.Add(Make(tagService));
+                    result[i] = Make(services[i]);
                 }
 
-                return result.ToArray();
+                return result;
             }
         }
 
@@ -320,6 +316,7 @@ namespace CatLib
                 {
                     throw new RuntimeException("Alias [" + alias + "] is already exists.");
                 }
+
                 if (!binds.ContainsKey(service) && !instances.ContainsKey(service))
                 {
                     throw new RuntimeException("You must Bind() or Instance() serivce before you can call Alias().");
@@ -328,14 +325,12 @@ namespace CatLib
                 aliases.Add(alias, service);
 
                 List<string> serviceList;
-                if (aliasesReverse.TryGetValue(service, out serviceList))
+                if (!aliasesReverse.TryGetValue(service, out serviceList))
                 {
+                    aliasesReverse[service] = serviceList = new List<string>();
                     serviceList.Add(alias);
                 }
-                else
-                {
-                    aliasesReverse.Add(service, new List<string> { alias });
-                }
+                serviceList.Add(alias);
             }
 
             return this;
@@ -1049,9 +1044,9 @@ namespace CatLib
         /// <param name="type">需要实现自的类型</param>
         /// <param name="instance">生成的实例</param>
         /// <returns>是否符合类型</returns>
-        protected virtual bool IsInstanceOfType(Type type, object instance)
+        protected virtual bool CanInject(Type type, object instance)
         {
-            return type.IsInstanceOfType(instance);
+            return instance == null || type.IsInstanceOfType(instance);
         }
 
         /// <summary>
@@ -1140,7 +1135,7 @@ namespace CatLib
                     instance = ResolveAttrPrimitive(makeServiceBindData, needService, property);
                 }
 
-                if (!IsInstanceOfType(property.PropertyType, instance))
+                if (!CanInject(property.PropertyType, instance))
                 {
                     throw new UnresolvableException("[" + makeServiceBindData.Service + "] Attr inject type must be [" + property.PropertyType + "] , But instance is [" + instance.GetType() + "] , Make service is [" + needService + "].");
                 }
@@ -1182,7 +1177,7 @@ namespace CatLib
                     param = ResolvePrimitive(makeServiceBindData, needService, baseParam);
                 }
 
-                if (!IsInstanceOfType(baseParam.ParameterType, param))
+                if (!CanInject(baseParam.ParameterType, param))
                 {
                     throw new UnresolvableException("[" + makeServiceBindData.Service + "] Params inject type must be [" + baseParam.ParameterType + "] , But instance is [" + param.GetType() + "] Make service is [" + needService + "].");
                 }
@@ -1293,13 +1288,24 @@ namespace CatLib
             var bind = GetBind(service);
 
             Flash(() =>
-            {
-                foreach (var callback in GetOnReboundCallbacks(service))
                 {
-                    callback.Invoke(instance);
-                }
-            }, new KeyValuePair<string, object>(Type2Service(typeof(IBindData)), bind),
-               new KeyValuePair<string, object>(Type2Service(typeof(BindData)), bind));
+                    foreach (var callback in GetOnReboundCallbacks(service))
+                    {
+                        callback.Invoke(instance);
+                    }
+                }, Pair(typeof(IBindData), bind),
+                   Pair(typeof(BindData), bind));
+        }
+
+        /// <summary>
+        /// 类型配实例配偶
+        /// </summary>
+        /// <param name="type">类型</param>
+        /// <param name="instance">实例</param>
+        /// <returns>键值对</returns>
+        private KeyValuePair<string, object> Pair(Type type, object instance)
+        {
+            return new KeyValuePair<string, object>(Type2Service(type), instance);
         }
 
         /// <summary>
