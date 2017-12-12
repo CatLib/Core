@@ -761,6 +761,11 @@ namespace CatLib
                     {
                         throw new RuntimeException("Flash service [" + service.Key + "] is already exists.");
                     }
+
+                    if (HasBind(service.Key))
+                    {
+                        throw new RuntimeException("Flash service [" + service.Key + "] name has be used for bind or alias.");
+                    }
                 }
 
                 Arr.Flash(serviceMapping,
@@ -949,13 +954,13 @@ namespace CatLib
             {
                 return Make(makeServiceBindData.GetContextual(service));
             }
-            catch (UnresolvableException ex)
+            catch (UnresolvableException)
             {
                 if (baseParam.IsOptional)
                 {
                     return baseParam.DefaultValue;
                 }
-                throw ex;
+                throw;
             }
         }
 
@@ -1410,7 +1415,9 @@ namespace CatLib
         {
             if (makeServiceType == null
                 || makeServiceType.IsAbstract
-                || makeServiceType.IsInterface)
+                || makeServiceType.IsInterface
+                || makeServiceType.IsArray
+                || makeServiceType.IsEnum)
             {
                 return null;
             }
