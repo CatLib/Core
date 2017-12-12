@@ -224,7 +224,7 @@ namespace CatLib
         /// <returns>服务是否被绑定</returns>
         public bool HasBind(string service)
         {
-            return GetBind(service) != null || HasInstance(service);
+            return GetBind(service) != null;
         }
 
         /// <summary>
@@ -268,7 +268,7 @@ namespace CatLib
             lock (syncRoot)
             {
                 service = AliasToService(service);
-                return HasBind(service) || SpeculatedServiceType(service) != null;
+                return HasBind(service) || HasInstance(service) || SpeculatedServiceType(service) != null;
             }
         }
 
@@ -824,6 +824,7 @@ namespace CatLib
             catch (Exception)
             {
                 // ignored
+                // when throw exception then stop inject
             }
 
             result = null;
@@ -976,7 +977,7 @@ namespace CatLib
         /// <returns></returns>
         protected virtual string GetBuildStackDebugMessage()
         {
-            var previous = string.Join(", ", buildStack.ToArray());
+            var previous = string.Join(", ", BuildStack.ToArray());
             return " While building [" + previous + "].";
         }
 
