@@ -141,7 +141,7 @@ namespace CatLib.Tests.Stl
             var container = MakeContainer();
             IBindData bind1, bind2;
             var result1 = container.BindIf("CanBindIf", (cont, param) => "Hello", true, out bind1);
-            var result2 = container.BindIf("CanBindIf", (cont, param) => "World", false,out bind2);
+            var result2 = container.BindIf("CanBindIf", (cont, param) => "World", false, out bind2);
 
             Assert.AreSame(bind1, bind2);
             Assert.AreEqual(true, result1);
@@ -1051,7 +1051,7 @@ namespace CatLib.Tests.Stl
         {
             public TestMakeBasePrimitiveConstructor(int value)
             {
-                
+
             }
         }
 
@@ -1088,7 +1088,7 @@ namespace CatLib.Tests.Stl
 
             protected override void GuardResolveInstance(object instance, string makeService)
             {
-                
+
             }
         }
 
@@ -1648,7 +1648,8 @@ namespace CatLib.Tests.Stl
             try
             {
                 container.Make<TestNoConstructorAccessClass>();
-            }catch(RuntimeException ex)
+            }
+            catch (RuntimeException ex)
             {
                 isThrow = ex.InnerException.GetType() == typeof(MissingMethodException);
             }
@@ -1737,7 +1738,7 @@ namespace CatLib.Tests.Stl
 
             public IContainer container;
 
-            public void OnChange(int instance,IContainer container)
+            public void OnChange(int instance, IContainer container)
             {
                 value = instance;
                 this.container = container;
@@ -1757,6 +1758,22 @@ namespace CatLib.Tests.Stl
 
             Assert.AreEqual(200, cls.value);
             Assert.AreSame(container, cls.container);
+        }
+
+        [TestMethod]
+        public void TestInstanceAndDecorator()
+        {
+            var container = new Container();
+            var oldObject = new object();
+            object newObject = null;
+            container.OnResolving((bindData, obj) =>
+            {
+                return newObject = new object();
+            });
+
+            container.Instance("Hello", oldObject);
+
+            Assert.AreSame(newObject, container["Hello"]);
         }
 
         [TestMethod]
