@@ -793,7 +793,7 @@ namespace CatLib
                 }
 
                 object result;
-                if (TryChangeType(userParam, baseParam.ParameterType, out result))
+                if (ChangeType(userParam, baseParam.ParameterType, out result))
                 {
                     Arr.RemoveAt(ref userParams, n);
                     return result;
@@ -804,13 +804,13 @@ namespace CatLib
         }
 
         /// <summary>
-        /// 安全的转换参数
+        /// 转换参数类型
         /// </summary>
         /// <param name="param">参数</param>
         /// <param name="conversionType">转换到的类型</param>
         /// <param name="result">转换后的结果</param>
         /// <returns>是否转换成功</returns>
-        protected virtual bool TryChangeType(object param, Type conversionType, out object result)
+        protected virtual bool ChangeType(object param, Type conversionType, out object result)
         {
             try
             {
