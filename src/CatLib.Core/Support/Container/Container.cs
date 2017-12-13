@@ -328,7 +328,6 @@ namespace CatLib
                 if (!aliasesReverse.TryGetValue(service, out serviceList))
                 {
                     aliasesReverse[service] = serviceList = new List<string>();
-                    serviceList.Add(alias);
                 }
                 serviceList.Add(alias);
             }
