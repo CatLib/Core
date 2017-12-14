@@ -571,6 +571,15 @@ namespace CatLib
         }
 
         /// <summary>
+        /// 解除服务绑定
+        /// </summary>
+        /// <typeparam name="T">解除绑定的服务</typeparam>
+        public static void Unbind<T>()
+        {
+            Handler.Unbind<T>();
+        }
+
+        /// <summary>
         /// 以单例的形式绑定一个服务
         /// </summary>
         /// <param name="service">服务名</param>
@@ -756,6 +765,18 @@ namespace CatLib
         /// <param name="method">方法名</param>
         /// <param name="target">调用目标</param>
         /// <param name="call">调用方法</param>
+        public static IMethodBind BindMethod(string method, object target,
+            string call = null)
+        {
+            return Handler.BindMethod(method, target, call);
+        }
+
+        /// <summary>
+        /// 绑定一个方法到容器
+        /// </summary>
+        /// <param name="method">方法名</param>
+        /// <param name="target">调用目标</param>
+        /// <param name="call">调用方法</param>
         /// <returns>方法绑定数据</returns>
         public static IMethodBind BindMethod(string method, object target, MethodInfo call)
         {
@@ -810,6 +831,29 @@ namespace CatLib
         public static IMethodBind BindMethod<T1, T2, T3, T4>(string method, Func<T1, T2, T3, T4, object> callback)
         {
             return Handler.BindMethod(method, callback);
+        }
+
+        /// <summary>
+        /// 解除绑定的方法
+        /// </summary>
+        /// <param name="target">
+        /// 解除目标
+        /// <para>如果为字符串则作为调用方法名</para>
+        /// <para>如果为<code>IMethodBind</code>则作为指定方法</para>
+        /// <para>如果为其他对象则作为调用目标做全体解除</para>
+        /// </param>
+        public static void UnbindMethod(object target)
+        {
+            Handler.UnbindMethod(target);
+        }
+
+        /// <summary>
+        /// 解除绑定服务
+        /// </summary>
+        /// <param name="service">服务名或者别名</param>
+        public static void Unbind(string service)
+        {
+            Handler.Unbind(service);
         }
 
         /// <summary>

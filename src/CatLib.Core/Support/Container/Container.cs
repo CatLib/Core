@@ -264,7 +264,14 @@ namespace CatLib
             lock (syncRoot)
             {
                 service = AliasToService(service);
-                return HasBind(service) || HasInstance(service) || SpeculatedServiceType(service) != null;
+
+                if (HasBind(service) || HasInstance(service))
+                {
+                    return true;
+                }
+
+                var type = SpeculatedServiceType(service);
+                return !(type == null || type.IsPrimitive);
             }
         }
 
@@ -712,21 +719,33 @@ namespace CatLib
         /// <param name="service">服务名或者别名</param>
         public void Unbind(string service)
         {
+            service = AliasToService(service);
+            var bind = GetBind(service);
+            if (bind != null)
+            {
+                bind.Unbind();
+            }
+        }
+
+        /// <summary>
+        /// 解除绑定服务
+        /// </summary>
+        /// <param name="bindable">绑定关系</param>
+        internal void Unbind(IBindable bindable)
+        {
             lock (syncRoot)
             {
-                service = AliasToService(service);
-
-                Release(service);
+                Release(bindable.Service);
                 List<string> serviceList;
-                if (aliasesReverse.TryGetValue(service, out serviceList))
+                if (aliasesReverse.TryGetValue(bindable.Service, out serviceList))
                 {
                     foreach (var alias in serviceList)
                     {
                         aliases.Remove(alias);
                     }
-                    aliasesReverse.Remove(service);
+                    aliasesReverse.Remove(bindable.Service);
                 }
-                binds.Remove(service);
+                binds.Remove(bindable.Service);
             }
         }
 
@@ -856,13 +875,7 @@ namespace CatLib
                 return needService;
             }
 
-            var propertyAttrs = baseParam.GetCustomAttributes(injectTarget, false);
-            if (propertyAttrs.Length <= 0)
-            {
-                return needService;
-            }
-
-            var injectAttr = (InjectAttribute)propertyAttrs[0];
+            var injectAttr = (InjectAttribute)baseParam.GetCustomAttributes(injectTarget, false)[0];
             if (!string.IsNullOrEmpty(injectAttr.Alias))
             {
                 needService = injectAttr.Alias;
@@ -885,7 +898,7 @@ namespace CatLib
                 return Make(service);
             }
 
-            var result = SpeculationServiceByParamName(makeServiceBindData, baseParam.Name);
+            var result = SpeculationServiceByParamName(makeServiceBindData, baseParam.Name, baseParam.PropertyType);
             if (result != null)
             {
                 return result;
@@ -921,7 +934,7 @@ namespace CatLib
                 return Make(service);
             }
 
-            var result = SpeculationServiceByParamName(makeServiceBindData, baseParam.Name);
+            var result = SpeculationServiceByParamName(makeServiceBindData, baseParam.Name, baseParam.ParameterType);
             if (result != null)
             {
                 return result;
@@ -963,11 +976,20 @@ namespace CatLib
         /// </summary>
         /// <param name="makeServiceBindData">请求注入操作的服务绑定数据</param>
         /// <param name="paramName">参数名</param>
+        /// <param name="paramType">参数类型</param>
         /// <returns>推测的服务</returns>
-        protected virtual object SpeculationServiceByParamName(Bindable makeServiceBindData, string paramName)
+        protected virtual object SpeculationServiceByParamName(Bindable makeServiceBindData, string paramName, Type paramType)
         {
             var service = makeServiceBindData.GetContextual("@" + paramName);
-            return CanMake(service) ? Make(service) : null;
+
+            if (!CanMake(service))
+            {
+                return null;
+            }
+
+            var instance = Make(service);
+            ChangeType(instance, paramType, out instance);
+            return instance;
         }
 
         /// <summary>
@@ -1236,12 +1258,8 @@ namespace CatLib
                 }
             }
 
-            if (exception != null)
-            {
-                throw exception;
-            }
-
-            return null;
+            Guard.Requires<AssertException>(exception != null);
+            throw exception;
         }
 
         /// <summary>

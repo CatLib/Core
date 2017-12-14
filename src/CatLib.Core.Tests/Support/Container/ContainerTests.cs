@@ -85,6 +85,30 @@ namespace CatLib.Tests.Stl
             });
         }
 
+        [TestMethod]
+        public void TestUnbind()
+        {
+            var container = MakeContainer();
+            container.Bind("TestService1", (app, param) => "hello");
+            container.Bind("TestService2", (app, param) => "world").Alias<IBindData>();
+
+            container.Unbind("TestService1");
+            container.Unbind<IBindData>();
+
+            ExceptionAssert.Throws<UnresolvableException>(() =>
+            {
+                container.Make("TestService1");
+            });
+
+            ExceptionAssert.Throws<UnresolvableException>(() =>
+            {
+                container.Make("TestService2");
+            });
+
+            container.Bind("TestService2", (app, param) => "hello");
+            Assert.AreEqual("hello", container["TestService2"]);
+        }
+
         /// <summary>
         /// 测试不存在的Tag
         /// </summary>
@@ -1796,6 +1820,21 @@ namespace CatLib.Tests.Stl
             }
 
             Assert.AreEqual(true, isThrow);
+        }
+
+        [TestMethod]
+        public void TestFlashOnBind()
+        {
+            var container = new Application();
+            container.Bind<IBindData>((c, p) => 100);
+
+            ExceptionAssert.Throws<RuntimeException>(() =>
+            {
+                App.Flash(() =>
+                {
+
+                }, App.Type2Service(typeof(IBindData)), 200);
+            });
         }
         #endregion
 

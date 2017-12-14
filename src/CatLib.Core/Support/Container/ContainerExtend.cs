@@ -167,6 +167,16 @@ namespace CatLib
         }
 
         /// <summary>
+        /// 解除服务绑定
+        /// </summary>
+        /// <typeparam name="T">解除绑定的服务</typeparam>
+        /// <param name="container">服务容器</param>
+        public static void Unbind<T>(this IContainer container)
+        {
+            container.Unbind(container.Type2Service(typeof(T)));
+        }
+
+        /// <summary>
         /// 以单例的形式绑定一个服务
         /// </summary>
         /// <typeparam name="TService">服务名</typeparam>
@@ -364,6 +374,21 @@ namespace CatLib
             Func<IContainer, object[], object> concrete, out IBindData bindData)
         {
             return container.BindIf(service, concrete, false, out bindData);
+        }
+
+        /// <summary>
+        /// 绑定一个方法到容器
+        /// </summary>
+        /// <param name="container">服务容器</param>
+        /// <param name="method">方法名</param>
+        /// <param name="target">调用目标</param>
+        /// <param name="call">调用方法</param>
+        public static IMethodBind BindMethod(this IContainer container, string method, object target, string call = null)
+        {
+            Guard.NotEmptyOrNull(method, "method");
+            Guard.Requires<ArgumentNullException>(target != null);
+
+            return container.BindMethod(method, target, target.GetType().GetMethod(call ?? Str.Method(method)));
         }
 
         /// <summary>

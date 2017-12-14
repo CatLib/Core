@@ -308,5 +308,20 @@ namespace CatLib.API.Stl
             str = Str.Truncate("喵h喵e越l来l越l漂o亮!了", 12);
             Assert.AreEqual("喵h喵e越l来l越...", str);
         }
+
+        [TestMethod]
+        public void TestStrMethod()
+        {
+            Assert.AreEqual("GetNameSpace", Str.Method("Helloworld.GetNameSpace"));
+            Assert.AreEqual("GetNameSpace", Str.Method("Helloworld.GetNameSpace()"));
+            Assert.AreEqual("Space", Str.Method("Helloworld.GetName@Space()"));
+            Assert.AreEqual("_Space", Str.Method("Helloworld.GetName@_Space()"));
+            Assert.AreEqual("g8975GetNameSpace", Str.Method("Helloworld.g8975GetNameSpace()"));
+            Assert.AreEqual("GetNameSpace", Str.Method("Helloworld.8975GetNameSpace()"));
+            Assert.AreEqual("ame_Space", Str.Method("Helloworld.8975GetN(;)ame_Space()"));
+            Assert.AreEqual("GetName_Space", Str.Method("Helloworld.8GetName_Space()"));
+            Assert.AreEqual(string.Empty, Str.Method(null));
+            Assert.AreEqual(string.Empty, Str.Method(string.Empty));
+        }
     }
 }

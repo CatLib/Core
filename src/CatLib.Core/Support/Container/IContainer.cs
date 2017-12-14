@@ -103,6 +103,23 @@ namespace CatLib
         IMethodBind BindMethod(string method, object target, MethodInfo call);
 
         /// <summary>
+        /// 解除绑定的方法
+        /// </summary>
+        /// <param name="target">
+        /// 解除目标
+        /// <para>如果为字符串则作为调用方法名</para>
+        /// <para>如果为<code>IMethodBind</code>则作为指定方法</para>
+        /// <para>如果为其他对象则作为调用目标做全体解除</para>
+        /// </param>
+        void UnbindMethod(object target);
+
+        /// <summary>
+        /// 解除绑定服务
+        /// </summary>
+        /// <param name="service">服务名或者别名</param>
+        void Unbind(string service);
+
+        /// <summary>
         /// 为一个及以上的服务定义一个标记
         /// </summary>
         /// <param name="tag">标记名</param>
@@ -130,7 +147,7 @@ namespace CatLib
         void Release(string service);
 
         /// <summary>
-        /// 清空容器的所有实例，绑定，别名，标签，解决器
+        /// 清空容器的所有实例，绑定，别名，标签，解决器，方法容器
         /// </summary>
         void Flush();
 

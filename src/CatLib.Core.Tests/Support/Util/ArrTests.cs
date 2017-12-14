@@ -620,5 +620,18 @@ namespace CatLib.Tests.Support.Util
             Assert.AreEqual(null, result);
             Assert.AreEqual(0, data.Length);
         }
+
+        [TestMethod]
+        public void TestEmptyFlash()
+        {
+            var data = new int[] { };
+            var isCall = false;
+            Arr.Flash(data, (i) => { }, (o) => { }, () =>
+            {
+                isCall = true;
+            });
+
+            Assert.AreEqual(true, isCall);
+        }
     }
 }

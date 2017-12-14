@@ -10,6 +10,7 @@
  */
 
 using System;
+using System.Collections.Specialized;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -39,6 +40,54 @@ namespace CatLib
             /// 填充字符串的右侧。默认。
             /// </summary>
             Right
+        }
+
+        /// <summary>
+        /// 获取字符串所表达的函数名
+        /// </summary>
+        /// <param name="pattern">输入字符串</param>
+        /// <returns>函数名</returns>
+        public static string Method(string pattern)
+        {
+            if (string.IsNullOrEmpty(pattern))
+            {
+                return string.Empty;
+            }
+
+            var chars = new char[pattern.Length];
+            var count = 0;
+            for (var i = pattern.Length - 1; i >= 0; i--)
+            {
+                var segment = pattern[i];
+                if ((segment >= 'A' && segment <= 'Z') 
+                    || (segment >= 'a' && segment <= 'z') 
+                    || (segment >= '0' && segment <= '9')
+                    || segment == '_')
+                {
+                    chars[count++] = segment;
+                    continue;
+                }
+
+                if (count > 0)
+                {
+                    break;
+                }
+            }
+
+            for (var i = count - 1; i >= 0; i--)
+            {
+                if ((chars[i] >= '0' && chars[i] <= '9'))
+                {
+                    count--;
+                    continue;
+                }
+                break;
+            }
+
+            Array.Resize(ref chars, count);
+            Array.Reverse(chars);
+
+            return new string(chars);
         }
 
         /// <summary>

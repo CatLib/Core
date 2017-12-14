@@ -95,11 +95,6 @@ namespace CatLib
                     resolving = new List<Func<IBindData, object, object>>();
                 }
                 resolving.Add(func);
-
-                if (Container.HasInstance(Service))
-                {
-                    
-                }
             }
             return this;
         }
@@ -133,7 +128,7 @@ namespace CatLib
         /// </summary>
         protected override void ReleaseBind()
         {
-            Container.Unbind(Service);
+            Container.Unbind(this);
         }
 
         /// <summary>

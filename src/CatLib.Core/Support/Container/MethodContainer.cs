@@ -85,12 +85,12 @@ namespace CatLib
                     targetToMethodsMappings[target] = targetMappings = new List<string>();
                 }
 
-                var methodBind = new MethodBind(container, method, target, call);
+                var methodBind = new MethodBind(this, container, method, target, call);
 
                 methodMappings[method] = methodBind;
                 targetMappings.Add(method);
 
-                return null;
+                return methodBind;
             }
         }
 
@@ -136,10 +136,20 @@ namespace CatLib
             lock (syncRoot)
             {
                 var methodBind = target as MethodBind;
-                if (methodBind != null ||
-                    (target is string && methodMappings.TryGetValue(target.ToString(), out methodBind)))
+
+                if (methodBind != null)
                 {
-                    UnbindWithMethodBind(methodBind);
+                    methodBind.Unbind();
+                    return;
+                }
+
+                if (target is string)
+                {
+                    if (!methodMappings.TryGetValue(target.ToString(), out methodBind))
+                    {
+                        return;
+                    }
+                    methodBind.Unbind();
                     return;
                 }
 
@@ -148,17 +158,26 @@ namespace CatLib
         }
 
         /// <summary>
-        /// 根据方法绑定信息解除绑定
+        /// 解除绑定
         /// </summary>
-        /// <param name="methodBind">方法绑定信息</param>
-        private void UnbindWithMethodBind(MethodBind methodBind)
+        /// <param name="methodBind">方法绑定</param>
+        internal void Unbind(MethodBind methodBind)
         {
-            methodMappings.Remove(methodBind.Service);
-
-            List<string> methods;
-            if (targetToMethodsMappings.TryGetValue(methodBind.Target, out methods))
+            lock (syncRoot)
             {
+                methodMappings.Remove(methodBind.Service);
+                List<string> methods;
+                if (!targetToMethodsMappings.TryGetValue(methodBind.Target, out methods))
+                {
+                    return;
+                }
+
                 methods.Remove(methodBind.Service);
+
+                if (methods.Count <= 0)
+                {
+                    targetToMethodsMappings.Remove(methodBind.Target);
+                }
             }
         }
 
@@ -174,10 +193,9 @@ namespace CatLib
                 return;
             }
 
-            targetToMethodsMappings.Remove(target);
-            foreach (var method in methods)
+            foreach (var method in methods.ToArray())
             {
-                methodMappings.Remove(method);
+                Unbind(method);
             }
         }
 

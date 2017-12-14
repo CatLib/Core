@@ -34,15 +34,22 @@ namespace CatLib
         public ParameterInfo[] ParameterInfos { get; private set; }
 
         /// <summary>
+        /// 方法容器
+        /// </summary>
+        private readonly MethodContainer methodContainer;
+
+        /// <summary>
         /// 构建一个绑定数据
         /// </summary>
+        /// <param name="methodContainer">方法容器</param>
         /// <param name="container">依赖注入容器</param>
         /// <param name="service">服务名</param>
         /// <param name="target">调用目标</param>
         /// <param name="call">调用信息</param>
-        public MethodBind(Container container, string service, object target, MethodInfo call)
+        public MethodBind(MethodContainer methodContainer, Container container, string service, object target, MethodInfo call)
             :base(container, service)
         {
+            this.methodContainer = methodContainer;
             Target = target;
             MethodInfo = call;
             ParameterInfos = call.GetParameters();
@@ -53,7 +60,7 @@ namespace CatLib
         /// </summary>
         protected override void ReleaseBind()
         {
-            Container.UnbindMethod(this);
+            methodContainer.Unbind(this);
         }
     }
 }

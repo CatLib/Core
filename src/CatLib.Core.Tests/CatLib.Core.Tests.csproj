@@ -36,6 +36,7 @@
   <ItemGroup>
     <Compile Include="CatLib\ApplicationTests.cs" />
     <Compile Include="CatLib\FacaedTests.cs" />
+    <Compile Include="Support\Container\MethodContainerTests.cs" />
     <Compile Include="Support\Dispatcher\DispatcherTests.cs" />
     <Compile Include="ExceptionAssert.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
