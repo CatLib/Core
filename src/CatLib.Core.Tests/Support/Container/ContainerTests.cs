@@ -691,12 +691,12 @@ namespace CatLib.Tests.Stl
             container.Bind<SimpleTestClass2>();
 
             var objOut = new object();
-            var call = container.Wrap((object obj, SimpleTestClass1 cls1, int num, SimpleTestClass2 cls2) =>
+            var call = container.Wrap((object[] obj, SimpleTestClass1 cls1, SimpleTestClass2 cls2) =>
             {
-                Assert.AreSame(objOut, obj);
+                Assert.AreSame(objOut, obj[0]);
                 Assert.AreNotEqual(null, cls1);
                 Assert.AreNotEqual(null, cls2);
-                Assert.AreEqual(100, num);
+                Assert.AreEqual((long)100, obj[1]);
             }, objOut, (long)100);
 
             call.Invoke();

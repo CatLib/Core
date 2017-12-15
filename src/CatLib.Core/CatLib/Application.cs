@@ -11,6 +11,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Threading;
 
 namespace CatLib
@@ -23,7 +24,7 @@ namespace CatLib
         /// <summary>
         /// 版本号
         /// </summary>
-        private readonly Version version = new Version("1.1.0");
+        private readonly Version version = new Version("1.2.0");
 
         /// <summary>
         /// 框架启动流程
@@ -284,46 +285,62 @@ namespace CatLib
         /// 触发一个事件,并获取事件的返回结果
         /// </summary>
         /// <param name="eventName">事件名称</param>
-        /// <param name="payload">载荷</param>
+        /// <param name="payloads">载荷</param>
         /// <returns>事件结果</returns>
-        public object[] Trigger(string eventName, object payload = null)
+        public object[] Trigger(string eventName, params object[] payloads)
         {
-            return Dispatcher.Trigger(eventName, payload);
+            return Dispatcher.Trigger(eventName, payloads);
         }
 
         /// <summary>
         /// 触发一个事件,遇到第一个事件存在处理结果后终止,并获取事件的返回结果
         /// </summary>
         /// <param name="eventName">事件名</param>
-        /// <param name="payload">载荷</param>
+        /// <param name="payloads">载荷</param>
         /// <returns>事件结果</returns>
-        public object TriggerHalt(string eventName, object payload = null)
+        public object TriggerHalt(string eventName, params object[] payloads)
         {
-            return Dispatcher.TriggerHalt(eventName, payload);
+            return Dispatcher.TriggerHalt(eventName, payloads);
         }
 
         /// <summary>
-        /// 注册一个事件
+        /// 判断给定事件是否存在事件监听器
         /// </summary>
-        /// <param name="eventName">事件名称</param>
-        /// <param name="handler">事件句柄</param>
-        /// <param name="life">在几次后事件会被自动释放</param>
-        /// <returns>事件句柄</returns>
-        public IEventHandler On(string eventName, Action<object> handler, int life = 0)
+        /// <param name="eventName">事件名</param>
+        /// <param name="strict">
+        /// 严格模式
+        /// <para>启用严格模式则不使用正则来进行匹配事件监听器</para>
+        /// </param>
+        /// <returns>是否存在事件监听器</returns>
+        public bool HasListeners(string eventName, bool strict = false)
         {
-            return Dispatcher.On(eventName, handler, life);
+            return Dispatcher.HasListeners(eventName, strict);
         }
 
         /// <summary>
-        /// 注册一个事件
+        /// 注册一个事件监听器
         /// </summary>
         /// <param name="eventName">事件名称</param>
-        /// <param name="handler">事件句柄</param>
-        /// <param name="life">在几次后事件会被自动释放</param>
-        /// <returns>事件句柄</returns>
-        public IEventHandler Listen(string eventName, Func<object, object> handler, int life = 0)
+        /// <param name="target">调用目标</param>
+        /// <param name="method">调用方法</param>
+        /// <returns>事件对象</returns>
+        public IEvent On(string eventName, object target, MethodInfo method)
         {
-            return Dispatcher.Listen(eventName, handler, life);
+            return Dispatcher.On(eventName, target, method);
+        }
+
+        /// <summary>
+        /// 解除注册的事件监听器
+        /// </summary>
+        /// <param name="target">
+        /// 事件解除目标
+        /// <para>如果传入的是字符串(<code>string</code>)将会解除对应事件名的所有事件</para>
+        /// <para>如果传入的是事件对象(<code>IEvent</code>)那么解除对应事件</para>
+        /// <para>如果传入的是其他实例(<code>object</code>)会解除该实例下的所有事件</para>
+        /// </param>
+        public void Off(object target)
+        {
+            Dispatcher.Off(target);
         }
 
         /// <summary>
@@ -369,20 +386,9 @@ namespace CatLib
         }
 
         /// <summary>
-        /// 获取服务提供者基础类型
-        /// </summary>
-        /// <param name="provider">服务提供者</param>
-        /// <returns>基础类型</returns>
-        private Type GetProviderBaseType(IServiceProvider provider)
-        {
-            var providerType = provider as IServiceProviderType;
-            return providerType == null ? provider.GetType() : providerType.BaseType;
-        }
-
-        /// <summary>
         /// 注册核心别名
         /// </summary>
-        private void RegisterCoreAlias()
+        protected virtual void RegisterCoreAlias()
         {
             var application = Type2Service(typeof(Application));
             Instance(application, this);
@@ -400,9 +406,20 @@ namespace CatLib
         /// <summary>
         /// 注册核心服务
         /// </summary>
-        private void RegisterCoreService()
+        protected virtual void RegisterCoreService()
         {
             this.Singleton<Dispatcher>().Alias<IDispatcher>();
+        }
+
+        /// <summary>
+        /// 获取服务提供者基础类型
+        /// </summary>
+        /// <param name="provider">服务提供者</param>
+        /// <returns>基础类型</returns>
+        private Type GetProviderBaseType(IServiceProvider provider)
+        {
+            var providerType = provider as IServiceProviderType;
+            return providerType == null ? provider.GetType() : providerType.BaseType;
         }
     }
 }

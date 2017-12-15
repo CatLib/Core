@@ -131,7 +131,7 @@ namespace CatLib.Tests
             var app = new Application();
             ExceptionAssert.DoesNotThrow(() =>
             {
-                app.On("hello", (o) => { });
+                app.On("hello", () => { });
             });
         }
 
@@ -309,7 +309,7 @@ namespace CatLib.Tests
         {
             var app = MakeApplication();
 
-            app.Listen("testevent", (payload) =>
+            app.Listen("testevent", (object payload) =>
             {
                 Assert.AreEqual("abc", payload);
                 return 123;

@@ -45,7 +45,7 @@ namespace CatLib
         /// <param name="container">依赖注入容器</param>
         /// <param name="service">服务名</param>
         /// <param name="target">调用目标</param>
-        /// <param name="call">调用信息</param>
+        /// <param name="call">调用方法</param>
         public MethodBind(MethodContainer methodContainer, Container container, string service, object target, MethodInfo call)
             :base(container, service)
         {

@@ -51,10 +51,9 @@
     <Compile Include="Support\Container\MethodBind.cs" />
     <Compile Include="Support\Container\MethodContainer.cs" />
     <Compile Include="Support\Container\UnresolvableException.cs" />
-    <Compile Include="Support\Events\Dispatcher.cs" />
-    <Compile Include="Support\Events\EventHandler.cs" />
+    <Compile Include="Support\Events\DispatcherExtend.cs" />
     <Compile Include="Support\Events\IDispatcher.cs" />
-    <Compile Include="Support\Events\IEventHandler.cs" />
+    <Compile Include="Support\Events\IEvent.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Support\Attribute\ExcludeFromCodeCoverageAttribute.cs" />
     <Compile Include="Support\Attribute\PriorityAttribute.cs" />
@@ -66,7 +65,8 @@
     <Compile Include="Support\Container\InjectAttribute.cs" />
     <Compile Include="Support\Container\IBindData.cs" />
     <Compile Include="Support\Container\IGivenData.cs" />
-    <Compile Include="Support\Events\EventMethod.cs" />
+    <Compile Include="Support\Events\Dispatcher.cs" />
+    <Compile Include="Support\Events\Event.cs" />
     <Compile Include="Support\Exception\AssertException.cs" />
     <Compile Include="Support\Exception\RuntimeException.cs" />
     <Compile Include="Support\FilterChain\FilterChain.cs" />
