@@ -36,8 +36,9 @@ namespace CatLib
         /// <summary>
         /// 调用事件
         /// </summary>
+        /// <param name="eventName">事件名</param>
         /// <param name="payloads">载荷</param>
         /// <returns>事件结果</returns>
-        object Call(params object[] payloads);
+        object Call(string eventName, params object[] payloads);
     }
 }

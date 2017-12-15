@@ -307,10 +307,14 @@ namespace CatLib
         /// 判断给定事件是否存在事件监听器
         /// </summary>
         /// <param name="eventName">事件名</param>
+        /// <param name="strict">
+        /// 严格模式
+        /// <para>启用严格模式则不使用正则来进行匹配事件监听器</para>
+        /// </param>
         /// <returns>是否存在事件监听器</returns>
-        public bool HasListeners(string eventName)
+        public bool HasListeners(string eventName, bool strict = false)
         {
-            return Dispatcher.HasListeners(eventName);
+            return Dispatcher.HasListeners(eventName, strict);
         }
 
         /// <summary>

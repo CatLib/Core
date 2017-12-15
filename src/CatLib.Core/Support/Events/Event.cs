@@ -57,10 +57,11 @@ namespace CatLib
         /// <summary>
         /// 调用事件
         /// </summary>
+        /// <param name="eventName">事件名</param>
         /// <param name="payloads">载荷</param>
-        public object Call(params object[] payloads)
+        public object Call(string eventName, params object[] payloads)
         {
-            return transfer(EventName, payloads);
+            return transfer(eventName, payloads);
         }
     }
 }

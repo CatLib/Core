@@ -250,7 +250,7 @@ namespace CatLib
         /// <returns>事件对象</returns>
         public static IEvent Listen(string eventName, Func<object> method)
         {
-            return Handler.On(eventName, method);
+            return Handler.Listen(eventName, method);
         }
 
         /// <summary>
@@ -261,7 +261,7 @@ namespace CatLib
         /// <returns>事件对象</returns>
         public static IEvent Listen<T1>(string eventName, Func<T1, object> method)
         {
-            return Handler.On(eventName, method);
+            return Handler.Listen(eventName, method);
         }
 
         /// <summary>
@@ -272,7 +272,7 @@ namespace CatLib
         /// <returns>事件对象</returns>
         public static IEvent Listen<T1, T2>(string eventName, Func<T1, T2, object> method)
         {
-            return Handler.On(eventName, method);
+            return Handler.Listen(eventName, method);
         }
 
         /// <summary>
@@ -283,7 +283,7 @@ namespace CatLib
         /// <returns>事件对象</returns>
         public static IEvent Listen<T1, T2, T3>(string eventName, Func<T1, T2, T3, object> method)
         {
-            return Handler.On(eventName, method);
+            return Handler.Listen(eventName, method);
         }
 
         /// <summary>
@@ -294,17 +294,21 @@ namespace CatLib
         /// <returns>事件对象</returns>
         public static IEvent Listen<T1, T2, T3, T4>(string eventName, Func<T1, T2, T3, T4, object> method)
         {
-            return Handler.On(eventName, method);
+            return Handler.Listen(eventName, method);
         }
 
         /// <summary>
         /// 判断给定事件是否存在事件监听器
         /// </summary>
         /// <param name="eventName">事件名</param>
+        /// <param name="strict">
+        /// 严格模式
+        /// <para>启用严格模式则不使用正则来进行匹配事件监听器</para>
+        /// </param>
         /// <returns>是否存在事件监听器</returns>
-        public static bool HasListeners(string eventName)
+        public static bool HasListeners(string eventName, bool strict = false)
         {
-            return Handler.HasListeners(eventName);
+            return Handler.HasListeners(eventName, strict);
         }
 
         /// <summary>

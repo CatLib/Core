@@ -81,15 +81,36 @@ namespace CatLib
         /// 判断给定事件是否存在事件监听器
         /// </summary>
         /// <param name="eventName">事件名</param>
+        /// <param name="strict">
+        /// 严格模式
+        /// <para>启用严格模式则不使用正则来进行匹配事件监听器</para>
+        /// </param>
         /// <returns>是否存在事件监听器</returns>
-        public bool HasListeners(string eventName)
+        public bool HasListeners(string eventName, bool strict = false)
         {
             eventName = FormatEventName(eventName);
             lock (syncRoot)
             {
-                return IsWildcard(eventName)
-                    ? wildcardListeners.ContainsKey(eventName)
-                    : listeners.ContainsKey(eventName);
+                if (listeners.ContainsKey(eventName) 
+                    || wildcardListeners.ContainsKey(eventName))
+                {
+                    return true;
+                }
+
+                if (strict)
+                {
+                    return false;
+                }
+
+                foreach (var element in wildcardListeners)
+                {
+                    if (element.Value.Key.IsMatch(eventName))
+                    {
+                        return true;
+                    }
+                }
+
+                return false;
             }
         }
 
@@ -241,7 +262,7 @@ namespace CatLib
 
                 foreach (var listener in GetListeners(eventName))
                 {
-                    var response = listener.Call(payload);
+                    var response = listener.Call(eventName, payload);
 
                     // 如果启用了事件暂停，且得到的有效的响应那么我们终止事件调用
                     if (halt && response != null)
