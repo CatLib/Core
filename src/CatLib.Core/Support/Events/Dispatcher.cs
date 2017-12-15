@@ -11,6 +11,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Text.RegularExpressions;
 
 namespace CatLib
@@ -18,17 +19,35 @@ namespace CatLib
     /// <summary>
     /// 事件调度器
     /// </summary>
-    public sealed class Dispatcher : IDispatcher
+    public class Dispatcher : IDispatcher
     {
         /// <summary>
-        /// 事件句柄
+        /// 调用方法目标 映射到 事件句柄
         /// </summary>
-        private readonly Dictionary<string, List<EventHandler>> handlers;
+        private readonly Dictionary<object, List<IEvent>> targetMapping;
 
         /// <summary>
-        /// 通配符事件句柄
+        /// 普通事件列表
         /// </summary>
-        private readonly Dictionary<Regex, List<EventHandler>> wildcardHandlers;
+        private readonly Dictionary<string, List<IEvent>> listeners;
+
+        /// <summary>
+        /// 通配符事件列表
+        /// </summary>
+        private readonly Dictionary<string, KeyValuePair<Regex, List<IEvent>>> wildcardListeners;
+
+        /// <summary>
+        /// 依赖注入容器
+        /// </summary>
+        private readonly IContainer container;
+
+        /// <summary>
+        /// 依赖注入容器
+        /// </summary>
+        protected IContainer Container
+        {
+            get { return container; }
+        }
 
         /// <summary>
         /// 同步锁
@@ -38,229 +57,231 @@ namespace CatLib
         /// <summary>
         /// 跳出标记
         /// </summary>
-        private readonly object breakFlag = false;
+        protected virtual object BreakFlag
+        {
+            get { return false; }
+        }
 
         /// <summary>
-        /// 依赖注入容器
+        /// 构建一个事件调度器
         /// </summary>
-        private IContainer container;
-
-        /// <summary>
-        /// 调度器
-        /// </summary>
+        /// <param name="container">依赖注入容器</param>
         public Dispatcher(IContainer container)
         {
+            Guard.Requires<ArgumentNullException>(container != null);
+
             this.container = container;
-            handlers = new Dictionary<string, List<EventHandler>>();
-            wildcardHandlers = new Dictionary<Regex, List<EventHandler>>();
             syncRoot = new object();
+            targetMapping = new Dictionary<object, List<IEvent>>();
+            listeners = new Dictionary<string, List<IEvent>>();
+            wildcardListeners = new Dictionary<string, KeyValuePair<Regex, List<IEvent>>>();
         }
 
         /// <summary>
-        /// 触发一个事件,并获取事件的返回结果
-        /// </summary>
-        /// <param name="eventName">事件名称</param>
-        /// <param name="payload">载荷</param>
-        /// <returns>事件结果</returns>
-        public object[] Trigger(string eventName, object payload = null)
-        {
-            return Dispatch(eventName, payload) as object[];
-        }
-
-        /// <summary>
-        /// 触发一个事件,遇到第一个事件存在处理结果后终止,并获取事件的返回结果
+        /// 判断给定事件是否存在事件监听器
         /// </summary>
         /// <param name="eventName">事件名</param>
-        /// <param name="payload">载荷</param>
-        /// <returns>事件结果</returns>
-        public object TriggerHalt(string eventName, object payload = null)
+        /// <returns>是否存在事件监听器</returns>
+        public bool HasListeners(string eventName)
         {
-            return Dispatch(eventName, payload, true);
+            eventName = FormatEventName(eventName);
+            lock (syncRoot)
+            {
+                return IsWildcard(eventName)
+                    ? wildcardListeners.ContainsKey(eventName)
+                    : listeners.ContainsKey(eventName);
+            }
+        }
+
+        /// <summary>
+        /// 触发一个事件,并获取事件监听器的返回结果
+        /// </summary>
+        /// <param name="eventName">事件名称</param>
+        /// <param name="payloads">载荷</param>
+        /// <returns>事件结果</returns>
+        public object[] Trigger(string eventName, params object[] payloads)
+        {
+            return Dispatch(false, eventName, payloads) as object[];
+        }
+
+        /// <summary>
+        /// 触发一个事件,并获取事件监听器的返回结果
+        /// </summary>
+        /// <param name="eventName">事件名称</param>
+        /// <param name="payloads">载荷</param>
+        /// <returns>事件结果</returns>
+        public object TriggerHalt(string eventName, params object[] payloads)
+        {
+            return Dispatch(true, eventName, payloads);
+        }
+
+        /// <summary>
+        /// 注册一个事件监听器
+        /// </summary>
+        /// <param name="eventName">事件名称</param>
+        /// <param name="target">调用目标</param>
+        /// <param name="method">调用方法</param>
+        /// <returns>事件对象</returns>
+        public IEvent On(string eventName, object target, MethodInfo method)
+        {
+            Guard.NotEmptyOrNull(eventName, "eventName");
+            Guard.Requires<ArgumentNullException>(target != null);
+            Guard.Requires<ArgumentNullException>(method != null);
+
+            lock (syncRoot)
+            {
+                eventName = FormatEventName(eventName);
+
+                var result = IsWildcard(eventName)
+                    ? SetupWildcardListen(eventName, target, method)
+                    : SetupListen(eventName, target, method);
+
+                List<IEvent> listener;
+                if (!targetMapping.TryGetValue(target, out listener))
+                {
+                    targetMapping[target] = listener = new List<IEvent>();
+                }
+                listener.Add(result);
+
+                return result;
+            }
+        }
+
+        /// <summary>
+        /// 解除注册的事件监听器
+        /// </summary>
+        /// <param name="target">
+        /// 事件解除目标
+        /// <para>如果传入的是字符串(<code>string</code>)将会解除对应事件名的所有事件</para>
+        /// <para>如果传入的是事件对象(<code>IEvent</code>)那么解除对应事件</para>
+        /// <para>如果传入的是其他实例(<code>object</code>)会解除该实例下的所有事件</para>
+        /// </param>
+        public void Off(object target)
+        {
+            Guard.Requires<ArgumentNullException>(target != null);
+
+            lock (syncRoot)
+            {
+                var baseEvent = target as IEvent;
+                if (baseEvent != null)
+                {
+                    Forget(baseEvent);
+                    return;
+                }
+
+                if (target is string)
+                {
+                    var eventName = FormatEventName(target.ToString());
+                    if (IsWildcard(eventName))
+                    {
+                        DismissWildcardEventName(eventName);
+                    }
+                    else
+                    {
+                        DismissEventName(eventName);
+                    }
+                    return;
+                }
+
+                DismissTargetObject(target);
+            }
+        }
+
+        /// <summary>
+        /// 生成事件
+        /// </summary>
+        /// <param name="eventName">事件名</param>
+        /// <param name="target">目标对象</param>
+        /// <param name="method">调用方法</param>
+        /// <param name="isWildcard">是否是通配符事件</param>
+        protected virtual IEvent MakeEvent(string eventName, object target, MethodInfo method, bool isWildcard = false)
+        {
+            return new Event(eventName, target, method, MakeListener(target, method, isWildcard));
+        }
+
+        /// <summary>
+        /// 创建事件监听器
+        /// </summary>
+        /// <param name="target">调用目标</param>
+        /// <param name="method">调用方法</param>
+        /// <param name="isWildcard">是否是通配符方法</param>
+        /// <returns>事件监听器</returns>
+        protected virtual Func<string, object[], object> MakeListener(object target, MethodInfo method, bool isWildcard = false)
+        {
+            return (eventName, payloads) => container.Call(target, method, isWildcard
+                ? Arr.Merge(new object[] { method }, payloads)
+                : payloads);
+        }
+
+        /// <summary>
+        /// 格式化事件名
+        /// </summary>
+        /// <param name="eventName">事件名</param>
+        /// <returns>格式化后的事件名</returns>
+        protected virtual string FormatEventName(string eventName)
+        {
+            return eventName;
         }
 
         /// <summary>
         /// 调度事件
         /// </summary>
+        /// <param name="halt">遇到第一个事件存在处理结果后终止</param>
         /// <param name="eventName">事件名</param>
         /// <param name="payload">载荷</param>
-        /// <param name="halt">遇到第一个事件存在处理结果后终止</param>
         /// <returns>处理结果</returns>
-        private object Dispatch(string eventName, object payload = null, bool halt = false)
+        private object Dispatch(bool halt, string eventName, params object[] payload)
         {
             Guard.Requires<ArgumentNullException>(eventName != null);
-            eventName = Normalize(eventName);
+            eventName = FormatEventName(eventName);
 
             lock (syncRoot)
             {
-                var listeners = GetListeners(eventName);
                 var outputs = new List<object>(listeners.Count);
-                var triggerListener = new List<EventHandler>(listeners.Count);
 
-                foreach (var listener in listeners)
+                foreach (var listener in GetListeners(eventName))
                 {
-                    var result = listener.Trigger(payload);
-                    triggerListener.Add(listener);
+                    var response = listener.Call(payload);
 
-                    if (halt && result != null)
+                    // 如果启用了事件暂停，且得到的有效的响应那么我们终止事件调用
+                    if (halt && response != null)
                     {
-                        outputs.Add(result);
+                        return response;
+                    }
+
+                    // 如果响应内容和终止标记相同那么我们终止事件调用
+                    if (response != null && response.Equals(BreakFlag))
+                    {
                         break;
                     }
 
-                    if (result != null && result.Equals(breakFlag))
-                    {
-                        break;
-                    }
-
-                    outputs.Add(result);
+                    outputs.Add(response);
                 }
 
-                foreach (var listener in triggerListener)
-                {
-                    if (!listener.IsLife)
-                    {
-                        listener.Off();
-                    }
-                }
-
-                return halt ? outputs.Count <= 0 ? null : outputs[Math.Max(0, outputs.Count - 1)] : outputs.ToArray();
+                return halt ? null : outputs.ToArray();
             }
         }
 
         /// <summary>
-        /// 注册一个事件
-        /// </summary>
-        /// <param name="eventName">事件名称</param>
-        /// <param name="handler">事件句柄</param>
-        /// <param name="life">在几次后事件会被自动释放</param>
-        /// <returns>事件句柄</returns>
-        public IEventHandler On(string eventName, Action<object> handler, int life = 0)
-        {
-            Guard.Requires<ArgumentNullException>(handler != null);
-            return Listen(eventName, (payload) =>
-            {
-                handler.Invoke(payload);
-                return null;
-            }, life);
-        }
-
-        /// <summary>
-        /// 注册一个事件
-        /// </summary>
-        /// <param name="eventName">事件名称</param>
-        /// <param name="handler">事件句柄</param>
-        /// <param name="life">在几次后事件会被自动释放</param>
-        /// <returns>事件句柄</returns>
-        public IEventHandler Listen(string eventName, Func<object, object> handler, int life = 0)
-        {
-            Guard.Requires<ArgumentNullException>(eventName != null);
-            Guard.Requires<ArgumentNullException>(handler != null);
-
-            eventName = Normalize(eventName);
-
-            var wildcard = eventName.IndexOf("*") != -1;
-            var eventHandler = new EventHandler(this, wildcard ? Str.AsteriskWildcard(eventName) : eventName, handler, life);
-
-            lock (syncRoot)
-            {
-                if (wildcard)
-                {
-                    SetWildcardListener(eventHandler);
-                }
-                else
-                {
-                    List<EventHandler> handlers;
-                    if (!this.handlers.TryGetValue(eventName, out handlers))
-                    {
-                        this.handlers[eventName] = handlers = new List<EventHandler>();
-                    }
-                    handlers.Add(eventHandler);
-                }
-
-                return eventHandler;
-            }
-        }
-
-        /// <summary>
-        /// 移除一个事件
-        /// </summary>
-        /// <param name="handler">事件句柄</param>
-        internal void Off(EventHandler handler)
-        {
-            lock (syncRoot)
-            {
-                List<EventHandler> result;
-                if (handlers.TryGetValue(handler.EventName, out result))
-                {
-                    result.Remove(handler);
-                    if (result.Count <= 0)
-                    {
-                        handlers.Remove(handler.EventName);
-                    }
-                }
-
-                Regex wildcardkey = null;
-                foreach (var element in wildcardHandlers)
-                {
-                    if (element.Key.ToString() == handler.EventName)
-                    {
-                        element.Value.Remove(handler);
-                        wildcardkey = element.Key;
-                        result = element.Value;
-                        break;
-                    }
-                }
-                if (wildcardkey != null && result.Count <= 0)
-                {
-                    wildcardHandlers.Remove(wildcardkey);
-                }
-            }
-        }
-
-        /// <summary>
-        /// 设定通配符监听
-        /// </summary>
-        /// <param name="handler">监听句柄</param>
-        private void SetWildcardListener(EventHandler handler)
-        {
-            List<EventHandler> handlers = null;
-            foreach (var element in wildcardHandlers)
-            {
-                if (element.Key.ToString() == handler.EventName)
-                {
-                    handlers = element.Value;
-                    break;
-                }
-            }
-
-            if (handlers == null)
-            {
-                wildcardHandlers[new Regex(handler.EventName)] = handlers = new List<EventHandler>();
-            }
-
-            handlers.Add(handler);
-        }
-
-        /// <summary>
-        /// 获取指定事件的事件句柄列表
+        /// 获取指定事件的事件列表
         /// </summary>
         /// <param name="eventName">事件名</param>
-        /// <returns>句柄列表</returns>
-        private IList<EventHandler> GetListeners(string eventName)
+        /// <returns>事件列表</returns>
+        private IEnumerable<IEvent> GetListeners(string eventName)
         {
-            var outputs = new List<EventHandler>();
+            var outputs = new List<IEvent>();
 
-            List<EventHandler> result;
-            if (handlers.TryGetValue(eventName, out result))
+            List<IEvent> result;
+            if (listeners.TryGetValue(eventName, out result))
             {
                 outputs.AddRange(result);
             }
 
-            foreach (var element in wildcardHandlers)
+            foreach (var element in wildcardListeners)
             {
-                if (element.Key.IsMatch(eventName))
+                if (element.Value.Key.IsMatch(eventName))
                 {
-                    outputs.AddRange(element.Value);
+                    outputs.AddRange(element.Value.Value);
                 }
             }
 
@@ -268,13 +289,175 @@ namespace CatLib
         }
 
         /// <summary>
-        /// 标准化字符串
+        /// 根据普通事件解除相关事件
         /// </summary>
-        /// <param name="input">输入</param>
-        /// <returns>输出</returns>
-        private string Normalize(string input)
+        /// <param name="eventName">事件名</param>
+        private void DismissEventName(string eventName)
         {
-            return input.ToLower();
+            List<IEvent> events;
+            if (!listeners.TryGetValue(eventName, out events))
+            {
+                return;
+            }
+
+            foreach (var element in events.ToArray())
+            {
+                Forget(element);
+            }
+        }
+
+        /// <summary>
+        /// 根据通配符事件解除相关事件
+        /// </summary>
+        /// <param name="eventName">事件名</param>
+        private void DismissWildcardEventName(string eventName)
+        {
+            KeyValuePair<Regex, List<IEvent>> events;
+            if (!wildcardListeners.TryGetValue(eventName, out events))
+            {
+                return;
+            }
+
+            foreach (var element in events.Value.ToArray())
+            {
+                Forget(element);
+            }
+        }
+
+        /// <summary>
+        /// 根据Object解除事件
+        /// </summary>
+        /// <param name="target">事件解除目标</param>
+        private void DismissTargetObject(object target)
+        {
+            List<IEvent> events;
+            if (!targetMapping.TryGetValue(target, out events))
+            {
+                return;
+            }
+
+            foreach (var element in events.ToArray())
+            {
+                Forget(element);
+            }
+        }
+
+        /// <summary>
+        /// 从事件调度器中移除指定的事件监听器
+        /// </summary>
+        /// <param name="target">事件监听器</param>
+        private void Forget(IEvent target)
+        {
+            lock (syncRoot)
+            {
+                List<IEvent> events;
+                if (targetMapping.TryGetValue(target.Target, out events))
+                {
+                    events.Remove(target);
+                    if (events.Count <= 0)
+                    {
+                        targetMapping.Remove(target.Target);
+                    }
+                }
+
+                if (IsWildcard(target.EventName))
+                {
+                    ForgetWildcardListen(target);
+                }
+                else
+                {
+                    ForgetListen(target);
+                }
+            }
+        }
+
+        /// <summary>
+        /// 销毁普通事件
+        /// </summary>
+        /// <param name="target">事件对象</param>
+        private void ForgetListen(IEvent target)
+        {
+            List<IEvent> events;
+            if (!listeners.TryGetValue(target.EventName, out events))
+            {
+                return;
+            }
+
+            events.Remove(target);
+            if (events.Count <= 0)
+            {
+                listeners.Remove(target.EventName);
+            }
+        }
+
+        /// <summary>
+        /// 销毁通配符事件
+        /// </summary>
+        /// <param name="target">事件对象</param>
+        private void ForgetWildcardListen(IEvent target)
+        {
+            KeyValuePair<Regex, List<IEvent>> wildcardEvents;
+            if (!wildcardListeners.TryGetValue(target.EventName, out wildcardEvents))
+            {
+                return;
+            }
+
+            wildcardEvents.Value.Remove(target);
+            if (wildcardEvents.Value.Count <= 0)
+            {
+                wildcardListeners.Remove(target.EventName);
+            }
+        }
+
+        /// <summary>
+        /// 设定普通事件
+        /// </summary>
+        /// <param name="eventName">事件名</param>
+        /// <param name="target">事件调用目标</param>
+        /// <param name="method">事件调用方法</param>
+        /// <returns>监听事件</returns>
+        private IEvent SetupListen(string eventName, object target, MethodInfo method)
+        {
+            List<IEvent> listener;
+            if (!listeners.TryGetValue(eventName, out listener))
+            {
+                listeners[eventName] = listener = new List<IEvent>();
+            }
+
+            var output = MakeEvent(eventName, target, method);
+            listener.Add(output);
+            return output;
+        }
+
+        /// <summary>
+        /// 设定通配符事件
+        /// </summary>
+        /// <param name="eventName">事件名</param>
+        /// <param name="target">事件调用目标</param>
+        /// <param name="method">事件调用方法</param>
+        /// <returns>监听事件</returns>
+        private IEvent SetupWildcardListen(string eventName, object target, MethodInfo method)
+        {
+            KeyValuePair<Regex, List<IEvent>> listener;
+            if (!wildcardListeners.TryGetValue(eventName, out listener))
+            {
+                wildcardListeners[eventName] = listener =
+                    new KeyValuePair<Regex, List<IEvent>>(new Regex(Str.AsteriskWildcard(eventName)), new List<IEvent>());
+            }
+
+            var output = MakeEvent(eventName, target, method, true);
+            listener.Value.Add(output);
+            return output;
+        }
+
+        /// <summary>
+        /// 是否是通配符事件
+        /// </summary>
+        /// <param name="eventName">事件名</param>
+        /// <returns>是否是通配符事件</returns>
+        private bool IsWildcard(string eventName)
+        {
+            return eventName.IndexOf('*') != -1;
         }
     }
 }

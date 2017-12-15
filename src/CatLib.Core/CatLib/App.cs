@@ -157,47 +157,158 @@ namespace CatLib
         /// 触发一个事件,并获取事件的返回结果
         /// </summary>
         /// <param name="eventName">事件名称</param>
-        /// <param name="payload">载荷</param>
+        /// <param name="payloads">载荷</param>
         /// <returns>事件结果</returns>
-        public static object[] Trigger(string eventName, object payload = null)
+        public static object[] Trigger(string eventName, params object[] payloads)
         {
-            return Handler.Trigger(eventName, payload);
+            return Handler.Trigger(eventName, payloads);
         }
 
         /// <summary>
         /// 触发一个事件,遇到第一个事件存在处理结果后终止,并获取事件的返回结果
         /// </summary>
         /// <param name="eventName">事件名</param>
-        /// <param name="payload">载荷</param>
+        /// <param name="payloads">载荷</param>
         /// <returns>事件结果</returns>
-        public static object TriggerHalt(string eventName, object payload = null)
+        public static object TriggerHalt(string eventName, params object[] payloads)
         {
-            return Handler.TriggerHalt(eventName, payload);
+            return Handler.TriggerHalt(eventName, payloads);
+        }
+
+
+
+        /// <summary>
+        /// 注册一个事件监听器
+        /// </summary>
+        /// <param name="eventName">事件名称</param>
+        /// <param name="target">事件调用目标</param>
+        /// <param name="method">事件处理方法</param>
+        /// <returns>事件对象</returns>
+        public static IEvent On(string eventName, object target, string method = null)
+        {
+            return Handler.On(eventName, target, method);
         }
 
         /// <summary>
-        /// 注册一个事件
+        /// 注册一个事件监听器
         /// </summary>
+        /// <param name="dispatcher">事件调度器</param>
         /// <param name="eventName">事件名称</param>
-        /// <param name="handler">事件句柄</param>
-        /// <param name="life">在几次后事件会被自动释放</param>
-        /// <returns>事件句柄</returns>
-        public static IEventHandler On(string eventName, Action<object> handler, int life = 0)
+        /// <param name="method">事件处理方法</param>
+        /// <returns>事件对象</returns>
+        public static IEvent On<T1>(this IDispatcher dispatcher, string eventName, Action<T1> method)
         {
-            return Handler.On(eventName, handler, life);
+            Guard.Requires<ArgumentNullException>(method != null);
+            return dispatcher.On(eventName, method.Target, method.Method);
         }
 
         /// <summary>
-        /// 注册一个事件
+        /// 注册一个事件监听器
         /// </summary>
+        /// <param name="dispatcher">事件调度器</param>
         /// <param name="eventName">事件名称</param>
-        /// <param name="handler">事件句柄</param>
-        /// <param name="life">在几次后事件会被自动释放</param>
-        /// <returns>事件句柄</returns>
-        public static IEventHandler Listen(string eventName, Func<object, object> handler, int life = 0)
+        /// <param name="method">事件处理方法</param>
+        /// <returns>事件对象</returns>
+        public static IEvent On<T1, T2>(this IDispatcher dispatcher, string eventName, Action<T1, T2> method)
         {
-            return Handler.Listen(eventName, handler, life);
+            Guard.Requires<ArgumentNullException>(method != null);
+            return dispatcher.On(eventName, method.Target, method.Method);
         }
+
+        /// <summary>
+        /// 注册一个事件监听器
+        /// </summary>
+        /// <param name="dispatcher">事件调度器</param>
+        /// <param name="eventName">事件名称</param>
+        /// <param name="method">事件处理方法</param>
+        /// <returns>事件对象</returns>
+        public static IEvent On<T1, T2, T3>(this IDispatcher dispatcher, string eventName, Action<T1, T2, T3> method)
+        {
+            Guard.Requires<ArgumentNullException>(method != null);
+            return dispatcher.On(eventName, method.Target, method.Method);
+        }
+
+        /// <summary>
+        /// 注册一个事件监听器
+        /// </summary>
+        /// <param name="dispatcher">事件调度器</param>
+        /// <param name="eventName">事件名称</param>
+        /// <param name="method">事件处理方法</param>
+        /// <returns>事件对象</returns>
+        public static IEvent On<T1, T2, T3, T4>(this IDispatcher dispatcher, string eventName, Action<T1, T2, T3, T4> method)
+        {
+            Guard.Requires<ArgumentNullException>(method != null);
+            return dispatcher.On(eventName, method.Target, method.Method);
+        }
+
+        /// <summary>
+        /// 注册一个事件监听器
+        /// </summary>
+        /// <param name="dispatcher">事件调度器</param>
+        /// <param name="eventName">事件名称</param>
+        /// <param name="method">事件处理方法</param>
+        /// <returns>事件对象</returns>
+        public static IEvent Listen(this IDispatcher dispatcher, string eventName, Func<object> method)
+        {
+            Guard.Requires<ArgumentNullException>(method != null);
+            return dispatcher.On(eventName, method.Target, method.Method);
+        }
+
+        /// <summary>
+        /// 注册一个事件监听器
+        /// </summary>
+        /// <param name="dispatcher">事件调度器</param>
+        /// <param name="eventName">事件名称</param>
+        /// <param name="method">事件处理方法</param>
+        /// <returns>事件对象</returns>
+        public static IEvent Listen<T1>(this IDispatcher dispatcher, string eventName, Func<T1, object> method)
+        {
+            Guard.Requires<ArgumentNullException>(method != null);
+            return dispatcher.On(eventName, method.Target, method.Method);
+        }
+
+        /// <summary>
+        /// 注册一个事件监听器
+        /// </summary>
+        /// <param name="dispatcher">事件调度器</param>
+        /// <param name="eventName">事件名称</param>
+        /// <param name="method">事件处理方法</param>
+        /// <returns>事件对象</returns>
+        public static IEvent Listen<T1, T2>(this IDispatcher dispatcher, string eventName, Func<T1, T2, object> method)
+        {
+            Guard.Requires<ArgumentNullException>(method != null);
+            return dispatcher.On(eventName, method.Target, method.Method);
+        }
+
+        /// <summary>
+        /// 注册一个事件监听器
+        /// </summary>
+        /// <param name="dispatcher">事件调度器</param>
+        /// <param name="eventName">事件名称</param>
+        /// <param name="method">事件处理方法</param>
+        /// <returns>事件对象</returns>
+        public static IEvent Listen<T1, T2, T3>(this IDispatcher dispatcher, string eventName, Func<T1, T2, T3, object> method)
+        {
+            Guard.Requires<ArgumentNullException>(method != null);
+            return dispatcher.On(eventName, method.Target, method.Method);
+        }
+
+        /// <summary>
+        /// 注册一个事件监听器
+        /// </summary>
+        /// <param name="dispatcher">事件调度器</param>
+        /// <param name="eventName">事件名称</param>
+        /// <param name="method">事件处理方法</param>
+        /// <returns>事件对象</returns>
+        public static IEvent Listen<T1, T2, T3, T4>(this IDispatcher dispatcher, string eventName, Func<T1, T2, T3, T4, object> method)
+        {
+            Guard.Requires<ArgumentNullException>(method != null);
+            return dispatcher.On(eventName, method.Target, method.Method);
+        }
+
+
+
+
 
         /// <summary>
         /// 获取服务的绑定数据,如果绑定不存在则返回null

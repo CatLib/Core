@@ -9,16 +9,35 @@
  * Document: http://catlib.io/
  */
 
+using System.Reflection;
+
 namespace CatLib
 {
     /// <summary>
-    /// 事件
+    /// 事件对象
     /// </summary>
     public interface IEvent
     {
         /// <summary>
-        /// 撤销事件
+        /// 事件名
         /// </summary>
-        void Off();
+        string EventName { get; }
+
+        /// <summary>
+        /// 事件目标
+        /// </summary>
+        object Target { get; }
+
+        /// <summary>
+        /// 方法信息
+        /// </summary>
+        MethodInfo Method { get; }
+
+        /// <summary>
+        /// 调用事件
+        /// </summary>
+        /// <param name="payloads">载荷</param>
+        /// <returns>事件结果</returns>
+        object Call(params object[] payloads);
     }
 }

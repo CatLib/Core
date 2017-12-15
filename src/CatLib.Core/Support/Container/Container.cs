@@ -597,35 +597,6 @@ namespace CatLib
         }
 
         /// <summary>
-        /// 清空容器的所有实例，绑定，别名，标签，解决器
-        /// </summary>
-        public void Flush()
-        {
-            lock (syncRoot)
-            {
-                foreach (var service in Dict.Keys(instances))
-                {
-                    Release(service);
-                }
-
-                tags.Clear();
-                aliases.Clear();
-                aliasesReverse.Clear();
-                instances.Clear();
-                binds.Clear();
-                resolving.Clear();
-                release.Clear();
-                resolved.Clear();
-                findType.Clear();
-                findTypeCache.Clear();
-                buildStack.Clear();
-                userParamsStack.Clear();
-                rebound.Clear();
-                methodContainer.Flush();
-            }
-        }
-
-        /// <summary>
         /// 当查找类型无法找到时会尝试去调用开发者提供的查找类型函数
         /// </summary>
         /// <param name="finder">查找类型的回调</param>
@@ -728,6 +699,45 @@ namespace CatLib
         }
 
         /// <summary>
+        /// 清空容器的所有实例，绑定，别名，标签，解决器
+        /// </summary>
+        public virtual void Flush()
+        {
+            lock (syncRoot)
+            {
+                foreach (var service in Dict.Keys(instances))
+                {
+                    Release(service);
+                }
+
+                tags.Clear();
+                aliases.Clear();
+                aliasesReverse.Clear();
+                instances.Clear();
+                binds.Clear();
+                resolving.Clear();
+                release.Clear();
+                resolved.Clear();
+                findType.Clear();
+                findTypeCache.Clear();
+                buildStack.Clear();
+                userParamsStack.Clear();
+                rebound.Clear();
+                methodContainer.Flush();
+            }
+        }
+
+        /// <summary>
+        /// 将类型转为服务名
+        /// </summary>
+        /// <param name="type">类型</param>
+        /// <returns>服务名</returns>
+        public virtual string Type2Service(Type type)
+        {
+            return type.ToString();
+        }
+
+        /// <summary>
         /// 解除绑定服务
         /// </summary>
         /// <param name="bindable">绑定关系</param>
@@ -747,16 +757,6 @@ namespace CatLib
                 }
                 binds.Remove(bindable.Service);
             }
-        }
-
-        /// <summary>
-        /// 将类型转为服务名
-        /// </summary>
-        /// <param name="type">类型</param>
-        /// <returns>服务名</returns>
-        public virtual string Type2Service(Type type)
-        {
-            return type.ToString();
         }
 
         /// <summary>
@@ -1166,6 +1166,23 @@ namespace CatLib
         }
 
         /// <summary>
+        /// 检查是否可以紧缩注入用户传入的参数
+        /// </summary>
+        /// <param name="baseParams">服务实例的参数信息</param>
+        /// <param name="userParams">输入的构造参数列表</param>
+        /// <returns>是否可以紧缩注入</returns>
+        protected virtual bool CheckCompactInjectUserParams(ParameterInfo baseParams, object[] userParams)
+        {
+            if (userParams.Length <= 0)
+            {
+                return false;
+            }
+
+            return baseParams.GetType() == typeof(object[])
+                || baseParams.GetType() == typeof(object);
+        }
+
+        /// <summary>
         /// 获取依赖解决结果
         /// </summary>
         /// <param name="makeServiceBindData">服务绑定数据</param>
@@ -1179,6 +1196,16 @@ namespace CatLib
 
             foreach (var baseParam in baseParams)
             {
+                // 当容器发现开发者使用 object 或者 object[] 作为参数类型时
+                // 我们尝试将所有用户传入的用户参数紧缩注入
+                if (CheckCompactInjectUserParams(baseParam, userParams))
+                {
+                    results.Add(userParams);
+                    userParams = null;
+                    continue;
+                }
+
+                // 从用户传入的参数中挑选合适的参数，按照相对顺序依次注入
                 var param = GetDependenciesFromUserParams(baseParam, ref userParams);
                 if (param != null)
                 {
@@ -1186,6 +1213,7 @@ namespace CatLib
                     continue;
                 }
 
+                // 尝试通过依赖注入容器来生成所需求的参数
                 var needService = GetParamNeedsService(baseParam);
 
                 if (baseParam.ParameterType.IsClass
