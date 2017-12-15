@@ -1168,18 +1168,43 @@ namespace CatLib
         /// <summary>
         /// 检查是否可以紧缩注入用户传入的参数
         /// </summary>
-        /// <param name="baseParams">服务实例的参数信息</param>
+        /// <param name="baseParam">服务实例的参数信息</param>
         /// <param name="userParams">输入的构造参数列表</param>
         /// <returns>是否可以紧缩注入</returns>
-        protected virtual bool CheckCompactInjectUserParams(ParameterInfo baseParams, object[] userParams)
+        protected virtual bool CheckCompactInjectUserParams(ParameterInfo baseParam, object[] userParams)
         {
-            if (userParams.Length <= 0)
+            if (userParams == null || userParams.Length <= 0)
             {
                 return false;
             }
 
-            return baseParams.GetType() == typeof(object[])
-                || baseParams.GetType() == typeof(object);
+            return baseParam.ParameterType == typeof(object[])
+                || baseParam.ParameterType == typeof(object);
+        }
+
+        /// <summary>
+        /// 获取通过紧缩注入的参数
+        /// </summary>
+        /// <param name="baseParam">服务实例的参数信息</param>
+        /// <param name="userParams">输入的构造参数列表</param>
+        /// <returns>紧缩注入的参数</returns>
+        protected virtual object GetCompactInjectUserParams(ParameterInfo baseParam, ref object[] userParams)
+        {
+            if (!CheckCompactInjectUserParams(baseParam, userParams))
+            {
+                return null;
+            }
+
+            var result = userParams;
+            userParams = null;
+
+            if (baseParam.ParameterType == typeof(object) 
+                && result != null && result.Length == 1)
+            {
+                return result[0];
+            }
+
+            return result;
         }
 
         /// <summary>
@@ -1198,15 +1223,15 @@ namespace CatLib
             {
                 // 当容器发现开发者使用 object 或者 object[] 作为参数类型时
                 // 我们尝试将所有用户传入的用户参数紧缩注入
-                if (CheckCompactInjectUserParams(baseParam, userParams))
+                var param = GetCompactInjectUserParams(baseParam, ref userParams);
+                if (param != null)
                 {
-                    results.Add(userParams);
-                    userParams = null;
+                    results.Add(param);
                     continue;
                 }
 
                 // 从用户传入的参数中挑选合适的参数，按照相对顺序依次注入
-                var param = GetDependenciesFromUserParams(baseParam, ref userParams);
+                param = GetDependenciesFromUserParams(baseParam, ref userParams);
                 if (param != null)
                 {
                     results.Add(param);

@@ -209,7 +209,7 @@ namespace CatLib
         protected virtual Func<string, object[], object> MakeListener(object target, MethodInfo method, bool isWildcard = false)
         {
             return (eventName, payloads) => container.Call(target, method, isWildcard
-                ? Arr.Merge(new object[] { method }, payloads)
+                ? Arr.Merge(new object[] { eventName }, payloads)
                 : payloads);
         }
 

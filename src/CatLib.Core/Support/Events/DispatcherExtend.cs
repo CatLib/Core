@@ -42,6 +42,19 @@ namespace CatLib
         /// <param name="eventName">事件名称</param>
         /// <param name="method">事件处理方法</param>
         /// <returns>事件对象</returns>
+        public static IEvent On(this IDispatcher dispatcher, string eventName, Action method)
+        {
+            Guard.Requires<ArgumentNullException>(method != null);
+            return dispatcher.On(eventName, method.Target, method.Method);
+        }
+
+        /// <summary>
+        /// 注册一个事件监听器
+        /// </summary>
+        /// <param name="dispatcher">事件调度器</param>
+        /// <param name="eventName">事件名称</param>
+        /// <param name="method">事件处理方法</param>
+        /// <returns>事件对象</returns>
         public static IEvent On<T1>(this IDispatcher dispatcher, string eventName, Action<T1> method)
         {
             Guard.Requires<ArgumentNullException>(method != null);
