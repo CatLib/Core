@@ -620,17 +620,6 @@ namespace CatLib
         }
 
         /// <summary>
-        /// 获取一个回调，当执行回调可以生成指定的服务
-        /// </summary>
-        /// <typeparam name="TService">服务名</typeparam>
-        /// <param name="service">服务名或者别名</param>
-        /// <returns>回调方案</returns>
-        public static Func<TService> Factory<TService>(string service)
-        {
-            return Handler.Factory<TService>(service);
-        }
-
-        /// <summary>
         /// 为服务设定一个别名
         /// </summary>
         /// <param name="alias">别名</param>

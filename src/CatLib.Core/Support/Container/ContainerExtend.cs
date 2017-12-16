@@ -492,18 +492,6 @@ namespace CatLib
         }
 
         /// <summary>
-        /// 获取一个回调，当执行回调可以生成指定的服务
-        /// </summary>
-        /// <typeparam name="TService">服务名</typeparam>
-        /// <param name="container">服务容器</param>
-        /// <param name="service">服务名或者别名</param>
-        /// <returns>回调方案</returns>
-        public static Func<TService> Factory<TService>(this IContainer container, string service)
-        {
-            return () => (TService)container.Factory(service).Invoke();
-        }
-
-        /// <summary>
         /// 释放服务
         /// </summary>
         /// <typeparam name="TService">服务名</typeparam>

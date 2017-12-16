@@ -569,9 +569,6 @@ namespace CatLib.Tests.Stl
 
             var fac = container.Factory<Container>();
             Assert.AreEqual(container.Make<Container>(), fac.Invoke());
-
-            var fac2 = container.Factory<int>("hello");
-            Assert.AreEqual(123, fac2.Invoke());
         }
 
         [TestMethod]
