@@ -1263,18 +1263,6 @@ namespace CatLib
         }
 
         /// <summary>
-        /// 获取别名最终对应的服务名
-        /// </summary>
-        /// <param name="service">服务名或别名</param>
-        /// <returns>最终映射的服务名</returns>
-        protected virtual string AliasToService(string service)
-        {
-            service = FormatService(service);
-            string alias;
-            return aliases.TryGetValue(service, out alias) ? alias : service;
-        }
-
-        /// <summary>
         /// 获取构造函数参数
         /// </summary>
         /// <param name="makeServiceBindData">服务绑定数据</param>
@@ -1313,6 +1301,18 @@ namespace CatLib
 
             Guard.Requires<AssertException>(exception != null);
             throw exception;
+        }
+
+        /// <summary>
+        /// 获取别名最终对应的服务名
+        /// </summary>
+        /// <param name="service">服务名或别名</param>
+        /// <returns>最终映射的服务名</returns>
+        private string AliasToService(string service)
+        {
+            service = FormatService(service);
+            string alias;
+            return aliases.TryGetValue(service, out alias) ? alias : service;
         }
 
         /// <summary>
