@@ -102,7 +102,7 @@ namespace CatLib
         }
 
         /// <summary>
-        /// 批量添加到字典
+        /// 将元素批量添加到字典
         /// </summary>
         /// <typeparam name="TKey">字典键</typeparam>
         /// <typeparam name="TValue">字典值</typeparam>
@@ -233,7 +233,7 @@ namespace CatLib
         }
 
         /// <summary>
-        /// 使用点（.）来访问深度字典，并移除其中一个值
+        /// 使用点（.）来访问深度字典，并移除其中指定的值
         /// </summary>
         /// <param name="dict">规定字典</param>
         /// <param name="key">键，支持使用点（.）来进行深度访问</param>
