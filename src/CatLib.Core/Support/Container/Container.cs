@@ -763,12 +763,12 @@ namespace CatLib
         /// 在回调区间内暂时性的静态化服务实例
         /// </summary>
         /// <param name="callback">回调区间</param>
-        /// <param name="serviceMapping">服务映射</param>
-        public void Flash(Action callback, params KeyValuePair<string, object>[] serviceMapping)
+        /// <param name="services">服务映射</param>
+        public void Flash(Action callback, params KeyValuePair<string, object>[] services)
         {
             lock (syncRoot)
             {
-                foreach (var service in serviceMapping)
+                foreach (var service in services)
                 {
                     if (HasInstance(service.Key))
                     {
@@ -781,7 +781,7 @@ namespace CatLib
                     }
                 }
 
-                Arr.Flash(serviceMapping,
+                Arr.Flash(services,
                     service => Instance(service.Key, service.Value),
                     service => Release(service.Key),
                     callback);
@@ -1198,7 +1198,7 @@ namespace CatLib
             var result = userParams;
             userParams = null;
 
-            if (baseParam.ParameterType == typeof(object) 
+            if (baseParam.ParameterType == typeof(object)
                 && result != null && result.Length == 1)
             {
                 return result[0];

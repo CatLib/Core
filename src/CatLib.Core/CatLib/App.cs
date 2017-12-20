@@ -21,6 +21,7 @@ namespace CatLib
     [ExcludeFromCodeCoverage]
     public static class App
     {
+        #region Original
         /// <summary>
         /// 当新建Application时
         /// </summary>
@@ -53,7 +54,9 @@ namespace CatLib
                 }
             }
         }
+        #endregion
 
+        #region Application API
         /// <summary>
         /// 注册服务提供者
         /// </summary>
@@ -151,6 +154,22 @@ namespace CatLib
         {
             get { return Handler.DebugLevel; }
             set { Handler.DebugLevel = value; }
+        }
+        #endregion
+
+        #region Dispatcher API
+        /// <summary>
+        /// 判断给定事件是否存在事件监听器
+        /// </summary>
+        /// <param name="eventName">事件名</param>
+        /// <param name="strict">
+        /// 严格模式
+        /// <para>启用严格模式则不使用正则来进行匹配事件监听器</para>
+        /// </param>
+        /// <returns>是否存在事件监听器</returns>
+        public static bool HasListeners(string eventName, bool strict = false)
+        {
+            return Handler.HasListeners(eventName, strict);
         }
 
         /// <summary>
@@ -298,20 +317,6 @@ namespace CatLib
         }
 
         /// <summary>
-        /// 判断给定事件是否存在事件监听器
-        /// </summary>
-        /// <param name="eventName">事件名</param>
-        /// <param name="strict">
-        /// 严格模式
-        /// <para>启用严格模式则不使用正则来进行匹配事件监听器</para>
-        /// </param>
-        /// <returns>是否存在事件监听器</returns>
-        public static bool HasListeners(string eventName, bool strict = false)
-        {
-            return Handler.HasListeners(eventName, strict);
-        }
-
-        /// <summary>
         /// 解除注册的事件监听器
         /// </summary>
         /// <param name="target">
@@ -324,7 +329,9 @@ namespace CatLib
         {
             Handler.Off(target);
         }
+        #endregion
 
+        #region Container API
         /// <summary>
         /// 获取服务的绑定数据,如果绑定不存在则返回null
         /// </summary>
@@ -379,10 +386,10 @@ namespace CatLib
         /// 绑定一个服务
         /// </summary>
         /// <param name="service">服务名</param>
-        /// <param name="concrete">服务实体</param>
+        /// <param name="concrete">服务实现</param>
         /// <param name="isStatic">服务是否静态化</param>
         /// <returns>服务绑定数据</returns>
-        public static IBindData Bind(string service, Func<IContainer, object[], object> concrete, bool isStatic)
+        public static IBindData Bind(string service, Type concrete, bool isStatic)
         {
             return Handler.Bind(service, concrete, isStatic);
         }
@@ -391,10 +398,10 @@ namespace CatLib
         /// 绑定一个服务
         /// </summary>
         /// <param name="service">服务名</param>
-        /// <param name="concrete">服务实现</param>
+        /// <param name="concrete">服务实体</param>
         /// <param name="isStatic">服务是否静态化</param>
         /// <returns>服务绑定数据</returns>
-        public static IBindData Bind(string service, Type concrete, bool isStatic)
+        public static IBindData Bind(string service, Func<IContainer, object[], object> concrete, bool isStatic)
         {
             return Handler.Bind(service, concrete, isStatic);
         }
@@ -423,6 +430,41 @@ namespace CatLib
         public static bool BindIf(string service, Type concrete, bool isStatic, out IBindData bindData)
         {
             return Handler.BindIf(service, concrete, isStatic, out bindData);
+        }
+
+        /// <summary>
+        /// 绑定一个方法到容器
+        /// </summary>
+        /// <param name="method">方法名</param>
+        /// <param name="target">调用目标</param>
+        /// <param name="call">调用方法</param>
+        /// <returns>方法绑定数据</returns>
+        public static IMethodBind BindMethod(string method, object target, MethodInfo call)
+        {
+            return Handler.BindMethod(method, target, call);
+        }
+
+        /// <summary>
+        /// 解除绑定的方法
+        /// </summary>
+        /// <param name="target">
+        /// 解除目标
+        /// <para>如果为字符串则作为调用方法名</para>
+        /// <para>如果为<code>IMethodBind</code>则作为指定方法</para>
+        /// <para>如果为其他对象则作为调用目标做全体解除</para>
+        /// </param>
+        public static void UnbindMethod(object target)
+        {
+            Handler.UnbindMethod(target);
+        }
+
+        /// <summary>
+        /// 解除绑定服务
+        /// </summary>
+        /// <param name="service">服务名或者别名</param>
+        public static void Unbind(string service)
+        {
+            Handler.Unbind(service);
         }
 
         /// <summary>
@@ -465,15 +507,6 @@ namespace CatLib
         }
 
         /// <summary>
-        /// 当静态服务被释放时
-        /// </summary>
-        /// <param name="action">处理释放时的回调</param>
-        public static IContainer OnRelease(Action<IBindData, object> action)
-        {
-            return Handler.OnRelease(action);
-        }
-
-        /// <summary>
         /// 调用一个已经被绑定的方法
         /// </summary>
         /// <param name="method">方法名</param>
@@ -488,24 +521,498 @@ namespace CatLib
         /// 以依赖注入形式调用一个方法
         /// </summary>
         /// <param name="instance">方法对象</param>
-        /// <param name="method">方法名</param>
-        /// <param name="userParams">用户传入的参数</param>
-        /// <returns>方法返回值</returns>
-        public static object Call(object instance, string method, params object[] userParams)
-        {
-            return Handler.Call(instance, method, userParams);
-        }
-
-        /// <summary>
-        /// 以依赖注入形式调用一个方法
-        /// </summary>
-        /// <param name="instance">方法对象</param>
         /// <param name="methodInfo">方法信息</param>
         /// <param name="userParams">用户传入的参数</param>
         /// <returns>方法返回值</returns>
         public static object Call(object instance, MethodInfo methodInfo, params object[] userParams)
         {
             return Handler.Call(instance, methodInfo, userParams);
+        }
+
+        /// <summary>
+        /// 构造服务
+        /// </summary>
+        /// <param name="service">服务名或别名</param>
+        /// <param name="userParams">用户传入的参数</param>
+        /// <returns>服务实例，如果构造失败那么返回null</returns>
+        public static object Make(string service, params object[] userParams)
+        {
+            return Handler.Make(service, userParams);
+        }
+
+        /// <summary>
+        /// 获取一个回调，当执行回调可以生成指定的服务
+        /// </summary>
+        /// <param name="service">服务名或别名</param>
+        /// <returns>回调方案</returns>
+        public static Func<object> Factory(string service)
+        {
+            return Handler.Factory(service);
+        }
+
+        /// <summary>
+        /// 为服务设定一个别名
+        /// </summary>
+        /// <param name="alias">别名</param>
+        /// <param name="service">映射到的服务名</param>
+        /// <returns>当前容器对象</returns>
+        public static IContainer Alias(string alias, string service)
+        {
+            return Handler.Alias(alias, service);
+        }
+
+        /// <summary>
+        /// 当服务被解决时触发的事件
+        /// </summary>
+        /// <param name="func">回调函数</param>
+        /// <returns>当前容器实例</returns>
+        public static IContainer OnResolving(Func<IBindData, object, object> func)
+        {
+            return Handler.OnResolving(func);
+        }
+
+        /// <summary>
+        /// 当静态服务被释放时
+        /// </summary>
+        /// <param name="action">处理释放时的回调</param>
+        public static IContainer OnRelease(Action<IBindData, object> action)
+        {
+            return Handler.OnRelease(action);
+        }
+
+        /// <summary>
+        /// 当查找类型无法找到时会尝试去调用开发者提供的查找类型函数
+        /// </summary>
+        /// <param name="func">查找类型的回调</param>
+        /// <param name="priority">查询优先级(值越小越优先)</param>
+        /// <returns>当前容器实例</returns>
+        public static IContainer OnFindType(Func<string, Type> func, int priority = int.MaxValue)
+        {
+            return Handler.OnFindType(func, priority);
+        }
+
+        /// <summary>
+        /// 当一个已经被解决的服务，发生重定义时触发
+        /// </summary>
+        /// <param name="service">服务名</param>
+        /// <param name="callback">回调</param>
+        /// <returns>服务容器</returns>
+        public static IContainer OnRebound(string service, Action<object> callback)
+        {
+            return Handler.OnRebound(service, callback);
+        }
+
+        /// <summary>
+        /// 关注指定的服务，当服务触发重定义时调用指定对象的指定方法
+        /// <para>调用是以依赖注入的形式进行的</para>
+        /// <para>服务的新建（第一次解决服务）操作并不会触发重定义</para>
+        /// </summary>
+        /// <param name="service">关注的服务名</param>
+        /// <param name="target">当服务发生重定义时调用的目标</param>
+        /// <param name="methodInfo">方法信息</param>
+        public static void Watch(string service, object target, MethodInfo methodInfo)
+        {
+            Handler.Watch(service, target, methodInfo);
+        }
+
+        /// <summary>
+        /// 在回调区间内暂时性的静态化服务实例
+        /// </summary>
+        /// <param name="callback">回调区间</param>
+        /// <param name="services">服务映射</param>
+        public static void Flash(Action callback, params KeyValuePair<string, object>[] services)
+        {
+            Handler.Flash(callback, services);
+        }
+
+        /// <summary>
+        /// 类型转为服务名
+        /// </summary>
+        /// <param name="type">类型</param>
+        /// <returns>转换后的服务名</returns>
+        public static string Type2Service(Type type)
+        {
+            return Handler.Type2Service(type);
+        }
+        #endregion
+
+        #region Container Extend API
+        /// <summary>
+        /// 获取服务的绑定数据,如果绑定不存在则返回null
+        /// </summary>
+        /// <typeparam name="TService">服务名</typeparam>
+        /// <returns>服务绑定数据或者null</returns>
+        public static IBindData GetBind<TService>()
+        {
+            return Handler.GetBind<TService>();
+        }
+
+        /// <summary>
+        /// 是否已经绑定了服务
+        /// </summary>
+        /// <typeparam name="TService">服务名</typeparam>
+        /// <returns>代表服务是否被绑定</returns>
+        public static bool HasBind<TService>()
+        {
+            return Handler.HasBind<TService>();
+        }
+
+        /// <summary>
+        /// 是否可以生成服务
+        /// </summary>
+        /// <typeparam name="TService">服务名</typeparam>
+        /// <returns>服务是否可以被构建</returns>
+        public static bool CanMake<TService>()
+        {
+            return Handler.CanMake<TService>();
+        }
+
+        /// <summary>
+        /// 服务是否是静态化的,如果服务不存在也将返回false
+        /// </summary>
+        /// <typeparam name="TService">服务名</typeparam>
+        /// <returns>服务是否是静态化的</returns>
+        public static bool IsStatic<TService>()
+        {
+            return Handler.IsStatic<TService>();
+        }
+
+        /// <summary>
+        /// 是否是别名
+        /// </summary>
+        /// <typeparam name="TService">服务名</typeparam>
+        /// <returns>是否是别名</returns>
+        public static bool IsAlias<TService>()
+        {
+            return Handler.IsAlias<TService>();
+        }
+
+        /// <summary>
+        /// 常规绑定一个服务
+        /// </summary>
+        /// <typeparam name="TService">服务名，同时也是服务实现</typeparam>
+        /// <returns>服务绑定数据</returns>
+        public static IBindData Bind<TService>()
+        {
+            return Handler.Bind<TService>();
+        }
+
+        /// <summary>
+        /// 常规绑定一个服务
+        /// </summary>
+        /// <typeparam name="TService">服务名</typeparam>
+        /// <typeparam name="TAlias">服务别名</typeparam>
+        /// <returns>服务绑定数据</returns>
+        public static IBindData Bind<TService, TAlias>()
+        {
+            return Handler.Bind<TService, TAlias>();
+        }
+
+        /// <summary>
+        /// 常规绑定一个服务
+        /// </summary>
+        /// <typeparam name="TService">服务名</typeparam>
+        /// <param name="concrete">服务实现</param>
+        /// <returns>服务绑定数据</returns>
+        public static IBindData Bind<TService>(Func<IContainer, object[], object> concrete)
+        {
+            return Handler.Bind<TService>(concrete);
+        }
+
+        /// <summary>
+        /// 常规绑定一个服务
+        /// </summary>
+        /// <typeparam name="TService">服务名</typeparam>
+        /// <param name="concrete">服务实现</param>
+        /// <returns>服务绑定数据</returns>
+        public static IBindData Bind<TService>(Func<object> concrete)
+        {
+            return Handler.Bind<TService>(concrete);
+        }
+
+        /// <summary>
+        /// 常规绑定一个服务
+        /// </summary>
+        /// <param name="service">服务名</param>
+        /// <param name="concrete">服务实现</param>
+        /// <returns>服务绑定数据</returns>
+        public static IBindData Bind(string service, Func<IContainer, object[], object> concrete)
+        {
+            return Handler.Bind(service, concrete);
+        }
+
+        /// <summary>
+        /// 如果服务不存在那么则绑定服务
+        /// </summary>
+        /// <typeparam name="TService">服务名</typeparam>
+        /// <typeparam name="TAlias">服务别名</typeparam>
+        /// <param name="bindData">如果绑定失败则返回历史绑定对象</param>
+        /// <returns>是否完成绑定</returns>
+        public static bool BindIf<TService, TAlias>(out IBindData bindData)
+        {
+            return Handler.BindIf<TService, TAlias>(out bindData);
+        }
+
+        /// <summary>
+        /// 如果服务不存在那么则绑定服务
+        /// </summary>
+        /// <typeparam name="TService">服务名，同时也是服务实现</typeparam>
+        /// <param name="bindData">如果绑定失败则返回历史绑定对象</param>
+        /// <returns>是否完成绑定</returns>
+        public static bool BindIf<TService>(out IBindData bindData)
+        {
+            return Handler.BindIf<TService>(out bindData);
+        }
+
+        /// <summary>
+        /// 如果服务不存在那么则绑定服务
+        /// </summary>
+        /// <typeparam name="TService">服务名</typeparam>
+        /// <param name="concrete">服务实现</param>
+        /// <param name="bindData">如果绑定失败则返回历史绑定对象</param>
+        /// <returns>是否完成绑定</returns>
+        public static bool BindIf<TService>(Func<IContainer, object[], object> concrete, out IBindData bindData)
+        {
+            return Handler.BindIf<TService>(concrete, out bindData);
+        }
+
+        /// <summary>
+        /// 如果服务不存在那么则绑定服务
+        /// </summary>
+        /// <typeparam name="TService">服务名</typeparam>
+        /// <param name="concrete">服务实现</param>
+        /// <param name="bindData">如果绑定失败则返回历史绑定对象</param>
+        /// <returns>是否完成绑定</returns>
+        public static bool BindIf<TService>(Func<object> concrete, out IBindData bindData)
+        {
+            return Handler.BindIf<TService>(concrete, out bindData);
+        }
+
+        /// <summary>
+        /// 如果服务不存在那么则绑定服务
+        /// </summary>
+        /// <param name="service">服务名</param>
+        /// <param name="concrete">服务实现</param>
+        /// <param name="bindData">如果绑定失败则返回历史绑定对象</param>
+        /// <returns>是否完成绑定</returns>
+        public static bool BindIf(string service, Func<IContainer, object[], object> concrete, out IBindData bindData)
+        {
+            return Handler.BindIf(service, concrete, out bindData);
+        }
+
+        /// <summary>
+        /// 以单例的形式绑定一个服务
+        /// </summary>
+        /// <typeparam name="TService">服务名</typeparam>
+        /// <typeparam name="TAlias">服务别名</typeparam>
+        /// <returns>服务绑定数据</returns>
+        public static IBindData Singleton<TService, TAlias>()
+        {
+            return Handler.Singleton<TService, TAlias>();
+        }
+
+        /// <summary>
+        /// 以单例的形式绑定一个服务
+        /// </summary>
+        /// <typeparam name="TService">服务名，同时也是服务实现</typeparam>
+        /// <returns>服务绑定数据</returns>
+        public static IBindData Singleton<TService>()
+        {
+            return Handler.Singleton<TService>();
+        }
+
+        /// <summary>
+        /// 以单例的形式绑定一个服务
+        /// </summary>
+        /// <typeparam name="TService">服务名</typeparam>
+        /// <param name="concrete">服务实现</param>
+        /// <returns>服务绑定数据</returns>
+        public static IBindData Singleton<TService>(Func<IContainer, object[], object> concrete)
+        {
+            return Handler.Singleton<TService>(concrete);
+        }
+
+        /// <summary>
+        /// 以单例的形式绑定一个服务
+        /// </summary>
+        /// <typeparam name="TService">服务名</typeparam>
+        /// <param name="concrete">服务实现</param>
+        /// <returns>服务绑定数据</returns>
+        public static IBindData Singleton<TService>(Func<object> concrete)
+        {
+            return Handler.Singleton<TService>(concrete);
+        }
+
+        /// <summary>
+        /// 以单例的形式绑定一个服务
+        /// </summary>
+        /// <param name="service">服务名</param>
+        /// <param name="concrete">服务实现</param>
+        /// <returns>服务绑定数据</returns>
+        public static IBindData Singleton(string service, Func<IContainer, object[], object> concrete)
+        {
+            return Handler.Singleton(service, concrete);
+        }
+
+        /// <summary>
+        /// 如果服务不存在那么则绑定服务
+        /// </summary>
+        /// <typeparam name="TService">服务名</typeparam>
+        /// <typeparam name="TAlias">服务别名</typeparam>
+        /// <param name="bindData">如果绑定失败则返回历史绑定对象</param>
+        /// <returns>是否完成绑定</returns>
+        public static bool SingletonIf<TService, TAlias>(out IBindData bindData)
+        {
+            return Handler.SingletonIf<TService, TAlias>(out bindData);
+        }
+
+        /// <summary>
+        /// 如果服务不存在那么则绑定服务
+        /// </summary>
+        /// <typeparam name="TService">服务名，同时也是服务实现</typeparam>
+        /// <param name="bindData">如果绑定失败则返回历史绑定对象</param>
+        /// <returns>是否完成绑定</returns>
+        public static bool SingletonIf<TService>(out IBindData bindData)
+        {
+            return Handler.SingletonIf<TService>(out bindData);
+        }
+
+        /// <summary>
+        /// 如果服务不存在那么则绑定服务
+        /// </summary>
+        /// <typeparam name="TService">服务名</typeparam>
+        /// <param name="concrete">服务实现</param>
+        /// <param name="bindData">如果绑定失败则返回历史绑定对象</param>
+        /// <returns>是否完成绑定</returns>
+        public static bool SingletonIf<TService>(Func<IContainer, object[], object> concrete, out IBindData bindData)
+        {
+            return Handler.SingletonIf<TService>(concrete, out bindData);
+        }
+
+        /// <summary>
+        /// 如果服务不存在那么则绑定服务
+        /// </summary>
+        /// <typeparam name="TService">服务名</typeparam>
+        /// <param name="concrete">服务实现</param>
+        /// <param name="bindData">如果绑定失败则返回历史绑定对象</param>
+        /// <returns>是否完成绑定</returns>
+        public static bool SingletonIf<TService>(Func<object> concrete, out IBindData bindData)
+        {
+            return Handler.SingletonIf<TService>(concrete, out bindData);
+        }
+
+        /// <summary>
+        /// 如果服务不存在那么则绑定服务
+        /// </summary>
+        /// <param name="service">服务名</param>
+        /// <param name="concrete">服务实现</param>
+        /// <param name="bindData">如果绑定失败则返回历史绑定对象</param>
+        /// <returns>是否完成绑定</returns>
+        public static bool SingletonIf(string service, Func<IContainer, object[], object> concrete, out IBindData bindData)
+        {
+            return Handler.SingletonIf(service, concrete, out bindData);
+        }
+
+        /// <summary>
+        /// 绑定一个方法到容器
+        /// </summary>
+        /// <param name="method">方法名</param>
+        /// <param name="target">调用目标</param>
+        /// <param name="call">调用方法</param>
+        public static IMethodBind BindMethod(string method, object target,
+            string call = null)
+        {
+            return Handler.BindMethod(method, target, call);
+        }
+
+        /// <summary>
+        /// 绑定一个方法到容器
+        /// </summary>
+        /// <param name="method">方法名</param>
+        /// <param name="callback">调用方法</param>
+        public static IMethodBind BindMethod(string method, Func<object> callback)
+        {
+            return Handler.BindMethod(method, callback);
+        }
+
+        /// <summary>
+        /// 绑定一个方法到容器
+        /// </summary>
+        /// <param name="method">方法名</param>
+        /// <param name="callback">调用方法</param>
+        public static IMethodBind BindMethod<T1>(string method, Func<T1, object> callback)
+        {
+            return Handler.BindMethod(method, callback);
+        }
+
+        /// <summary>
+        /// 绑定一个方法到容器
+        /// </summary>
+        /// <param name="method">方法名</param>
+        /// <param name="callback">调用方法</param>
+        public static IMethodBind BindMethod<T1, T2>(string method, Func<T1, T2, object> callback)
+        {
+            return Handler.BindMethod(method, callback);
+        }
+
+        /// <summary>
+        /// 绑定一个方法到容器
+        /// </summary>
+        /// <param name="method">方法名</param>
+        /// <param name="callback">调用方法</param>
+        public static IMethodBind BindMethod<T1, T2, T3>(string method, Func<T1, T2, T3, object> callback)
+        {
+            return Handler.BindMethod(method, callback);
+        }
+
+        /// <summary>
+        /// 绑定一个方法到容器
+        /// </summary>
+        /// <param name="method">方法名</param>
+        /// <param name="callback">调用方法</param>
+        public static IMethodBind BindMethod<T1, T2, T3, T4>(string method, Func<T1, T2, T3, T4, object> callback)
+        {
+            return Handler.BindMethod(method, callback);
+        }
+
+        /// <summary>
+        /// 解除服务绑定
+        /// </summary>
+        /// <typeparam name="TService">解除绑定的服务</typeparam>
+        public static void Unbind<TService>()
+        {
+            Handler.Unbind<TService>();
+        }
+
+        /// <summary>
+        /// 静态化一个服务,实例值会经过解决修饰器
+        /// </summary>
+        /// <typeparam name="TService">服务名</typeparam>
+        /// <param name="instance">实例值</param>
+        public static void Instance<TService>(object instance)
+        {
+            Handler.Instance<TService>(instance);
+        }
+
+        /// <summary>
+        /// 释放服务
+        /// </summary>
+        /// <typeparam name="TService">服务名</typeparam>
+        public static void Release<TService>()
+        {
+            Handler.Release<TService>();
+        }
+
+        /// <summary>
+        /// 以依赖注入形式调用一个方法
+        /// </summary>
+        /// <param name="instance">方法对象</param>
+        /// <param name="method">方法名</param>
+        /// <param name="userParams">用户传入的参数</param>
+        /// <returns>方法返回值</returns>
+        public static object Call(object instance, string method, params object[] userParams)
+        {
+            return Handler.Call(instance, method, userParams);
         }
 
         /// <summary>
@@ -589,24 +1096,14 @@ namespace CatLib
         }
 
         /// <summary>
-        /// 构造服务
+        /// 构造一个服务
         /// </summary>
-        /// <param name="service">服务名或别名</param>
-        /// <param name="userParams">用户传入的参数</param>
-        /// <returns>服务实例，如果构造失败那么返回null</returns>
-        public static object Make(string service, params object[] userParams)
+        /// <typeparam name="TService">服务名</typeparam>
+        /// <param name="userParams">用户参数</param>
+        /// <returns>服务实例</returns>
+        public static TService Make<TService>(params object[] userParams)
         {
-            return Handler.Make(service, userParams);
-        }
-
-        /// <summary>
-        /// 获取一个回调，当执行回调可以生成指定的服务
-        /// </summary>
-        /// <param name="service">服务名或别名</param>
-        /// <returns>回调方案</returns>
-        public static Func<object> Factory(string service)
-        {
-            return Handler.Factory(service);
+            return Handler.Make<TService>(userParams);
         }
 
         /// <summary>
@@ -620,385 +1117,15 @@ namespace CatLib
         }
 
         /// <summary>
-        /// 为服务设定一个别名
-        /// </summary>
-        /// <param name="alias">别名</param>
-        /// <param name="service">映射到的服务名</param>
-        /// <returns>当前容器对象</returns>
-        public static IContainer Alias(string alias, string service)
-        {
-            return Handler.Alias(alias, service);
-        }
-
-        /// <summary>
-        /// 当服务被解决时触发的事件
-        /// </summary>
-        /// <param name="func">回调函数</param>
-        /// <returns>当前容器实例</returns>
-        public static IContainer OnResolving(Func<IBindData, object, object> func)
-        {
-            return Handler.OnResolving(func);
-        }
-
-        /// <summary>
-        /// 当查找类型无法找到时会尝试去调用开发者提供的查找类型函数
-        /// </summary>
-        /// <param name="func">查找类型的回调</param>
-        /// <param name="priority">查询优先级(值越小越优先)</param>
-        /// <returns>当前容器实例</returns>
-        public static IContainer OnFindType(Func<string, Type> func, int priority = int.MaxValue)
-        {
-            return Handler.OnFindType(func, priority);
-        }
-
-        /// <summary>
-        /// 当一个已经被解决的服务，发生重定义时触发
-        /// </summary>
-        /// <param name="service">服务名</param>
-        /// <param name="callback">回调</param>
-        /// <returns>服务容器</returns>
-        public static IContainer OnRebound(string service, Action<object> callback)
-        {
-            return Handler.OnRebound(service, callback);
-        }
-
-        /// <summary>
         /// 关注指定的服务，当服务触发重定义时调用指定对象的指定方法
-        /// <para>调用是以依赖注入的形式进行的</para>
-        /// <para>服务的新建（第一次解决服务）操作并不会触发重定义</para>
+        /// <param>调用是以依赖注入的形式进行的</param>
         /// </summary>
         /// <param name="service">关注的服务名</param>
         /// <param name="target">当服务发生重定义时调用的目标</param>
-        /// <param name="methodInfo">方法信息</param>
-        public static void Watch(string service, object target, MethodInfo methodInfo)
-        {
-            Handler.Watch(service, target, methodInfo);
-        }
-
-        /// <summary>
-        /// 类型转为服务名
-        /// </summary>
-        /// <param name="type">类型</param>
-        /// <returns>转换后的服务名</returns>
-        public static string Type2Service(Type type)
-        {
-            return Handler.Type2Service(type);
-        }
-
-        /// <summary>
-        /// 解除服务绑定
-        /// </summary>
-        /// <typeparam name="T">解除绑定的服务</typeparam>
-        public static void Unbind<T>()
-        {
-            Handler.Unbind<T>();
-        }
-
-        /// <summary>
-        /// 以单例的形式绑定一个服务
-        /// </summary>
-        /// <param name="service">服务名</param>
-        /// <param name="concrete">服务实现</param>
-        /// <returns>服务绑定数据</returns>
-        public static IBindData Singleton(string service, Func<IContainer, object[], object> concrete)
-        {
-            return Handler.Singleton(service, concrete);
-        }
-
-        /// <summary>
-        /// 以单例的形式绑定一个服务
-        /// </summary>
-        /// <typeparam name="TService">服务名</typeparam>
-        /// <typeparam name="TAlias">服务别名</typeparam>
-        /// <returns>服务绑定数据</returns>
-        public static IBindData Singleton<TService, TAlias>()
-        {
-            return Handler.Singleton<TService, TAlias>();
-        }
-
-        /// <summary>
-        /// 以单例的形式绑定一个服务
-        /// </summary>
-        /// <typeparam name="TService">服务名，同时也是服务实现</typeparam>
-        /// <returns>服务绑定数据</returns>
-        public static IBindData Singleton<TService>()
-        {
-            return Handler.Singleton<TService>();
-        }
-
-        /// <summary>
-        /// 以单例的形式绑定一个服务
-        /// </summary>
-        /// <typeparam name="TService">服务名</typeparam>
-        /// <param name="concrete">服务实现</param>
-        /// <returns>服务绑定数据</returns>
-        public static IBindData Singleton<TService>(Func<IContainer, object[], object> concrete)
-        {
-            return Handler.Singleton<TService>(concrete);
-        }
-
-        /// <summary>
-        /// 如果服务不存在那么则绑定服务
-        /// </summary>
-        /// <typeparam name="TService">服务名</typeparam>
-        /// <typeparam name="TAlias">服务别名</typeparam>
-        /// <param name="bindData">如果绑定失败则返回历史绑定对象</param>
-        /// <returns>是否完成绑定</returns>
-        public static bool SingletonIf<TService, TAlias>(out IBindData bindData)
-        {
-            return Handler.SingletonIf<TService, TAlias>(out bindData);
-        }
-
-        /// <summary>
-        /// 如果服务不存在那么则绑定服务
-        /// </summary>
-        /// <typeparam name="TService">服务名，同时也是服务实现</typeparam>
-        /// <param name="bindData">如果绑定失败则返回历史绑定对象</param>
-        /// <returns>是否完成绑定</returns>
-        public static bool SingletonIf<TService>(out IBindData bindData)
-        {
-            return Handler.SingletonIf<TService>(out bindData);
-        }
-
-        /// <summary>
-        /// 如果服务不存在那么则绑定服务
-        /// </summary>
-        /// <typeparam name="TService">服务名</typeparam>
-        /// <param name="concrete">服务实现</param>
-        /// <param name="bindData">如果绑定失败则返回历史绑定对象</param>
-        /// <returns>是否完成绑定</returns>
-        public static bool SingletonIf<TService>(Func<IContainer, object[], object> concrete, out IBindData bindData)
-        {
-            return Handler.SingletonIf<TService>(concrete, out bindData);
-        }
-
-        /// <summary>
-        /// 如果服务不存在那么则绑定服务
-        /// </summary>
-        /// <param name="service">服务名</param>
-        /// <param name="concrete">服务实现</param>
-        /// <param name="bindData">如果绑定失败则返回历史绑定对象</param>
-        /// <returns>是否完成绑定</returns>
-        public static bool SingletonIf(string service, Func<IContainer, object[], object> concrete, out IBindData bindData)
-        {
-            return Handler.SingletonIf(service, concrete, out bindData);
-        }
-
-        /// <summary>
-        /// 常规绑定一个服务
-        /// </summary>
-        /// <typeparam name="TService">服务名</typeparam>
-        /// <typeparam name="TAlias">服务别名</typeparam>
-        /// <returns>服务绑定数据</returns>
-        public static IBindData Bind<TService, TAlias>()
-        {
-            return Handler.Bind<TService, TAlias>();
-        }
-
-        /// <summary>
-        /// 常规绑定一个服务
-        /// </summary>
-        /// <typeparam name="TService">服务名，同时也是服务实现</typeparam>
-        /// <returns>服务绑定数据</returns>
-        public static IBindData Bind<TService>()
-        {
-            return Handler.Bind<TService>();
-        }
-
-        /// <summary>
-        /// 常规绑定一个服务
-        /// </summary>
-        /// <typeparam name="TService">服务名</typeparam>
-        /// <param name="concrete">服务实现</param>
-        /// <returns>服务绑定数据</returns>
-        public static IBindData Bind<TService>(Func<IContainer, object[], object> concrete)
-        {
-            return Handler.Bind<TService>(concrete);
-        }
-
-        /// <summary>
-        /// 常规绑定一个服务
-        /// </summary>
-        /// <param name="service">服务名</param>
-        /// <param name="concrete">服务实现</param>
-        /// <returns>服务绑定数据</returns>
-        public static IBindData Bind(string service, Func<IContainer, object[], object> concrete)
-        {
-            return Handler.Bind(service, concrete);
-        }
-
-        /// <summary>
-        /// 如果服务不存在那么则绑定服务
-        /// </summary>
-        /// <typeparam name="TService">服务名</typeparam>
-        /// <typeparam name="TAlias">服务别名</typeparam>
-        /// <param name="bindData">如果绑定失败则返回历史绑定对象</param>
-        /// <returns>是否完成绑定</returns>
-        public static bool BindIf<TService, TAlias>(out IBindData bindData)
-        {
-            return Handler.BindIf<TService, TAlias>(out bindData);
-        }
-
-        /// <summary>
-        /// 如果服务不存在那么则绑定服务
-        /// </summary>
-        /// <typeparam name="TService">服务名，同时也是服务实现</typeparam>
-        /// <param name="bindData">如果绑定失败则返回历史绑定对象</param>
-        /// <returns>是否完成绑定</returns>
-        public static bool BindIf<TService>(out IBindData bindData)
-        {
-            return Handler.BindIf<TService>(out bindData);
-        }
-
-        /// <summary>
-        /// 如果服务不存在那么则绑定服务
-        /// </summary>
-        /// <typeparam name="TService">服务名</typeparam>
-        /// <param name="concrete">服务实现</param>
-        /// <param name="bindData">如果绑定失败则返回历史绑定对象</param>
-        /// <returns>是否完成绑定</returns>
-        public static bool BindIf<TService>(Func<IContainer, object[], object> concrete, out IBindData bindData)
-        {
-            return Handler.BindIf<TService>(concrete, out bindData);
-        }
-
-        /// <summary>
-        /// 如果服务不存在那么则绑定服务
-        /// </summary>
-        /// <param name="service">服务名</param>
-        /// <param name="concrete">服务实现</param>
-        /// <param name="bindData">如果绑定失败则返回历史绑定对象</param>
-        /// <returns>是否完成绑定</returns>
-        public static bool BindIf(string service, Func<IContainer, object[], object> concrete, out IBindData bindData)
-        {
-            return Handler.BindIf(service, concrete, out bindData);
-        }
-
-        /// <summary>
-        /// 绑定一个方法到容器
-        /// </summary>
         /// <param name="method">方法名</param>
-        /// <param name="target">调用目标</param>
-        /// <param name="call">调用方法</param>
-        public static IMethodBind BindMethod(string method, object target,
-            string call = null)
+        public static void Watch(string service, object target, string method)
         {
-            return Handler.BindMethod(method, target, call);
-        }
-
-        /// <summary>
-        /// 绑定一个方法到容器
-        /// </summary>
-        /// <param name="method">方法名</param>
-        /// <param name="target">调用目标</param>
-        /// <param name="call">调用方法</param>
-        /// <returns>方法绑定数据</returns>
-        public static IMethodBind BindMethod(string method, object target, MethodInfo call)
-        {
-            return Handler.BindMethod(method, target, call);
-        }
-
-        /// <summary>
-        /// 绑定一个方法到容器
-        /// </summary>
-        /// <param name="method">方法名</param>
-        /// <param name="callback">调用方法</param>
-        public static IMethodBind BindMethod(string method, Func<object> callback)
-        {
-            return Handler.BindMethod(method, callback);
-        }
-
-        /// <summary>
-        /// 绑定一个方法到容器
-        /// </summary>
-        /// <param name="method">方法名</param>
-        /// <param name="callback">调用方法</param>
-        public static IMethodBind BindMethod<T1>(string method, Func<T1, object> callback)
-        {
-            return Handler.BindMethod(method, callback);
-        }
-
-        /// <summary>
-        /// 绑定一个方法到容器
-        /// </summary>
-        /// <param name="method">方法名</param>
-        /// <param name="callback">调用方法</param>
-        public static IMethodBind BindMethod<T1, T2>(string method, Func<T1, T2, object> callback)
-        {
-            return Handler.BindMethod(method, callback);
-        }
-
-        /// <summary>
-        /// 绑定一个方法到容器
-        /// </summary>
-        /// <param name="method">方法名</param>
-        /// <param name="callback">调用方法</param>
-        public static IMethodBind BindMethod<T1, T2, T3>(string method, Func<T1, T2, T3, object> callback)
-        {
-            return Handler.BindMethod(method, callback);
-        }
-
-        /// <summary>
-        /// 绑定一个方法到容器
-        /// </summary>
-        /// <param name="method">方法名</param>
-        /// <param name="callback">调用方法</param>
-        public static IMethodBind BindMethod<T1, T2, T3, T4>(string method, Func<T1, T2, T3, T4, object> callback)
-        {
-            return Handler.BindMethod(method, callback);
-        }
-
-        /// <summary>
-        /// 解除绑定的方法
-        /// </summary>
-        /// <param name="target">
-        /// 解除目标
-        /// <para>如果为字符串则作为调用方法名</para>
-        /// <para>如果为<code>IMethodBind</code>则作为指定方法</para>
-        /// <para>如果为其他对象则作为调用目标做全体解除</para>
-        /// </param>
-        public static void UnbindMethod(object target)
-        {
-            Handler.UnbindMethod(target);
-        }
-
-        /// <summary>
-        /// 解除绑定服务
-        /// </summary>
-        /// <param name="service">服务名或者别名</param>
-        public static void Unbind(string service)
-        {
-            Handler.Unbind(service);
-        }
-
-        /// <summary>
-        /// 构造一个服务
-        /// </summary>
-        /// <typeparam name="TService">服务名</typeparam>
-        /// <param name="userParams">用户参数</param>
-        /// <returns>服务实例</returns>
-        public static TService Make<TService>(params object[] userParams)
-        {
-            return Handler.Make<TService>(userParams);
-        }
-
-        /// <summary>
-        /// 释放服务
-        /// </summary>
-        /// <typeparam name="TService">服务名</typeparam>
-        public static void Release<TService>()
-        {
-            Handler.Release<TService>();
-        }
-
-        /// <summary>
-        /// 静态化一个服务,实例值会经过解决修饰器
-        /// </summary>
-        /// <typeparam name="TService">服务名</typeparam>
-        /// <param name="instance">实例值</param>
-        public static void Instance<TService>(object instance)
-        {
-            Handler.Instance<TService>(instance);
+            Handler.Watch(service, target, method);
         }
 
         /// <summary>
@@ -1013,13 +1140,14 @@ namespace CatLib
         }
 
         /// <summary>
-        /// 在回调区间内暂时性的静态化服务实例
+        /// 类型转为服务名
         /// </summary>
-        /// <param name="callback">回调区间</param>
-        /// <param name="serviceMapping">服务映射</param>
-        public static void Flash(Action callback, params KeyValuePair<string, object>[] serviceMapping)
+        /// <typeparam name="TService">服务类型</typeparam>
+        /// <returns>服务名</returns>
+        public static string Type2Service<TService>()
         {
-            Handler.Flash(callback, serviceMapping);
+            return Handler.Type2Service<TService>();
         }
+        #endregion
     }
 }

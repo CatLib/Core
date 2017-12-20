@@ -576,7 +576,7 @@ namespace CatLib.Tests.Stl
         {
             var container = MakeContainer();
             container.Instance<Container>(container);
-            container.Alias<Container>("123");
+            container.Alias("123", container.Type2Service<Container>());
 
             Assert.AreEqual(true, container.IsAlias("123"));
             Assert.AreEqual(false, container.IsAlias(container.Type2Service(typeof(Container))));
