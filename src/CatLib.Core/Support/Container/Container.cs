@@ -916,7 +916,20 @@ namespace CatLib
         /// <returns>解决结果</returns>
         protected virtual object ResloveAttrClass(Bindable makeServiceBindData, string service, PropertyInfo baseParam)
         {
-            return Make(makeServiceBindData.GetContextual(service));
+            try
+            {
+                return Make(makeServiceBindData.GetContextual(service));
+            }
+            catch (Exception)
+            {
+                var result = SpeculationServiceByParamName(makeServiceBindData, baseParam.Name, baseParam.PropertyType);
+                if (result != null)
+                {
+                    return result;
+                }
+
+                throw;
+            }
         }
 
         /// <summary>
@@ -963,10 +976,17 @@ namespace CatLib
             }
             catch (UnresolvableException)
             {
+                var result = SpeculationServiceByParamName(makeServiceBindData, baseParam.Name, baseParam.ParameterType);
+                if (result != null)
+                {
+                    return result;
+                }
+
                 if (baseParam.IsOptional)
                 {
                     return baseParam.DefaultValue;
                 }
+
                 throw;
             }
         }
