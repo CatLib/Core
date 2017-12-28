@@ -134,7 +134,9 @@ namespace CatLib.Tests
             Assert.AreEqual(true, App.BindIf<object>(out bindData));
             Assert.AreEqual(typeof(object), app.Make<object>().GetType());
 
-            Assert.AreEqual(true, App.BindIf<int>((c, p) => 100, out bindData));
+            Assert.AreEqual(true, App.BindIf<long>((c,p) => 100, out bindData));
+            Assert.AreEqual(true, App.BindIf<int>(() => 100, out bindData));
+            Assert.AreEqual(100, App.Make<int>());
             Assert.AreEqual(true, App.BindIf<double, float>(out bindData));
             Assert.AreEqual(false, App.BindIf<double, float>(out bindData));
 
@@ -158,11 +160,62 @@ namespace CatLib.Tests
             Assert.AreEqual(true, App.SingletonIf<object>(out bindData));
             Assert.AreEqual(typeof(object), app.Make<object>().GetType());
 
-            Assert.AreEqual(true, App.SingletonIf<int>((c, p) => 100, out bindData));
+            Assert.AreEqual(true, App.SingletonIf<long>((c, p) => 100, out bindData));
+            Assert.AreEqual(true, App.SingletonIf<int>(() => 100, out bindData));
+            Assert.AreEqual(100, App.Make<int>());
             Assert.AreEqual(true, App.SingletonIf<double, float>(out bindData));
             Assert.AreEqual(false, App.SingletonIf<double, float>(out bindData));
 
             Assert.AreEqual(typeof(double), App.Make<double>(App.Type2Service(typeof(float))).GetType());
+        }
+
+        [TestMethod]
+        public void TestGetBind()
+        {
+            var container = new Container();
+            var bind = container.Bind<IApplication>(() => "helloworld");
+
+            Assert.AreEqual("helloworld", container.Make(container.Type2Service<IApplication>()));
+            Assert.AreEqual(true, container.HasBind<IApplication>());
+            Assert.AreSame(bind, container.GetBind<IApplication>());
+        }
+
+        [TestMethod]
+        public void TestCanMake()
+        {
+            var container = new Container();
+
+            Assert.AreEqual(false, container.CanMake<IApplication>());
+            container.Bind<IApplication>(() => "helloworld");
+            Assert.AreEqual(true, container.CanMake<IApplication>());
+        }
+
+        [TestMethod]
+        public void TestIsStatic()
+        {
+            var container = new Container();
+            container.Bind<IApplication>(() => "helloworld");
+            Assert.AreEqual(false, container.IsStatic<IApplication>());
+            container.Unbind<IApplication>();
+            container.Singleton<IApplication>(() => "helloworld");
+            Assert.AreEqual("helloworld", container.Make(container.Type2Service<IApplication>()));
+            Assert.AreEqual(true, container.IsStatic<IApplication>());
+        }
+
+        [TestMethod]
+        public void TestIsAlias()
+        {
+            var container = new Container();
+            container.Bind<IApplication>(() => "helloworld").Alias<IContainer>();
+            Assert.AreEqual(false, container.IsAlias<IApplication>());
+            Assert.AreEqual(true, container.IsAlias<IContainer>());
+        }
+
+        [TestMethod]
+        public void TestGetService()
+        {
+            var container = new Container();
+            Assert.AreEqual(container.Type2Service(typeof(string)), container.Type2Service<string>());
         }
 
         /// <summary>

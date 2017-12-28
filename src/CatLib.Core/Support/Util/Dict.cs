@@ -46,30 +46,33 @@ namespace CatLib
         }
 
         /// <summary>
-        /// 将输入字典中的每个值传给回调函数，如果回调函数返回 true，则移除字典中对应的元素
+        /// 将输入字典中的每个值传给回调函数，如果回调函数返回 true，则移除字典中对应的元素，并返回被移除的元素
         /// </summary>
         /// <typeparam name="TKey">字典键类型</typeparam>
         /// <typeparam name="TValue">字典值类型</typeparam>
         /// <param name="source">规定字典</param>
         /// <param name="predicate">回调函数</param>
-        public static void Remove<TKey, TValue>(IDictionary<TKey, TValue> source, Func<TKey, TValue, bool> predicate)
+        /// <return>被移除的元素</return>
+        public static KeyValuePair<TKey,TValue>[] Remove<TKey, TValue>(IDictionary<TKey, TValue> source, Func<TKey, TValue, bool> predicate)
         {
             Guard.Requires<ArgumentNullException>(source != null);
             Guard.Requires<ArgumentNullException>(predicate != null);
 
-            var list = new List<TKey>();
+            var results = new List<KeyValuePair<TKey, TValue>>();
             foreach (var result in source)
             {
                 if (predicate.Invoke(result.Key, result.Value))
                 {
-                    list.Add(result.Key);
+                    results.Add(result);
                 }
             }
 
-            foreach (var result in list)
+            foreach (var result in results)
             {
-                source.Remove(result);
+                source.Remove(result.Key);
             }
+
+            return results.ToArray();
         }
 
         /// <summary>
@@ -102,7 +105,7 @@ namespace CatLib
         }
 
         /// <summary>
-        /// 批量添加到字典
+        /// 将元素批量添加到字典
         /// </summary>
         /// <typeparam name="TKey">字典键</typeparam>
         /// <typeparam name="TValue">字典值</typeparam>
@@ -233,7 +236,7 @@ namespace CatLib
         }
 
         /// <summary>
-        /// 使用点（.）来访问深度字典，并移除其中一个值
+        /// 使用点（.）来访问深度字典，并移除其中指定的值
         /// </summary>
         /// <param name="dict">规定字典</param>
         /// <param name="key">键，支持使用点（.）来进行深度访问</param>
