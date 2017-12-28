@@ -78,6 +78,7 @@
     <Compile Include="..\CatLib.Core\Support\Container\InjectAttribute.cs" Link="Support\Container\InjectAttribute.cs" />
     <Compile Include="..\CatLib.Core\Support\Container\MethodBind.cs" Link="Support\Container\MethodBind.cs" />
     <Compile Include="..\CatLib.Core\Support\Container\MethodContainer.cs" Link="Support\Container\MethodContainer.cs" />
+    <Compile Include="..\CatLib.Core\Support\Container\Params.cs" Link="Support\Container\Params.cs" />
     <Compile Include="..\CatLib.Core\Support\Container\UnresolvableException.cs" Link="Support\Container\UnresolvableException.cs" />
     <Compile Include="..\CatLib.Core\Support\Events\Dispatcher.cs" Link="Support\Events\Dispatcher.cs" />
     <Compile Include="..\CatLib.Core\Support\Events\DispatcherExtend.cs" Link="Support\Events\DispatcherExtend.cs" />

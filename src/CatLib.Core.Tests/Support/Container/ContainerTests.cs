@@ -643,6 +643,17 @@ namespace CatLib.Tests.Stl
             Assert.AreEqual(777, result);
         }
 
+        [TestMethod]
+        public void TestContainerCallWithErrorParams()
+        {
+            var container = MakeContainer();
+            container.Instance("@num", "helloworld");
+            ExceptionAssert.Throws<UnresolvableException>(() =>
+            {
+                container.Call(this, "TestContainerCall", null);
+            });
+        }
+
         /// <summary>
         /// 测试无效的传入参数
         /// </summary>
@@ -1704,6 +1715,106 @@ namespace CatLib.Tests.Stl
             }
             Assert.AreEqual(true, isThrow);
             Assert.AreEqual(true, isException);
+        }
+
+        private class ParamsTypeInjectTest
+        {
+            public int num1;
+            public long num2;
+            public string str;
+
+            public ParamsTypeInjectTest(int num1, long num2,string str)
+            {
+                this.num1 = num1;
+                this.num2 = num2;
+                this.str = str;
+            }
+        }
+
+        [TestMethod]
+        public void TestParamsUserParams()
+        {
+            var container = MakeContainer();
+            container.Bind<ParamsTypeInjectTest>();
+
+            var result = container.Make<ParamsTypeInjectTest>(new Params
+            {
+                {"num2", 100},
+                {"num1", 50},
+                {"str", "helloworld"},
+            }, 100, 200, "dog");
+
+            Assert.AreEqual(50, result.num1);
+            Assert.AreEqual(100, result.num2);
+            Assert.AreEqual("helloworld", result.str);
+        }
+
+        [TestMethod]
+        public void TestMultParamsUserParams()
+        {
+            var container = MakeContainer();
+            container.Bind<ParamsTypeInjectTest>();
+
+            var result = container.Make<ParamsTypeInjectTest>(new Params
+            {
+                {"num2", 100},
+                {"num1", 50},
+            }, 100, new Params
+            {
+                {"num2", 500},
+                {"num1", 4000},
+                {"str", "helloworld"},
+            }, 200, "dog");
+
+            Assert.AreEqual(50, result.num1);
+            Assert.AreEqual(100, result.num2);
+            Assert.AreEqual("helloworld", result.str);
+        }
+
+        [TestMethod]
+        public void TestParamsUserParamsThrowError()
+        {
+            var container = MakeContainer();
+            container.Bind<ParamsTypeInjectTest>();
+
+            ExceptionAssert.Throws<UnresolvableException>(() =>
+            {
+                var result = container.Make<ParamsTypeInjectTest>(new Params
+                {
+                    {"num2", 100},
+                    {"num1", "helloworld"},
+                    {"str", "helloworld"},
+                });
+            });
+        }
+
+        private class ContainerReplaceThrow : Container
+        {
+            // 测试由于开发者写错代码导致的bug是否被正确抛出异常
+            protected override Func<ParameterInfo, object> GetParamsMatcher(ref object[] userParams)
+            {
+                return (param) =>
+                {
+                    return 200;
+                };
+            }
+        }
+
+        [TestMethod]
+        public void TestReplaceContainerParamsUserParamsThrowError()
+        {
+            var container = new ContainerReplaceThrow();
+            container.Bind<ParamsTypeInjectTest>();
+
+            ExceptionAssert.Throws<UnresolvableException>(() =>
+            {
+                container.Make<ParamsTypeInjectTest>(new Params
+                {
+                    {"num2", 100},
+                    {"num1", "helloworld"},
+                    {"str", "helloworld"},
+                });
+            });
         }
 
         /// <summary>

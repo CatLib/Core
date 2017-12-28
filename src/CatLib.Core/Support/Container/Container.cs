@@ -806,16 +806,11 @@ namespace CatLib
             for (var n = 0; n < userParams.Length; n++)
             {
                 var userParam = userParams[n];
-                if (baseParam.ParameterType.IsInstanceOfType(userParam))
-                {
-                    return Arr.RemoveAt(ref userParams, n);
-                }
 
-                object result;
-                if (ChangeType(userParam, baseParam.ParameterType, out result))
+                if (ChangeType(ref userParam, baseParam.ParameterType))
                 {
                     Arr.RemoveAt(ref userParams, n);
-                    return result;
+                    return userParam;
                 }
             }
 
@@ -825,17 +820,21 @@ namespace CatLib
         /// <summary>
         /// 转换参数类型
         /// </summary>
-        /// <param name="param">参数</param>
+        /// <param name="result">需要转换的参数</param>
         /// <param name="conversionType">转换到的类型</param>
-        /// <param name="result">转换后的结果</param>
         /// <returns>是否转换成功</returns>
-        protected virtual bool ChangeType(object param, Type conversionType, out object result)
+        protected virtual bool ChangeType(ref object result, Type conversionType)
         {
             try
             {
-                if (conversionType.IsPrimitive && param is IConvertible)
+                if (conversionType.IsInstanceOfType(result))
                 {
-                    result = Convert.ChangeType(param, conversionType);
+                    return true;
+                }
+
+                if (conversionType.IsPrimitive && result is IConvertible)
+                {
+                    result = Convert.ChangeType(result, conversionType);
                     return true;
                 }
             }
@@ -845,7 +844,6 @@ namespace CatLib
                 // when throw exception then stop inject
             }
 
-            result = null;
             return false;
         }
 
@@ -988,8 +986,7 @@ namespace CatLib
             }
 
             var instance = Make(service);
-            ChangeType(instance, paramType, out instance);
-            return instance;
+            return ChangeType(ref instance, paramType) ? instance : null;
         }
 
         /// <summary>
@@ -1198,13 +1195,31 @@ namespace CatLib
             var result = userParams;
             userParams = null;
 
-            if (baseParam.ParameterType == typeof(object) 
+            if (baseParam.ParameterType == typeof(object)
                 && result != null && result.Length == 1)
             {
                 return result[0];
             }
 
             return result;
+        }
+
+        /// <summary>
+        /// 获取参数(<see cref="Params"/>)匹配器
+        /// <para>开发者重写后可以实现自己的匹配器</para>
+        /// <para>如果调用获取到的匹配器后返回结果为null则表示没有匹配到参数</para>
+        /// </summary>
+        /// <param name="userParams">用户传入的参数</param>
+        /// <returns>匹配器，如果返回null则表示没有匹配器</returns>
+        protected virtual Func<ParameterInfo, object> GetParamsMatcher(ref object[] userParams)
+        {
+            if (userParams == null || userParams.Length <= 0)
+            {
+                return null;
+            }
+
+            var tables = GetParamsTypeInUserParams(ref userParams);
+            return tables.Length <= 0 ? null : MakeParamsMatcher(tables);
         }
 
         /// <summary>
@@ -1219,41 +1234,54 @@ namespace CatLib
         {
             var results = new List<object>(baseParams.Length);
 
+            // 获取一个参数匹配器用于筛选参数
+            var matcher = GetParamsMatcher(ref userParams);
+
             foreach (var baseParam in baseParams)
             {
+                // 使用参数匹配器对参数进行匹配，参数匹配器是最先进行的，因为他们的匹配精度是最准确的
+                var param = (matcher == null) ? null : matcher(baseParam);
+
                 // 当容器发现开发者使用 object 或者 object[] 作为参数类型时
                 // 我们尝试将所有用户传入的用户参数紧缩注入
-                var param = GetCompactInjectUserParams(baseParam, ref userParams);
-                if (param != null)
-                {
-                    results.Add(param);
-                    continue;
-                }
+                param = param ?? GetCompactInjectUserParams(baseParam, ref userParams);
 
                 // 从用户传入的参数中挑选合适的参数，按照相对顺序依次注入
-                param = GetDependenciesFromUserParams(baseParam, ref userParams);
-                if (param != null)
+                param = param ?? GetDependenciesFromUserParams(baseParam, ref userParams);
+
+                string needService = null;
+
+                if (param == null)
                 {
-                    results.Add(param);
-                    continue;
+                    // 尝试通过依赖注入容器来生成所需求的参数
+                    needService = GetParamNeedsService(baseParam);
+
+                    if (baseParam.ParameterType.IsClass
+                        || baseParam.ParameterType.IsInterface)
+                    {
+                        param = ResloveClass(makeServiceBindData, needService, baseParam);
+                    }
+                    else
+                    {
+                        param = ResolvePrimitive(makeServiceBindData, needService, baseParam);
+                    }
                 }
 
-                // 尝试通过依赖注入容器来生成所需求的参数
-                var needService = GetParamNeedsService(baseParam);
-
-                if (baseParam.ParameterType.IsClass
-                    || baseParam.ParameterType.IsInterface)
-                {
-                    param = ResloveClass(makeServiceBindData, needService, baseParam);
-                }
-                else
-                {
-                    param = ResolvePrimitive(makeServiceBindData, needService, baseParam);
-                }
-
+                // 对筛选到的参数进行注入检查
                 if (!CanInject(baseParam.ParameterType, param))
                 {
-                    throw new UnresolvableException("[" + makeServiceBindData.Service + "] Params inject type must be [" + baseParam.ParameterType + "] , But instance is [" + param.GetType() + "] Make service is [" + needService + "].");
+                    var error = "[" + makeServiceBindData.Service + "] Params inject type must be [" +
+                                   baseParam.ParameterType + "] , But instance is [" + param.GetType() + "]";
+                    if (needService == null)
+                    {
+                        error += " Inject params from user incoming parameters.";
+                    }
+                    else
+                    {
+                        error += " Make service is [" + needService + "].";
+                    }
+
+                    throw new UnresolvableException(error);
                 }
 
                 results.Add(param);
@@ -1515,6 +1543,51 @@ namespace CatLib
         {
             BindData bindData;
             return binds.TryGetValue(service, out bindData) ? bindData : MakeEmptyBindData(service);
+        }
+
+        /// <summary>
+        /// 从<paramref name="userParams"/>中获取<see cref="Params"/>类型的变量
+        /// </summary>
+        /// <param name="userParams">用户传入参数</param>
+        /// <returns>获取到的参数</returns>
+        private Params[] GetParamsTypeInUserParams(ref object[] userParams)
+        {
+            var elements = Arr.Remove(ref userParams, value => value is Params);
+            var results = new Params[elements.Length];
+            for (var i = 0; i < elements.Length; i++)
+            {
+                results[i] = (Params)elements[i];
+            }
+            return results;
+        }
+
+        /// <summary>
+        /// 生成一个默认的参数<see cref="Params" />匹配器
+        /// </summary>
+        /// <param name="tables">参数表</param>
+        /// <returns>匹配器</returns>
+        private Func<ParameterInfo, object> MakeParamsMatcher(Params[] tables)
+        {
+            // 默认匹配器策略将会将参数名和参数表的参数名进行匹配
+            // 最先匹配到的有效参数值将作为返回值返回
+            return (parameterInfo) =>
+            {
+                foreach (var table in tables)
+                {
+                    object result;
+                    if (!table.TryGetValue(parameterInfo.Name, out result))
+                    {
+                        continue;
+                    }
+
+                    if (ChangeType(ref result, parameterInfo.ParameterType))
+                    {
+                        return result;
+                    }
+                }
+
+                return null;
+            };
         }
     }
 }

@@ -10,6 +10,7 @@
  */
 
 using System;
+using System.Collections.Generic;
 
 namespace CatLib
 {
@@ -227,6 +228,38 @@ namespace CatLib
             }
 
             return requested;
+        }
+
+        /// <summary>
+        /// 将数组每个值传给回调函数，如果回调函数返回 true，则移除数组中对应的元素，并返回被移除的元素
+        /// </summary>
+        /// <typeparam name="T">数组类型</typeparam>
+        /// <param name="source">规定数组</param>
+        /// <param name="predicate">回调函数</param>
+        /// <returns>被移除的数组</returns>
+        public static T[] Remove<T>(ref T[] source, Predicate<T> predicate)
+        {
+            Guard.Requires<ArgumentNullException>(source != null);
+            Guard.Requires<ArgumentNullException>(predicate != null);
+
+            if (source.Length <= 0)
+            {
+                return new T[] { };
+            }
+
+            var results = new List<T>();
+
+            for (var i = source.Length - 1; i >= 0; i--)
+            {
+                if (!predicate.Invoke(source[i]))
+                {
+                    continue;
+                }
+                results.Add(source[i]);
+                RemoveAt(ref source, i);
+            }
+
+            return Reverse(results.ToArray());
         }
 
         /// <summary>
