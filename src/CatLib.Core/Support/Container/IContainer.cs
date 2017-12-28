@@ -59,19 +59,19 @@ namespace CatLib
         /// 绑定一个服务
         /// </summary>
         /// <param name="service">服务名</param>
-        /// <param name="concrete">服务实体</param>
+        /// <param name="concrete">服务实现</param>
         /// <param name="isStatic">服务是否静态化</param>
         /// <returns>服务绑定数据</returns>
-        IBindData Bind(string service, Func<IContainer, object[], object> concrete, bool isStatic);
+        IBindData Bind(string service, Type concrete, bool isStatic);
 
         /// <summary>
         /// 绑定一个服务
         /// </summary>
         /// <param name="service">服务名</param>
-        /// <param name="concrete">服务实现</param>
+        /// <param name="concrete">服务实体</param>
         /// <param name="isStatic">服务是否静态化</param>
         /// <returns>服务绑定数据</returns>
-        IBindData Bind(string service, Type concrete, bool isStatic);
+        IBindData Bind(string service, Func<IContainer, object[], object> concrete, bool isStatic);
 
         /// <summary>
         /// 如果服务不存在那么则绑定服务
@@ -241,8 +241,8 @@ namespace CatLib
         /// 在回调区间内暂时性的静态化服务实例
         /// </summary>
         /// <param name="callback">回调区间</param>
-        /// <param name="serviceMapping">服务映射</param>
-        void Flash(Action callback, params KeyValuePair<string, object>[] serviceMapping);
+        /// <param name="services">服务映射</param>
+        void Flash(Action callback, params KeyValuePair<string, object>[] services);
 
         /// <summary>
         /// 类型转为服务名
