@@ -763,12 +763,12 @@ namespace CatLib
         /// 在回调区间内暂时性的静态化服务实例
         /// </summary>
         /// <param name="callback">回调区间</param>
-        /// <param name="serviceMapping">服务映射</param>
-        public void Flash(Action callback, params KeyValuePair<string, object>[] serviceMapping)
+        /// <param name="services">服务映射</param>
+        public void Flash(Action callback, params KeyValuePair<string, object>[] services)
         {
             lock (syncRoot)
             {
-                foreach (var service in serviceMapping)
+                foreach (var service in services)
                 {
                     if (HasInstance(service.Key))
                     {
@@ -781,7 +781,7 @@ namespace CatLib
                     }
                 }
 
-                Arr.Flash(serviceMapping,
+                Arr.Flash(services,
                     service => Instance(service.Key, service.Value),
                     service => Release(service.Key),
                     callback);
@@ -914,7 +914,20 @@ namespace CatLib
         /// <returns>解决结果</returns>
         protected virtual object ResloveAttrClass(Bindable makeServiceBindData, string service, PropertyInfo baseParam)
         {
-            return Make(makeServiceBindData.GetContextual(service));
+            try
+            {
+                return Make(makeServiceBindData.GetContextual(service));
+            }
+            catch (Exception)
+            {
+                var result = SpeculationServiceByParamName(makeServiceBindData, baseParam.Name, baseParam.PropertyType);
+                if (result != null)
+                {
+                    return result;
+                }
+
+                throw;
+            }
         }
 
         /// <summary>
@@ -961,10 +974,17 @@ namespace CatLib
             }
             catch (UnresolvableException)
             {
+                var result = SpeculationServiceByParamName(makeServiceBindData, baseParam.Name, baseParam.ParameterType);
+                if (result != null)
+                {
+                    return result;
+                }
+
                 if (baseParam.IsOptional)
                 {
                     return baseParam.DefaultValue;
                 }
+
                 throw;
             }
         }
