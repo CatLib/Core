@@ -48,6 +48,7 @@
     <Compile Include="Support\Container\Bindable.cs" />
     <Compile Include="Support\Container\IBindable.cs" />
     <Compile Include="Support\Container\IMethodBind.cs" />
+    <Compile Include="Support\Container\IVariant.cs" />
     <Compile Include="Support\Container\MethodBind.cs" />
     <Compile Include="Support\Container\MethodContainer.cs" />
     <Compile Include="Support\Container\Params.cs" />

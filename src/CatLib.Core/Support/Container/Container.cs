@@ -271,7 +271,7 @@ namespace CatLib
                 }
 
                 var type = SpeculatedServiceType(service);
-                return !(type == null || type.IsPrimitive || type == typeof(string));
+                return !IsBasicType(type);
             }
         }
 
@@ -789,6 +789,16 @@ namespace CatLib
         }
 
         /// <summary>
+        /// 是否是依赖注入容器默认的基础类型
+        /// </summary>
+        /// <param name="type">基础类型</param>
+        /// <returns>是否是基础类型</returns>
+        protected virtual bool IsBasicType(Type type)
+        {
+            return type == null || type.IsPrimitive || type == typeof(string);
+        }
+
+        /// <summary>
         /// 从用户传入的参数中获取依赖
         /// </summary>
         /// <param name="baseParam">基础参数</param>
@@ -827,12 +837,26 @@ namespace CatLib
         {
             try
             {
-                if (conversionType.IsInstanceOfType(result))
+                if (result == null || conversionType.IsInstanceOfType(result))
                 {
                     return true;
                 }
 
-                if (result is IConvertible)
+                if (IsBasicType(result.GetType()) && typeof(IVariant).IsAssignableFrom(conversionType))
+                {
+                    try
+                    {
+                        result = Make(Type2Service(conversionType), result);
+                        return true;
+                    }
+                    catch (Exception)
+                    {
+                        // ignored
+                        // when throw exception then stop inject
+                    }
+                }
+                
+                if (result is IConvertible && typeof(IConvertible).IsAssignableFrom(conversionType))
                 {
                     result = Convert.ChangeType(result, conversionType);
                     return true;

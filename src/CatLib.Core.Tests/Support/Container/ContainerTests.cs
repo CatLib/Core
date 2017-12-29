@@ -1854,6 +1854,72 @@ namespace CatLib.Tests.Stl
             });
         }
 
+        public class VariantModel : IVariant
+        {
+            public int num;
+            public VariantModel(int num)
+            {
+                this.num = num;
+                if (num == 0)
+                {
+                    throw new Exception();
+                }
+            }
+        }
+
+        public class VariantFather
+        {
+            public long code;
+            public VariantModel model;
+            public VariantFather(long code, VariantModel model)
+            {
+                this.code = code;
+                this.model = model;
+            }
+        }
+
+        /// <summary>
+        /// 测试类型变换
+        /// </summary>
+        [TestMethod]
+        public void TestVariant()
+        {
+            var container = new Container();
+            container.Bind<VariantModel>();
+            container.Bind<VariantFather>();
+
+            var cls = container.Make<VariantFather>(10, 20);
+
+            Assert.AreEqual(10, cls.code);
+            Assert.AreEqual(20, cls.model.num);
+        }
+
+        [TestMethod]
+        public void TestVariantThrowError()
+        {
+            var container = new Container();
+            container.Bind<VariantModel>();
+            container.Bind<VariantFather>();
+
+            ExceptionAssert.Throws<UnresolvableException>(() =>
+            {
+                container.Make<VariantFather>(10, 0);
+            });
+        }
+
+        [TestMethod]
+        public void TestNullFromParams()
+        {
+            var container = new Container();
+            container.Bind<VariantModel>();
+            container.Bind<VariantFather>();
+
+            ExceptionAssert.Throws<UnresolvableException>(() =>
+            {
+                container.Make<VariantFather>(10, new Params {{"model", null}});
+            });
+        }
+
         /// <summary>
         /// 测试基础容器调用
         /// </summary>
