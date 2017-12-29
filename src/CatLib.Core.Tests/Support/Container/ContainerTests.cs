@@ -1817,6 +1817,43 @@ namespace CatLib.Tests.Stl
             });
         }
 
+        public class TestResloveAttrClassSpeculationService
+        {
+            [Inject]
+            public RuntimeException rex { get; set; }
+
+            public UnresolvableException ex;
+            public TestResloveAttrClassSpeculationService(UnresolvableException ex)
+            {
+                this.ex = ex;
+            }
+        }
+
+        [TestMethod]
+        public void TestResloveAttrClassSpeculationServiceFunc()
+        {
+            var container = new Container();
+            container.Bind<TestResloveAttrClassSpeculationService>();
+            container.Instance("@ex", new UnresolvableException());
+            container.Instance("@rex", new UnresolvableException());
+            var cls = container.Make<TestResloveAttrClassSpeculationService>();
+
+            Assert.AreSame(container.Make("@ex"), cls.ex);
+        }
+
+        [TestMethod]
+        public void TestResloveAttrClassSpeculationServiceAttrs()
+        {
+            var container = new Container();
+            container.Bind<TestResloveAttrClassSpeculationService>();
+            container.Instance("@ex", new UnresolvableException());
+
+            ExceptionAssert.Throws<UnresolvableException>(() =>
+            {
+                container.Make<TestResloveAttrClassSpeculationService>();
+            });
+        }
+
         /// <summary>
         /// 测试基础容器调用
         /// </summary>

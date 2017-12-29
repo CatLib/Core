@@ -271,7 +271,7 @@ namespace CatLib
                 }
 
                 var type = SpeculatedServiceType(service);
-                return !(type == null || type.IsPrimitive);
+                return !(type == null || type.IsPrimitive || type == typeof(string));
             }
         }
 
@@ -832,7 +832,7 @@ namespace CatLib
                     return true;
                 }
 
-                if (conversionType.IsPrimitive && result is IConvertible)
+                if (result is IConvertible)
                 {
                     result = Convert.ChangeType(result, conversionType);
                     return true;
