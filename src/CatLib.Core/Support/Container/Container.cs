@@ -480,15 +480,17 @@ namespace CatLib
         /// <exception cref="ArgumentNullException"><paramref name="target"/>,<paramref name="methodInfo"/>为<c>null</c></exception>
         public object Call(object target, MethodInfo methodInfo, params object[] userParams)
         {
-            Guard.NotNull(target, "instance");
-            Guard.NotNull(methodInfo, "methodInfo");
-
-            var type = target.GetType();
+            Guard.Requires<ArgumentNullException>(methodInfo != null);
+            if (!methodInfo.IsStatic)
+            {
+                Guard.Requires<ArgumentNullException>(target != null);
+            }
+            
             var parameter = methodInfo.GetParameters();
 
             lock (syncRoot)
             {
-                var bindData = GetBindFillable(Type2Service(type));
+                var bindData = GetBindFillable(target != null ? Type2Service(target.GetType()) : null);
                 userParams = parameter.Length > 0 ? GetDependencies(bindData, parameter, userParams) : new object[] { };
                 return methodInfo.Invoke(target, userParams);
             }
@@ -675,9 +677,13 @@ namespace CatLib
         /// <param name="methodInfo">方法信息</param>
         public void Watch(string service, object target, MethodInfo methodInfo)
         {
-            Guard.Requires<ArgumentNullException>(target != null);
             Guard.Requires<ArgumentNullException>(methodInfo != null);
 
+            if (!methodInfo.IsStatic)
+            {
+                Guard.Requires<ArgumentNullException>(target != null);
+            }
+           
             OnRebound(service, (instance) =>
             {
                 Call(target, methodInfo, instance);
@@ -1586,7 +1592,9 @@ namespace CatLib
         private BindData GetBindFillable(string service)
         {
             BindData bindData;
-            return binds.TryGetValue(service, out bindData) ? bindData : MakeEmptyBindData(service);
+            return service != null && binds.TryGetValue(service, out bindData)
+                ? bindData
+                : MakeEmptyBindData(service);
         }
 
         /// <summary>

@@ -9,6 +9,7 @@
  * Document: http://catlib.io/
  */
 
+using System;
 using CatLib.Tests;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -77,6 +78,32 @@ namespace CatLib.Core.Tests.Support.Container
             ExceptionAssert.Throws<RuntimeException>(() =>
             {
                 App.BindMethod("Helloworld.Func1", cls);
+            });
+        }
+
+        public static object TestStaticMethodAction(int num)
+        {
+            return num;
+        }
+
+        [TestMethod]
+        public void TestStaticMethod()
+        {
+            new Application();
+            App.BindMethod<int>("echo", TestStaticMethodAction);
+            Assert.AreEqual(200, App.Invoke("echo", 200));
+        }
+
+        [TestMethod]
+        public void TestUnbindStaticMethod()
+        {
+            new Application();
+            var bind = App.BindMethod<int>("echo", TestStaticMethodAction);
+            Assert.AreEqual(100, App.Invoke("echo", 100));
+            App.UnbindMethod(bind);
+            ExceptionAssert.Throws<Exception>(() =>
+            {
+                App.Invoke("echo", 200);
             });
         }
 

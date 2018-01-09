@@ -64,13 +64,17 @@ namespace CatLib
         /// </summary>
         /// <param name="method">通过这个名字可以调用方法</param>
         /// <param name="target">方法调用目标</param>
-        /// <param name="call">在方法调用目标中被调用的方法</param>
+        /// <param name="methodInfo">在方法调用目标中被调用的方法</param>
         /// <returns></returns>
-        public IMethodBind Bind(string method, object target, MethodInfo call)
+        public IMethodBind Bind(string method, object target, MethodInfo methodInfo)
         {
             Guard.NotEmptyOrNull(method, "method");
-            Guard.Requires<ArgumentNullException>(target != null);
-            Guard.Requires<ArgumentNullException>(call != null);
+            Guard.Requires<ArgumentNullException>(methodInfo != null);
+
+            if (!methodInfo.IsStatic)
+            {
+                Guard.Requires<ArgumentNullException>(target != null);
+            }
 
             lock (syncRoot)
             {
@@ -79,17 +83,21 @@ namespace CatLib
                     throw new RuntimeException("Method [" + method + "] is already bind");
                 }
 
+                var methodBind = new MethodBind(this, container, method, target, methodInfo);
+                methodMappings[method] = methodBind;
+
+                if (target == null)
+                {
+                    return methodBind;
+                }
+
                 List<string> targetMappings;
                 if (!targetToMethodsMappings.TryGetValue(target, out targetMappings))
                 {
                     targetToMethodsMappings[target] = targetMappings = new List<string>();
                 }
 
-                var methodBind = new MethodBind(this, container, method, target, call);
-
-                methodMappings[method] = methodBind;
                 targetMappings.Add(method);
-
                 return methodBind;
             }
         }
@@ -166,6 +174,12 @@ namespace CatLib
             lock (syncRoot)
             {
                 methodMappings.Remove(methodBind.Service);
+
+                if (methodBind.Target == null)
+                {
+                    return;
+                }
+
                 List<string> methods;
                 if (!targetToMethodsMappings.TryGetValue(methodBind.Target, out methods))
                 {

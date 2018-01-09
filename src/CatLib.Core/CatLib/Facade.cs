@@ -61,26 +61,25 @@ namespace CatLib
                     return service;
                 }
 
-                Init();
-                return service = App.Make<TService>();
+                return Make();
             }
         }
 
         /// <summary>
         /// 初始化
         /// </summary>
-        private static void Init()
+        private static TService Make()
         {
             if (!inited)
             {
-                App.Watch<TService>((service) => Facade<TService>.service = service);
+                App.Watch<TService>(ServiceRebound);
                 inited = true;
             }
 
             var newBinder = App.GetBind<TService>();
-            if (newBinder == null)
+            if (newBinder == null || !newBinder.IsStatic)
             {
-                return;
+                return App.Make<TService>();
             }
 
             if (binder == null || binder != newBinder)
@@ -88,6 +87,24 @@ namespace CatLib
                 newBinder.OnRelease((_, __) => service = default(TService));
                 binder = newBinder;
             }
+
+            return service = App.Make<TService>();
+        }
+
+        /// <summary>
+        /// 当服务被重绑定时
+        /// </summary>
+        /// <param name="service">新的服务实例</param>
+        private static void ServiceRebound(TService service)
+        {
+            var newBinder = App.GetBind<TService>();
+            if (newBinder == null || !newBinder.IsStatic)
+            {
+                Facade<TService>.service = default(TService);
+                return;
+            }
+
+            Facade<TService>.service = service;
         }
     }
 }
