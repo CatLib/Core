@@ -218,6 +218,88 @@ namespace CatLib.Tests
             Assert.AreEqual(container.Type2Service(typeof(string)), container.Type2Service<string>());
         }
 
+        public class TestWatchCLass
+        {
+            public int value;
+
+            public IContainer container;
+
+            public void OnChange(int instance, IContainer container)
+            {
+                value = instance;
+                this.container = container;
+            }
+        }
+
+        public interface IWatchTest
+        {
+            int getValue();
+        }
+
+        public class TestData : IWatchTest
+        {
+            private int val;
+            public TestData(int val)
+            {
+                this.val = val;
+            }
+            public int getValue()
+            {
+                return val;
+            }
+        }
+
+        [TestMethod]
+        public void TestWatch()
+        {
+            var container = new Container();
+            container.Instance<IContainer>(container);
+
+            var cls = new TestWatchCLass();
+            container.Watch<IWatchTest>(cls, "OnChange");
+            container.Instance<IWatchTest>(100);
+            container.Instance<IWatchTest>(200);
+
+            Assert.AreEqual(200, cls.value);
+            Assert.AreSame(container, cls.container);
+        }
+
+        [TestMethod]
+        public void TestWatchLambda()
+        {
+            var container = new Container();
+            container.Instance<IContainer>(container);
+
+            var isCall = false;
+            container.Watch<IWatchTest>((val) =>
+            {
+                isCall = true;
+                Assert.AreEqual(200, val.getValue());
+            });
+            container.Instance<IWatchTest>(new TestData(100));
+            container.Instance<IWatchTest>(new TestData(200));
+
+            Assert.AreEqual(true, isCall);
+            Assert.AreEqual(true, isCall);
+        }
+
+        [TestMethod]
+        public void TestWatchLambdaNoParam()
+        {
+            var container = new Container();
+            container.Instance<IContainer>(container);
+
+            var isCall = false;
+            container.Watch<IWatchTest>(() =>
+            {
+                isCall = true;
+            });
+            container.Instance<IWatchTest>(100);
+            container.Instance<IWatchTest>(200);
+
+            Assert.AreEqual(true, isCall);
+        }
+
         /// <summary>
         /// 生成容器
         /// </summary>

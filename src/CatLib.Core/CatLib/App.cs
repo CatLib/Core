@@ -1129,6 +1129,40 @@ namespace CatLib
         }
 
         /// <summary>
+        /// 关注指定的服务，当服务触发重定义时调用指定对象的指定方法
+        /// <param>调用是以依赖注入的形式进行的</param>
+        /// </summary>
+        /// <typeparam name="TService">服务名</typeparam>
+        /// <param name="target">当服务发生重定义时调用的目标</param>
+        /// <param name="method">方法名</param>
+        public static void Watch<TService>(object target, string method)
+        {
+            Handler.Watch<TService>(target, method);
+        }
+
+        /// <summary>
+        /// 关注指定的服务，当服务触发重定义时调用指定对象的指定方法
+        /// <param>调用是以依赖注入的形式进行的</param>
+        /// </summary>
+        /// <typeparam name="TService">服务名</typeparam>
+        /// <param name="method">回调</param>
+        public static void Watch<TService>(Action method)
+        {
+            Handler.Watch<TService>(method);
+        }
+
+        /// <summary>
+        /// 关注指定的服务，当服务触发重定义时调用指定对象的指定方法
+        /// <param>调用是以依赖注入的形式进行的</param>
+        /// </summary>
+        /// <typeparam name="TService">服务名</typeparam>
+        /// <param name="method">回调</param>
+        public static void Watch<TService>(Action<TService> method)
+        {
+            Handler.Watch(method);
+        }
+
+        /// <summary>
         /// 在回调区间内暂时性的静态化服务实例
         /// </summary>
         /// <param name="callback">回调区间</param>
