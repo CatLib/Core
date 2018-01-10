@@ -19,7 +19,7 @@ namespace CatLib
     /// CatLib实例
     /// </summary>
     [ExcludeFromCodeCoverage]
-    public class App
+    public static class App
     {
         #region Original
         /// <summary>
