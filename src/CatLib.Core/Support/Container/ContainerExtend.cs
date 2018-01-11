@@ -602,6 +602,21 @@ namespace CatLib
         }
 
         /// <summary>
+        /// 构造一个服务
+        /// </summary>
+        /// <param name="container">服务容器</param>
+        /// <param name="type">服务类型</param>
+        /// <param name="userParams">用户提供的参数</param>
+        /// <returns>服务实例</returns>
+        public static object Make(this IContainer container, Type type, params object[] userParams)
+        {
+            var service = container.Type2Service(type);
+            IBindData binder;
+            container.BindIf(service, type, false, out binder);
+            return container.Make(service, userParams);
+        }
+
+        /// <summary>
         /// 获取一个回调，当执行回调可以生成指定的服务
         /// </summary>
         /// <typeparam name="TService">服务名</typeparam>

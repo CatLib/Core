@@ -1107,6 +1107,17 @@ namespace CatLib
         }
 
         /// <summary>
+        /// 构造一个服务
+        /// </summary>
+        /// <param name="type">服务类型</param>
+        /// <param name="userParams">用户提供的参数</param>
+        /// <returns>服务实例</returns>
+        public static object Make(Type type, params object[] userParams)
+        {
+            return Handler.Make(type, userParams);
+        }
+
+        /// <summary>
         /// 获取一个回调，当执行回调可以生成指定的服务
         /// </summary>
         /// <typeparam name="TService">服务名</typeparam>

@@ -293,6 +293,7 @@ namespace CatLib
         /// <returns>是否是别名</returns>
         public bool IsAlias(string name)
         {
+            name = FormatService(name);
             return aliases.ContainsKey(name);
         }
 
@@ -353,6 +354,11 @@ namespace CatLib
         public bool BindIf(string service, Func<IContainer, object[], object> concrete, bool isStatic, out IBindData bindData)
         {
             var bind = GetBind(service);
+            if (bind == null && (HasInstance(service) || IsAlias(service)))
+            {
+                bindData = null;
+                return false;
+            }
             bindData = bind ?? Bind(service, concrete, isStatic);
             return bind == null;
         }
@@ -367,9 +373,7 @@ namespace CatLib
         /// <returns>服务绑定数据</returns>
         public bool BindIf(string service, Type concrete, bool isStatic, out IBindData bindData)
         {
-            var bind = GetBind(service);
-            bindData = bind ?? Bind(service, concrete, isStatic);
-            return bind == null;
+            return BindIf(service, WrapperTypeBuilder(service, concrete), isStatic, out bindData);
         }
 
         /// <summary>
@@ -383,11 +387,7 @@ namespace CatLib
         public IBindData Bind(string service, Type concrete, bool isStatic)
         {
             Guard.NotNull(concrete, "concrete");
-            return Bind(service, (c, param) =>
-            {
-                var container = (Container)c;
-                return container.CreateInstance(GetBindFillable(service), concrete, param);
-            }, isStatic);
+            return Bind(service, WrapperTypeBuilder(service, concrete), isStatic);
         }
 
         /// <summary>
@@ -802,6 +802,18 @@ namespace CatLib
         protected virtual bool IsBasicType(Type type)
         {
             return type == null || type.IsPrimitive || type == typeof(string);
+        }
+
+        /// <summary>
+        /// 包装一个类型，可以被用来生成服务
+        /// </summary>
+        /// <param name="service">服务名</param>
+        /// <param name="concrete">类型</param>
+        /// <returns>根据类型生成的服务</returns>
+        protected virtual Func<IContainer, object[], object> WrapperTypeBuilder(string service, Type concrete)
+        {
+            service = FormatService(service);
+            return (container, userParams) => ((Container)container).CreateInstance(GetBindFillable(service), concrete, userParams);
         }
 
         /// <summary>

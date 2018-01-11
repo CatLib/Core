@@ -39,6 +39,14 @@ namespace CatLib.Tests
             Assert.AreSame(this, obj);
         }
 
+        [TestMethod]
+        public void MakeTypeService()
+        {
+            var container = MakeContainer();
+            var obj = container.Make(typeof(ContainerHelperTests));
+            Assert.AreSame(this, obj);
+        }
+
         /// <summary>
         /// 以单例形式绑定
         /// </summary>
