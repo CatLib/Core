@@ -1122,9 +1122,9 @@ namespace CatLib
         /// </summary>
         /// <typeparam name="TService">服务名</typeparam>
         /// <returns>回调方案</returns>
-        public static Func<TService> Factory<TService>()
+        public static Func<TService> Factory<TService>(params object[] userParams)
         {
-            return Handler.Factory<TService>();
+            return Handler.Factory<TService>(userParams);
         }
 
         /// <summary>

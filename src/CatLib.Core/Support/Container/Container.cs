@@ -523,10 +523,11 @@ namespace CatLib
         /// 获取一个回调，当执行回调可以生成指定的服务
         /// </summary>
         /// <param name="service">服务名或别名</param>
+        /// <param name="userParams">用户传入的参数</param>
         /// <returns>回调方案</returns>
-        public Func<object> Factory(string service)
+        public Func<object> Factory(string service, params object[] userParams)
         {
-            return () => Make(service);
+            return () => Make(service, userParams);
         }
 
         /// <summary>

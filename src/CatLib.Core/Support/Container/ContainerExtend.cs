@@ -621,10 +621,11 @@ namespace CatLib
         /// </summary>
         /// <typeparam name="TService">服务名</typeparam>
         /// <param name="container">服务容器</param>
+        /// <param name="userParams">用户传入的参数</param>
         /// <returns>回调方案</returns>
-        public static Func<TService> Factory<TService>(this IContainer container)
+        public static Func<TService> Factory<TService>(this IContainer container, params object[] userParams)
         {
-            return () => (TService)container.Factory(container.Type2Service(typeof(TService))).Invoke();
+            return () => (TService)container.Make(container.Type2Service(typeof(TService)), userParams);
         }
 
         /// <summary>
