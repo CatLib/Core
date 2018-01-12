@@ -157,6 +157,29 @@ namespace CatLib.Tests.Stl
 
         #region Bind
         /// <summary>
+        /// 测试无法被绑定的类型
+        /// </summary>
+        [TestMethod]
+        public void TestBindUnableBuilt()
+        {
+            var container = MakeContainer();
+
+            IBindData binder;
+            Assert.AreEqual(false, container.BindIf<IContainer>(out binder));
+
+            var isError = false;
+            try
+            {
+                container.Bind<string[]>();
+            }
+            catch (RuntimeException)
+            {
+                isError = true;
+            }
+            Assert.AreEqual(true, isError);
+        }
+
+        /// <summary>
         /// 是否能够进行如果不存在则绑定的操作
         /// </summary>
         [TestMethod]
@@ -567,8 +590,10 @@ namespace CatLib.Tests.Stl
             container.Instance<Container>(container);
             container.Instance("hello", 123);
 
-            var fac = container.Factory<Container>();
+            var fac = container.Factory<Container>(123);
             Assert.AreEqual(container.Make<Container>(), fac.Invoke());
+            var fac2 = container.Factory("hello", 333);
+            Assert.AreEqual(123, fac2.Invoke());
         }
 
         [TestMethod]

@@ -271,7 +271,7 @@ namespace CatLib
                 }
 
                 var type = SpeculatedServiceType(service);
-                return !IsBasicType(type);
+                return !IsBasicType(type) && !IsUnableType(type);
             }
         }
 
@@ -373,6 +373,11 @@ namespace CatLib
         /// <returns>服务绑定数据</returns>
         public bool BindIf(string service, Type concrete, bool isStatic, out IBindData bindData)
         {
+            if (IsUnableType(concrete))
+            {
+                bindData = null;
+                return false;
+            }
             return BindIf(service, WrapperTypeBuilder(service, concrete), isStatic, out bindData);
         }
 
@@ -387,6 +392,10 @@ namespace CatLib
         public IBindData Bind(string service, Type concrete, bool isStatic)
         {
             Guard.NotNull(concrete, "concrete");
+            if (IsUnableType(concrete))
+            {
+                throw new RuntimeException("Bind type [" + concrete + "] can not built");
+            }
             return Bind(service, WrapperTypeBuilder(service, concrete), isStatic);
         }
 
@@ -803,6 +812,16 @@ namespace CatLib
         protected virtual bool IsBasicType(Type type)
         {
             return type == null || type.IsPrimitive || type == typeof(string);
+        }
+
+        /// <summary>
+        /// 是否是无法被构建的类型
+        /// </summary>
+        /// <param name="type">类型</param>
+        /// <returns>是否可以被构建</returns>
+        protected virtual bool IsUnableType(Type type)
+        {
+            return type == null || type.IsAbstract || type.IsInterface || type.IsArray || type.IsEnum;
         }
 
         /// <summary>
@@ -1576,11 +1595,7 @@ namespace CatLib
         /// <returns>服务实例</returns>
         private object CreateInstance(Bindable makeServiceBindData, Type makeServiceType, object[] userParams)
         {
-            if (makeServiceType == null
-                || makeServiceType.IsAbstract
-                || makeServiceType.IsInterface
-                || makeServiceType.IsArray
-                || makeServiceType.IsEnum)
+            if (IsUnableType(makeServiceType))
             {
                 return null;
             }
