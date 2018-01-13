@@ -1604,6 +1604,11 @@ namespace CatLib
 
             try
             {
+                // 如果参数不存在那么在反射时不写入参数可以获得更好的性能
+                if (userParams == null || userParams.Length <= 0)
+                {
+                    return Activator.CreateInstance(makeServiceType);
+                }
                 return Activator.CreateInstance(makeServiceType, userParams);
             }
             catch (Exception ex)
