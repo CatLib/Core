@@ -120,10 +120,8 @@ namespace CatLib
                     throw MakeMethodNotFoundException(method);
                 }
 
-                var injectParams = methodBind.ParameterInfos.Length > 0
-                    ? dependenciesResolved(methodBind, methodBind.ParameterInfos, userParams)
-                    : new object[] { };
-
+                var injectParams = dependenciesResolved(methodBind, methodBind.ParameterInfos, userParams) ??
+                                   new object[] { };
                 return methodBind.MethodInfo.Invoke(methodBind.Target, injectParams);
             }
         }

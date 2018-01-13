@@ -69,7 +69,7 @@ namespace CatLib
         /// <summary>
         /// 已经被解决过的服务名
         /// </summary>
-        private readonly Dictionary<string, bool> resolved;
+        private readonly HashSet<string> resolved;
 
         /// <summary>
         /// 重定义事件
@@ -131,7 +131,7 @@ namespace CatLib
             binds = new Dictionary<string, BindData>(prime * 4);
             resolving = new List<Func<IBindData, object, object>>((int)(prime * 0.25));
             release = new List<Action<IBindData, object>>((int)(prime * 0.25));
-            resolved = new Dictionary<string, bool>(prime * 4);
+            resolved = new HashSet<string>();
             findType = new SortSet<Func<string, Type>, int>();
             findTypeCache = new Dictionary<string, Type>(prime * 4);
             rebound = new Dictionary<string, List<Action<object>>>(prime);
@@ -249,7 +249,7 @@ namespace CatLib
             lock (syncRoot)
             {
                 service = AliasToService(service);
-                return resolved.ContainsKey(service) || instances.ContainsKey(service);
+                return resolved.Contains(service) || instances.ContainsKey(service);
             }
         }
 
@@ -494,13 +494,13 @@ namespace CatLib
             {
                 Guard.Requires<ArgumentNullException>(target != null);
             }
-            
+
             var parameter = methodInfo.GetParameters();
 
             lock (syncRoot)
             {
                 var bindData = GetBindFillable(target != null ? Type2Service(target.GetType()) : null);
-                userParams = parameter.Length > 0 ? GetDependencies(bindData, parameter, userParams) : new object[] { };
+                userParams = GetDependencies(bindData, parameter, userParams) ?? new object[] { };
                 return methodInfo.Invoke(target, userParams);
             }
         }
@@ -693,7 +693,7 @@ namespace CatLib
             {
                 Guard.Requires<ArgumentNullException>(target != null);
             }
-           
+
             OnRebound(service, (instance) =>
             {
                 Call(target, methodInfo, instance);
@@ -893,7 +893,7 @@ namespace CatLib
                         // when throw exception then stop inject
                     }
                 }
-                
+
                 if (result is IConvertible && typeof(IConvertible).IsAssignableFrom(conversionType))
                 {
                     result = Convert.ChangeType(result, conversionType);
@@ -1258,7 +1258,7 @@ namespace CatLib
             }
 
             return baseParam.ParameterType == typeof(object[])
-                || baseParam.ParameterType == typeof(object);
+                   || baseParam.ParameterType == typeof(object);
         }
 
         /// <summary>
@@ -1314,6 +1314,11 @@ namespace CatLib
         /// <exception cref="RuntimeException">生成的实例类型和需求类型不一致</exception>
         protected virtual object[] GetDependencies(Bindable makeServiceBindData, ParameterInfo[] baseParams, object[] userParams)
         {
+            if (baseParams.Length <= 0)
+            {
+                return null;
+            }
+
             var results = new List<object>(baseParams.Length);
 
             // 获取一个参数匹配器用于筛选参数
@@ -1353,7 +1358,7 @@ namespace CatLib
                 if (!CanInject(baseParam.ParameterType, param))
                 {
                     var error = "[" + makeServiceBindData.Service + "] Params inject type must be [" +
-                                   baseParam.ParameterType + "] , But instance is [" + param.GetType() + "]";
+                                baseParam.ParameterType + "] , But instance is [" + param.GetType() + "]";
                     if (needService == null)
                     {
                         error += " Inject params from user incoming parameters.";
@@ -1390,15 +1395,9 @@ namespace CatLib
             Exception exception = null;
             foreach (var constructor in constructors)
             {
-                var parameter = constructor.GetParameters();
-                if (parameter.Length <= 0)
-                {
-                    return null;
-                }
-
                 try
                 {
-                    return GetDependencies(makeServiceBindData, parameter, userParams);
+                    return GetDependencies(makeServiceBindData, constructor.GetParameters(), userParams);
                 }
                 catch (Exception ex)
                 {
@@ -1470,7 +1469,7 @@ namespace CatLib
                         callback.Invoke(instance);
                     }
                 }, Pair(typeof(IBindData), bind),
-                   Pair(typeof(BindData), bind));
+                Pair(typeof(BindData), bind));
         }
 
         /// <summary>
@@ -1541,7 +1540,9 @@ namespace CatLib
                 try
                 {
                     var bindData = GetBindFillable(service);
-                    return Inject(bindData, Build(bindData, userParams));
+                    var result = Inject(bindData, Build(bindData, userParams));
+                    resolved.Add(bindData.Service);
+                    return result;
                 }
                 finally
                 {
@@ -1566,8 +1567,6 @@ namespace CatLib
             instance = bindData.IsStatic
                 ? Instance(bindData.Service, instance)
                 : TriggerOnResolving(bindData, bindData.TriggerResolving(instance));
-
-            resolved[bindData.Service] = true;
 
             return instance;
         }
