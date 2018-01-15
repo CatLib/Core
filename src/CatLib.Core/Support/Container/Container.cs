@@ -604,6 +604,7 @@ namespace CatLib
                 var bindData = GetBindFillable(service);
                 bindData.TriggerRelease(instance);
                 TriggerOnRelease(bindData, instance);
+                DisposeInstance(instance);
                 instances.Remove(service);
             }
         }
@@ -1450,6 +1451,19 @@ namespace CatLib
             foreach (var action in release)
             {
                 action.Invoke(bindData, obj);
+            }
+        }
+
+        /// <summary>
+        /// 释放实例
+        /// </summary>
+        /// <param name="obj">实例</param>
+        private void DisposeInstance(object obj)
+        {
+            var disposable = obj as IDisposable;
+            if (disposable != null)
+            {
+                disposable.Dispose();
             }
         }
 

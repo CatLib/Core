@@ -19,7 +19,7 @@ namespace CatLib
         /// <summary>
         /// 实例
         /// </summary>
-        private static TService service;
+        private static TService instance;
 
         /// <summary>
         /// 绑定数据
@@ -43,7 +43,7 @@ namespace CatLib
 
             App.OnNewApplication += app =>
             {
-                service = default(TService);
+                instance = default(TService);
                 binder = null;
                 inited = false;
             };
@@ -56,9 +56,9 @@ namespace CatLib
         {
             get
             {
-                if (service != null)
+                if (instance != null)
                 {
-                    return service;
+                    return instance;
                 }
 
                 return Make();
@@ -84,11 +84,11 @@ namespace CatLib
 
             if (binder == null || binder != newBinder)
             {
-                newBinder.OnRelease((_, __) => service = default(TService));
+                newBinder.OnRelease((_, __) => instance = default(TService));
                 binder = newBinder;
             }
 
-            return service = App.Make<TService>();
+            return instance = App.Make<TService>();
         }
 
         /// <summary>
@@ -100,11 +100,11 @@ namespace CatLib
             var newBinder = App.GetBind<TService>();
             if (newBinder == null || !newBinder.IsStatic)
             {
-                Facade<TService>.service = default(TService);
+                instance = default(TService);
                 return;
             }
 
-            Facade<TService>.service = service;
+            instance = service;
         }
     }
 }

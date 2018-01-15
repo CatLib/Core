@@ -1592,6 +1592,25 @@ namespace CatLib.Tests.Stl
             }
             Assert.Fail();
         }
+
+        public class TestDisposableClass : IDisposable
+        {
+            public bool isDispose;
+            public void Dispose()
+            {
+                isDispose = true;
+            }
+        }
+
+        [TestMethod]
+        public void TestDisposableRelease()
+        {
+            var container = MakeContainer();
+            container.Singleton<TestDisposableClass>();
+            var cls = container.Make<TestDisposableClass>();
+            container.Release<TestDisposableClass>();
+            Assert.AreEqual(true, cls.isDispose);
+        }
         #endregion
 
         [TestMethod]
