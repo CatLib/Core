@@ -35,6 +35,20 @@ namespace CatLib
         bool HasBind(string service);
 
         /// <summary>
+        /// 是否已经实例静态化
+        /// </summary>
+        /// <param name="service">服务名或别名</param>
+        /// <returns>是否已经静态化</returns>
+        bool HasInstance(string service);
+
+        /// <summary>
+        /// 服务是否已经被解决过
+        /// </summary>
+        /// <param name="service">服务名或别名</param>
+        /// <returns>是否已经被解决过</returns>
+        bool IsResolved(string service);
+
+        /// <summary>
         /// 是否可以生成服务
         /// </summary>
         /// <param name="service">服务名或者别名</param>

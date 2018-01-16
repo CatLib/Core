@@ -42,6 +42,28 @@ namespace CatLib
         }
 
         /// <summary>
+        /// 是否已经实例静态化
+        /// </summary>
+        /// <typeparam name="TService">服务名</typeparam>
+        /// <param name="container">服务容器</param>
+        /// <returns>是否已经静态化</returns>
+        public static bool HasInstance<TService>(this IContainer container)
+        {
+            return container.HasInstance(container.Type2Service<TService>());
+        }
+
+        /// <summary>
+        /// 服务是否已经被解决过
+        /// </summary>
+        /// <typeparam name="TService">服务名</typeparam>
+        /// <param name="container">服务容器</param>
+        /// <returns>是否已经被解决过</returns>
+        public static bool IsResolved<TService>(this IContainer container)
+        {
+            return container.IsResolved(container.Type2Service<TService>());
+        }
+
+        /// <summary>
         /// 是否可以生成服务
         /// </summary>
         /// <typeparam name="TService">服务名</typeparam>

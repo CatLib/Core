@@ -353,6 +353,26 @@ namespace CatLib
         }
 
         /// <summary>
+        /// 是否已经实例静态化
+        /// </summary>
+        /// <typeparam name="TService">服务名</typeparam>
+        /// <returns>是否已经静态化</returns>
+        public static bool HasInstance<TService>()
+        {
+            return Handler.HasInstance<TService>();
+        }
+
+        /// <summary>
+        /// 服务是否已经被解决过
+        /// </summary>
+        /// <typeparam name="TService">服务名</typeparam>
+        /// <returns>是否已经被解决过</returns>
+        public static bool IsResolved<TService>()
+        {
+            return Handler.IsResolved<TService>();
+        }
+
+        /// <summary>
         /// 是否可以生成服务
         /// </summary>
         /// <param name="service">服务名或者别名</param>

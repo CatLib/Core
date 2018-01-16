@@ -737,7 +737,6 @@ namespace CatLib.Tests.Stl
         #endregion
 
         #region Make
-
         public class MakeTestClass
         {
             private readonly MakeTestClassDependency dependency;
@@ -2090,6 +2089,26 @@ namespace CatLib.Tests.Stl
 
                 }, App.Type2Service(typeof(IBindData)), 200);
             });
+        }
+
+        [TestMethod]
+        public void TestHasInstance()
+        {
+            var container = new Application();
+            container.Instance<Application>(container);
+
+            Assert.AreEqual(true, container.HasInstance<Application>());
+            Assert.AreEqual(false, container.HasInstance<IBindData>());
+        }
+
+        [TestMethod]
+        public void TestIsResolved()
+        {
+            var container = new Application();
+            container.Instance<Application>(container);
+            
+            Assert.AreEqual(true, container.IsResolved<Application>());
+            Assert.AreEqual(false, container.IsResolved<IBindData>());
         }
         #endregion
 
