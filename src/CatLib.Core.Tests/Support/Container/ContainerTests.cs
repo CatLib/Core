@@ -2110,6 +2110,30 @@ namespace CatLib.Tests.Stl
             Assert.AreEqual(true, container.IsResolved<Application>());
             Assert.AreEqual(false, container.IsResolved<IBindData>());
         }
+
+        [TestMethod]
+        public void TestFlushAndInstance()
+        {
+            var container = new Application();
+            container.Instance<Application>(container);
+
+            container.OnRelease((_, __) =>
+            {
+                container.Instance<Application>(container);
+            });
+
+            var isError = false;
+            try
+            {
+                container.Flush();
+            }
+            catch (RuntimeException)
+            {
+                isError = true;
+            }
+
+            Assert.AreEqual(true, isError);
+        }
         #endregion
 
         /// <summary>

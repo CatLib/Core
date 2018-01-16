@@ -118,6 +118,11 @@ namespace CatLib
         }
 
         /// <summary>
+        /// 是否在清空过程中
+        /// </summary>
+        private bool flushing;
+
+        /// <summary>
         /// 构造一个容器
         /// </summary>
         /// <param name="prime">初始预计服务数量</param>
@@ -140,6 +145,7 @@ namespace CatLib
 
             injectTarget = typeof(InjectAttribute);
             methodContainer = new MethodContainer(this, GetDependencies);
+            flushing = false;
         }
 
         /// <summary>
@@ -158,6 +164,7 @@ namespace CatLib
 
             lock (syncRoot)
             {
+                GuardFlushing();
                 List<string> list;
                 if (!tags.TryGetValue(tag, out list))
                 {
@@ -320,6 +327,7 @@ namespace CatLib
 
             lock (syncRoot)
             {
+                GuardFlushing();
                 if (aliases.ContainsKey(alias))
                 {
                     throw new RuntimeException("Alias [" + alias + "] is already exists.");
@@ -415,6 +423,8 @@ namespace CatLib
             service = FormatService(service);
             lock (syncRoot)
             {
+                GuardFlushing();
+
                 if (binds.ContainsKey(service))
                 {
                     throw new RuntimeException("Bind [" + service + "] already exists.");
@@ -451,6 +461,7 @@ namespace CatLib
         /// <returns>方法绑定数据</returns>
         public IMethodBind BindMethod(string method, object target, MethodInfo call)
         {
+            GuardFlushing();
             return methodContainer.Bind(method, target, call);
         }
 
@@ -552,6 +563,7 @@ namespace CatLib
             Guard.NotEmptyOrNull(service, "service");
             lock (syncRoot)
             {
+                GuardFlushing();
                 service = AliasToService(service);
 
                 var bindData = GetBind(service);
@@ -620,6 +632,7 @@ namespace CatLib
             Guard.NotNull(finder, "finder");
             lock (syncRoot)
             {
+                GuardFlushing();
                 findType.Add(finder, priority);
             }
             return this;
@@ -635,6 +648,7 @@ namespace CatLib
             Guard.NotNull(callback, "callback");
             lock (syncRoot)
             {
+                GuardFlushing();
                 release.Add(callback);
             }
             return this;
@@ -650,6 +664,7 @@ namespace CatLib
             Guard.NotNull(callback, "callback");
             lock (syncRoot)
             {
+                GuardFlushing();
                 resolving.Add(callback);
             }
             return this;
@@ -666,6 +681,7 @@ namespace CatLib
             Guard.NotNull(callback, "callback");
             lock (syncRoot)
             {
+                GuardFlushing();
                 service = AliasToService(service);
 
                 List<Action<object>> list;
@@ -722,25 +738,33 @@ namespace CatLib
         {
             lock (syncRoot)
             {
-                foreach (var service in Dict.Keys(instances))
+                try
                 {
-                    Release(service);
-                }
+                    flushing = true;
+                    foreach (var service in Dict.Keys(instances))
+                    {
+                        Release(service);
+                    }
 
-                tags.Clear();
-                aliases.Clear();
-                aliasesReverse.Clear();
-                instances.Clear();
-                binds.Clear();
-                resolving.Clear();
-                release.Clear();
-                resolved.Clear();
-                findType.Clear();
-                findTypeCache.Clear();
-                buildStack.Clear();
-                userParamsStack.Clear();
-                rebound.Clear();
-                methodContainer.Flush();
+                    tags.Clear();
+                    aliases.Clear();
+                    aliasesReverse.Clear();
+                    instances.Clear();
+                    binds.Clear();
+                    resolving.Clear();
+                    release.Clear();
+                    resolved.Clear();
+                    findType.Clear();
+                    findTypeCache.Clear();
+                    buildStack.Clear();
+                    userParamsStack.Clear();
+                    rebound.Clear();
+                    methodContainer.Flush();
+                }
+                finally
+                {
+                    flushing = false;
+                }
             }
         }
 
@@ -1411,6 +1435,17 @@ namespace CatLib
 
             Guard.Requires<AssertException>(exception != null);
             throw exception;
+        }
+
+        /// <summary>
+        /// 验证重置状态
+        /// </summary>
+        private void GuardFlushing()
+        {
+            if (flushing)
+            {
+                throw new RuntimeException("Container is flushing can not ");
+            }
         }
 
         /// <summary>
