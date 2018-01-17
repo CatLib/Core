@@ -28,11 +28,6 @@ namespace CatLib
         private readonly int maxCapacity;
 
         /// <summary>
-        /// Lru Cache
-        /// </summary>
-        private readonly Dictionary<TKey, CacheNode<TKey, TVal>> lruCache;
-
-        /// <summary>
         /// 头节点
         /// </summary>
         private CacheNode<TKey, TVal> header;
@@ -91,13 +86,18 @@ namespace CatLib
         }
 
         /// <summary>
+        /// 元素计数
+        /// </summary>
+        private int count;
+
+        /// <summary>
         /// 创建一个Lru缓存
         /// </summary>
         public LruCache(int maxCapacity)
         {
             Guard.Requires<ArgumentOutOfRangeException>(maxCapacity > 0);
             this.maxCapacity = maxCapacity;
-            lruCache = new Dictionary<TKey, CacheNode<TKey, TVal>>();
+            count = 0;
         }
 
         /// <summary>
@@ -108,15 +108,19 @@ namespace CatLib
         public void Add(TKey key, TVal value)
         {
             Guard.Requires<ArgumentNullException>(key != null);
-            CacheNode<TKey, TVal> result;
-            if (lruCache.TryGetValue(key, out result))
+            var result = header;
+            while (result != null)
             {
-                result.Replace(value);
-                MakeUsed(result);
-                return;
+                if (result.KeyValue.Key.Equals(key))
+                {
+                    result.Replace(value);
+                    MakeUsed(result);
+                    return;
+                }
+                result = result.Forward;
             }
 
-            if (lruCache.Count >= maxCapacity)
+            if (count >= maxCapacity)
             {
                 RemoveLeastUsed();
             }
@@ -133,7 +137,7 @@ namespace CatLib
                 MakeUsed(addedNode);
             }
 
-            lruCache.Add(key, addedNode);
+            count++;
         }
 
         /// <summary>
@@ -143,24 +147,37 @@ namespace CatLib
         public void Remove(TKey key)
         {
             Guard.Requires<ArgumentNullException>(key != null);
-            CacheNode<TKey, TVal> result;
-            if (!lruCache.TryGetValue(key, out result))
+            var result = header;
+            while (result != null)
+            {
+                if (result.KeyValue.Key.Equals(key))
+                {
+                    break;
+                }
+                result = result.Forward;
+            }
+
+            if (result == null)
             {
                 return;
             }
-            lruCache.Remove(key);
+
             if (result == tail)
             {
                 tail = result.Backward;
+                tail.Forward = null;
             }
-            if (result == header)
+            else if (result == header)
             {
                 header = result.Forward;
+                header.Backward = null;
             }
-            if (result.Backward != null)
+            else if (result.Backward != null)
             {
                 result.Backward.Forward = result.Forward;
+                result.Forward.Backward = result.Backward;
             }
+            count--;
         }
 
         /// <summary>
@@ -186,8 +203,17 @@ namespace CatLib
         public bool Get(TKey key, out TVal val, TVal defaultVal = default(TVal))
         {
             Guard.Requires<ArgumentNullException>(key != null);
-            CacheNode<TKey, TVal> result;
-            if (!lruCache.TryGetValue(key, out result))
+            var result = header;
+            while (result != null)
+            {
+                if (result.KeyValue.Key.Equals(key))
+                {
+                    break;
+                }
+                result = result.Forward;
+            }
+
+            if (result == null)
             {
                 val = defaultVal;
                 return false;
@@ -203,7 +229,7 @@ namespace CatLib
         /// </summary>
         public int Count
         {
-            get { return lruCache.Count; }
+            get { return count; }
         }
 
         /// <summary>
@@ -243,15 +269,11 @@ namespace CatLib
             if (OnRemoveLeastUsed != null)
             {
                 OnRemoveLeastUsed.Invoke(tail.KeyValue.Key, tail.KeyValue.Value);
-                if (lruCache.Count < maxCapacity)
-                {
-                    return;
-                }
             }
 
-            lruCache.Remove(tail.KeyValue.Key);
             tail.Backward.Forward = null;
             tail = tail.Backward;
+            count--;
         }
 
         /// <summary>
@@ -260,6 +282,11 @@ namespace CatLib
         /// <param name="node">节点</param>
         private void MakeUsed(CacheNode<TKey, TVal> node)
         {
+            if (node == header)
+            {
+                return;
+            }
+
             if (node.Forward == null && node.Backward == null)
             {
                 node.Forward = header;
@@ -274,7 +301,9 @@ namespace CatLib
             {
                 node.Backward.Forward = null;
                 tail = node.Backward;
+
                 node.Forward = header;
+                node.Backward = null;
                 header.Backward = node;
                 header = node;
             }
@@ -283,6 +312,7 @@ namespace CatLib
                 node.Backward.Forward = node.Forward;
                 node.Forward.Backward = node.Backward;
                 node.Forward = header;
+                node.Backward = null;
                 header.Backward = node;
                 header = node;
             }
