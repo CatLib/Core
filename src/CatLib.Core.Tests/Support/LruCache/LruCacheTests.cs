@@ -36,6 +36,17 @@ namespace CatLib.Tests.Stl
         }
 
         /// <summary>
+        /// 单元素测试
+        /// </summary>
+        [TestMethod]
+        public void OnecElementTests()
+        {
+            var cache = new LruCache<string, string>(5);
+            cache.Add("1", "2");
+            cache.Remove("1");
+        }
+
+        /// <summary>
         /// 获取测试
         /// </summary>
         [TestMethod]

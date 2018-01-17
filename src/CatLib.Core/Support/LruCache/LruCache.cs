@@ -165,18 +165,27 @@ namespace CatLib
             if (result == tail)
             {
                 tail = result.Backward;
-                tail.Forward = null;
+                if (tail != null)
+                {
+                    tail.Forward = null;
+                }
             }
-            else if (result == header)
+
+            if (result == header)
             {
                 header = result.Forward;
-                header.Backward = null;
+                if (header != null)
+                {
+                    header.Backward = null;
+                }
             }
-            else if (result.Backward != null)
+
+            if (result.Backward != null && result.Forward != null)
             {
                 result.Backward.Forward = result.Forward;
                 result.Forward.Backward = result.Backward;
             }
+
             count--;
         }
 
