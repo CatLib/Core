@@ -305,7 +305,7 @@ namespace CatLib
         }
 
         /// <summary>
-        /// 为服务设定一个别名
+        /// 以全局的方式为服务设定一个别名
         /// </summary>
         /// <param name="alias">别名</param>
         /// <param name="service">映射到的服务名</param>
@@ -445,7 +445,16 @@ namespace CatLib
 
                 if (IsResolved(service))
                 {
-                    TriggerOnRebound(service);
+                    if (isStatic)
+                    {
+                        // 如果为 静态的 那么直接解决这个服务
+                        // 在服务静态化的过程会触发 TriggerOnRebound
+                        Resolve(service);
+                    }
+                    else
+                    {
+                        TriggerOnRebound(service);
+                    }
                 }
 
                 return bindData;
@@ -589,7 +598,7 @@ namespace CatLib
 
                 if (isResolved)
                 {
-                    TriggerOnRebound(service);
+                    TriggerOnRebound(service, instance);
                 }
 
                 return instance;
@@ -809,23 +818,59 @@ namespace CatLib
         {
             lock (syncRoot)
             {
-                foreach (var service in services)
+                if (services == null || services.Length <= 0)
                 {
-                    if (HasInstance(service.Key))
-                    {
-                        throw new RuntimeException("Flash service [" + service.Key + "] is already exists.");
-                    }
-
-                    if (HasBind(service.Key))
-                    {
-                        throw new RuntimeException("Flash service [" + service.Key + "] name has be used for bind or alias.");
-                    }
+                    callback();
+                    return;
                 }
 
-                Arr.Flash(services,
-                    service => Instance(service.Key, service.Value),
-                    service => Release(service.Key),
-                    callback);
+                Stack<KeyValuePair<string, object>> serviceStack = null;
+                try
+                {
+                    foreach (var service in services)
+                    {
+                        try
+                        {
+                            // 如果服务被绑定过了，那么我们认为这不是一个Flash可用的服务
+                            // 所以我们抛出一个异常来终止该操作。
+                            if (HasBind(service.Key))
+                            {
+                                throw new RuntimeException("Flash service [" + service.Key +
+                                                           "] name has be used for bind or alias.");
+                            }
+                        }
+                        catch
+                        {
+                            // 如果在 HasBind 执行过程中出现了异常，那么清空服务堆栈
+                            // 因为服务还没替换也无需在执行还原操作。
+                            serviceStack = null;
+                            throw;
+                        }
+
+                        if (!HasInstance(service.Key))
+                        {
+                            continue;
+                        }
+
+                        // 如果服务已经存在那么，将旧的服务加入堆栈。
+                        // 等待Flash操作完成后再恢复旧的服务实例。
+                        serviceStack = serviceStack ?? new Stack<KeyValuePair<string, object>>(services.Length);
+                        serviceStack.Push(new KeyValuePair<string, object>(service.Key, Make(service.Key)));
+                    }
+
+                    Arr.Flash(services,
+                        service => Instance(service.Key, service.Value),
+                        service => Release(service.Key),
+                        callback);
+                }
+                finally
+                {
+                    while (serviceStack != null && serviceStack.Count > 0)
+                    {
+                        var service = serviceStack.Pop();
+                        Instance(service.Key, service.Value);
+                    }
+                }
             }
         }
 
@@ -1490,6 +1535,36 @@ namespace CatLib
         }
 
         /// <summary>
+        /// 触发服务重定义事件
+        /// </summary>
+        /// <param name="service">发生重定义的服务</param>
+        /// <param name="instance">服务实例（如果为空将会从容器请求）</param>
+        private void TriggerOnRebound(string service, object instance = null)
+        {
+            var callbacks = GetOnReboundCallbacks(service);
+            if (callbacks == null || callbacks.Count <= 0)
+            {
+                return;
+            }
+
+            var bind = GetBind(service);
+            instance = instance ?? Make(service);
+            Flash(() =>
+            {
+                for (var index = 0; index < callbacks.Count; index++)
+                {
+                    callbacks[index](instance);
+                    // 如果是非实例绑定那么每个 callback 给定单独的实例
+                    if (index + 1 < callbacks.Count && (bind == null || !bind.IsStatic))
+                    {
+                        instance = Make(service);
+                    }
+                }
+            }, Pair(typeof(IBindData), bind),
+            Pair(typeof(BindData), bind));
+        }
+
+        /// <summary>
         /// 释放实例
         /// </summary>
         /// <param name="obj">实例</param>
@@ -1500,25 +1575,6 @@ namespace CatLib
             {
                 disposable.Dispose();
             }
-        }
-
-        /// <summary>
-        /// 触发服务重定义事件
-        /// </summary>
-        /// <param name="service">发生重定义的服务</param>
-        private void TriggerOnRebound(string service)
-        {
-            var instance = Make(service);
-            var bind = GetBind(service);
-
-            Flash(() =>
-                {
-                    foreach (var callback in GetOnReboundCallbacks(service))
-                    {
-                        callback.Invoke(instance);
-                    }
-                }, Pair(typeof(IBindData), bind),
-                Pair(typeof(BindData), bind));
         }
 
         /// <summary>
@@ -1536,14 +1592,10 @@ namespace CatLib
         /// 获取重定义的服务所对应的回调
         /// </summary>
         /// <returns>回调列表</returns>
-        private IEnumerable<Action<object>> GetOnReboundCallbacks(string service)
+        private IList<Action<object>> GetOnReboundCallbacks(string service)
         {
             List<Action<object>> result;
-            if (!rebound.TryGetValue(service, out result))
-            {
-                return new Action<object>[] { };
-            }
-            return result;
+            return !rebound.TryGetValue(service, out result) ? null : result;
         }
 
         /// <summary>

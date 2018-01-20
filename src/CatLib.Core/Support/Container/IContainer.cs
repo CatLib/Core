@@ -206,7 +206,7 @@ namespace CatLib
         Func<object> Factory(string service, params object[] userParams);
 
         /// <summary>
-        /// 为服务设定一个别名
+        /// 以全局的方式为服务设定一个别名
         /// </summary>
         /// <param name="alias">别名</param>
         /// <param name="service">映射到的服务名</param>

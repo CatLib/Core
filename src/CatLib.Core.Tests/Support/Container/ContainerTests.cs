@@ -1613,6 +1613,150 @@ namespace CatLib.Tests.Stl
         #endregion
 
         [TestMethod]
+        public void TestOneWatch()
+        {
+            var container = MakeContainer();
+
+            var b = container.Bind<object>((c, p) => 123);
+            var obj = container.Make<object>();
+            Assert.AreEqual(123, obj);
+
+            b.Unbind();
+
+            object ins1 = null;
+            container.Watch<object>((instance) =>
+            {
+                ins1 = instance;
+            });
+            container.Bind<object>((c, p) => new object());
+
+            Assert.AreNotEqual(null, ins1);
+        }
+
+        [TestMethod]
+        public void TestNullBindWatch()
+        {
+            var container = MakeContainer();
+            container.Instance<object>(123);
+
+            object ins1 = null, ins2 = null;
+            container.Watch<object>((instance) =>
+            {
+                ins1 = instance;
+            });
+            container.Watch<object>((instance) =>
+            {
+                ins2 = instance;
+            });
+            var obj = new object();
+            container.Instance<object>(obj);
+
+            Assert.AreSame(obj, ins1);
+            Assert.AreEqual(obj, ins1);
+            Assert.AreSame(obj, ins2);
+            Assert.AreEqual(obj, ins2);
+        }
+
+        [TestMethod]
+        public void TestBindWatch()
+        {
+            var container = MakeContainer();
+
+            var b = container.Bind<object>((c, p) => 123);
+            var obj = container.Make<object>();
+            Assert.AreEqual(123, obj);
+
+            b.Unbind();
+
+            object ins1 = null,ins2 = null;
+            container.Watch<object>((instance) =>
+            {
+                ins1 = instance;
+            });
+            container.Watch<object>((instance) =>
+            {
+                ins2 = instance;
+            });
+            container.Bind<object>((c, p) => new object());
+
+            Assert.AreNotSame(ins1, ins2);
+        }
+
+        [TestMethod]
+        public void TestSingletonWatch()
+        {
+            var container = MakeContainer();
+
+            var b = container.Singleton<object>((c, p) => 123);
+            var obj = container.Make<object>();
+            Assert.AreEqual(123, obj);
+
+            b.Unbind();
+
+            object ins1 = null, ins2 = null;
+            container.Watch<object>((instance) =>
+            {
+                ins1 = instance;
+            });
+            container.Watch<object>((instance) =>
+            {
+                ins2 = instance;
+            });
+            container.Singleton<object>((c, p) => new object());
+
+            Assert.AreSame(ins1, ins2);
+        }
+
+        [TestMethod]
+        public void TestNullFlash()
+        {
+            var container = MakeContainer();
+            container.Flash(() =>
+            {
+            }, null);
+
+            // no throw error is success
+        }
+
+        [TestMethod]
+        public void TestEmptyFlash()
+        {
+            var container = MakeContainer();
+            container.Flash(() =>
+            {
+            }, new KeyValuePair<string, object>[] { });
+
+            // no throw error is success
+        }
+
+        [TestMethod]
+        public void TestFlashRecursive()
+        {
+            var container = MakeContainer();
+
+            var call = 0;
+            container.Flash(() =>
+            {
+                call++;
+                Assert.AreEqual(1, container.Make("hello"));
+                Assert.AreEqual(2, container.Make("world"));
+                container.Flash(() =>
+                {
+                    call++;
+                    Assert.AreEqual(10, container.Make("hello"));
+                    Assert.AreEqual(2, container.Make("world"));
+                }, new KeyValuePair<string, object>("hello", 10));
+                Assert.AreEqual(1, container.Make("hello"));
+                Assert.AreEqual(2, container.Make("world"));
+            },new KeyValuePair<string, object>("hello", 1)
+                , new KeyValuePair<string, object>("world", 2));
+
+            Assert.AreEqual(false, container.HasInstance("hello"));
+            Assert.AreEqual(false, container.HasInstance("world"));
+            Assert.AreEqual(2, call);
+        }
+
+        [TestMethod]
         public void OnResolvingExistsObject()
         {
             var container = MakeContainer();
