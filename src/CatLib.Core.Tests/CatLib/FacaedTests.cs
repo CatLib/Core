@@ -17,15 +17,90 @@ namespace CatLib.Tests
     [TestClass]
     public class FacaedTests
     {
+        public class FacaedTestClass : IFacaedTestClass
+        {
+        }
 
-        public class FacaedTestClass
+        public interface IFacaedTestClass
+        {
+        }
+        public class TestClassFacade : Facade<IFacaedTestClass>
         {
 
         }
 
-        public class TestClassFacaed : Facade<FacaedTestClass>
+        public class TestClassFacadeError : Facade<FacaedTestClass>
         {
+            
+        }
 
+        [TestMethod]
+        public void FacadeErrorTest()
+        {
+            var app = new Application();
+            app.Bootstrap();
+            app.Singleton<FacaedTestClass>();
+
+            var isError = false;
+            try
+            {
+                var data = TestClassFacadeError.Instance;
+            }
+            catch (TypeInitializationException)
+            {
+                isError = true;
+            }
+
+            Assert.AreEqual(true, isError);
+        }
+
+        [TestMethod]
+        public void FacadeWatchTest()
+        {
+            var app = new Application();
+            app.Bootstrap();
+            app.Singleton<FacaedTestClass>().Alias<IFacaedTestClass>();
+            var old = TestClassFacade.Instance;
+            app.Unbind<FacaedTestClass>();
+            app.Singleton<FacaedTestClass>().Alias<IFacaedTestClass>();
+
+            Assert.AreNotSame(old, TestClassFacade.Instance);
+        }
+
+        [TestMethod]
+        public void FacadeWatchTestWithInstance()
+        {
+            var app = new Application();
+            app.Bootstrap();
+            app.Singleton<FacaedTestClass>().Alias<IFacaedTestClass>();
+
+            var cls = new FacaedTestClass();
+            app.Instance<FacaedTestClass>(cls);
+
+            Assert.AreSame(cls, TestClassFacade.Instance);
+        }
+
+        [TestMethod]
+        public void FacadeMakeFaild()
+        {
+            var app = new Application();
+            app.Bootstrap();
+            app.Singleton<FacaedTestClass>().Alias<IFacaedTestClass>();
+            var old = TestClassFacade.Instance;
+
+            Assert.AreNotEqual(null, old);
+            app.Unbind<FacaedTestClass>();
+
+            var isError = false;
+            try
+            {
+                var data = TestClassFacade.Instance;
+            }
+            catch (UnresolvableException)
+            {
+                isError = true;
+            }
+            Assert.AreEqual(true, isError);
         }
 
         /// <summary>
@@ -36,15 +111,99 @@ namespace CatLib.Tests
         {
             var app = new Application();
             app.Bootstrap();
-            var obj = new FacaedTestClass();
+            IFacaedTestClass obj = new FacaedTestClass();
             app.Singleton<FacaedTestClass>((c, p) =>
             {
                 return obj;
-            });
+            }).Alias<IFacaedTestClass>();
 
-            Assert.AreEqual(obj, TestClassFacaed.Instance);
+            Assert.AreSame(obj, TestClassFacade.Instance);
             //double run
-            Assert.AreEqual(obj, TestClassFacaed.Instance);
+            Assert.AreSame(obj, TestClassFacade.Instance);
+            Assert.AreSame(obj, TestClassFacade.Instance);
+        }
+
+        [TestMethod]
+        public void FacadeReleaseTest()
+        {
+            var app = new Application();
+            app.Bootstrap();
+            app.Singleton<FacaedTestClass>().Alias<IFacaedTestClass>();
+
+            var data = TestClassFacade.Instance;
+            Assert.AreSame(data, TestClassFacade.Instance);
+            app.Release<IFacaedTestClass>();
+            Assert.AreNotSame(data, TestClassFacade.Instance);
+        }
+
+        [TestMethod]
+        public void TestNotStaticBindFacade()
+        {
+            var app = new Application();
+            app.Bootstrap();
+            app.Bind<FacaedTestClass>().Alias<IFacaedTestClass>();
+
+            var data = TestClassFacade.Instance;
+            Assert.AreNotSame(data, TestClassFacade.Instance);
+            Assert.AreNotSame(TestClassFacade.Instance, TestClassFacade.Instance);
+        }
+
+        [TestMethod]
+        public void TestBindingStateSwitchSingletonToBind()
+        {
+            var app = new Application();
+            app.Bootstrap();
+            app.Singleton<FacaedTestClass>().Alias<IFacaedTestClass>();
+
+            var data = TestClassFacade.Instance;
+            Assert.AreSame(data, TestClassFacade.Instance);
+
+            app.Unbind<IFacaedTestClass>();
+            app.Bind<FacaedTestClass>().Alias<IFacaedTestClass>();
+            Assert.AreNotSame(data, TestClassFacade.Instance);
+            Assert.AreNotSame(TestClassFacade.Instance, TestClassFacade.Instance);
+        }
+
+        [TestMethod]
+        public void TestBindingStateSwitchBindToSingleton()
+        {
+            var app = new Application();
+            app.Bootstrap();
+            app.Bind<FacaedTestClass>().Alias<IFacaedTestClass>();
+
+            var data = TestClassFacade.Instance;
+            Assert.AreNotSame(data, TestClassFacade.Instance);
+            Assert.AreNotSame(TestClassFacade.Instance, TestClassFacade.Instance);
+
+            app.Unbind<IFacaedTestClass>();
+            app.Singleton<FacaedTestClass>().Alias<IFacaedTestClass>();
+            data = TestClassFacade.Instance;
+            Assert.AreSame(data, TestClassFacade.Instance);
+            Assert.AreSame(TestClassFacade.Instance, TestClassFacade.Instance);
+        }
+
+        [TestMethod]
+        public void TestNotBind()
+        {
+            var app = new Application();
+            app.Bootstrap();
+            app.Instance<IFacaedTestClass>(new FacaedTestClass());
+
+            var data = TestClassFacade.Instance;
+            Assert.AreSame(data, TestClassFacade.Instance);
+            
+            app.Release<IFacaedTestClass>();
+
+            var isError = false;
+            try
+            {
+                data = TestClassFacade.Instance;
+            }
+            catch (UnresolvableException)
+            {
+                isError = true;
+            }
+            Assert.AreEqual(true, isError);
         }
     }
 }

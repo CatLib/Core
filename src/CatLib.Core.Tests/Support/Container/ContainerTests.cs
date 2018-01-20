@@ -85,6 +85,30 @@ namespace CatLib.Tests.Stl
             });
         }
 
+        [TestMethod]
+        public void TestUnbind()
+        {
+            var container = MakeContainer();
+            container.Bind("TestService1", (app, param) => "hello");
+            container.Bind("TestService2", (app, param) => "world").Alias<IBindData>();
+
+            container.Unbind("TestService1");
+            container.Unbind<IBindData>();
+
+            ExceptionAssert.Throws<UnresolvableException>(() =>
+            {
+                container.Make("TestService1");
+            });
+
+            ExceptionAssert.Throws<UnresolvableException>(() =>
+            {
+                container.Make("TestService2");
+            });
+
+            container.Bind("TestService2", (app, param) => "hello");
+            Assert.AreEqual("hello", container["TestService2"]);
+        }
+
         /// <summary>
         /// 测试不存在的Tag
         /// </summary>
@@ -108,7 +132,12 @@ namespace CatLib.Tests.Stl
             container.Tag("hello", "world");
             container.Tag("hello", "world2");
 
+            container.Bind("world", (c, p) => "hello");
+            container.Bind("world2", (c, p) => "world");
+
             Assert.AreEqual(2, container.Tagged("hello").Length);
+            Assert.AreEqual("hello", container.Tagged("hello")[0]);
+            Assert.AreEqual("world", container.Tagged("hello")[1]);
         }
 
         /// <summary>
@@ -128,16 +157,42 @@ namespace CatLib.Tests.Stl
 
         #region Bind
         /// <summary>
+        /// 测试无法被绑定的类型
+        /// </summary>
+        [TestMethod]
+        public void TestBindUnableBuilt()
+        {
+            var container = MakeContainer();
+
+            IBindData binder;
+            Assert.AreEqual(false, container.BindIf<IContainer>(out binder));
+
+            var isError = false;
+            try
+            {
+                container.Bind<string[]>();
+            }
+            catch (RuntimeException)
+            {
+                isError = true;
+            }
+            Assert.AreEqual(true, isError);
+        }
+
+        /// <summary>
         /// 是否能够进行如果不存在则绑定的操作
         /// </summary>
         [TestMethod]
         public void CanBindIf()
         {
             var container = MakeContainer();
-            var bind = container.BindIf("CanBindIf", (cont, param) => "Hello", true);
-            var bind2 = container.BindIf("CanBindIf", (cont, param) => "World", false);
+            IBindData bind1, bind2;
+            var result1 = container.BindIf("CanBindIf", (cont, param) => "Hello", true, out bind1);
+            var result2 = container.BindIf("CanBindIf", (cont, param) => "World", false, out bind2);
 
-            Assert.AreSame(bind, bind2);
+            Assert.AreSame(bind1, bind2);
+            Assert.AreEqual(true, result1);
+            Assert.AreEqual(false, result2);
         }
 
         /// <summary>
@@ -147,10 +202,13 @@ namespace CatLib.Tests.Stl
         public void CanBindIfByType()
         {
             var container = MakeContainer();
-            var bind = container.BindIf("CanBindIf", typeof(ContainerTest), true);
-            var bind2 = container.BindIf("CanBindIf", typeof(ContainerTest), false);
+            IBindData bind1, bind2;
+            var result1 = container.BindIf("CanBindIf", typeof(ContainerTest), true, out bind1);
+            var result2 = container.BindIf("CanBindIf", typeof(ContainerTest), false, out bind2);
 
-            Assert.AreSame(bind, bind2);
+            Assert.AreSame(bind1, bind2);
+            Assert.AreEqual(true, result1);
+            Assert.AreEqual(false, result2);
         }
 
         /// <summary>
@@ -442,6 +500,114 @@ namespace CatLib.Tests.Stl
         }
 
         /// <summary>
+        /// 调用方法注入测试
+        /// </summary>
+        [TestMethod]
+        public void CheckDelegateCall()
+        {
+            var container = MakeContainer();
+            container.Instance<Container>(container);
+
+            container.Call((Container cls) =>
+            {
+                Assert.AreNotEqual(null, cls);
+            });
+
+            container.Call((Container cls1, Container cls2) =>
+            {
+                Assert.AreNotEqual(null, cls1);
+                Assert.AreNotEqual(null, cls2);
+            });
+
+            container.Call((Container cls1, Container cls2, Container cls3) =>
+            {
+                Assert.AreNotEqual(null, cls1);
+                Assert.AreNotEqual(null, cls2);
+                Assert.AreNotEqual(null, cls3);
+            });
+
+            container.Call((Container cls1, Container cls2, Container cls3, Container cls4) =>
+            {
+                Assert.AreNotEqual(null, cls1);
+                Assert.AreNotEqual(null, cls2);
+                Assert.AreNotEqual(null, cls3);
+                Assert.AreNotEqual(null, cls4);
+
+                Assert.AreSame(cls1, cls4);
+            });
+        }
+
+        [TestMethod]
+        public void CheckWrapCall()
+        {
+            var container = MakeContainer();
+            container.Instance<Container>(container);
+
+            var callCount = 0;
+            var wrap = container.Wrap((Container cls) =>
+            {
+                Assert.AreNotEqual(null, cls);
+                callCount++;
+            });
+            wrap.Invoke();
+
+            wrap = container.Wrap((Container cls1, Container cls2) =>
+            {
+                Assert.AreNotEqual(null, cls1);
+                Assert.AreNotEqual(null, cls2);
+                callCount++;
+            });
+            wrap.Invoke();
+
+            wrap = container.Wrap((Container cls1, Container cls2, Container cls3) =>
+            {
+                Assert.AreNotEqual(null, cls1);
+                Assert.AreNotEqual(null, cls2);
+                Assert.AreNotEqual(null, cls3);
+                callCount++;
+            });
+            wrap.Invoke();
+
+            wrap = container.Wrap((Container cls1, Container cls2, Container cls3, Container cls4) =>
+            {
+                Assert.AreNotEqual(null, cls1);
+                Assert.AreNotEqual(null, cls2);
+                Assert.AreNotEqual(null, cls3);
+                Assert.AreNotEqual(null, cls4);
+
+                Assert.AreSame(cls1, cls4);
+                callCount++;
+            });
+            wrap.Invoke();
+
+            Assert.AreEqual(4, callCount);
+        }
+
+        [TestMethod]
+        public void TestFactory()
+        {
+            var container = MakeContainer();
+            container.Instance<Container>(container);
+            container.Instance("hello", 123);
+
+            var fac = container.Factory<Container>(123);
+            Assert.AreEqual(container.Make<Container>(), fac.Invoke());
+            var fac2 = container.Factory("hello", 333);
+            Assert.AreEqual(123, fac2.Invoke());
+        }
+
+        [TestMethod]
+        public void TestIsAlias()
+        {
+            var container = MakeContainer();
+            container.Instance<Container>(container);
+            container.Alias("123", container.Type2Service<Container>());
+
+            Assert.AreEqual(true, container.IsAlias("123"));
+            Assert.AreEqual(false, container.IsAlias(container.Type2Service(typeof(Container))));
+        }
+
+        /// <summary>
         /// 可以调用方法
         /// </summary>
         [TestMethod]
@@ -464,7 +630,7 @@ namespace CatLib.Tests.Stl
         [TestMethod]
         public void CanCallMethodNoParam()
         {
-            var container = MakeContainer();
+            var container = MakeContainer() as IContainer;
             container.Bind<CallTestClassInject>();
             var cls = new CallTestClass();
 
@@ -497,8 +663,20 @@ namespace CatLib.Tests.Stl
         public void TestContainerCallWithNullParams()
         {
             var container = MakeContainer();
+            container.Instance("@num", 777);
             var result = container.Call(this, "TestContainerCall", null);
-            Assert.AreEqual(0, result);
+            Assert.AreEqual(777, result);
+        }
+
+        [TestMethod]
+        public void TestContainerCallWithErrorParams()
+        {
+            var container = MakeContainer();
+            container.Instance("@num", "helloworld");
+            ExceptionAssert.Throws<UnresolvableException>(() =>
+            {
+                container.Call(this, "TestContainerCall", null);
+            });
         }
 
         /// <summary>
@@ -511,18 +689,54 @@ namespace CatLib.Tests.Stl
             container.Bind<CallTestClassInject>();
             var cls = new CallTestClass();
 
-            ExceptionAssert.Throws<RuntimeException>(() =>
-            {
-                container.Call(cls, "GetNumber", "illegal param");
-            });
-
+            Assert.AreEqual(2, container.Call(cls, "GetNumber", "illegal param"));
             var result = container.Call(cls, "GetNumber", null);
             Assert.AreEqual(2, result);
+        }
+
+        [TestMethod]
+        public void TestOverflowParamNum()
+        {
+            var container = MakeContainer();
+            var cls = new CallTestClass();
+
+            var isThrow = false;
+            try
+            {
+                container.Call(cls, "GetNumber", new object[256]);
+            }
+            catch (Exception ex)
+            {
+                isThrow = true;
+            }
+
+            Assert.AreEqual(true, isThrow);
+        }
+
+        class SimpleTestClass1 { }
+        class SimpleTestClass2 { }
+
+        [TestMethod]
+        public void TestLooseParameters()
+        {
+            var container = MakeContainer();
+            container.Bind<SimpleTestClass1>();
+            container.Bind<SimpleTestClass2>();
+
+            var objOut = new object();
+            var call = container.Wrap((object[] obj, SimpleTestClass1 cls1, SimpleTestClass2 cls2) =>
+            {
+                Assert.AreSame(objOut, obj[0]);
+                Assert.AreNotEqual(null, cls1);
+                Assert.AreNotEqual(null, cls2);
+                Assert.AreEqual((long)100, obj[1]);
+            }, objOut, (long)100);
+
+            call.Invoke();
         }
         #endregion
 
         #region Make
-
         public class MakeTestClass
         {
             private readonly MakeTestClassDependency dependency;
@@ -530,13 +744,13 @@ namespace CatLib.Tests.Stl
             [Inject]
             public MakeTestClassDependency Dependency { get; set; }
 
-            [Inject(Required = true)]
+            [Inject]
             public MakeTestClassDependency DependencyRequired { get; set; }
 
             [Inject("AliasName")]
             public MakeTestClassDependency2 DependencyAlias { get; set; }
 
-            [Inject("AliasNameRequired", Required = true)]
+            [Inject("AliasNameRequired")]
             public MakeTestClassDependency DependencyAliasRequired { get; set; }
 
             public MakeTestClass(MakeTestClassDependency dependency)
@@ -598,9 +812,10 @@ namespace CatLib.Tests.Stl
         {
             var container = MakeContainer();
             container.Bind<NoClassAttrInject>();
+            container.Bind("@Time", (c, p) => 100, false);
 
             var result = container.Make<NoClassAttrInject>();
-            Assert.AreEqual(0, result.Time);
+            Assert.AreEqual(100, result.Time);
         }
 
         /// <summary>
@@ -618,6 +833,7 @@ namespace CatLib.Tests.Stl
             });
 
             container.Bind<MakeTestClassDependency>().Alias("AliasNameRequired");
+            container.Bind<MakeTestClassDependency2>().Alias("AliasName");
             var result = container.Make<MakeTestClass>();
 
             Assert.AreNotEqual(null, result);
@@ -653,11 +869,12 @@ namespace CatLib.Tests.Stl
             var container = MakeContainer();
             container.Bind<MakeTestNoParamClass>();
             container.Bind<MakeTestClassDependency>();
+            container.Instance("@i", 77);
             var result = container.Make<MakeTestNoParamClass>();
-            Assert.AreEqual(0, result.I);
+            Assert.AreEqual(77, result.I);
             Assert.AreNotEqual(null, result.Dependency);
 
-            var result2 = container.MakeWith<MakeTestNoParamClass>(100);
+            var result2 = container.Make<MakeTestNoParamClass>(100);
             Assert.AreEqual(100, result2.I);
             Assert.AreNotEqual(null, result2.Dependency);
         }
@@ -671,12 +888,13 @@ namespace CatLib.Tests.Stl
             var container = MakeContainer();
             container.Bind<MakeTestClass>();
             container.Bind<MakeTestClassDependency>().Alias("AliasNameRequired");
+            container.Bind<MakeTestClassDependency2>().Alias("AliasName");
 
             var result = container.Make<MakeTestClass>();
             Assert.AreEqual(typeof(MakeTestClass), result.GetType());
 
             var dep = new MakeTestClassDependency();
-            var result2 = container.MakeWith<MakeTestClass>(dep);
+            var result2 = container.Make<MakeTestClass>(dep);
             Assert.AreEqual(typeof(MakeTestClass), result2.GetType());
 
             var result3 = container[container.Type2Service(typeof(MakeTestClass))] as MakeTestClass;
@@ -745,6 +963,7 @@ namespace CatLib.Tests.Stl
             var container = MakeContainer();
             container.Bind<MakeTestClass>();
             container.Bind<MakeTestClassDependency>().Alias("AliasNameRequired");
+            container.Bind<MakeTestClassDependency2>().Alias("AliasName");
 
             var result1 = container.Make<MakeTestClass>();
             var result2 = container.Make<MakeTestClass>();
@@ -753,7 +972,7 @@ namespace CatLib.Tests.Stl
             Assert.AreNotSame(result1.Dependency, result1.DependencyRequired);
             Assert.AreNotSame(null, result1.DependencyRequired);
             Assert.AreNotSame(null, result1.DependencyAliasRequired);
-            Assert.AreSame(null, result1.DependencyAlias);
+            Assert.AreNotEqual(null, result1.DependencyAlias);
         }
 
         /// <summary>
@@ -861,11 +1080,154 @@ namespace CatLib.Tests.Stl
             cls = container.Make<TestMakeParamInjectAttrClass>();
             Assert.AreEqual("hello", cls.GetMsg());
 
-            subBind.UnBind();
+            subBind.Unbind();
             cls = container.Make<TestMakeParamInjectAttrClass>();
             Assert.AreEqual("hello", cls.GetMsg());
         }
 
+        public class TestMakeBasePrimitive
+        {
+            [Inject]
+            public int Value { get; set; }
+        }
+
+        [TestMethod]
+        public void TestUnresolvablePrimitiveAttr()
+        {
+            var container = MakeContainer();
+            container.Bind<TestMakeBasePrimitive>();
+
+            ExceptionAssert.Throws<UnresolvableException>(() =>
+            {
+                container.Make<TestMakeBasePrimitive>();
+            });
+        }
+
+        public class TestMakeBasePrimitiveConstructor
+        {
+            public TestMakeBasePrimitiveConstructor(int value)
+            {
+
+            }
+        }
+
+        [TestMethod]
+        public void TestUnresolvablePrimitiveConstructor()
+        {
+            var container = MakeContainer();
+            container.Bind<TestMakeBasePrimitiveConstructor>();
+            ExceptionAssert.Throws<UnresolvableException>(() =>
+            {
+                container.Make<TestMakeBasePrimitiveConstructor>();
+            });
+        }
+
+        public class TestOptionalPrimitiveClass
+        {
+            public TestOptionalPrimitiveClass(int value = 100)
+            {
+                Assert.AreEqual(100, value);
+            }
+        }
+
+        public class SupportNullContainer : Container
+        {
+            public string[] GetStack()
+            {
+                return BuildStack.ToArray();
+            }
+
+            public object[][] GetUserParams()
+            {
+                return UserParamsStack.ToArray();
+            }
+
+            protected override void GuardResolveInstance(object instance, string makeService)
+            {
+
+            }
+        }
+
+        [TestMethod]
+        public void TestSupportNullValueContainer()
+        {
+            var container = new SupportNullContainer() as IContainer;
+            container.Bind("null", (c, p) => null);
+
+            Assert.AreEqual(null, container.Make("null"));
+        }
+
+        [TestMethod]
+        public void TestGetStack()
+        {
+            var container = new SupportNullContainer();
+            container.Bind("null", (c, p) =>
+            {
+                Assert.AreEqual(1, container.GetStack().Length);
+                Assert.AreEqual(1, container.GetUserParams().Length);
+                Assert.AreEqual(3, container.GetUserParams()[0].Length);
+                return null;
+            });
+
+            Assert.AreEqual(null, container.Make("null", "123", "hello", 12333));
+
+            Assert.AreEqual(0, container.GetStack().Length);
+            Assert.AreEqual(0, container.GetUserParams().Length);
+        }
+
+        public class TestInjectNullClass
+        {
+            public TestInjectNullClass(TestMakeBasePrimitiveConstructor cls)
+            {
+                Assert.AreEqual(null, cls);
+            }
+        }
+
+        [TestMethod]
+        public void TestInjectNull()
+        {
+            var container = new SupportNullContainer() as IContainer;
+            container.Bind<TestInjectNullClass>();
+
+            container.Make<TestInjectNullClass>();
+        }
+
+        public class TestDefaultValueClass
+        {
+            public TestDefaultValueClass(SupportNullContainer container = null)
+            {
+                Assert.AreEqual(null, container);
+            }
+        }
+
+        [TestMethod]
+        public void TestDefaultValue()
+        {
+            var container = new Container();
+            container.Bind<TestDefaultValueClass>();
+            container.Make<TestDefaultValueClass>();
+        }
+
+        [TestMethod]
+        public void TestAllFalseFindType()
+        {
+            var container = new Container();
+
+            container.OnFindType((str) => null);
+
+            ExceptionAssert.Throws<UnresolvableException>(() =>
+            {
+                container.Make<TestDefaultValueClass>();
+            });
+        }
+
+        [TestMethod]
+        public void TestOptionalPrimitive()
+        {
+            var container = MakeContainer();
+            container.Bind<TestOptionalPrimitiveClass>();
+            container.Make<TestOptionalPrimitiveClass>();
+        }
 
         /// <summary>
         /// 参数注入是必须的
@@ -874,7 +1236,7 @@ namespace CatLib.Tests.Stl
         {
             private IMsg msg;
             public TestMakeParamInjectAttrRequiredClass(
-                [Inject(Required = true)]IMsg msg)
+                IMsg msg)
             {
                 this.msg = msg;
             }
@@ -972,9 +1334,9 @@ namespace CatLib.Tests.Stl
             Assert.AreNotEqual(null, result.Cls);
             Assert.AreEqual(typeof(string).ToString(), result.Cls.GetMsg());
 
-            container.Bind<GenericClass<string>>((app, param) => null);
+            container.Bind<GenericClass<string>>((app, param) => new GenericClass<string>());
             result = container.Make<TestMakeGenericInject>();
-            Assert.AreEqual(null, result.Cls);
+            Assert.AreNotEqual(null, result.Cls);
 
         }
 
@@ -1044,8 +1406,11 @@ namespace CatLib.Tests.Stl
             {
                 return Type.GetType(str);
             });
-            var result = container.Make<TestInjectBase>();
-            Assert.AreEqual(null, result);
+
+            ExceptionAssert.Throws<UnresolvableException>(() =>
+            {
+                container.Make<TestInjectBase>();
+            });
         }
 
         /// <summary>
@@ -1226,11 +1591,171 @@ namespace CatLib.Tests.Stl
             }
             Assert.Fail();
         }
+
+        public class TestDisposableClass : IDisposable
+        {
+            public bool isDispose;
+            public void Dispose()
+            {
+                isDispose = true;
+            }
+        }
+
+        [TestMethod]
+        public void TestDisposableRelease()
+        {
+            var container = MakeContainer();
+            container.Singleton<TestDisposableClass>();
+            var cls = container.Make<TestDisposableClass>();
+            container.Release<TestDisposableClass>();
+            Assert.AreEqual(true, cls.isDispose);
+        }
         #endregion
 
-        /// <summary>
-        /// 已存在的静态对象在注册新的OnResolving时会自动触发
-        /// </summary>
+        [TestMethod]
+        public void TestOneWatch()
+        {
+            var container = MakeContainer();
+
+            var b = container.Bind<object>((c, p) => 123);
+            var obj = container.Make<object>();
+            Assert.AreEqual(123, obj);
+
+            b.Unbind();
+
+            object ins1 = null;
+            container.Watch<object>((instance) =>
+            {
+                ins1 = instance;
+            });
+            container.Bind<object>((c, p) => new object());
+
+            Assert.AreNotEqual(null, ins1);
+        }
+
+        [TestMethod]
+        public void TestNullBindWatch()
+        {
+            var container = MakeContainer();
+            container.Instance<object>(123);
+
+            object ins1 = null, ins2 = null;
+            container.Watch<object>((instance) =>
+            {
+                ins1 = instance;
+            });
+            container.Watch<object>((instance) =>
+            {
+                ins2 = instance;
+            });
+            var obj = new object();
+            container.Instance<object>(obj);
+
+            Assert.AreSame(obj, ins1);
+            Assert.AreEqual(obj, ins1);
+            Assert.AreSame(obj, ins2);
+            Assert.AreEqual(obj, ins2);
+        }
+
+        [TestMethod]
+        public void TestBindWatch()
+        {
+            var container = MakeContainer();
+
+            var b = container.Bind<object>((c, p) => 123);
+            var obj = container.Make<object>();
+            Assert.AreEqual(123, obj);
+
+            b.Unbind();
+
+            object ins1 = null,ins2 = null;
+            container.Watch<object>((instance) =>
+            {
+                ins1 = instance;
+            });
+            container.Watch<object>((instance) =>
+            {
+                ins2 = instance;
+            });
+            container.Bind<object>((c, p) => new object());
+
+            Assert.AreNotSame(ins1, ins2);
+        }
+
+        [TestMethod]
+        public void TestSingletonWatch()
+        {
+            var container = MakeContainer();
+
+            var b = container.Singleton<object>((c, p) => 123);
+            var obj = container.Make<object>();
+            Assert.AreEqual(123, obj);
+
+            b.Unbind();
+
+            object ins1 = null, ins2 = null;
+            container.Watch<object>((instance) =>
+            {
+                ins1 = instance;
+            });
+            container.Watch<object>((instance) =>
+            {
+                ins2 = instance;
+            });
+            container.Singleton<object>((c, p) => new object());
+
+            Assert.AreSame(ins1, ins2);
+        }
+
+        [TestMethod]
+        public void TestNullFlash()
+        {
+            var container = MakeContainer();
+            container.Flash(() =>
+            {
+            }, null);
+
+            // no throw error is success
+        }
+
+        [TestMethod]
+        public void TestEmptyFlash()
+        {
+            var container = MakeContainer();
+            container.Flash(() =>
+            {
+            }, new KeyValuePair<string, object>[] { });
+
+            // no throw error is success
+        }
+
+        [TestMethod]
+        public void TestFlashRecursive()
+        {
+            var container = MakeContainer();
+
+            var call = 0;
+            container.Flash(() =>
+            {
+                call++;
+                Assert.AreEqual(1, container.Make("hello"));
+                Assert.AreEqual(2, container.Make("world"));
+                container.Flash(() =>
+                {
+                    call++;
+                    Assert.AreEqual(10, container.Make("hello"));
+                    Assert.AreEqual(2, container.Make("world"));
+                }, new KeyValuePair<string, object>("hello", 10));
+                Assert.AreEqual(1, container.Make("hello"));
+                Assert.AreEqual(2, container.Make("world"));
+            },new KeyValuePair<string, object>("hello", 1)
+                , new KeyValuePair<string, object>("world", 2));
+
+            Assert.AreEqual(false, container.HasInstance("hello"));
+            Assert.AreEqual(false, container.HasInstance("world"));
+            Assert.AreEqual(2, call);
+        }
+
         [TestMethod]
         public void OnResolvingExistsObject()
         {
@@ -1242,11 +1767,10 @@ namespace CatLib.Tests.Stl
             container.OnResolving((bind, obj) =>
             {
                 isCall = true;
-                Assert.AreSame(data, obj);
                 return obj;
             });
 
-            Assert.AreEqual(true, isCall);
+            Assert.AreEqual(false, isCall);
         }
 
         /// <summary>
@@ -1266,8 +1790,16 @@ namespace CatLib.Tests.Stl
             container.Flush();
 
             Assert.AreEqual(true, isCallTest);
-            Assert.AreEqual(null, container.Make("TestInstance2"));
-            Assert.AreEqual(null, container.Make("Test"));
+
+            ExceptionAssert.Throws<UnresolvableException>(() =>
+            {
+                container.Make("TestInstance2");
+            });
+
+            ExceptionAssert.Throws<UnresolvableException>(() =>
+            {
+                container.Make("Test");
+            });
         }
 
         [TestMethod]
@@ -1293,7 +1825,7 @@ namespace CatLib.Tests.Stl
         {
             var container = MakeContainer();
             container.Bind<TestParamsMakeClass>();
-            Assert.AreEqual(typeof(TestParamsMakeClass), container.MakeWith<TestParamsMakeClass>(null).GetType());
+            Assert.AreEqual(typeof(TestParamsMakeClass), container.Make<TestParamsMakeClass>(null).GetType());
         }
 
         [TestMethod]
@@ -1308,35 +1840,16 @@ namespace CatLib.Tests.Stl
         public void TestBaseStructChangeInvalid()
         {
             var container = new Container();
-
-            var isThrow = false;
-            try
-            {
-                container.Call(this, "TestContainerCall", "100000000000000000000");
-            }
-            catch (RuntimeException)
-            {
-                isThrow = true;
-            }
-
-            Assert.AreEqual(true, isThrow);
+            container.Instance<int>(10000);
+            Assert.AreEqual(10000, container.Call(this, "TestContainerCall", "100000000000000000000"));
         }
 
         [TestMethod]
         public void TestFormatException()
         {
             var container = new Container();
-
-            var isThrow = false;
-            try
-            {
-                container.Call(this, "TestContainerCall", new ContainerTest());
-            }
-            catch (RuntimeException)
-            {
-                isThrow = true;
-            }
-            Assert.AreEqual(true, isThrow);
+            container.Instance("@num", 10);
+            Assert.AreEqual(10, container.Call(this, "TestContainerCall", new ContainerTest()));
         }
 
         internal class TestNoConstructorAccessClass
@@ -1354,7 +1867,8 @@ namespace CatLib.Tests.Stl
             try
             {
                 container.Make<TestNoConstructorAccessClass>();
-            }catch(RuntimeException ex)
+            }
+            catch (RuntimeException ex)
             {
                 isThrow = ex.InnerException.GetType() == typeof(MissingMethodException);
             }
@@ -1390,6 +1904,209 @@ namespace CatLib.Tests.Stl
             Assert.AreEqual(true, isException);
         }
 
+        private class ParamsTypeInjectTest
+        {
+            public int num1;
+            public long num2;
+            public string str;
+
+            public ParamsTypeInjectTest(int num1, long num2,string str)
+            {
+                this.num1 = num1;
+                this.num2 = num2;
+                this.str = str;
+            }
+        }
+
+        [TestMethod]
+        public void TestParamsUserParams()
+        {
+            var container = MakeContainer();
+            container.Bind<ParamsTypeInjectTest>();
+
+            var result = container.Make<ParamsTypeInjectTest>(new Params
+            {
+                {"num2", 100},
+                {"num1", 50},
+                {"str", "helloworld"},
+            }, 100, 200, "dog");
+
+            Assert.AreEqual(50, result.num1);
+            Assert.AreEqual(100, result.num2);
+            Assert.AreEqual("helloworld", result.str);
+        }
+
+        [TestMethod]
+        public void TestMultParamsUserParams()
+        {
+            var container = MakeContainer();
+            container.Bind<ParamsTypeInjectTest>();
+
+            var result = container.Make<ParamsTypeInjectTest>(new Params
+            {
+                {"num2", 100},
+                {"num1", 50},
+            }, 100, new Params
+            {
+                {"num2", 500},
+                {"num1", 4000},
+                {"str", "helloworld"},
+            }, 200, "dog");
+
+            Assert.AreEqual(50, result.num1);
+            Assert.AreEqual(100, result.num2);
+            Assert.AreEqual("helloworld", result.str);
+        }
+
+        [TestMethod]
+        public void TestParamsUserParamsThrowError()
+        {
+            var container = MakeContainer();
+            container.Bind<ParamsTypeInjectTest>();
+
+            ExceptionAssert.Throws<UnresolvableException>(() =>
+            {
+                var result = container.Make<ParamsTypeInjectTest>(new Params
+                {
+                    {"num2", 100},
+                    {"num1", "helloworld"},
+                    {"str", "helloworld"},
+                });
+            });
+        }
+
+        private class ContainerReplaceThrow : Container
+        {
+            // 测试由于开发者写错代码导致的bug是否被正确抛出异常
+            protected override Func<ParameterInfo, object> GetParamsMatcher(ref object[] userParams)
+            {
+                return (param) =>
+                {
+                    return 200;
+                };
+            }
+        }
+
+        [TestMethod]
+        public void TestReplaceContainerParamsUserParamsThrowError()
+        {
+            var container = new ContainerReplaceThrow();
+            container.Bind<ParamsTypeInjectTest>();
+
+            ExceptionAssert.Throws<UnresolvableException>(() =>
+            {
+                container.Make<ParamsTypeInjectTest>(new Params
+                {
+                    {"num2", 100},
+                    {"num1", "helloworld"},
+                    {"str", "helloworld"},
+                });
+            });
+        }
+
+        public class TestResloveAttrClassSpeculationService
+        {
+            [Inject]
+            public RuntimeException rex { get; set; }
+
+            public UnresolvableException ex;
+            public TestResloveAttrClassSpeculationService(UnresolvableException ex)
+            {
+                this.ex = ex;
+            }
+        }
+
+        [TestMethod]
+        public void TestResloveAttrClassSpeculationServiceFunc()
+        {
+            var container = new Container();
+            container.Bind<TestResloveAttrClassSpeculationService>();
+            container.Instance("@ex", new UnresolvableException());
+            container.Instance("@rex", new UnresolvableException());
+            var cls = container.Make<TestResloveAttrClassSpeculationService>();
+
+            Assert.AreSame(container.Make("@ex"), cls.ex);
+        }
+
+        [TestMethod]
+        public void TestResloveAttrClassSpeculationServiceAttrs()
+        {
+            var container = new Container();
+            container.Bind<TestResloveAttrClassSpeculationService>();
+            container.Instance("@ex", new UnresolvableException());
+
+            ExceptionAssert.Throws<UnresolvableException>(() =>
+            {
+                container.Make<TestResloveAttrClassSpeculationService>();
+            });
+        }
+
+        public class VariantModel : IVariant
+        {
+            public int num;
+            public VariantModel(int num)
+            {
+                this.num = num;
+                if (num == 0)
+                {
+                    throw new Exception();
+                }
+            }
+        }
+
+        public class VariantFather
+        {
+            public long code;
+            public VariantModel model;
+            public VariantFather(long code, VariantModel model)
+            {
+                this.code = code;
+                this.model = model;
+            }
+        }
+
+        /// <summary>
+        /// 测试类型变换
+        /// </summary>
+        [TestMethod]
+        public void TestVariant()
+        {
+            var container = new Container();
+            container.Bind<VariantModel>();
+            container.Bind<VariantFather>();
+
+            var cls = container.Make<VariantFather>(10, 20);
+
+            Assert.AreEqual(10, cls.code);
+            Assert.AreEqual(20, cls.model.num);
+        }
+
+        [TestMethod]
+        public void TestVariantThrowError()
+        {
+            var container = new Container();
+            container.Bind<VariantModel>();
+            container.Bind<VariantFather>();
+
+            ExceptionAssert.Throws<UnresolvableException>(() =>
+            {
+                container.Make<VariantFather>(10, 0);
+            });
+        }
+
+        [TestMethod]
+        public void TestNullFromParams()
+        {
+            var container = new Container();
+            container.Bind<VariantModel>();
+            container.Bind<VariantFather>();
+
+            ExceptionAssert.Throws<UnresolvableException>(() =>
+            {
+                container.Make<VariantFather>(10, new Params {{"model", null}});
+            });
+        }
+
         /// <summary>
         /// 测试基础容器调用
         /// </summary>
@@ -1398,6 +2115,170 @@ namespace CatLib.Tests.Stl
         {
             return num;
         }
+
+        #region Rebound
+        [TestMethod]
+        public void TestOnRebound()
+        {
+            var container = new Container();
+            var callRebound = false;
+            container.OnRebound("TestService", (instance) =>
+            {
+                Assert.AreEqual(300, instance);
+                callRebound = true;
+            });
+
+            container.Bind("TestService", (c, p) => 100).Unbind();
+            var bind = container.Bind("TestService", (c, p) => 200);
+            container.Make("TestService");
+            bind.Unbind();
+            container.Bind("TestService", (c, p) => 300);
+
+            Assert.AreEqual(true, callRebound);
+        }
+
+        [TestMethod]
+        public void TestOnReboundWithInstance()
+        {
+            var container = new Container();
+            var callRebound = false;
+            container.OnRebound("TestService", (instance) =>
+            {
+                Assert.AreEqual(300, instance);
+                callRebound = true;
+            });
+
+            container.Instance("TestService", 100);
+            container.Instance("TestService", 300);
+
+            Assert.AreEqual(true, callRebound);
+        }
+
+        public class TestWatchCLass
+        {
+            public int value;
+
+            public IContainer container;
+
+            public void OnChange(int instance, IContainer container)
+            {
+                value = instance;
+                this.container = container;
+            }
+        }
+
+        [TestMethod]
+        public void TestWatch()
+        {
+            var container = new Container();
+
+            container.Instance<IContainer>(container);
+            var cls = new TestWatchCLass();
+            container.Watch("WatchService", cls, "OnChange");
+            container.Instance("WatchService", 100);
+            container.Instance("WatchService", 200);
+
+            Assert.AreEqual(200, cls.value);
+            Assert.AreSame(container, cls.container);
+        }
+
+        [TestMethod]
+        public void TestInstanceAndDecorator()
+        {
+            var container = new Container();
+            var oldObject = new object();
+            object newObject = null;
+            container.OnResolving((bindData, obj) =>
+            {
+                return newObject = new object();
+            });
+
+            container.Instance("Hello", oldObject);
+
+            Assert.AreSame(newObject, container["Hello"]);
+        }
+
+        [TestMethod]
+        public void TestOccupiedKeyInstance()
+        {
+            var container = new Container();
+            container.Instance<IBindData>(null);
+            var cls = new TestWatchCLass();
+            container.Watch("WatchService", cls, "OnChange");
+            container.Instance("WatchService", 100);
+
+            var isThrow = false;
+            try
+            {
+                container.Instance("WatchService", 200);
+            }
+            catch (RuntimeException)
+            {
+                isThrow = true;
+            }
+
+            Assert.AreEqual(true, isThrow);
+        }
+
+        [TestMethod]
+        public void TestFlashOnBind()
+        {
+            var container = new Application();
+            container.Bind<IBindData>((c, p) => 100);
+
+            ExceptionAssert.Throws<RuntimeException>(() =>
+            {
+                App.Flash(() =>
+                {
+
+                }, App.Type2Service(typeof(IBindData)), 200);
+            });
+        }
+
+        [TestMethod]
+        public void TestHasInstance()
+        {
+            var container = new Application();
+            container.Instance<Application>(container);
+
+            Assert.AreEqual(true, container.HasInstance<Application>());
+            Assert.AreEqual(false, container.HasInstance<IBindData>());
+        }
+
+        [TestMethod]
+        public void TestIsResolved()
+        {
+            var container = new Application();
+            container.Instance<Application>(container);
+            
+            Assert.AreEqual(true, container.IsResolved<Application>());
+            Assert.AreEqual(false, container.IsResolved<IBindData>());
+        }
+
+        [TestMethod]
+        public void TestFlushAndInstance()
+        {
+            var container = new Application();
+            container.Instance<Application>(container);
+
+            container.OnRelease((_, __) =>
+            {
+                container.Instance<Application>(container);
+            });
+
+            var isError = false;
+            try
+            {
+                container.Flush();
+            }
+            catch (RuntimeException)
+            {
+                isError = true;
+            }
+
+            Assert.AreEqual(true, isError);
+        }
+        #endregion
 
         /// <summary>
         /// 生成容器

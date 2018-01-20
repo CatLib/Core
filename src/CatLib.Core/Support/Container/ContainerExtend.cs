@@ -10,6 +10,7 @@
  */
 
 using System;
+using System.Collections.Generic;
 
 namespace CatLib
 {
@@ -18,6 +19,217 @@ namespace CatLib
     /// </summary>
     public static class ContainerExtend
     {
+        /// <summary>
+        /// 获取服务的绑定数据,如果绑定不存在则返回null
+        /// </summary>
+        /// <typeparam name="TService">服务名</typeparam>
+        /// <param name="container">服务容器</param>
+        /// <returns>服务绑定数据或者null</returns>
+        public static IBindData GetBind<TService>(this IContainer container)
+        {
+            return container.GetBind(container.Type2Service(typeof(TService)));
+        }
+
+        /// <summary>
+        /// 是否已经绑定了服务
+        /// </summary>
+        /// <typeparam name="TService">服务名</typeparam>
+        /// <param name="container">服务容器</param>
+        /// <returns>代表服务是否被绑定</returns>
+        public static bool HasBind<TService>(this IContainer container)
+        {
+            return container.HasBind(container.Type2Service(typeof(TService)));
+        }
+
+        /// <summary>
+        /// 是否已经实例静态化
+        /// </summary>
+        /// <typeparam name="TService">服务名</typeparam>
+        /// <param name="container">服务容器</param>
+        /// <returns>是否已经静态化</returns>
+        public static bool HasInstance<TService>(this IContainer container)
+        {
+            return container.HasInstance(container.Type2Service<TService>());
+        }
+
+        /// <summary>
+        /// 服务是否已经被解决过
+        /// </summary>
+        /// <typeparam name="TService">服务名</typeparam>
+        /// <param name="container">服务容器</param>
+        /// <returns>是否已经被解决过</returns>
+        public static bool IsResolved<TService>(this IContainer container)
+        {
+            return container.IsResolved(container.Type2Service<TService>());
+        }
+
+        /// <summary>
+        /// 是否可以生成服务
+        /// </summary>
+        /// <typeparam name="TService">服务名</typeparam>
+        /// <param name="container">服务容器</param>
+        /// <returns>服务是否可以被构建</returns>
+        public static bool CanMake<TService>(this IContainer container)
+        {
+            return container.CanMake(container.Type2Service(typeof(TService)));
+        }
+
+        /// <summary>
+        /// 服务是否是静态化的,如果服务不存在也将返回false
+        /// </summary>
+        /// <typeparam name="TService">服务名</typeparam>
+        /// <param name="container">服务容器</param>
+        /// <returns>服务是否是静态化的</returns>
+        public static bool IsStatic<TService>(this IContainer container)
+        {
+            return container.IsStatic(container.Type2Service(typeof(TService)));
+        }
+
+        /// <summary>
+        /// 是否是别名
+        /// </summary>
+        /// <typeparam name="TService">服务名</typeparam>
+        /// <param name="container">服务容器</param>
+        /// <returns>是否是别名</returns>
+        public static bool IsAlias<TService>(this IContainer container)
+        {
+            return container.IsAlias(container.Type2Service(typeof(TService)));
+        }
+
+        /// <summary>
+        /// 常规绑定一个服务
+        /// </summary>
+        /// <typeparam name="TService">服务名，同时也是服务实现</typeparam>
+        /// <param name="container">服务容器</param>
+        /// <returns>服务绑定数据</returns>
+        public static IBindData Bind<TService>(this IContainer container)
+        {
+            return container.Bind(container.Type2Service(typeof(TService)), typeof(TService), false);
+        }
+
+        /// <summary>
+        /// 常规绑定一个服务
+        /// </summary>
+        /// <typeparam name="TService">服务名</typeparam>
+        /// <typeparam name="TAlias">服务别名</typeparam>
+        /// <param name="container">服务容器</param>
+        /// <returns>服务绑定数据</returns>
+        public static IBindData Bind<TService, TAlias>(this IContainer container)
+        {
+            return container.Bind(container.Type2Service(typeof(TService)), typeof(TService), false)
+                .Alias(container.Type2Service(typeof(TAlias)));
+        }
+
+        /// <summary>
+        /// 常规绑定一个服务
+        /// </summary>
+        /// <typeparam name="TService">服务名</typeparam>
+        /// <param name="container">服务容器</param>
+        /// <param name="concrete">服务实现</param>
+        /// <returns>服务绑定数据</returns>
+        public static IBindData Bind<TService>(this IContainer container, Func<IContainer, object[], object> concrete)
+        {
+            Guard.Requires<ArgumentNullException>(concrete != null);
+            return container.Bind(container.Type2Service(typeof(TService)), concrete, false);
+        }
+
+        /// <summary>
+        /// 常规绑定一个服务
+        /// </summary>
+        /// <typeparam name="TService">服务名</typeparam>
+        /// <param name="container">服务容器</param>
+        /// <param name="concrete">服务实现</param>
+        /// <returns>服务绑定数据</returns>
+        public static IBindData Bind<TService>(this IContainer container, Func<object> concrete)
+        {
+            return container.Bind(container.Type2Service(typeof(TService)), (c, p) => concrete.Invoke(), false);
+        }
+
+        /// <summary>
+        /// 常规绑定一个服务
+        /// </summary>
+        /// <param name="container">服务容器</param>
+        /// <param name="service">服务名</param>
+        /// <param name="concrete">服务实现</param>
+        /// <returns>服务绑定数据</returns>
+        public static IBindData Bind(this IContainer container, string service,
+            Func<IContainer, object[], object> concrete)
+        {
+            return container.Bind(service, concrete, false);
+        }
+
+        /// <summary>
+        /// 如果服务不存在那么则绑定服务
+        /// </summary>
+        /// <typeparam name="TService">服务名</typeparam>
+        /// <typeparam name="TAlias">服务别名</typeparam>
+        /// <param name="container">服务容器</param>
+        /// <param name="bindData">如果绑定失败则返回历史绑定对象</param>
+        /// <returns>是否完成绑定</returns>
+        public static bool BindIf<TService, TAlias>(this IContainer container, out IBindData bindData)
+        {
+            if (container.BindIf(container.Type2Service(typeof(TService)), typeof(TService), false, out bindData))
+            {
+                bindData.Alias(container.Type2Service(typeof(TAlias)));
+                return true;
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// 如果服务不存在那么则绑定服务
+        /// </summary>
+        /// <typeparam name="TService">服务名，同时也是服务实现</typeparam>
+        /// <param name="container">服务容器</param>
+        /// <param name="bindData">如果绑定失败则返回历史绑定对象</param>
+        /// <returns>是否完成绑定</returns>
+        public static bool BindIf<TService>(this IContainer container, out IBindData bindData)
+        {
+            return container.BindIf(container.Type2Service(typeof(TService)), typeof(TService), false, out bindData);
+        }
+
+        /// <summary>
+        /// 如果服务不存在那么则绑定服务
+        /// </summary>
+        /// <typeparam name="TService">服务名</typeparam>
+        /// <param name="container">服务容器</param>
+        /// <param name="concrete">服务实现</param>
+        /// <param name="bindData">如果绑定失败则返回历史绑定对象</param>
+        /// <returns>是否完成绑定</returns>
+        public static bool BindIf<TService>(this IContainer container, Func<IContainer, object[], object> concrete, out IBindData bindData)
+        {
+            return container.BindIf(container.Type2Service(typeof(TService)), concrete, false, out bindData);
+        }
+
+        /// <summary>
+        /// 如果服务不存在那么则绑定服务
+        /// </summary>
+        /// <typeparam name="TService">服务名</typeparam>
+        /// <param name="container">服务容器</param>
+        /// <param name="concrete">服务实现</param>
+        /// <param name="bindData">如果绑定失败则返回历史绑定对象</param>
+        /// <returns>是否完成绑定</returns>
+        public static bool BindIf<TService>(this IContainer container, Func<object> concrete, out IBindData bindData)
+        {
+            Guard.Requires<ArgumentNullException>(concrete != null);
+            return container.BindIf(container.Type2Service(typeof(TService)), (c, p) => concrete.Invoke(), false,
+                out bindData);
+        }
+
+        /// <summary>
+        /// 如果服务不存在那么则绑定服务
+        /// </summary>
+        /// <param name="container">服务容器</param>
+        /// <param name="service">服务名</param>
+        /// <param name="concrete">服务实现</param>
+        /// <param name="bindData">如果绑定失败则返回历史绑定对象</param>
+        /// <returns>是否完成绑定</returns>
+        public static bool BindIf(this IContainer container, string service,
+            Func<IContainer, object[], object> concrete, out IBindData bindData)
+        {
+            return container.BindIf(service, concrete, false, out bindData);
+        }
+
         /// <summary>
         /// 以单例的形式绑定一个服务
         /// </summary>
@@ -50,7 +262,7 @@ namespace CatLib
         /// <typeparam name="TService">服务名，同时也是服务实现</typeparam>
         /// <param name="container">服务容器</param>
         /// <returns>服务绑定数据</returns>
-        public static IBindData Singleton<TService>(this IContainer container) where TService : class
+        public static IBindData Singleton<TService>(this IContainer container)
         {
             return container.Bind(container.Type2Service(typeof(TService)), typeof(TService), true);
         }
@@ -63,104 +275,185 @@ namespace CatLib
         /// <param name="concrete">服务实现</param>
         /// <returns>服务绑定数据</returns>
         public static IBindData Singleton<TService>(this IContainer container,
-            Func<IContainer, object[], object> concrete) where TService : class
+            Func<IContainer, object[], object> concrete)
         {
             return container.Bind(container.Type2Service(typeof(TService)), concrete, true);
         }
 
         /// <summary>
-        /// 常规绑定一个服务
+        /// 以单例的形式绑定一个服务
+        /// </summary>
+        /// <typeparam name="TService">服务名</typeparam>
+        /// <param name="container">服务容器</param>
+        /// <param name="concrete">服务实现</param>
+        /// <returns>服务绑定数据</returns>
+        public static IBindData Singleton<TService>(this IContainer container,
+            Func<object> concrete)
+        {
+            Guard.Requires<ArgumentNullException>(concrete != null);
+            return container.Bind(container.Type2Service(typeof(TService)), (c, p) => concrete.Invoke(), true);
+        }
+
+        /// <summary>
+        /// 如果服务不存在那么则绑定服务
         /// </summary>
         /// <typeparam name="TService">服务名</typeparam>
         /// <typeparam name="TAlias">服务别名</typeparam>
         /// <param name="container">服务容器</param>
-        /// <returns>服务绑定数据</returns>
-        public static IBindData Bind<TService, TAlias>(this IContainer container)
+        /// <param name="bindData">如果绑定失败则返回历史绑定对象</param>
+        /// <returns>是否完成绑定</returns>
+        public static bool SingletonIf<TService, TAlias>(this IContainer container, out IBindData bindData)
         {
-            return container.Bind(container.Type2Service(typeof(TService)), typeof(TService), false)
-                .Alias(container.Type2Service(typeof(TAlias)));
+            if (container.BindIf(container.Type2Service(typeof(TService)), typeof(TService), true, out bindData))
+            {
+                bindData.Alias(container.Type2Service(typeof(TAlias)));
+                return true;
+            }
+            return false;
         }
 
         /// <summary>
-        /// 常规绑定一个服务
+        /// 如果服务不存在那么则绑定服务
         /// </summary>
         /// <typeparam name="TService">服务名，同时也是服务实现</typeparam>
         /// <param name="container">服务容器</param>
-        /// <returns>服务绑定数据</returns>
-        public static IBindData Bind<TService>(this IContainer container) where TService : class
+        /// <param name="bindData">如果绑定失败则返回历史绑定对象</param>
+        /// <returns>是否完成绑定</returns>
+        public static bool SingletonIf<TService>(this IContainer container, out IBindData bindData)
         {
-            return container.Bind(container.Type2Service(typeof(TService)), typeof(TService), false);
+            return container.BindIf(container.Type2Service(typeof(TService)), typeof(TService), true, out bindData);
         }
 
         /// <summary>
-        /// 常规绑定一个服务
+        /// 如果服务不存在那么则绑定服务
         /// </summary>
         /// <typeparam name="TService">服务名</typeparam>
         /// <param name="container">服务容器</param>
         /// <param name="concrete">服务实现</param>
-        /// <returns>服务绑定数据</returns>
-        public static IBindData Bind<TService>(this IContainer container, Func<IContainer, object[], object> concrete)
-            where TService : class
+        /// <param name="bindData">如果绑定失败则返回历史绑定对象</param>
+        /// <returns>是否完成绑定</returns>
+        public static bool SingletonIf<TService>(this IContainer container, Func<IContainer, object[], object> concrete, out IBindData bindData)
         {
-            return container.Bind(container.Type2Service(typeof(TService)), concrete, false);
+            return container.BindIf(container.Type2Service(typeof(TService)), concrete, true, out bindData);
         }
 
         /// <summary>
-        /// 常规绑定一个服务
+        /// 如果服务不存在那么则绑定服务
+        /// </summary>
+        /// <typeparam name="TService">服务名</typeparam>
+        /// <param name="container">服务容器</param>
+        /// <param name="concrete">服务实现</param>
+        /// <param name="bindData">如果绑定失败则返回历史绑定对象</param>
+        /// <returns>是否完成绑定</returns>
+        public static bool SingletonIf<TService>(this IContainer container, Func<object> concrete, out IBindData bindData)
+        {
+            Guard.Requires<ArgumentNullException>(concrete != null);
+            return container.BindIf(container.Type2Service(typeof(TService)), (c, p) => concrete.Invoke(), true,
+                out bindData);
+        }
+
+        /// <summary>
+        /// 如果服务不存在那么则绑定服务
         /// </summary>
         /// <param name="container">服务容器</param>
         /// <param name="service">服务名</param>
         /// <param name="concrete">服务实现</param>
-        /// <returns>服务绑定数据</returns>
-        public static IBindData Bind(this IContainer container, string service,
-            Func<IContainer, object[], object> concrete)
+        /// <param name="bindData">如果绑定失败则返回历史绑定对象</param>
+        /// <returns>是否完成绑定</returns>
+        public static bool SingletonIf(this IContainer container, string service,
+            Func<IContainer, object[], object> concrete, out IBindData bindData)
         {
-            return container.Bind(service, concrete, false);
+            return container.BindIf(service, concrete, true, out bindData);
         }
 
         /// <summary>
-        /// 构造一个服务，允许传入构造参数
+        /// 绑定一个方法到容器
         /// </summary>
-        /// <typeparam name="TService">服务名</typeparam>
         /// <param name="container">服务容器</param>
-        /// <param name="param">构造参数</param>
-        /// <returns>服务实例</returns>
-        public static TService MakeWith<TService>(this IContainer container, params object[] param)
+        /// <param name="method">方法名</param>
+        /// <param name="target">调用目标</param>
+        /// <param name="call">调用方法</param>
+        public static IMethodBind BindMethod(this IContainer container, string method, object target, string call = null)
         {
-            return (TService) container.MakeWith(container.Type2Service(typeof(TService)), param);
+            Guard.NotEmptyOrNull(method, "method");
+            Guard.Requires<ArgumentNullException>(target != null);
+
+            return container.BindMethod(method, target, target.GetType().GetMethod(call ?? Str.Method(method)));
         }
 
         /// <summary>
-        /// 构造一个服务
+        /// 绑定一个方法到容器
         /// </summary>
-        /// <typeparam name="TService">服务名</typeparam>
         /// <param name="container">服务容器</param>
-        /// <returns>服务实例</returns>
-        public static TService Make<TService>(this IContainer container)
+        /// <param name="method">方法名</param>
+        /// <param name="callback">调用方法</param>
+        public static IMethodBind BindMethod(this IContainer container, string method, Func<object> callback)
         {
-            return (TService) container.Make(container.Type2Service(typeof(TService)));
+            Guard.Requires<ArgumentNullException>(method != null);
+            Guard.Requires<ArgumentNullException>(callback != null);
+            return container.BindMethod(method, callback.Target, callback.Method);
         }
 
         /// <summary>
-        /// 构造一个服务
+        /// 绑定一个方法到容器
         /// </summary>
-        /// <typeparam name="TConvert">服务实例转换到的类型</typeparam>
         /// <param name="container">服务容器</param>
-        /// <param name="service">服务名</param>
-        /// <returns>服务实例</returns>
-        public static TConvert Make<TConvert>(this IContainer container, string service)
+        /// <param name="method">方法名</param>
+        /// <param name="callback">调用方法</param>
+        public static IMethodBind BindMethod<T1>(this IContainer container, string method, Func<T1, object> callback)
         {
-            return (TConvert) container.Make(service);
+            Guard.Requires<ArgumentNullException>(method != null);
+            Guard.Requires<ArgumentNullException>(callback != null);
+            return container.BindMethod(method, callback.Target, callback.Method);
         }
 
         /// <summary>
-        /// 释放服务
+        /// 绑定一个方法到容器
         /// </summary>
-        /// <typeparam name="TService">服务名</typeparam>
         /// <param name="container">服务容器</param>
-        public static void Release<TService>(this IContainer container) where TService : class
+        /// <param name="method">方法名</param>
+        /// <param name="callback">调用方法</param>
+        public static IMethodBind BindMethod<T1, T2>(this IContainer container, string method, Func<T1, T2, object> callback)
         {
-            container.Release(container.Type2Service(typeof(TService)));
+            Guard.Requires<ArgumentNullException>(method != null);
+            Guard.Requires<ArgumentNullException>(callback != null);
+            return container.BindMethod(method, callback.Target, callback.Method);
+        }
+
+        /// <summary>
+        /// 绑定一个方法到容器
+        /// </summary>
+        /// <param name="container">服务容器</param>
+        /// <param name="method">方法名</param>
+        /// <param name="callback">调用方法</param>
+        public static IMethodBind BindMethod<T1, T2, T3>(this IContainer container, string method, Func<T1, T2, T3, object> callback)
+        {
+            Guard.Requires<ArgumentNullException>(method != null);
+            Guard.Requires<ArgumentNullException>(callback != null);
+            return container.BindMethod(method, callback.Target, callback.Method);
+        }
+
+        /// <summary>
+        /// 绑定一个方法到容器
+        /// </summary>
+        /// <param name="container">服务容器</param>
+        /// <param name="method">方法名</param>
+        /// <param name="callback">调用方法</param>
+        public static IMethodBind BindMethod<T1, T2, T3, T4>(this IContainer container, string method, Func<T1, T2, T3, T4, object> callback)
+        {
+            Guard.Requires<ArgumentNullException>(method != null);
+            Guard.Requires<ArgumentNullException>(callback != null);
+            return container.BindMethod(method, callback.Target, callback.Method);
+        }
+
+        /// <summary>
+        /// 解除服务绑定
+        /// </summary>
+        /// <typeparam name="TService">解除绑定的服务</typeparam>
+        /// <param name="container">服务容器</param>
+        public static void Unbind<TService>(this IContainer container)
+        {
+            container.Unbind(container.Type2Service(typeof(TService)));
         }
 
         /// <summary>
@@ -169,9 +462,272 @@ namespace CatLib
         /// <typeparam name="TService">服务名</typeparam>
         /// <param name="container">服务容器</param>
         /// <param name="instance">实例值</param>
-        public static void Instance<TService>(this IContainer container, object instance) where TService : class
+        public static object Instance<TService>(this IContainer container, object instance)
         {
-            container.Instance(container.Type2Service(typeof(TService)), instance);
+            return container.Instance(container.Type2Service(typeof(TService)), instance);
+        }
+
+        /// <summary>
+        /// 释放服务
+        /// </summary>
+        /// <typeparam name="TService">服务名</typeparam>
+        /// <param name="container">服务容器</param>
+        public static void Release<TService>(this IContainer container)
+        {
+            container.Release(container.Type2Service(typeof(TService)));
+        }
+
+        /// <summary>
+        /// 以依赖注入的形式调用一个方法
+        /// </summary>
+        /// <param name="container">服务容器</param>
+        /// <param name="method">方法</param>
+        public static void Call<T1>(this IContainer container, Action<T1> method)
+        {
+            Guard.Requires<ArgumentNullException>(method != null);
+            container.Call(method.Target, method.Method);
+        }
+
+        /// <summary>
+        /// 以依赖注入的形式调用一个方法
+        /// </summary>
+        /// <param name="container">服务容器</param>
+        /// <param name="method">方法</param>
+        public static void Call<T1, T2>(this IContainer container, Action<T1, T2> method)
+        {
+            Guard.Requires<ArgumentNullException>(method != null);
+            container.Call(method.Target, method.Method);
+        }
+
+        /// <summary>
+        /// 以依赖注入的形式调用一个方法
+        /// </summary>
+        /// <param name="container">服务容器</param>
+        /// <param name="method">方法</param>
+        public static void Call<T1, T2, T3>(this IContainer container, Action<T1, T2, T3> method)
+        {
+            Guard.Requires<ArgumentNullException>(method != null);
+            container.Call(method.Target, method.Method);
+        }
+
+        /// <summary>
+        /// 以依赖注入的形式调用一个方法
+        /// </summary>
+        /// <param name="container">服务容器</param>
+        /// <param name="method">方法</param>
+        public static void Call<T1, T2, T3, T4>(this IContainer container, Action<T1, T2, T3, T4> method)
+        {
+            Guard.Requires<ArgumentNullException>(method != null);
+            container.Call(method.Target, method.Method);
+        }
+
+        /// <summary>
+        /// 以依赖注入形式调用一个方法
+        /// </summary>
+        /// <param name="container">服务容器</param>
+        /// <param name="target">方法对象</param>
+        /// <param name="method">方法名</param>
+        /// <param name="userParams">用户传入的参数</param>
+        /// <returns>方法返回值</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="target"/>,<paramref name="method"/>为<c>null</c>或者空字符串</exception>
+        public static object Call(this IContainer container, object target, string method, params object[] userParams)
+        {
+            Guard.Requires<ArgumentNullException>(target != null);
+            Guard.NotEmptyOrNull(method, "method");
+
+            var methodInfo = target.GetType().GetMethod(method);
+            return container.Call(target, methodInfo, userParams);
+        }
+
+        /// <summary>
+        /// 包装一个依赖注入形式调用的一个方法
+        /// </summary>
+        /// <param name="container">服务容器</param>
+        /// <param name="method">方法</param>
+        /// <param name="userParams">用户传入的参数</param>
+        /// <returns>包装方法</returns>
+        public static Action Wrap<T1>(this IContainer container, Action<T1> method, params object[] userParams)
+        {
+            return () =>
+            {
+                if (method != null)
+                {
+                    container.Call(method.Target, method.Method, userParams);
+                }
+            };
+        }
+
+        /// <summary>
+        /// 包装一个依赖注入形式调用的一个方法
+        /// </summary>
+        /// <param name="container">服务容器</param>
+        /// <param name="method">方法</param>
+        /// <param name="userParams">用户传入的参数</param>
+        /// <returns>包装方法</returns>
+        public static Action Wrap<T1, T2>(this IContainer container, Action<T1, T2> method, params object[] userParams)
+        {
+            return () =>
+            {
+                if (method != null)
+                {
+                    container.Call(method.Target, method.Method, userParams);
+                }
+            };
+        }
+
+        /// <summary>
+        /// 包装一个依赖注入形式调用的一个方法
+        /// </summary>
+        /// <param name="container">服务容器</param>
+        /// <param name="method">方法</param>
+        /// <param name="userParams">用户传入的参数</param>
+        /// <returns>包装方法</returns>
+        public static Action Wrap<T1, T2, T3>(this IContainer container, Action<T1, T2, T3> method, params object[] userParams)
+        {
+            return () =>
+            {
+                if (method != null)
+                {
+                    container.Call(method.Target, method.Method, userParams);
+                }
+            };
+        }
+
+        /// <summary>
+        /// 包装一个依赖注入形式调用的一个方法
+        /// </summary>
+        /// <param name="container">服务容器</param>
+        /// <param name="method">方法</param>
+        /// <param name="userParams">用户传入的参数</param>
+        /// <returns>包装方法</returns>
+        public static Action Wrap<T1, T2, T3, T4>(this IContainer container, Action<T1, T2, T3, T4> method, params object[] userParams)
+        {
+            return () =>
+            {
+                if (method != null)
+                {
+                    container.Call(method.Target, method.Method, userParams);
+                }
+            };
+        }
+
+        /// <summary>
+        /// 构造一个服务
+        /// </summary>
+        /// <typeparam name="TService">服务名</typeparam>
+        /// <param name="container">服务容器</param>
+        /// <param name="userParams">用户提供的参数</param>
+        /// <returns>服务实例</returns>
+        public static TService Make<TService>(this IContainer container, params object[] userParams)
+        {
+            return (TService)container.Make(container.Type2Service(typeof(TService)), userParams);
+        }
+
+        /// <summary>
+        /// 构造一个服务
+        /// </summary>
+        /// <param name="container">服务容器</param>
+        /// <param name="type">服务类型</param>
+        /// <param name="userParams">用户提供的参数</param>
+        /// <returns>服务实例</returns>
+        public static object Make(this IContainer container, Type type, params object[] userParams)
+        {
+            var service = container.Type2Service(type);
+            IBindData binder;
+            container.BindIf(service, type, false, out binder);
+            return container.Make(service, userParams);
+        }
+
+        /// <summary>
+        /// 获取一个回调，当执行回调可以生成指定的服务
+        /// </summary>
+        /// <typeparam name="TService">服务名</typeparam>
+        /// <param name="container">服务容器</param>
+        /// <param name="userParams">用户传入的参数</param>
+        /// <returns>回调方案</returns>
+        public static Func<TService> Factory<TService>(this IContainer container, params object[] userParams)
+        {
+            return () => (TService)container.Make(container.Type2Service(typeof(TService)), userParams);
+        }
+
+        /// <summary>
+        /// 关注指定的服务，当服务触发重定义时调用指定对象的指定方法
+        /// <param>调用是以依赖注入的形式进行的</param>
+        /// </summary>
+        /// <param name="container">服务容器</param>
+        /// <param name="service">关注的服务名</param>
+        /// <param name="target">当服务发生重定义时调用的目标</param>
+        /// <param name="method">方法名</param>
+        public static void Watch(this IContainer container, string service, object target, string method)
+        {
+            Guard.Requires<ArgumentNullException>(target != null);
+            Guard.NotEmptyOrNull(method, "method");
+
+            var methodInfo = target.GetType().GetMethod(method);
+            container.Watch(service, target, methodInfo);
+        }
+
+        /// <summary>
+        /// 关注指定的服务，当服务触发重定义时调用指定对象的指定方法
+        /// <param>调用是以依赖注入的形式进行的</param>
+        /// </summary>
+        /// <typeparam name="TService">服务名</typeparam>
+        /// <param name="container">服务容器</param>
+        /// <param name="target">当服务发生重定义时调用的目标</param>
+        /// <param name="method">方法名</param>
+        public static void Watch<TService>(this IContainer container, object target, string method)
+        {
+            Guard.Requires<ArgumentNullException>(method != null);
+            container.Watch(container.Type2Service<TService>(), target, method);
+        }
+
+        /// <summary>
+        /// 关注指定的服务，当服务触发重定义时调用指定对象的指定方法
+        /// <param>调用是以依赖注入的形式进行的</param>
+        /// </summary>
+        /// <typeparam name="TService">服务名</typeparam>
+        /// <param name="container">服务容器</param>
+        /// <param name="method">回调</param>
+        public static void Watch<TService>(this IContainer container, Action method)
+        {
+            Guard.Requires<ArgumentNullException>(method != null);
+            container.Watch(container.Type2Service<TService>(), method.Target, method.Method);
+        }
+
+        /// <summary>
+        /// 关注指定的服务，当服务触发重定义时调用指定对象的指定方法
+        /// <param>调用是以依赖注入的形式进行的</param>
+        /// </summary>
+        /// <typeparam name="TService">服务名</typeparam>
+        /// <param name="container">服务容器</param>
+        /// <param name="method">回调</param>
+        public static void Watch<TService>(this IContainer container, Action<TService> method)
+        {
+            Guard.Requires<ArgumentNullException>(method != null);
+            container.Watch(container.Type2Service<TService>(), method.Target, method.Method);
+        }
+
+        /// <summary>
+        /// 在回调区间内暂时性的静态化服务实例
+        /// </summary>
+        /// <param name="container">服务容器</param>
+        /// <param name="callback">回调区间</param>
+        /// <param name="service">服务名</param>
+        /// <param name="instance">实例名</param>
+        public static void Flash(this IContainer container, Action callback, string service, object instance)
+        {
+            container.Flash(callback, new KeyValuePair<string, object>(service, instance));
+        }
+
+        /// <summary>
+        /// 类型转为服务名
+        /// </summary>
+        /// <typeparam name="TService">服务类型</typeparam>
+        /// <param name="container">服务容器</param>
+        /// <returns>服务名</returns>
+        public static string Type2Service<TService>(this IContainer container)
+        {
+            return container.Type2Service(typeof(TService));
         }
     }
 }

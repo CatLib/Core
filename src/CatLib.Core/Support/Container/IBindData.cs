@@ -16,13 +16,8 @@ namespace CatLib
     /// <summary>
     /// 服务绑定数据
     /// </summary>
-    public interface IBindData
+    public interface IBindData : IBindable<IBindData>
     {
-        /// <summary>
-        /// 服务名
-        /// </summary>
-        string Service { get; }
-
         /// <summary>
         /// 服务实现
         /// </summary>
@@ -32,20 +27,6 @@ namespace CatLib
         /// 是否是静态服务
         /// </summary>
         bool IsStatic { get; }
-
-        /// <summary>
-        /// 当需求某个服务                                                                                                                                                                                                                                                                                                                                                                                  
-        /// </summary>
-        /// <param name="service">服务名</param>
-        /// <returns>绑定关系临时数据</returns>
-        IGivenData Needs(string service);
-
-        /// <summary>
-        /// 当需求某个服务
-        /// </summary>
-        /// <typeparam name="T">服务类型</typeparam>
-        /// <returns>绑定关系临时数据</returns>
-        IGivenData Needs<T>();
 
         /// <summary>
         /// 为服务设定一个别名
@@ -74,10 +55,5 @@ namespace CatLib
         /// <param name="action">处理事件</param>
         /// <returns>服务绑定数据</returns>
         IBindData OnRelease(Action<IBindData, object> action);
-
-        /// <summary>
-        /// 移除绑定服务 , 在解除绑定时如果是静态化物体将会触发释放
-        /// </summary>
-        void UnBind();
     }
 }

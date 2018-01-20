@@ -174,7 +174,7 @@ namespace CatLib.Tests.Stl
 
             bindData.OnResolving((bind, obj) => null);
 
-            var data = bindData.ExecResolvingDecorator(new Container());
+            var data = bindData.TriggerResolving(new Container());
             Assert.AreEqual(null, data);
         }
 
@@ -194,7 +194,7 @@ namespace CatLib.Tests.Stl
         }
         #endregion
 
-        #region UnBind
+        #region Unbind
         /// <summary>
         /// 能够正常解除绑定
         /// </summary>
@@ -205,8 +205,12 @@ namespace CatLib.Tests.Stl
             var bindData = container.Bind("CanUnBind", (app, param) => "hello world", false);
 
             Assert.AreEqual("hello world", container.Make("CanUnBind").ToString());
-            bindData.UnBind();
-            Assert.AreEqual(null, container.Make("CanUnBind"));
+            bindData.Unbind();
+
+            ExceptionAssert.Throws<UnresolvableException>(() =>
+            {
+                container.Make("CanUnBind");
+            });
         }
 
         /// <summary>
@@ -217,7 +221,7 @@ namespace CatLib.Tests.Stl
         {
             var container = new Container();
             var bindData = container.Bind("CanUnBind", (app, param) => "hello world", false);
-            bindData.UnBind();
+            bindData.Unbind();
 
             ExceptionAssert.Throws<RuntimeException>(() =>
             {

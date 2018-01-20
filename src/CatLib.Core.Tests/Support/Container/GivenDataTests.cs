@@ -28,12 +28,12 @@ namespace CatLib.Tests.Stl
         {
             var container = new Container();
             var bindData = new BindData(container, "CanGiven", (app, param) => "hello world", false);
-            var givenData = new GivenData(container, bindData);
+            var givenData = new GivenData<IBindData>(container, bindData);
             givenData.Needs("needs1");
             givenData.Given("hello");
             Assert.AreEqual("hello", bindData.GetContextual("needs1"));
 
-            givenData = new GivenData(container, bindData);
+            givenData = new GivenData<IBindData>(container, bindData);
             givenData.Needs("needs2");
             givenData.Given<GivenDataTest>();
             Assert.AreEqual(container.Type2Service(typeof(GivenDataTest)), bindData.GetContextual("needs2"));
@@ -47,7 +47,7 @@ namespace CatLib.Tests.Stl
         {
             var container = new Container();
             var bindData = new BindData(container, "CanGiven", (app, param) => "hello world", false);
-            var givenData = new GivenData(container, bindData);
+            var givenData = new GivenData<IBindData>(container, bindData);
             givenData.Needs("needs");
 
             ExceptionAssert.Throws<ArgumentNullException>(() =>

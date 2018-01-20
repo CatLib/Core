@@ -456,6 +456,12 @@ namespace CatLib.Tests.Support.Util
             Assert.AreEqual("a", data[0]);
             Assert.AreEqual("b", data[1]);
             Assert.AreEqual("c", data[2]);
+
+            data = new[] {"a"};
+            result = Arr.Reverse(data);
+
+            Assert.AreEqual(1, result.Length);
+            Assert.AreEqual("a", data[0]);
         }
 
         [TestMethod]
@@ -520,6 +526,112 @@ namespace CatLib.Tests.Support.Util
             Assert.AreEqual("c", result[2]);
         }
 
+        [TestMethod]
+        public void TestDifferenceEmptyMatch()
+        {
+            var data = new[] { "a", "b", "c", "d", "e" };
+            var result = Arr.Difference(data, null);
+            Assert.AreEqual(5, result.Length);
+            Assert.AreEqual("a", result[0]);
+            Assert.AreEqual("b", result[1]);
+            Assert.AreEqual("c", result[2]);
+            Assert.AreEqual("d", result[3]);
+            Assert.AreEqual("e", result[4]);
+        }
 
+        [TestMethod]
+        public void TestRemoveAt()
+        {
+            var data = new[] { "a", "b", "c", "d", "e" };
+            var result = Arr.RemoveAt(ref data, 1);
+            Assert.AreEqual("b", result);
+            Assert.AreEqual("a", data[0]);
+            Assert.AreEqual("c", data[1]);
+            Assert.AreEqual("d", data[2]);
+            Assert.AreEqual("e", data[3]);
+            Assert.AreEqual(4, data.Length);
+
+            result = Arr.RemoveAt(ref data, 3);
+            Assert.AreEqual("e", result);
+            Assert.AreEqual("a", data[0]);
+            Assert.AreEqual("c", data[1]);
+            Assert.AreEqual("d", data[2]);
+            Assert.AreEqual(3, data.Length);
+
+            result = Arr.RemoveAt(ref data, 0);
+            Assert.AreEqual("a", result);
+            Assert.AreEqual("c", data[0]);
+            Assert.AreEqual("d", data[1]);
+            Assert.AreEqual(2, data.Length);
+
+            bool ex = false;
+            try
+            {
+                result = Arr.RemoveAt(ref data, 2);
+            }
+            catch (Exception)
+            {
+                ex = true;
+            }
+            Assert.AreEqual(true, ex);
+
+            result = Arr.RemoveAt(ref data, 0);
+            Assert.AreEqual("c", result);
+            Assert.AreEqual("d", data[0]);
+            Assert.AreEqual(1, data.Length);
+        }
+
+        [TestMethod]
+        public void TestRemoveAtNegativeNumber()
+        {
+            var data = new[] { "a", "b", "c", "d", "e" };
+            var result = Arr.RemoveAt(ref data, -2);
+            Assert.AreEqual("d", result);
+            Assert.AreEqual("a", data[0]);
+            Assert.AreEqual("b", data[1]);
+            Assert.AreEqual("c", data[2]);
+            Assert.AreEqual("e", data[3]);
+            Assert.AreEqual(4, data.Length);
+
+            result = Arr.RemoveAt(ref data, -1);
+            Assert.AreEqual("e", result);
+            Assert.AreEqual("a", data[0]);
+            Assert.AreEqual("b", data[1]);
+            Assert.AreEqual("c", data[2]);
+            Assert.AreEqual(3, data.Length);
+
+            result = Arr.RemoveAt(ref data, -999);
+            Assert.AreEqual("a", result);
+            Assert.AreEqual("b", data[0]);
+            Assert.AreEqual("c", data[1]);
+            Assert.AreEqual(2, data.Length);
+
+            result = Arr.RemoveAt(ref data, -1);
+            Assert.AreEqual("c", result);
+            Assert.AreEqual("b", data[0]);
+            Assert.AreEqual(1, data.Length);
+
+            result = Arr.RemoveAt(ref data, -1);
+            Assert.AreEqual("b", result);
+            Assert.AreEqual(0, data.Length);
+
+            data = new string[] { };
+            result = Arr.RemoveAt(ref data, -1);
+            Assert.AreEqual(null, result);
+            Assert.AreEqual(0, data.Length);
+        }
+
+        [TestMethod]
+        public void TestEmptyFlash()
+        {
+            var data = new int[] { };
+            var isCall = false;
+            Arr.Flash(data, (i) => { }, (o) => { }, () =>
+            {
+                isCall = true;
+            });
+
+            Assert.AreEqual(true, isCall);
+        }
     }
 }

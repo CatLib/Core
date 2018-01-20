@@ -10,7 +10,7 @@
  */
 
 using System;
-using System.Diagnostics;
+using System.Collections.Generic;
 
 namespace CatLib
 {
@@ -231,6 +231,38 @@ namespace CatLib
         }
 
         /// <summary>
+        /// 将数组每个值传给回调函数，如果回调函数返回 true，则移除数组中对应的元素，并返回被移除的元素
+        /// </summary>
+        /// <typeparam name="T">数组类型</typeparam>
+        /// <param name="source">规定数组</param>
+        /// <param name="predicate">回调函数</param>
+        /// <returns>被移除的数组</returns>
+        public static T[] Remove<T>(ref T[] source, Predicate<T> predicate)
+        {
+            Guard.Requires<ArgumentNullException>(source != null);
+            Guard.Requires<ArgumentNullException>(predicate != null);
+
+            if (source.Length <= 0)
+            {
+                return new T[] { };
+            }
+
+            var results = new List<T>();
+
+            for (var i = source.Length - 1; i >= 0; i--)
+            {
+                if (!predicate.Invoke(source[i]))
+                {
+                    continue;
+                }
+                results.Add(source[i]);
+                RemoveAt(ref source, i);
+            }
+
+            return Reverse(results.ToArray());
+        }
+
+        /// <summary>
         /// 输入数组中的每个值传给回调函数,如果回调函数返回 true，则把输入数组中的当前值加入结果数组中
         /// </summary>
         /// <typeparam name="T">数组类型</typeparam>
@@ -426,6 +458,12 @@ namespace CatLib
         public static T[] Reverse<T>(T[] source, int start = 0, int? length = null)
         {
             Guard.Requires<ArgumentNullException>(source != null);
+
+            if (source.Length == 1)
+            {
+                return source;
+            }
+
             Util.NormalizationPosition(source.Length, ref start, ref length);
             var tmpSource = new T[source.Length];
             Array.Copy(source, tmpSource, source.Length);
@@ -503,6 +541,61 @@ namespace CatLib
                 }
                 return true;
             });
+        }
+
+        /// <summary>
+        /// 移除并返回指定下标的数组元素
+        /// <para>如果下标传入的是负数那么将会从末尾移除</para>
+        /// </summary>
+        /// <typeparam name="T">数组类型</typeparam>
+        /// <param name="source">规定数组</param>
+        /// <param name="index">数组下标</param>
+        /// <returns>被移除的元素</returns>
+        public static T RemoveAt<T>(ref T[] source, int index)
+        {
+            Guard.Requires<ArgumentNullException>(source != null);
+            Guard.Requires<ArgumentNullException>(index < source.Length);
+
+            var result = Splice(ref source, index, 1);
+            return result.Length > 0 ? result[0] : default(T);
+        }
+
+        /// <summary>
+        /// 临时性的回调元素，如果遇到异常或者完成回调后会进行回滚元素回调
+        /// </summary>
+        /// <typeparam name="T">数组类型</typeparam>
+        /// <param name="source">规定数组</param>
+        /// <param name="process">顺序回调</param>
+        /// <param name="completed">所有回调完成后</param>
+        /// <param name="rollback">回滚回调</param>
+        public static void Flash<T>(T[] source, Action<T> process, Action<T> rollback, Action completed)
+        {
+            Guard.Requires<ArgumentNullException>(source != null);
+
+            if (source.Length <= 0)
+            {
+                completed.Invoke();
+                return;
+            }
+
+            var index = 0;
+            try
+            {
+                foreach (var result in source)
+                {
+                    ++index;
+                    process.Invoke(result);
+                }
+
+                completed();
+            }
+            finally
+            {
+                while (--index >= 0)
+                {
+                    rollback.Invoke(source[index]);
+                }
+            }
         }
     }
 }

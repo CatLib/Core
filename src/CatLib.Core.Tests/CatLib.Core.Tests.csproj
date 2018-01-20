@@ -36,6 +36,8 @@
   <ItemGroup>
     <Compile Include="CatLib\ApplicationTests.cs" />
     <Compile Include="CatLib\FacaedTests.cs" />
+    <Compile Include="Support\Container\ContainerPerformanceTests.cs" />
+    <Compile Include="Support\Container\MethodContainerTests.cs" />
     <Compile Include="Support\Dispatcher\DispatcherTests.cs" />
     <Compile Include="ExceptionAssert.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -44,13 +46,13 @@
     <Compile Include="Support\Container\ContainerTests.cs" />
     <Compile Include="Support\Container\GivenDataTests.cs" />
     <Compile Include="Support\FilterChain\FilterChainTests.cs" />
-    <Compile Include="Support\LruCache\LruCacheTests.cs" />
     <Compile Include="Support\QuickList\InternalListTests.cs" />
     <Compile Include="Support\QuickList\QuickListTests.cs" />
     <Compile Include="Support\SortSet\SortSetTests.cs" />
     <Compile Include="Support\Template\ManagerTests.cs" />
     <Compile Include="Support\Template\SingleManagerTests.cs" />
     <Compile Include="Support\Util\ArrTests.cs" />
+    <Compile Include="Support\Util\DictTests.cs" />
     <Compile Include="Support\Util\EnumTests.cs" />
     <Compile Include="Support\Util\ReferenceCountTests.cs" />
     <Compile Include="Support\Util\StrTests.cs" />

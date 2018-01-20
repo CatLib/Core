@@ -120,9 +120,9 @@ namespace CatLib.Tests
         public void MakeAssemblyClass()
         {
             var app = new Application();
-            var lru = app.MakeWith<LruCache<string, string>>(10);
+            var sortSet = app.Make<SortSet<string, string>>();
 
-            Assert.AreNotEqual(null, lru);
+            Assert.AreNotEqual(null, sortSet);
         }
 
         [TestMethod]
@@ -131,7 +131,7 @@ namespace CatLib.Tests
             var app = new Application();
             ExceptionAssert.DoesNotThrow(() =>
             {
-                app.On("hello", (o) => { });
+                app.On("hello", () => { });
             });
         }
 
@@ -143,6 +143,13 @@ namespace CatLib.Tests
         {
             var app = MakeApplication();
             Assert.AreEqual(Application.StartProcess.Inited, app.Process);
+        }
+
+        [TestMethod]
+        public void TestDebugLevel()
+        {
+            App.DebugLevel = DebugLevels.Dev;
+            Assert.AreEqual(DebugLevels.Dev, App.DebugLevel);
         }
 
         /// <summary>
@@ -302,7 +309,7 @@ namespace CatLib.Tests
         {
             var app = MakeApplication();
 
-            app.Listen("testevent", (payload) =>
+            app.Listen("testevent", (object payload) =>
             {
                 Assert.AreEqual("abc", payload);
                 return 123;

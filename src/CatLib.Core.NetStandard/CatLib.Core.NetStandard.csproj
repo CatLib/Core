@@ -65,26 +65,32 @@
     <Compile Include="..\CatLib.Core\CatLib\IServiceProviderType.cs" Link="CatLib\IServiceProviderType.cs" />
     <Compile Include="..\CatLib.Core\Support\Attribute\ExcludeFromCodeCoverageAttribute.cs" Link="Support\Attribute\ExcludeFromCodeCoverageAttribute.cs" />
     <Compile Include="..\CatLib.Core\Support\Attribute\PriorityAttribute.cs" Link="Support\Attribute\PriorityAttribute.cs" />
+    <Compile Include="..\CatLib.Core\Support\Container\Bindable.cs" Link="Support\Container\Bindable.cs" />
     <Compile Include="..\CatLib.Core\Support\Container\BindData.cs" Link="Support\Container\BindData.cs" />
     <Compile Include="..\CatLib.Core\Support\Container\Container.cs" Link="Support\Container\Container.cs" />
     <Compile Include="..\CatLib.Core\Support\Container\ContainerExtend.cs" Link="Support\Container\ContainerExtend.cs" />
     <Compile Include="..\CatLib.Core\Support\Container\GivenData.cs" Link="Support\Container\GivenData.cs" />
+    <Compile Include="..\CatLib.Core\Support\Container\IBindable.cs" Link="Support\Container\IBindable.cs" />
+    <Compile Include="..\CatLib.Core\Support\Container\IBindData.cs" Link="Support\Container\IBindData.cs" />
     <Compile Include="..\CatLib.Core\Support\Container\IContainer.cs" Link="Support\Container\IContainer.cs" />
+    <Compile Include="..\CatLib.Core\Support\Container\IGivenData.cs" Link="Support\Container\IGivenData.cs" />
+    <Compile Include="..\CatLib.Core\Support\Container\IMethodBind.cs" Link="Support\Container\IMethodBind.cs" />
     <Compile Include="..\CatLib.Core\Support\Container\InjectAttribute.cs" Link="Support\Container\InjectAttribute.cs" />
-    <Compile Include="..\CatLib.Core\Support\Container\Internal\IBindData.cs" Link="Support\Container\Internal\IBindData.cs" />
-    <Compile Include="..\CatLib.Core\Support\Container\Internal\IGivenData.cs" Link="Support\Container\Internal\IGivenData.cs" />
-    <Compile Include="..\CatLib.Core\Support\Dispatcher\Dispatcher.cs" Link="Support\Dispatcher\Dispatcher.cs" />
-    <Compile Include="..\CatLib.Core\Support\Dispatcher\EventHandler.cs" Link="Support\Dispatcher\EventHandler.cs" />
-    <Compile Include="..\CatLib.Core\Support\Dispatcher\IDispatcher.cs" Link="Support\Dispatcher\IDispatcher.cs" />
-    <Compile Include="..\CatLib.Core\Support\Dispatcher\IEventHandler.cs" Link="Support\Dispatcher\IEventHandler.cs" />
+    <Compile Include="..\CatLib.Core\Support\Container\IVariant.cs" Link="Support\Container\IVariant.cs" />
+    <Compile Include="..\CatLib.Core\Support\Container\MethodBind.cs" Link="Support\Container\MethodBind.cs" />
+    <Compile Include="..\CatLib.Core\Support\Container\MethodContainer.cs" Link="Support\Container\MethodContainer.cs" />
+    <Compile Include="..\CatLib.Core\Support\Container\Params.cs" Link="Support\Container\Params.cs" />
+    <Compile Include="..\CatLib.Core\Support\Container\UnresolvableException.cs" Link="Support\Container\UnresolvableException.cs" />
+    <Compile Include="..\CatLib.Core\Support\Events\Dispatcher.cs" Link="Support\Events\Dispatcher.cs" />
+    <Compile Include="..\CatLib.Core\Support\Events\DispatcherExtend.cs" Link="Support\Events\DispatcherExtend.cs" />
+    <Compile Include="..\CatLib.Core\Support\Events\Event.cs" Link="Support\Events\Event.cs" />
+    <Compile Include="..\CatLib.Core\Support\Events\IDispatcher.cs" Link="Support\Events\IDispatcher.cs" />
+    <Compile Include="..\CatLib.Core\Support\Events\IEvent.cs" Link="Support\Events\IEvent.cs" />
     <Compile Include="..\CatLib.Core\Support\Exception\AssertException.cs" Link="Support\Exception\AssertException.cs" />
     <Compile Include="..\CatLib.Core\Support\Exception\RuntimeException.cs" Link="Support\Exception\RuntimeException.cs" />
     <Compile Include="..\CatLib.Core\Support\FilterChain\FilterChain.cs" Link="Support\FilterChain\FilterChain.cs" />
     <Compile Include="..\CatLib.Core\Support\FilterChain\IFilterChain.cs" Link="Support\FilterChain\IFilterChain.cs" />
     <Compile Include="..\CatLib.Core\Support\Guard\Guard.cs" Link="Support\Guard\Guard.cs" />
-    <Compile Include="..\CatLib.Core\Support\LruCache\CacheNode.cs" Link="Support\LruCache\CacheNode.cs" />
-    <Compile Include="..\CatLib.Core\Support\LruCache\ILruCache.cs" Link="Support\LruCache\ILruCache.cs" />
-    <Compile Include="..\CatLib.Core\Support\LruCache\LruCache.cs" Link="Support\LruCache\LruCache.cs" />
     <Compile Include="..\CatLib.Core\Support\QuickList\InternalList.cs" Link="Support\QuickList\InternalList.cs" />
     <Compile Include="..\CatLib.Core\Support\QuickList\IQuickList.cs" Link="Support\QuickList\IQuickList.cs" />
     <Compile Include="..\CatLib.Core\Support\QuickList\QuickList.cs" Link="Support\QuickList\QuickList.cs" />
@@ -99,6 +105,7 @@
     <Compile Include="..\CatLib.Core\Support\Template\SingleManaged.cs" Link="Support\Template\SingleManaged.cs" />
     <Compile Include="..\CatLib.Core\Support\Template\SingleManager.cs" Link="Support\Template\SingleManager.cs" />
     <Compile Include="..\CatLib.Core\Support\Util\Arr.cs" Link="Support\Util\Arr.cs" />
+    <Compile Include="..\CatLib.Core\Support\Util\Dict.cs" Link="Support\Util\Dict.cs" />
     <Compile Include="..\CatLib.Core\Support\Util\Enum.cs" Link="Support\Util\Enum.cs" />
     <Compile Include="..\CatLib.Core\Support\Util\IAwait.cs" Link="Support\Util\IAwait.cs" />
     <Compile Include="..\CatLib.Core\Support\Util\IReferenceCount.cs" Link="Support\Util\IReferenceCount.cs" />
@@ -113,16 +120,13 @@
     <Folder Include="..\CatLib.Core\Properties\" />
     <Folder Include="CatLib\" />
     <Folder Include="Support\Attribute\" />
-    <Folder Include="Support\Container\Internal\" />
-    <Folder Include="Support\Dispatcher\" />
+    <Folder Include="Support\Events\" />
     <Folder Include="Support\Exception\" />
     <Folder Include="Support\FilterChain\" />
     <Folder Include="Support\Guard\" />
-    <Folder Include="Support\LruCache\" />
     <Folder Include="Support\QuickList\" />
     <Folder Include="Support\SortSet\" />
     <Folder Include="Support\Template\" />
-    <Folder Include="Support\Util\" />
   </ItemGroup>
 
 </Project>
