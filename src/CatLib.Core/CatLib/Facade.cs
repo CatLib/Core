@@ -84,7 +84,13 @@ namespace CatLib
 
             if (binder == null || binder != newBinder)
             {
-                newBinder.OnRelease((_, __) => instance = default(TService));
+                newBinder.OnRelease((oldBinder, __) =>
+                {
+                    if (oldBinder == binder)
+                    {
+                        instance = default(TService);
+                    }
+                });
                 binder = newBinder;
             }
 
