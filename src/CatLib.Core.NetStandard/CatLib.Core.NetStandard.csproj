@@ -91,9 +91,6 @@
     <Compile Include="..\CatLib.Core\Support\FilterChain\FilterChain.cs" Link="Support\FilterChain\FilterChain.cs" />
     <Compile Include="..\CatLib.Core\Support\FilterChain\IFilterChain.cs" Link="Support\FilterChain\IFilterChain.cs" />
     <Compile Include="..\CatLib.Core\Support\Guard\Guard.cs" Link="Support\Guard\Guard.cs" />
-    <Compile Include="..\CatLib.Core\Support\LruCache\CacheNode.cs" Link="Support\LruCache\CacheNode.cs" />
-    <Compile Include="..\CatLib.Core\Support\LruCache\ILruCache.cs" Link="Support\LruCache\ILruCache.cs" />
-    <Compile Include="..\CatLib.Core\Support\LruCache\LruCache.cs" Link="Support\LruCache\LruCache.cs" />
     <Compile Include="..\CatLib.Core\Support\QuickList\InternalList.cs" Link="Support\QuickList\InternalList.cs" />
     <Compile Include="..\CatLib.Core\Support\QuickList\IQuickList.cs" Link="Support\QuickList\IQuickList.cs" />
     <Compile Include="..\CatLib.Core\Support\QuickList\QuickList.cs" Link="Support\QuickList\QuickList.cs" />
@@ -127,7 +124,6 @@
     <Folder Include="Support\Exception\" />
     <Folder Include="Support\FilterChain\" />
     <Folder Include="Support\Guard\" />
-    <Folder Include="Support\LruCache\" />
     <Folder Include="Support\QuickList\" />
     <Folder Include="Support\SortSet\" />
     <Folder Include="Support\Template\" />

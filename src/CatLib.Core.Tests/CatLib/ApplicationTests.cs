@@ -120,9 +120,9 @@ namespace CatLib.Tests
         public void MakeAssemblyClass()
         {
             var app = new Application();
-            var lru = app.Make<LruCache<string, string>>(10);
+            var sortSet = app.Make<SortSet<string, string>>();
 
-            Assert.AreNotEqual(null, lru);
+            Assert.AreNotEqual(null, sortSet);
         }
 
         [TestMethod]

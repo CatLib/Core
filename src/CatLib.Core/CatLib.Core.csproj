@@ -74,9 +74,6 @@
     <Compile Include="Support\FilterChain\FilterChain.cs" />
     <Compile Include="Support\FilterChain\IFilterChain.cs" />
     <Compile Include="Support\Guard\Guard.cs" />
-    <Compile Include="Support\LruCache\CacheNode.cs" />
-    <Compile Include="Support\LruCache\ILruCache.cs" />
-    <Compile Include="Support\LruCache\LruCache.cs" />
     <Compile Include="Support\QuickList\InternalList.cs" />
     <Compile Include="Support\QuickList\IQuickList.cs" />
     <Compile Include="Support\QuickList\QuickList.cs" />

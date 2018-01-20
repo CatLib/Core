@@ -46,7 +46,6 @@
     <Compile Include="Support\Container\ContainerTests.cs" />
     <Compile Include="Support\Container\GivenDataTests.cs" />
     <Compile Include="Support\FilterChain\FilterChainTests.cs" />
-    <Compile Include="Support\LruCache\LruCacheTests.cs" />
     <Compile Include="Support\QuickList\InternalListTests.cs" />
     <Compile Include="Support\QuickList\QuickListTests.cs" />
     <Compile Include="Support\SortSet\SortSetTests.cs" />
