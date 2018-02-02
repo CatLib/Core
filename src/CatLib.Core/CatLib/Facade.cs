@@ -24,7 +24,7 @@ namespace CatLib
         /// <summary>
         /// 绑定数据
         /// </summary>
-        private static IBindable binder;
+        private static IBindData binder;
 
         /// <summary>
         /// 是否已经被初始化
@@ -32,20 +32,28 @@ namespace CatLib
         private static bool inited;
 
         /// <summary>
+        /// 服务名
+        /// </summary>
+        private static string service;
+
+        /// <summary>
+        /// 是否被释放
+        /// </summary>
+        private static bool released;
+
+        /// <summary>
         /// 门面静态构造
         /// </summary>
         static Facade()
         {
-            if (!typeof(TService).IsInterface)
-            {
-                throw new RuntimeException("Facade<" + typeof(TService).Name + "> , generic type must be interface.");
-            }
-
+            service = App.Type2Service(typeof(TService));
             App.OnNewApplication += app =>
             {
                 instance = default(TService);
                 binder = null;
                 inited = false;
+                released = false;
+                service = App.Type2Service(typeof(TService));
             };
         }
 
@@ -54,63 +62,106 @@ namespace CatLib
         /// </summary>
         public static TService Instance
         {
-            get
-            {
-                if (instance != null)
-                {
-                    return instance;
-                }
-
-                return Make();
-            }
+            get { return Make(); }
         }
 
         /// <summary>
-        /// 初始化
+        /// 构建一个服务实例
         /// </summary>
-        private static TService Make()
+        /// <param name="userParams">用户参数</param>
+        /// <returns>服务实例</returns>
+        internal static TService Make(params object[] userParams)
         {
+            if (binder != null && binder.IsStatic && !released && instance != null)
+            {
+                return instance;
+            }
+
+            return Resolve(userParams);
+        }
+
+        /// <summary>
+        /// 构建一个服务
+        /// </summary>
+        private static TService Resolve(params object[] userParams)
+        {
+            released = false;
+
             if (!inited)
             {
                 App.Watch<TService>(ServiceRebound);
                 inited = true;
             }
+            else
+            {
+                // 如果已经初始化了说明binder已经被初始化过。
+                // 那么提前判断可以优化性能而不用经过一个hash查找。
+                if (binder != null && !binder.IsStatic)
+                {
+                    return Build(userParams);
+                }
+            }
 
-            var newBinder = App.GetBind<TService>();
+            var newBinder = App.GetBind(service);
             if (newBinder == null || !newBinder.IsStatic)
             {
-                return App.Make<TService>();
-            }
-
-            if (binder == null || binder != newBinder)
-            {
-                newBinder.OnRelease((oldBinder, __) =>
-                {
-                    if (oldBinder == binder)
-                    {
-                        instance = default(TService);
-                    }
-                });
                 binder = newBinder;
+                return Build(userParams);
             }
 
-            return instance = App.Make<TService>();
+            Rebind(newBinder);
+            return instance = Build(userParams);
+        }
+
+        /// <summary>
+        /// 当服务被释放时
+        /// </summary>
+        /// <param name="oldBinder">旧的绑定器</param>
+        /// <param name="_">忽略的参数</param>
+        private static void OnRelease(IBindData oldBinder, object _)
+        {
+            if (oldBinder != binder)
+            {
+                return;
+            }
+
+            instance = default(TService);
+            released = true;
         }
 
         /// <summary>
         /// 当服务被重绑定时
         /// </summary>
-        /// <param name="service">新的服务实例</param>
-        private static void ServiceRebound(TService service)
+        /// <param name="newService">新的服务实例</param>
+        private static void ServiceRebound(TService newService)
         {
-            var newBinder = App.GetBind<TService>();
-            if (newBinder == null || !newBinder.IsStatic)
+            var newBinder = App.GetBind(service);
+            Rebind(newBinder);
+            instance = (newBinder == null || !newBinder.IsStatic) ? default(TService) : newService;
+        }
+
+        /// <summary>
+        /// 重新绑定
+        /// </summary>
+        /// <param name="newBinder">新的Binder</param>
+        private static void Rebind(IBindData newBinder)
+        {
+            if (newBinder != null && binder != newBinder && newBinder.IsStatic)
             {
-                instance = default(TService);
-                return;
+                newBinder.OnRelease(OnRelease);
             }
 
-            instance = service;
+            binder = newBinder;
+        }
+
+        /// <summary>
+        /// 生成服务
+        /// </summary>
+        /// <param name="userParams">服务名</param>
+        /// <returns>服务实例</returns>
+        private static TService Build(params object[] userParams)
+        {
+            return (TService) App.Make(service, userParams);
         }
     }
 }

@@ -609,7 +609,7 @@ namespace CatLib
         /// 释放静态化实例
         /// </summary>
         /// <param name="service">服务名或别名</param>
-        public void Release(string service)
+        public bool Release(string service)
         {
             Guard.NotEmptyOrNull(service, "service");
             lock (syncRoot)
@@ -619,7 +619,7 @@ namespace CatLib
                 object instance;
                 if (!instances.TryGetValue(service, out instance))
                 {
-                    return;
+                    return false;
                 }
 
                 var bindData = GetBindFillable(service);
@@ -627,6 +627,8 @@ namespace CatLib
                 TriggerOnRelease(bindData, instance);
                 DisposeInstance(instance);
                 instances.Remove(service);
+
+                return true;
             }
         }
 

@@ -472,9 +472,9 @@ namespace CatLib
         /// </summary>
         /// <typeparam name="TService">服务名</typeparam>
         /// <param name="container">服务容器</param>
-        public static void Release<TService>(this IContainer container)
+        public static bool Release<TService>(this IContainer container)
         {
-            container.Release(container.Type2Service(typeof(TService)));
+            return container.Release(container.Type2Service(typeof(TService)));
         }
 
         /// <summary>
