@@ -35,26 +35,6 @@ namespace CatLib.Tests
         }
 
         [TestMethod]
-        public void FacadeErrorTest()
-        {
-            var app = new Application();
-            app.Bootstrap();
-            app.Singleton<FacaedTestClass>();
-
-            var isError = false;
-            try
-            {
-                var data = TestClassFacadeError.Instance;
-            }
-            catch (TypeInitializationException)
-            {
-                isError = true;
-            }
-
-            Assert.AreEqual(true, isError);
-        }
-
-        [TestMethod]
         public void FacadeWatchTest()
         {
             var app = new Application();
@@ -204,6 +184,168 @@ namespace CatLib.Tests
                 isError = true;
             }
             Assert.AreEqual(true, isError);
+        }
+
+        [TestMethod]
+        public void TestStructBindAndRebound()
+        {
+            var app = new Application();
+            Assert.AreEqual(0, Facade<int>.Instance);
+            Assert.AreEqual(0, Facade<int>.Instance); // double check
+            var makeCount = 0;
+            var binder = app.Bind<int>(() =>
+            {
+                makeCount++;
+                return 100;
+            });
+            Assert.AreEqual(100, Facade<int>.Instance);
+            Assert.AreEqual(100, Facade<int>.Instance); // double check
+            Assert.AreEqual(3, makeCount); // 这里为3是因为最开始的facade触发已经引发了解决事件
+            binder.Unbind();
+            Assert.AreEqual(0, Facade<int>.Instance);
+            Assert.AreEqual(0, Facade<int>.Instance); // double check
+            app.Bind<int>(() =>
+            {
+                makeCount++;
+                return 200;
+            });
+            Assert.AreEqual(200, Facade<int>.Instance);
+            Assert.AreEqual(200, Facade<int>.Instance); // double check
+            Assert.AreEqual(6, makeCount);
+        }
+
+        [TestMethod]
+        public void TestStructSingleAndRebound()
+        {
+            var app = new Application();
+            var makeCount = 0;
+            var binder = app.Singleton<int>(() =>
+            {
+                makeCount++;
+                return 100;
+            });
+            Assert.AreEqual(100, Facade<int>.Instance);
+            Assert.AreEqual(100, Facade<int>.Instance); // double check
+            Assert.AreEqual(1, makeCount);
+            app.Instance<int>(200);
+            Assert.AreEqual(200, Facade<int>.Instance);
+            Assert.AreEqual(200, Facade<int>.Instance); // double check
+            Assert.AreEqual(1, makeCount);
+            binder.Unbind();
+            Assert.AreEqual(0, Facade<int>.Instance);
+            Assert.AreEqual(0, Facade<int>.Instance); // double check
+            Assert.AreEqual(1, makeCount);
+            binder = app.Singleton<int>(() =>
+            {
+                makeCount++;
+                return 200;
+            });
+            Assert.AreEqual(200, Facade<int>.Instance);
+            Assert.AreEqual(200, Facade<int>.Instance); // double check
+            Assert.AreEqual(2, makeCount);
+
+            binder.Unbind(); // 三次连续测试来测试一个特殊情况
+            Assert.AreEqual(0, Facade<int>.Instance);
+            Assert.AreEqual(0, Facade<int>.Instance); // double check
+            Assert.AreEqual(2, makeCount);
+            binder = app.Singleton<int>(() =>
+            {
+                makeCount++;
+                return 300;
+            });
+            Assert.AreEqual(300, Facade<int>.Instance);
+            Assert.AreEqual(300, Facade<int>.Instance); // double check
+            Assert.AreEqual(3, makeCount);
+            app.Release<int>();
+            Assert.AreEqual(300, Facade<int>.Instance);
+            Assert.AreEqual(4, makeCount);
+        }
+
+        [TestMethod]
+        public void TestStructSingleToBindAndRebound()
+        {
+            var app = new Application();
+            var makeCount = 0;
+            var binder = app.Bind<int>(() =>
+            {
+                makeCount++;
+                return 100;
+            });
+            Assert.AreEqual(100, Facade<int>.Instance);
+            Assert.AreEqual(100, Facade<int>.Instance); // double check
+            Assert.AreEqual(2, makeCount);
+
+            binder.Unbind();
+            Assert.AreEqual(0, Facade<int>.Instance);
+
+            binder = app.Singleton<int>(() =>
+            {
+                makeCount++;
+                return 200;
+            });
+            Assert.AreEqual(200, Facade<int>.Instance);
+            Assert.AreEqual(200, Facade<int>.Instance); // double check
+            Assert.AreEqual(3, makeCount);
+        }
+
+        [TestMethod]
+        public void TestStructSingleRelease()
+        {
+            var app = new Application();
+            var makeCount = 0;
+            var binder = app.Singleton<int>(() =>
+            {
+                makeCount++;
+                return 100;
+            });
+            Assert.AreEqual(100, Facade<int>.Instance);
+            Assert.AreEqual(100, Facade<int>.Instance); // double check
+            Assert.AreEqual(1, makeCount);
+            app.Release<int>();
+            Assert.AreEqual(100, Facade<int>.Instance);
+            app.Instance<int>(200);
+            Assert.AreEqual(200, Facade<int>.Instance);
+            app.Release<int>();
+            app.Instance<int>(300);
+            Assert.AreEqual(300, Facade<int>.Instance);
+        }
+
+        [TestMethod]
+        public void TestStructBindToSingleRebound()
+        {
+            var app = new Application();
+            var makeCount = 0;
+            var binder = app.Bind<int>(() =>
+            {
+                makeCount++;
+                return 100;
+            });
+            Assert.AreEqual(100, Facade<int>.Instance);
+            Assert.AreEqual(100, Facade<int>.Instance); // double check
+            Assert.AreEqual(2, makeCount);
+
+            Assert.AreEqual(false, app.Release<int>());
+            binder.Unbind();
+            binder = app.Singleton<int>(() =>
+            {
+                makeCount++;
+                return 200;
+            });
+            Assert.AreEqual(3, makeCount);
+            Assert.AreEqual(200, Facade<int>.Instance);
+            Assert.AreEqual(200, Facade<int>.Instance);
+            Assert.AreEqual(3, makeCount);
+
+            Assert.AreEqual(true, app.Release<int>());
+            Assert.AreEqual(200, Facade<int>.Instance);
+            Assert.AreEqual(200, Facade<int>.Instance);
+            Assert.AreEqual(4, makeCount);
+
+            Assert.AreEqual(true, app.Release<int>());
+            app.Instance<int>(300);
+            Assert.AreEqual(300, Facade<int>.Instance);
+            Assert.AreEqual(300, Facade<int>.Instance);
+            Assert.AreEqual(4, makeCount);
         }
     }
 }

@@ -120,7 +120,7 @@ namespace CatLib.Tests.Stl
         [TestMethod]
         public void TestBindMake()
         {
-            var container = new Container();
+            var container = new Application();
             container.Bind<TestMakeHandClass>((_, __) => new TestMakeHandClass(null));
             container.Singleton<TestSerializeClass>();
             container.Bind<TestMakeClass>().Alias<ITestMakeClass>();
@@ -128,17 +128,17 @@ namespace CatLib.Tests.Stl
         
             Watch("TestBindMake(非反射) 1000000次", () =>
             {
-                container.Make<TestMakeHandClass>();
+                App.Make<TestMakeHandClass>();
             }, 1000000);
             
             Watch("TestBindMake(反射，依赖注入) 1000000次", () =>
             {
-                container.Make<ITestMakeClass>();
+                App.Make<ITestMakeClass>();
             }, 1000000);
 
             Watch("TestBindMake(反射，无注入) 1000000次", () =>
             {
-                container.Make<ITestMakeNullParamsClass>();
+                App.Make<ITestMakeNullParamsClass>();
             }, 1000000);
         }
 

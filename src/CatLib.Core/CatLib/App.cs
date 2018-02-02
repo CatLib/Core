@@ -19,7 +19,7 @@ namespace CatLib
     /// CatLib实例
     /// </summary>
     [ExcludeFromCodeCoverage]
-    public class App
+    public abstract class App
     {
         #region Original
         /// <summary>
@@ -521,9 +521,9 @@ namespace CatLib
         /// 释放某个静态化实例
         /// </summary>
         /// <param name="service">服务名或别名</param>
-        public static void Release(string service)
+        public static bool Release(string service)
         {
-            Handler.Release(service);
+            return Handler.Release(service);
         }
 
         /// <summary>
@@ -1018,9 +1018,9 @@ namespace CatLib
         /// 释放服务
         /// </summary>
         /// <typeparam name="TService">服务名</typeparam>
-        public static void Release<TService>()
+        public static bool Release<TService>()
         {
-            Handler.Release<TService>();
+            return Handler.Release<TService>();
         }
 
         /// <summary>
@@ -1123,7 +1123,7 @@ namespace CatLib
         /// <returns>服务实例</returns>
         public static TService Make<TService>(params object[] userParams)
         {
-            return Handler.Make<TService>(userParams);
+            return Facade<TService>.Make(userParams);
         }
 
         /// <summary>
@@ -1144,7 +1144,7 @@ namespace CatLib
         /// <returns>回调方案</returns>
         public static Func<TService> Factory<TService>(params object[] userParams)
         {
-            return Handler.Factory<TService>(userParams);
+            return () => Make<TService>(userParams);
         }
 
         /// <summary>

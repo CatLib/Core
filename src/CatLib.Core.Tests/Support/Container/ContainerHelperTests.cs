@@ -145,6 +145,7 @@ namespace CatLib.Tests
             Assert.AreEqual(true, App.BindIf<long>((c,p) => 100, out bindData));
             Assert.AreEqual(true, App.BindIf<int>(() => 100, out bindData));
             Assert.AreEqual(100, App.Make<int>());
+            Assert.AreEqual(100, App.Make<int>()); // double get check
             Assert.AreEqual(true, App.BindIf<double, float>(out bindData));
             Assert.AreEqual(false, App.BindIf<double, float>(out bindData));
 

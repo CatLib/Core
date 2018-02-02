@@ -158,7 +158,7 @@ namespace CatLib
         /// 释放某个静态化实例
         /// </summary>
         /// <param name="service">服务名或别名</param>
-        void Release(string service);
+        bool Release(string service);
 
         /// <summary>
         /// 清空容器的所有实例，绑定，别名，标签，解决器，方法容器
