@@ -132,6 +132,12 @@ namespace CatLib.Tests.Stl
                 Assert.AreSame(bindData, bind);
             });
 
+            // double check
+            bindData.OnRelease((bind, obj) =>
+            {
+                Assert.AreEqual("Test", obj);
+            });
+
             container.Instance("CanAddOnRelease", "Test");
             container.Release("CanAddOnRelease");
         }
@@ -151,7 +157,7 @@ namespace CatLib.Tests.Stl
 
             ExceptionAssert.Throws<RuntimeException>(() =>
             {
-                bindData.OnRelease((bind, obj) =>
+                bindData.OnRelease((obj) =>
                 {
                     Assert.Fail();
                 });
@@ -163,6 +169,17 @@ namespace CatLib.Tests.Stl
         #endregion
 
         #region OnResolving
+
+        [TestMethod]
+        public void TestAddOnResolvingWithExtend()
+        {
+            var container = new Container();
+            var bindData = new BindData(container, "CanAddOnResolving", (app, param) => "hello world", false);
+            bindData.OnResolving((obj) => Assert.AreEqual("hello world", obj));
+            var data = bindData.TriggerResolving("hello world");
+            Assert.AreEqual("hello world", data);
+        }
+
         /// <summary>
         /// 是否能追加到解决事件
         /// </summary>

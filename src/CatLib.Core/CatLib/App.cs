@@ -1148,6 +1148,26 @@ namespace CatLib
         }
 
         /// <summary>
+        /// 当静态服务被释放时
+        /// </summary>
+        /// <param name="callback">处理释放时的回调</param>
+        /// <returns>当前容器实例</returns>
+        public static IContainer OnRelease(Action<object> callback)
+        {
+            return Handler.OnRelease(callback);
+        }
+
+        /// <summary>
+        /// 当服务被解决时，生成的服务会经过注册的回调函数
+        /// </summary>
+        /// <param name="callback">回调函数</param>
+        /// <returns>当前容器对象</returns>
+        public static IContainer OnResolving(Action<object> callback)
+        {
+            return Handler.OnResolving(callback);
+        }
+
+        /// <summary>
         /// 关注指定的服务，当服务触发重定义时调用指定对象的指定方法
         /// <param>调用是以依赖注入的形式进行的</param>
         /// </summary>
