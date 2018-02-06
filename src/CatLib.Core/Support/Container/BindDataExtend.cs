@@ -48,5 +48,20 @@ namespace CatLib
                 action(instance);
             });
         }
+
+        /// <summary>
+        /// 当静态服务被释放时
+        /// </summary>
+        /// <param name="bindData">绑定数据</param>
+        /// <param name="action">处理事件</param>
+        /// <returns>服务绑定数据</returns>
+        public static IBindData OnRelease(this IBindData bindData, Action action)
+        {
+            Guard.Requires<ArgumentNullException>(action != null);
+            return bindData.OnRelease((_, __) =>
+            {
+                action();
+            });
+        }
     }
 }
