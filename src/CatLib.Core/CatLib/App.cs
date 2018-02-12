@@ -359,7 +359,7 @@ namespace CatLib
         /// <returns>是否已经静态化</returns>
         public static bool HasInstance<TService>()
         {
-            return Handler.HasInstance<TService>();
+            return Facade<TService>.HasInstance || Handler.HasInstance<TService>();
         }
 
         /// <summary>

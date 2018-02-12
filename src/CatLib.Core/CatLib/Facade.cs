@@ -66,18 +66,23 @@ namespace CatLib
         }
 
         /// <summary>
+        /// 是否拥有门面实例
+        /// <para>如果为非静态绑定那么永远返回<code>false</code></para>
+        /// <para>门面实例判断不能代替:<code>Container.HasInstance</code></para>
+        /// </summary>
+        internal static bool HasInstance
+        {
+            get { return binder != null && binder.IsStatic && !released && instance != null; }
+        }
+
+        /// <summary>
         /// 构建一个服务实例
         /// </summary>
         /// <param name="userParams">用户参数</param>
         /// <returns>服务实例</returns>
         internal static TService Make(params object[] userParams)
         {
-            if (binder != null && binder.IsStatic && !released && instance != null)
-            {
-                return instance;
-            }
-
-            return Resolve(userParams);
+            return HasInstance ? instance : Resolve(userParams);
         }
 
         /// <summary>
