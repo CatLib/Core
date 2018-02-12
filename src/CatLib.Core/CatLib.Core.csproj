@@ -26,7 +26,7 @@
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>..\..\build\Net35\</OutputPath>
-    <DefineConstants>TRACE;CATLIB</DefineConstants>
+    <DefineConstants>TRACE;CATLIB;CATLIB_PERFORMANCE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>

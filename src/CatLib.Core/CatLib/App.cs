@@ -359,7 +359,11 @@ namespace CatLib
         /// <returns>是否已经静态化</returns>
         public static bool HasInstance<TService>()
         {
+#if CATLIB_PERFORMANCE
             return Facade<TService>.HasInstance || Handler.HasInstance<TService>();
+#else
+            return Handler.HasInstance<TService>();
+#endif
         }
 
         /// <summary>
@@ -654,9 +658,9 @@ namespace CatLib
         {
             return Handler.Type2Service(type);
         }
-        #endregion
+#endregion
 
-        #region Container Extend API
+#region Container Extend API
         /// <summary>
         /// 获取服务的绑定数据,如果绑定不存在则返回null
         /// </summary>
@@ -1123,7 +1127,11 @@ namespace CatLib
         /// <returns>服务实例</returns>
         public static TService Make<TService>(params object[] userParams)
         {
+#if CATLIB_PERFORMANCE
             return Facade<TService>.Make(userParams);
+#else
+            return Handler.Make<TService>(userParams);
+#endif
         }
 
         /// <summary>
@@ -1233,6 +1241,6 @@ namespace CatLib
         {
             return Handler.Type2Service<TService>();
         }
-        #endregion
+#endregion
     }
 }
