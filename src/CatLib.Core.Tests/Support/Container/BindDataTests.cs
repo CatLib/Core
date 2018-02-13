@@ -124,7 +124,7 @@ namespace CatLib.Tests.Stl
         public void CanOnRelease()
         {
             var container = new Container();
-            var bindData = new BindData(container, "CanAddOnRelease", (app, param) => "hello world", true);
+            var bindData = container.Bind("CanAddOnRelease", (app, param) => "hello world", true);
 
             bindData.OnRelease((bind, obj) =>
             {
@@ -132,8 +132,21 @@ namespace CatLib.Tests.Stl
                 Assert.AreSame(bindData, bind);
             });
 
+            // double check
+            bindData.OnRelease((obj) =>
+            {
+                Assert.AreEqual("Test", obj);
+            });
+
+            var isCall = false;
+            bindData.OnRelease(()=>
+            {
+                isCall = true;
+            });
+
             container.Instance("CanAddOnRelease", "Test");
             container.Release("CanAddOnRelease");
+            Assert.AreEqual(true, isCall);
         }
         /// <summary>
         /// 检查无效的解决事件传入参数
@@ -142,7 +155,7 @@ namespace CatLib.Tests.Stl
         public void CheckIllegalRelease()
         {
             var container = new Container();
-            var bindData = new BindData(container, "CheckIllegalRelease", (app, param) => "hello world", false);
+            var bindData = container.Bind("CheckIllegalRelease", (app, param) => "hello world", false);
 
             ExceptionAssert.Throws<ArgumentNullException>(() =>
             {
@@ -151,7 +164,7 @@ namespace CatLib.Tests.Stl
 
             ExceptionAssert.Throws<RuntimeException>(() =>
             {
-                bindData.OnRelease((bind, obj) =>
+                bindData.OnRelease((obj) =>
                 {
                     Assert.Fail();
                 });
@@ -163,6 +176,17 @@ namespace CatLib.Tests.Stl
         #endregion
 
         #region OnResolving
+
+        [TestMethod]
+        public void TestAddOnResolvingWithExtend()
+        {
+            var container = new Container();
+            var bindData = new BindData(container, "CanAddOnResolving", (app, param) => "hello world", false);
+            bindData.OnResolving((obj) => Assert.AreEqual("hello world", obj));
+            var data = bindData.TriggerResolving("hello world");
+            Assert.AreEqual("hello world", data);
+        }
+
         /// <summary>
         /// 是否能追加到解决事件
         /// </summary>

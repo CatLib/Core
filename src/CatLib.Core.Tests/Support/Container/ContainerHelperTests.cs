@@ -309,6 +309,17 @@ namespace CatLib.Tests
             Assert.AreEqual(true, isCall);
         }
 
+        [TestMethod]
+        public void TestReleaseWithObject()
+        {
+            var container = new Container();
+            container.Instance<string>("abc");
+            container.Instance<int>(10);
+            Assert.AreEqual(true, container.Release("abc", 10, null));
+            object[] data = null;
+            Assert.AreEqual(true, container.Release(data));
+        }
+
         /// <summary>
         /// 生成容器
         /// </summary>

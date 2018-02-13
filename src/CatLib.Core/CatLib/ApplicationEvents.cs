@@ -30,5 +30,15 @@ namespace CatLib
         /// 当程序启动完成
         /// </summary>
         public static readonly string OnStartCompleted = "CatLib.ApplicationEvents.OnStartCompleted";
+
+        /// <summary>
+        /// 当程序终止之前
+        /// </summary>
+        public static readonly string OnTerminate = "CatLib.ApplicationEvents.OnTerminate";
+
+        /// <summary>
+        /// 当程序终止之后
+        /// </summary>
+        public static readonly string OnTerminated = "CatLib.ApplicationEvents.OnTerminated";
     }
 }

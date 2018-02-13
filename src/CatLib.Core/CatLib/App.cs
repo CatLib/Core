@@ -58,6 +58,14 @@ namespace CatLib
 
         #region Application API
         /// <summary>
+        /// 终止CatLib框架
+        /// </summary>
+        public static void Terminate()
+        {
+            Handler.Terminate();
+        }
+
+        /// <summary>
         /// 注册服务提供者
         /// </summary>
         /// <param name="provider">服务提供者</param>
@@ -359,7 +367,11 @@ namespace CatLib
         /// <returns>是否已经静态化</returns>
         public static bool HasInstance<TService>()
         {
+#if CATLIB_PERFORMANCE
+            return Facade<TService>.HasInstance || Handler.HasInstance<TService>();
+#else
             return Handler.HasInstance<TService>();
+#endif
         }
 
         /// <summary>
@@ -654,9 +666,9 @@ namespace CatLib
         {
             return Handler.Type2Service(type);
         }
-        #endregion
+#endregion
 
-        #region Container Extend API
+#region Container Extend API
         /// <summary>
         /// 获取服务的绑定数据,如果绑定不存在则返回null
         /// </summary>
@@ -1005,6 +1017,16 @@ namespace CatLib
         }
 
         /// <summary>
+        /// 为一个服务定义一个标记
+        /// </summary>
+        /// <typeparam name="TService">服务</typeparam>
+        /// <param name="tag">标记名</param>
+        public static void Tag<TService>(string tag)
+        {
+            Handler.Tag<TService>(tag);
+        }
+
+        /// <summary>
         /// 静态化一个服务,实例值会经过解决修饰器
         /// </summary>
         /// <typeparam name="TService">服务名</typeparam>
@@ -1021,6 +1043,16 @@ namespace CatLib
         public static bool Release<TService>()
         {
             return Handler.Release<TService>();
+        }
+
+        /// <summary>
+        /// 根据实例对象释放静态化实例
+        /// </summary>
+        /// <param name="instances">需要释放静态化实例对象</param>
+        /// <returns>只要有一个没有释放成功那么返回false</returns>
+        public static bool Release(params object[] instances)
+        {
+            return Handler.Release(instances);
         }
 
         /// <summary>
@@ -1123,7 +1155,11 @@ namespace CatLib
         /// <returns>服务实例</returns>
         public static TService Make<TService>(params object[] userParams)
         {
+#if CATLIB_PERFORMANCE
             return Facade<TService>.Make(userParams);
+#else
+            return Handler.Make<TService>(userParams);
+#endif
         }
 
         /// <summary>
@@ -1145,6 +1181,26 @@ namespace CatLib
         public static Func<TService> Factory<TService>(params object[] userParams)
         {
             return () => Make<TService>(userParams);
+        }
+
+        /// <summary>
+        /// 当静态服务被释放时
+        /// </summary>
+        /// <param name="callback">处理释放时的回调</param>
+        /// <returns>当前容器实例</returns>
+        public static IContainer OnRelease(Action<object> callback)
+        {
+            return Handler.OnRelease(callback);
+        }
+
+        /// <summary>
+        /// 当服务被解决时，生成的服务会经过注册的回调函数
+        /// </summary>
+        /// <param name="callback">回调函数</param>
+        /// <returns>当前容器对象</returns>
+        public static IContainer OnResolving(Action<object> callback)
+        {
+            return Handler.OnResolving(callback);
         }
 
         /// <summary>
@@ -1213,6 +1269,6 @@ namespace CatLib
         {
             return Handler.Type2Service<TService>();
         }
-        #endregion
+#endregion
     }
 }

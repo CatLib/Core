@@ -26,7 +26,7 @@
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>..\..\build\Net35\</OutputPath>
-    <DefineConstants>TRACE;CATLIB</DefineConstants>
+    <DefineConstants>TRACE;CATLIB;CATLIB_PERFORMANCE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
@@ -46,6 +46,7 @@
     <Compile Include="CatLib\IServiceProvider.cs" />
     <Compile Include="CatLib\IServiceProviderType.cs" />
     <Compile Include="Support\Container\Bindable.cs" />
+    <Compile Include="Support\Container\BindDataExtend.cs" />
     <Compile Include="Support\Container\IBindable.cs" />
     <Compile Include="Support\Container\IMethodBind.cs" />
     <Compile Include="Support\Container\IVariant.cs" />
