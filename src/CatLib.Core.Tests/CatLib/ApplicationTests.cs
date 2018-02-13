@@ -107,6 +107,28 @@ namespace CatLib.Tests
         }
 
         /// <summary>
+        /// 测试终止程序
+        /// </summary>
+        [TestMethod]
+        public void TestTerminate()
+        {
+            var app = new Application();
+            var oldApp = App.Handler;
+            var num = 0;
+            oldApp.On(ApplicationEvents.OnTerminate, () =>
+            {
+                Assert.AreEqual(0, num++);
+            });
+            oldApp.On(ApplicationEvents.OnTerminated, () =>
+            {
+                Assert.AreEqual(1, num++);
+            });
+            App.Terminate();
+            Assert.AreNotEqual(oldApp, App.Handler);
+            Assert.AreEqual(2, num);
+        }
+
+        /// <summary>
         /// 获取版本号测试
         /// </summary>
         [TestMethod]

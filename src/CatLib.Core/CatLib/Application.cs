@@ -55,6 +55,16 @@ namespace CatLib
             /// 初始化完成
             /// </summary>
             Inited = 4,
+
+            /// <summary>
+            /// 框架终止之前
+            /// </summary>
+            Terminate = 5,
+
+            /// <summary>
+            /// 框架终止之后
+            /// </summary>
+            Terminated = 6,
         }
 
         /// <summary>
@@ -91,6 +101,7 @@ namespace CatLib
             {
                 return process;
             }
+            private set { process = value; }
         }
 
         /// <summary>
@@ -144,12 +155,25 @@ namespace CatLib
         }
 
         /// <summary>
+        /// 终止CatLib框架
+        /// </summary>
+        public virtual void Terminate()
+        {
+            Process = StartProcess.Terminate;
+            Trigger(ApplicationEvents.OnTerminate, this);
+            Flush();
+            App.Handler = null;
+            Process = StartProcess.Terminated;
+            Trigger(ApplicationEvents.OnTerminated, this);
+        }
+
+        /// <summary>
         /// 引导程序
         /// </summary>
         /// <param name="bootstraps">引导程序</param>
         /// <returns>CatLib实例</returns>
         /// <exception cref="ArgumentNullException">当引导类型为null时引发</exception>
-        public void Bootstrap(params IBootstrap[] bootstraps)
+        public virtual void Bootstrap(params IBootstrap[] bootstraps)
         {
             Guard.Requires<ArgumentNullException>(bootstraps != null);
 
@@ -158,7 +182,7 @@ namespace CatLib
                 return;
             }
 
-            process = StartProcess.Bootstrap;
+            Process = StartProcess.Bootstrap;
 
             var sorting = new SortSet<IBootstrap, int>();
 
@@ -175,7 +199,7 @@ namespace CatLib
                 }
             }
 
-            process = StartProcess.Bootstraped;
+            Process = StartProcess.Bootstraped;
             bootstrapped = true;
             Trigger(ApplicationEvents.OnBootstraped, this);
         }
@@ -184,7 +208,7 @@ namespace CatLib
         /// 初始化
         /// </summary>
         /// <exception cref="RuntimeException">没有调用<c>Bootstrap(...)</c>就尝试初始化时触发</exception>
-        public void Init()
+        public virtual void Init()
         {
             if (!bootstrapped)
             {
@@ -196,7 +220,7 @@ namespace CatLib
                 return;
             }
 
-            process = StartProcess.Initing;
+            Process = StartProcess.Initing;
 
             foreach (var provider in serviceProviders)
             {
@@ -205,7 +229,7 @@ namespace CatLib
             }
 
             inited = true;
-            process = StartProcess.Inited;
+            Process = StartProcess.Inited;
 
             Trigger(ApplicationEvents.OnStartCompleted, this);
         }
@@ -215,7 +239,7 @@ namespace CatLib
         /// </summary>
         /// <param name="provider">注册服务提供者</param>
         /// <exception cref="RuntimeException">服务提供者被重复注册时触发</exception>
-        public void Register(IServiceProvider provider)
+        public virtual void Register(IServiceProvider provider)
         {
             Guard.Requires<ArgumentNullException>(provider != null);
 

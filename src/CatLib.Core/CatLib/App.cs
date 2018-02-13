@@ -58,6 +58,14 @@ namespace CatLib
 
         #region Application API
         /// <summary>
+        /// 终止CatLib框架
+        /// </summary>
+        public static void Terminate()
+        {
+            Handler.Terminate();
+        }
+
+        /// <summary>
         /// 注册服务提供者
         /// </summary>
         /// <param name="provider">服务提供者</param>
