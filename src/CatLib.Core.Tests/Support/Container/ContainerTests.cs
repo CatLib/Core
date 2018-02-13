@@ -33,6 +33,7 @@ namespace CatLib.Tests.Stl
             ExceptionAssert.DoesNotThrow(() =>
             {
                 container.Tag("TestTag", "service1", "service2");
+                container.Tag<ContainerTest>("TestTag");
             });
         }
 
@@ -1016,9 +1017,12 @@ namespace CatLib.Tests.Stl
 
             bind.OnResolving((bindData, obj) => "local resolve");
             container.OnResolving((bindData, obj) => obj + " global resolve");
+            var isTrigger = false;
+            container.OnResolving((obj) => isTrigger = true);
 
             var result = container.Make(container.Type2Service(typeof(MakeTestClassDependency)));
 
+            Assert.AreEqual(true, isTrigger);
             Assert.AreEqual("local resolve global resolve", result);
         }
 
@@ -2261,7 +2265,7 @@ namespace CatLib.Tests.Stl
             var container = new Application();
             container.Instance<Application>(container);
 
-            container.OnRelease((_, __) =>
+            container.OnRelease((__) =>
             {
                 container.Instance<Application>(container);
             });

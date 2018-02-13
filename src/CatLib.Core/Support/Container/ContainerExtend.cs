@@ -457,6 +457,17 @@ namespace CatLib
         }
 
         /// <summary>
+        /// 为一个服务定义一个标记
+        /// </summary>
+        /// <typeparam name="TService">服务</typeparam>
+        /// <param name="container">服务容器</param>
+        /// <param name="tag">标记名</param>
+        public static void Tag<TService>(this IContainer container, string tag)
+        {
+            container.Tag(tag, container.Type2Service(typeof(TService)));
+        }
+
+        /// <summary>
         /// 静态化一个服务,实例值会经过解决修饰器
         /// </summary>
         /// <typeparam name="TService">服务名</typeparam>
@@ -475,6 +486,36 @@ namespace CatLib
         public static bool Release<TService>(this IContainer container)
         {
             return container.Release(container.Type2Service(typeof(TService)));
+        }
+
+        /// <summary>
+        /// 根据实例对象释放静态化实例
+        /// </summary>
+        /// <param name="container">服务容器</param>
+        /// <param name="instances">需要释放静态化实例对象</param>
+        /// <returns>只要有一个没有释放成功那么返回false</returns>
+        public static bool Release(this IContainer container, params object[] instances)
+        {
+            var released = true;
+            if (instances == null)
+            {
+                return released;
+            }
+
+            foreach (var instance in instances)
+            {
+                if (instance == null)
+                {
+                    continue;
+                }
+
+                if (!container.Release(container.Type2Service(instance.GetType())))
+                {
+                    released = false;
+                }
+            }
+
+            return released;
         }
 
         /// <summary>
@@ -648,6 +689,34 @@ namespace CatLib
         public static Func<TService> Factory<TService>(this IContainer container, params object[] userParams)
         {
             return () => (TService)container.Make(container.Type2Service(typeof(TService)), userParams);
+        }
+
+        /// <summary>
+        /// 当静态服务被释放时
+        /// </summary>
+        /// <param name="container">服务容器</param>
+        /// <param name="callback">处理释放时的回调</param>
+        /// <returns>当前容器实例</returns>
+        public static IContainer OnRelease(this IContainer container, Action<object> callback)
+        {
+            Guard.Requires<ArgumentNullException>(callback != null);
+            return container.OnRelease((_, instance) => callback(instance));
+        }
+
+        /// <summary>
+        /// 当服务被解决时，生成的服务会经过注册的回调函数
+        /// </summary>
+        /// <param name="container">服务容器</param>
+        /// <param name="callback">回调函数</param>
+        /// <returns>当前容器对象</returns>
+        public static IContainer OnResolving(this IContainer container, Action<object> callback)
+        {
+            Guard.Requires<ArgumentNullException>(callback != null);
+            return container.OnResolving((_, instance) =>
+            {
+                callback(instance);
+                return instance;
+            });
         }
 
         /// <summary>

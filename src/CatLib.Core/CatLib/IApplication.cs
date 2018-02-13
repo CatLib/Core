@@ -82,5 +82,10 @@ namespace CatLib
         /// 调试等级
         /// </summary>
         DebugLevels DebugLevel { get; set; }
+
+        /// <summary>
+        /// 终止CatLib框架
+        /// </summary>
+        void Terminate();
     }
 }
