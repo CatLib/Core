@@ -316,6 +316,8 @@ namespace CatLib.Tests
             container.Instance<string>("abc");
             container.Instance<int>(10);
             Assert.AreEqual(true, container.Release("abc", 10, null));
+            object[] data = null;
+            Assert.AreEqual(true, container.Release(data));
         }
 
         /// <summary>

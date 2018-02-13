@@ -496,12 +496,12 @@ namespace CatLib
         /// <returns>只要有一个没有释放成功那么返回false</returns>
         public static bool Release(this IContainer container, params object[] instances)
         {
+            var released = true;
             if (instances == null)
             {
-                return false;
+                return released;
             }
 
-            var released = true;
             foreach (var instance in instances)
             {
                 if (instance == null)
