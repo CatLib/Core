@@ -457,6 +457,17 @@ namespace CatLib
         }
 
         /// <summary>
+        /// 为一个服务定义一个标记
+        /// </summary>
+        /// <typeparam name="TService">服务</typeparam>
+        /// <param name="container">服务容器</param>
+        /// <param name="tag">标记名</param>
+        public static void Tag<TService>(this IContainer container, string tag)
+        {
+            container.Tag(tag, container.Type2Service(typeof(TService)));
+        }
+
+        /// <summary>
         /// 静态化一个服务,实例值会经过解决修饰器
         /// </summary>
         /// <typeparam name="TService">服务名</typeparam>
@@ -475,6 +486,36 @@ namespace CatLib
         public static bool Release<TService>(this IContainer container)
         {
             return container.Release(container.Type2Service(typeof(TService)));
+        }
+
+        /// <summary>
+        /// 根据实例对象释放静态化实例
+        /// </summary>
+        /// <param name="container">服务容器</param>
+        /// <param name="instances">需要释放静态化实例对象</param>
+        /// <returns>只要有一个没有释放成功那么返回false</returns>
+        public static bool Release(this IContainer container, params object[] instances)
+        {
+            if (instances == null)
+            {
+                return false;
+            }
+
+            var released = true;
+            foreach (var instance in instances)
+            {
+                if (instance == null)
+                {
+                    continue;
+                }
+
+                if (!container.Release(container.Type2Service(instance.GetType())))
+                {
+                    released = false;
+                }
+            }
+
+            return released;
         }
 
         /// <summary>

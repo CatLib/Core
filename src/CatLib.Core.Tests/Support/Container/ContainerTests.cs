@@ -33,6 +33,7 @@ namespace CatLib.Tests.Stl
             ExceptionAssert.DoesNotThrow(() =>
             {
                 container.Tag("TestTag", "service1", "service2");
+                container.Tag<ContainerTest>("TestTag");
             });
         }
 
