@@ -2111,6 +2111,54 @@ namespace CatLib.Tests.Stl
             });
         }
 
+        class CallInjectClass
+        {
+            public string Value { get; set; }
+        }
+
+        [TestMethod]
+        public void TestCallInject()
+        {
+            var container = new Container();
+            var isCall = false;
+            container.Call((CallInjectClass cls) =>
+            {
+                Assert.AreEqual("100", cls.Value);
+                isCall = true;
+            }, new CallInjectClass { Value = "100"});
+            Assert.AreEqual(true, isCall);
+        }
+
+        class CallInjectClassCurrent : IParams
+        {
+            public string Value { get; set; }
+
+            /// <summary>
+            /// 获取一个参数
+            /// </summary>
+            /// <param name="key">参数名</param>
+            /// <param name="value">参数值</param>
+            /// <returns>是否成功获取</returns>
+            public bool TryGetValue(string key, out object value)
+            {
+                value = null;
+                return false;
+            }
+        }
+
+        [TestMethod]
+        public void TestCallInjectCurrent()
+        {
+            var container = new Container();
+            var isCall = false;
+            container.Call((CallInjectClassCurrent cls) =>
+            {
+                Assert.AreEqual("100", cls.Value);
+                isCall = true;
+            }, new CallInjectClassCurrent { Value = "100" });
+            Assert.AreEqual(true, isCall);
+        }
+
         /// <summary>
         /// 测试基础容器调用
         /// </summary>

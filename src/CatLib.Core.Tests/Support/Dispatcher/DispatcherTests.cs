@@ -219,7 +219,7 @@ namespace CatLib.Tests.Events
                 return 1;
             });
 
-            dispatcher.Listen("event.time", (object payload) =>
+            dispatcher.Listen<object, object>("event.time", (payload) =>
             {
                 Assert.AreEqual(123, payload);
                 return null;
@@ -263,12 +263,12 @@ namespace CatLib.Tests.Events
             var app = MakeEnv();
 
             var dispatcher = app.Make<IDispatcher>();
-            dispatcher.Listen("event.time", (object payload) =>
+            dispatcher.Listen<object, object>("event.time", (payload) =>
             {
                 return null;
             });
 
-            dispatcher.Listen("event.time", (object payload) =>
+            dispatcher.Listen<object, object>("event.time", (payload) =>
             {
                 return null;
             });
@@ -362,6 +362,21 @@ namespace CatLib.Tests.Events
             Assert.AreEqual(false, App.HasListeners("MyTestEventClass.Jump.Hack", true));
             App.Trigger("MyTestEventClass.Jump.Hack");
             Assert.AreEqual(true, isCall);
+        }
+
+        public static int StaticCall()
+        {
+            return 100;
+        }
+
+        [TestMethod]
+        public void TestStatic()
+        {
+            var app = MakeEnv();
+            var dispatcher = app.Make<IDispatcher>();
+
+            App.Listen("ActionTest", StaticCall);
+            Assert.AreEqual(100, App.TriggerHalt("ActionTest"));
         }
 
         [TestMethod]

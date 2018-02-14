@@ -146,8 +146,11 @@ namespace CatLib
         public IEvent On(string eventName, object target, MethodInfo method)
         {
             Guard.NotEmptyOrNull(eventName, "eventName");
-            Guard.Requires<ArgumentNullException>(target != null);
             Guard.Requires<ArgumentNullException>(method != null);
+            if (!method.IsStatic)
+            {
+                Guard.Requires<ArgumentNullException>(target != null);
+            }
 
             lock (syncRoot)
             {
@@ -156,6 +159,11 @@ namespace CatLib
                 var result = IsWildcard(eventName)
                     ? SetupWildcardListen(eventName, target, method)
                     : SetupListen(eventName, target, method);
+
+                if (target == null)
+                {
+                    return result;
+                }
 
                 List<IEvent> listener;
                 if (!targetMapping.TryGetValue(target, out listener))
