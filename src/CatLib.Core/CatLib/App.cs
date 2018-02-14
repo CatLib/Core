@@ -1071,36 +1071,40 @@ namespace CatLib
         /// 以依赖注入的形式调用一个方法
         /// </summary>
         /// <param name="method">方法</param>
-        public static void Call<T1>(Action<T1> method)
+        /// <param name="userParams">用户传入的参数</param>
+        public static void Call<T1>(Action<T1> method, params object[] userParams)
         {
-            Handler.Call(method);
+            Handler.Call(method, userParams);
         }
 
         /// <summary>
         /// 以依赖注入的形式调用一个方法
         /// </summary>
         /// <param name="method">方法</param>
-        public static void Call<T1, T2>(Action<T1, T2> method)
+        /// <param name="userParams">用户传入的参数</param>
+        public static void Call<T1, T2>(Action<T1, T2> method, params object[] userParams)
         {
-            Handler.Call(method);
+            Handler.Call(method, userParams);
         }
 
         /// <summary>
         /// 以依赖注入的形式调用一个方法
         /// </summary>
         /// <param name="method">方法</param>
-        public static void Call<T1, T2, T3>(Action<T1, T2, T3> method)
+        /// <param name="userParams">用户传入的参数</param>
+        public static void Call<T1, T2, T3>(Action<T1, T2, T3> method, params object[] userParams)
         {
-            Handler.Call(method);
+            Handler.Call(method, userParams);
         }
 
         /// <summary>
         /// 以依赖注入的形式调用一个方法
         /// </summary>
         /// <param name="method">方法</param>
-        public static void Call<T1, T2, T3, T4>(Action<T1, T2, T3, T4> method)
+        /// <param name="userParams">用户传入的参数</param>
+        public static void Call<T1, T2, T3, T4>(Action<T1, T2, T3, T4> method, params object[] userParams)
         {
-            Handler.Call(method);
+            Handler.Call(method, userParams);
         }
 
         /// <summary>

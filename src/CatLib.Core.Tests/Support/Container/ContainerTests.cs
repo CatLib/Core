@@ -2111,6 +2111,24 @@ namespace CatLib.Tests.Stl
             });
         }
 
+        class CallInjectClass
+        {
+            public string Value { get; set; }
+        }
+
+        [TestMethod]
+        public void TestCallInject()
+        {
+            var container = new Container();
+            var isCall = false;
+            container.Call((CallInjectClass cls) =>
+            {
+                Assert.AreEqual("100", cls.Value);
+                isCall = true;
+            }, new CallInjectClass { Value = "100"});
+            Assert.AreEqual(true, isCall);
+        }
+
         /// <summary>
         /// 测试基础容器调用
         /// </summary>
