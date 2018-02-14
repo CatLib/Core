@@ -1739,7 +1739,8 @@ namespace CatLib
         /// <returns>获取到的参数</returns>
         private IParams[] GetParamsTypeInUserParams(ref object[] userParams)
         {
-            var elements = Arr.Remove(ref userParams, value => value is IParams);
+            // 这里使用了Filter而没有使用Remove由于筛选器也是可能希望注入的类型之一
+            var elements = Arr.Filter(userParams, value => value is IParams);
             var results = new IParams[elements.Length];
             for (var i = 0; i < elements.Length; i++)
             {
