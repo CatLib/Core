@@ -275,7 +275,7 @@ namespace CatLib
         /// <param name="eventName">事件名称</param>
         /// <param name="method">事件处理方法</param>
         /// <returns>事件对象</returns>
-        public static IEvent Listen(string eventName, Func<object> method)
+        public static IEvent Listen<TResult>(string eventName, Func<TResult> method)
         {
             return Handler.Listen(eventName, method);
         }
@@ -286,7 +286,7 @@ namespace CatLib
         /// <param name="eventName">事件名称</param>
         /// <param name="method">事件处理方法</param>
         /// <returns>事件对象</returns>
-        public static IEvent Listen<T1>(string eventName, Func<T1, object> method)
+        public static IEvent Listen<T1, TResult>(string eventName, Func<T1, TResult> method)
         {
             return Handler.Listen(eventName, method);
         }
@@ -297,7 +297,7 @@ namespace CatLib
         /// <param name="eventName">事件名称</param>
         /// <param name="method">事件处理方法</param>
         /// <returns>事件对象</returns>
-        public static IEvent Listen<T1, T2>(string eventName, Func<T1, T2, object> method)
+        public static IEvent Listen<T1, T2, TResult>(string eventName, Func<T1, T2, TResult> method)
         {
             return Handler.Listen(eventName, method);
         }
@@ -308,7 +308,7 @@ namespace CatLib
         /// <param name="eventName">事件名称</param>
         /// <param name="method">事件处理方法</param>
         /// <returns>事件对象</returns>
-        public static IEvent Listen<T1, T2, T3>(string eventName, Func<T1, T2, T3, object> method)
+        public static IEvent Listen<T1, T2, T3, TResult>(string eventName, Func<T1, T2, T3, TResult> method)
         {
             return Handler.Listen(eventName, method);
         }
@@ -319,7 +319,7 @@ namespace CatLib
         /// <param name="eventName">事件名称</param>
         /// <param name="method">事件处理方法</param>
         /// <returns>事件对象</returns>
-        public static IEvent Listen<T1, T2, T3, T4>(string eventName, Func<T1, T2, T3, T4, object> method)
+        public static IEvent Listen<T1, T2, T3, T4, TResult>(string eventName, Func<T1, T2, T3, T4, TResult> method)
         {
             return Handler.Listen(eventName, method);
         }

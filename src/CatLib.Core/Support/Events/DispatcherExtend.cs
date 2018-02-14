@@ -107,7 +107,7 @@ namespace CatLib
         /// <param name="eventName">事件名称</param>
         /// <param name="method">事件处理方法</param>
         /// <returns>事件对象</returns>
-        public static IEvent Listen(this IDispatcher dispatcher, string eventName, Func<object> method)
+        public static IEvent Listen<TResult>(this IDispatcher dispatcher, string eventName, Func<TResult> method)
         {
             Guard.Requires<ArgumentNullException>(method != null);
             return dispatcher.On(eventName, method.Target, method.Method);
@@ -120,7 +120,7 @@ namespace CatLib
         /// <param name="eventName">事件名称</param>
         /// <param name="method">事件处理方法</param>
         /// <returns>事件对象</returns>
-        public static IEvent Listen<T1>(this IDispatcher dispatcher, string eventName, Func<T1, object> method)
+        public static IEvent Listen<T1, TResult>(this IDispatcher dispatcher, string eventName, Func<T1, TResult> method)
         {
             Guard.Requires<ArgumentNullException>(method != null);
             return dispatcher.On(eventName, method.Target, method.Method);
@@ -133,7 +133,7 @@ namespace CatLib
         /// <param name="eventName">事件名称</param>
         /// <param name="method">事件处理方法</param>
         /// <returns>事件对象</returns>
-        public static IEvent Listen<T1, T2>(this IDispatcher dispatcher, string eventName, Func<T1, T2, object> method)
+        public static IEvent Listen<T1, T2, TResult>(this IDispatcher dispatcher, string eventName, Func<T1, T2, TResult> method)
         {
             Guard.Requires<ArgumentNullException>(method != null);
             return dispatcher.On(eventName, method.Target, method.Method);
@@ -146,7 +146,7 @@ namespace CatLib
         /// <param name="eventName">事件名称</param>
         /// <param name="method">事件处理方法</param>
         /// <returns>事件对象</returns>
-        public static IEvent Listen<T1, T2, T3>(this IDispatcher dispatcher, string eventName, Func<T1, T2, T3, object> method)
+        public static IEvent Listen<T1, T2, T3, TResult>(this IDispatcher dispatcher, string eventName, Func<T1, T2, T3, TResult> method)
         {
             Guard.Requires<ArgumentNullException>(method != null);
             return dispatcher.On(eventName, method.Target, method.Method);
@@ -159,7 +159,7 @@ namespace CatLib
         /// <param name="eventName">事件名称</param>
         /// <param name="method">事件处理方法</param>
         /// <returns>事件对象</returns>
-        public static IEvent Listen<T1, T2, T3, T4>(this IDispatcher dispatcher, string eventName, Func<T1, T2, T3, T4, object> method)
+        public static IEvent Listen<T1, T2, T3, T4, TResult>(this IDispatcher dispatcher, string eventName, Func<T1, T2, T3, T4, TResult> method)
         {
             Guard.Requires<ArgumentNullException>(method != null);
             return dispatcher.On(eventName, method.Target, method.Method);
