@@ -17,7 +17,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("CatLib")]
 [assembly: AssemblyProduct("CatLib.Core.Tests")]
-[assembly: AssemblyCopyright("Copyright © CatLib 2017")]
+[assembly: AssemblyCopyright("Copyright © CatLib 2017-2018")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -25,5 +25,5 @@ using System.Runtime.InteropServices;
 
 [assembly: Guid("3c9f4024-910c-4881-a04d-34a6c3a09019")]
 
-[assembly: AssemblyVersion("1.2.3.0")]
-[assembly: AssemblyFileVersion("1.2.3.0")]
+[assembly: AssemblyVersion("1.2.4.0")]
+[assembly: AssemblyFileVersion("1.2.4.0")]

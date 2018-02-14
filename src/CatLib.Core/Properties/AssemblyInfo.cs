@@ -18,7 +18,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("CatLib")]
 [assembly: AssemblyProduct("CatLib.Core")]
-[assembly: AssemblyCopyright("Copyright © CatLib 2017")]
+[assembly: AssemblyCopyright("Copyright © CatLib 2017-2018")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -26,8 +26,8 @@ using System.Runtime.InteropServices;
 
 [assembly: Guid("4204658e-81fd-4106-a347-890cd369c8a4")]
 
-[assembly: AssemblyVersion("1.2.3.0")]
-[assembly: AssemblyFileVersion("1.2.3.0")]
+[assembly: AssemblyVersion("1.2.4.0")]
+[assembly: AssemblyFileVersion("1.2.4.0")]
 
 [assembly: InternalsVisibleTo("Assembly-CSharp-Editor"),
            InternalsVisibleTo("Assembly-CSharp-Editor-firstpass"),

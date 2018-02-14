@@ -666,9 +666,9 @@ namespace CatLib
         {
             return Handler.Type2Service(type);
         }
-#endregion
+        #endregion
 
-#region Container Extend API
+        #region Container Extend API
         /// <summary>
         /// 获取服务的绑定数据,如果绑定不存在则返回null
         /// </summary>
@@ -1269,6 +1269,6 @@ namespace CatLib
         {
             return Handler.Type2Service<TService>();
         }
-#endregion
+        #endregion
     }
 }

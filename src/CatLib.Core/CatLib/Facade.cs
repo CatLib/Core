@@ -166,7 +166,7 @@ namespace CatLib
         /// <returns>服务实例</returns>
         private static TService Build(params object[] userParams)
         {
-            return (TService) App.Make(service, userParams);
+            return (TService)App.Make(service, userParams);
         }
     }
 }
