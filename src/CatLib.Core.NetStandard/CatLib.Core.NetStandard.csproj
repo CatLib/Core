@@ -77,6 +77,7 @@
     <Compile Include="..\CatLib.Core\Support\Container\IGivenData.cs" Link="Support\Container\IGivenData.cs" />
     <Compile Include="..\CatLib.Core\Support\Container\IMethodBind.cs" Link="Support\Container\IMethodBind.cs" />
     <Compile Include="..\CatLib.Core\Support\Container\InjectAttribute.cs" Link="Support\Container\InjectAttribute.cs" />
+    <Compile Include="..\CatLib.Core\Support\Container\IParams.cs" Link="Support\Container\IParams.cs" />
     <Compile Include="..\CatLib.Core\Support\Container\IVariant.cs" Link="Support\Container\IVariant.cs" />
     <Compile Include="..\CatLib.Core\Support\Container\MethodBind.cs" Link="Support\Container\MethodBind.cs" />
     <Compile Include="..\CatLib.Core\Support\Container\MethodContainer.cs" Link="Support\Container\MethodContainer.cs" />

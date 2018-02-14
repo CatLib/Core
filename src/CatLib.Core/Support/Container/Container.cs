@@ -1359,7 +1359,7 @@ namespace CatLib
         }
 
         /// <summary>
-        /// 获取参数(<see cref="Params"/>)匹配器
+        /// 获取参数(<see cref="IParams"/>)匹配器
         /// <para>开发者重写后可以实现自己的匹配器</para>
         /// <para>如果调用获取到的匹配器后返回结果为null则表示没有匹配到参数</para>
         /// </summary>
@@ -1733,27 +1733,27 @@ namespace CatLib
         }
 
         /// <summary>
-        /// 从<paramref name="userParams"/>中获取<see cref="Params"/>类型的变量
+        /// 从<paramref name="userParams"/>中获取<see cref="IParams"/>类型的变量
         /// </summary>
         /// <param name="userParams">用户传入参数</param>
         /// <returns>获取到的参数</returns>
-        private Params[] GetParamsTypeInUserParams(ref object[] userParams)
+        private IParams[] GetParamsTypeInUserParams(ref object[] userParams)
         {
-            var elements = Arr.Remove(ref userParams, value => value is Params);
-            var results = new Params[elements.Length];
+            var elements = Arr.Remove(ref userParams, value => value is IParams);
+            var results = new IParams[elements.Length];
             for (var i = 0; i < elements.Length; i++)
             {
-                results[i] = (Params)elements[i];
+                results[i] = (IParams)elements[i];
             }
             return results;
         }
 
         /// <summary>
-        /// 生成一个默认的参数<see cref="Params" />匹配器
+        /// 生成一个默认的参数<see cref="IParams" />匹配器
         /// </summary>
         /// <param name="tables">参数表</param>
         /// <returns>匹配器</returns>
-        private Func<ParameterInfo, object> MakeParamsMatcher(Params[] tables)
+        private Func<ParameterInfo, object> MakeParamsMatcher(IParams[] tables)
         {
             // 默认匹配器策略将会将参数名和参数表的参数名进行匹配
             // 最先匹配到的有效参数值将作为返回值返回

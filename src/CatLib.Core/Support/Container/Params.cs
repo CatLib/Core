@@ -17,12 +17,12 @@ namespace CatLib
     /// 参数名注入表
     /// </summary>
     [ExcludeFromCodeCoverage]
-    public sealed class Params : IEnumerable<KeyValuePair<string, object>>
+    public sealed class Params : IParams, IEnumerable<KeyValuePair<string, object>>
     {
         /// <summary>
         /// 参数表
         /// </summary>
-        private readonly Dictionary<string, object> table = new Dictionary<string, object>();
+        private readonly IDictionary<string, object> table;
 
         /// <summary>
         /// 迭代器
@@ -34,12 +34,29 @@ namespace CatLib
         }
 
         /// <summary>
-        /// 
+        /// 迭代器
         /// </summary>
-        /// <returns></returns>
+        /// <returns>迭代器</returns>
         IEnumerator<KeyValuePair<string, object>> IEnumerable<KeyValuePair<string, object>>.GetEnumerator()
         {
             return table.GetEnumerator();
+        }
+
+        /// <summary>
+        /// 参数名注入表
+        /// </summary>
+        public Params()
+        {
+            table = new Dictionary<string, object>();
+        }
+
+        /// <summary>
+        /// 参数名注入表
+        /// </summary>
+        /// <param name="args">参数表</param>
+        public Params(IDictionary<string, object> args)
+        {
+            table = args;
         }
 
         /// <summary>
