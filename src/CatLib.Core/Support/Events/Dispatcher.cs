@@ -179,13 +179,13 @@ namespace CatLib
                 if (target is string)
                 {
                     var eventName = FormatEventName(target.ToString());
-                    var result = IsWildcard(eventName) 
-                        ? DismissWildcardEventName(eventName) 
-                        : DismissEventName(eventName);
-
-                    if (result)
+                    if (IsWildcard(eventName))
                     {
-                        return;
+                        DismissWildcardEventName(eventName);
+                    }
+                    else
+                    {
+                        DismissEventName(eventName);
                     }
                 }
 
@@ -307,40 +307,36 @@ namespace CatLib
         /// 根据普通事件解除相关事件
         /// </summary>
         /// <param name="eventName">事件名</param>
-        private bool DismissEventName(string eventName)
+        private void DismissEventName(string eventName)
         {
             List<IEvent> events;
             if (!listeners.TryGetValue(eventName, out events))
             {
-                return false;
+                return;
             }
 
             foreach (var element in events.ToArray())
             {
                 Forget(element);
             }
-
-            return true;
         }
 
         /// <summary>
         /// 根据通配符事件解除相关事件
         /// </summary>
         /// <param name="eventName">事件名</param>
-        private bool DismissWildcardEventName(string eventName)
+        private void DismissWildcardEventName(string eventName)
         {
             KeyValuePair<Regex, List<IEvent>> events;
             if (!wildcardListeners.TryGetValue(eventName, out events))
             {
-                return false;
+                return;
             }
 
             foreach (var element in events.Value.ToArray())
             {
                 Forget(element);
             }
-
-            return true;
         }
 
         /// <summary>
