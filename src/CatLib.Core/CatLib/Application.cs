@@ -345,12 +345,12 @@ namespace CatLib
         /// 注册一个事件监听器
         /// </summary>
         /// <param name="eventName">事件名称</param>
-        /// <param name="target">调用目标</param>
-        /// <param name="method">调用方法</param>
+        /// <param name="execution">事件调用方法</param>
+        /// <param name="group">事件分组</param>
         /// <returns>事件对象</returns>
-        public IEvent On(string eventName, object target, MethodInfo method)
+        public IEvent On(string eventName, Func<string, object[], object> execution, object group = null)
         {
-            return Dispatcher.On(eventName, target, method);
+            return Dispatcher.On(eventName, execution, group);
         }
 
         /// <summary>
@@ -432,7 +432,8 @@ namespace CatLib
         /// </summary>
         protected virtual void RegisterCoreService()
         {
-            this.Singleton<Dispatcher>().Alias<IDispatcher>();
+            var bindable = new BindData(this, null, null, false);
+            this.Singleton<GlobalDispatcher>((_, __) => new GlobalDispatcher((paramInfos, userParams) => GetDependencies(bindable, paramInfos, userParams))).Alias<IDispatcher>();
         }
 
         /// <summary>

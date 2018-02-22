@@ -40,6 +40,7 @@
     <Compile Include="CatLib\Application.cs" />
     <Compile Include="CatLib\ApplicationEvents.cs" />
     <Compile Include="CatLib\DebugLevels.cs" />
+    <Compile Include="CatLib\Events\GlobalDispatcher.cs" />
     <Compile Include="CatLib\Facade.cs" />
     <Compile Include="CatLib\IApplication.cs" />
     <Compile Include="CatLib\IBootstrap.cs" />
@@ -55,7 +56,7 @@
     <Compile Include="Support\Container\MethodContainer.cs" />
     <Compile Include="Support\Container\Params.cs" />
     <Compile Include="Support\Container\UnresolvableException.cs" />
-    <Compile Include="Support\Events\DispatcherExtend.cs" />
+    <Compile Include="CatLib\Events\DispatcherExtend.cs" />
     <Compile Include="Support\Events\IDispatcher.cs" />
     <Compile Include="Support\Events\IEvent.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

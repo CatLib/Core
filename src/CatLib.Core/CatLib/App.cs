@@ -207,10 +207,11 @@ namespace CatLib
         /// </summary>
         /// <param name="eventName">事件名称</param>
         /// <param name="method">事件处理方法</param>
+        /// <param name="group">事件分组</param>
         /// <returns>事件对象</returns>
-        public static IEvent On(string eventName, Action method)
+        public static IEvent On(string eventName, Action method, object group = null)
         {
-            return Handler.On(eventName, method);
+            return Handler.On(eventName, method, group);
         }
 
         /// <summary>
@@ -230,10 +231,11 @@ namespace CatLib
         /// </summary>
         /// <param name="eventName">事件名称</param>
         /// <param name="method">事件处理方法</param>
+        /// <param name="group">事件分组</param>
         /// <returns>事件对象</returns>
-        public static IEvent On<T1>(string eventName, Action<T1> method)
+        public static IEvent On<T1>(string eventName, Action<T1> method, object group = null)
         {
-            return Handler.On(eventName, method);
+            return Handler.On(eventName, method, group);
         }
 
         /// <summary>
@@ -241,10 +243,11 @@ namespace CatLib
         /// </summary>
         /// <param name="eventName">事件名称</param>
         /// <param name="method">事件处理方法</param>
+        /// <param name="group">事件分组</param>
         /// <returns>事件对象</returns>
-        public static IEvent On<T1, T2>(string eventName, Action<T1, T2> method)
+        public static IEvent On<T1, T2>(string eventName, Action<T1, T2> method, object group = null)
         {
-            return Handler.On(eventName, method);
+            return Handler.On(eventName, method, group);
         }
 
         /// <summary>
@@ -252,10 +255,11 @@ namespace CatLib
         /// </summary>
         /// <param name="eventName">事件名称</param>
         /// <param name="method">事件处理方法</param>
+        /// <param name="group">事件分组</param>
         /// <returns>事件对象</returns>
-        public static IEvent On<T1, T2, T3>(string eventName, Action<T1, T2, T3> method)
+        public static IEvent On<T1, T2, T3>(string eventName, Action<T1, T2, T3> method, object group = null)
         {
-            return Handler.On(eventName, method);
+            return Handler.On(eventName, method, group);
         }
 
         /// <summary>
@@ -263,10 +267,11 @@ namespace CatLib
         /// </summary>
         /// <param name="eventName">事件名称</param>
         /// <param name="method">事件处理方法</param>
+        /// <param name="group">事件分组</param>
         /// <returns>事件对象</returns>
-        public static IEvent On<T1, T2, T3, T4>(string eventName, Action<T1, T2, T3, T4> method)
+        public static IEvent On<T1, T2, T3, T4>(string eventName, Action<T1, T2, T3, T4> method, object group = null)
         {
-            return Handler.On(eventName, method);
+            return Handler.On(eventName, method, group);
         }
 
         /// <summary>
@@ -274,10 +279,11 @@ namespace CatLib
         /// </summary>
         /// <param name="eventName">事件名称</param>
         /// <param name="method">事件处理方法</param>
+        /// <param name="group">事件分组</param>
         /// <returns>事件对象</returns>
-        public static IEvent Listen<TResult>(string eventName, Func<TResult> method)
+        public static IEvent Listen<TResult>(string eventName, Func<TResult> method, object group = null)
         {
-            return Handler.Listen(eventName, method);
+            return Handler.Listen(eventName, method, group);
         }
 
         /// <summary>
@@ -285,10 +291,11 @@ namespace CatLib
         /// </summary>
         /// <param name="eventName">事件名称</param>
         /// <param name="method">事件处理方法</param>
+        /// <param name="group">事件分组</param>
         /// <returns>事件对象</returns>
-        public static IEvent Listen<T1, TResult>(string eventName, Func<T1, TResult> method)
+        public static IEvent Listen<T1, TResult>(string eventName, Func<T1, TResult> method, object group = null)
         {
-            return Handler.Listen(eventName, method);
+            return Handler.Listen(eventName, method, group);
         }
 
         /// <summary>
@@ -296,10 +303,11 @@ namespace CatLib
         /// </summary>
         /// <param name="eventName">事件名称</param>
         /// <param name="method">事件处理方法</param>
+        /// <param name="group">事件分组</param>
         /// <returns>事件对象</returns>
-        public static IEvent Listen<T1, T2, TResult>(string eventName, Func<T1, T2, TResult> method)
+        public static IEvent Listen<T1, T2, TResult>(string eventName, Func<T1, T2, TResult> method, object group = null)
         {
-            return Handler.Listen(eventName, method);
+            return Handler.Listen(eventName, method, group);
         }
 
         /// <summary>
@@ -307,10 +315,11 @@ namespace CatLib
         /// </summary>
         /// <param name="eventName">事件名称</param>
         /// <param name="method">事件处理方法</param>
+        /// <param name="group">事件分组</param>
         /// <returns>事件对象</returns>
-        public static IEvent Listen<T1, T2, T3, TResult>(string eventName, Func<T1, T2, T3, TResult> method)
+        public static IEvent Listen<T1, T2, T3, TResult>(string eventName, Func<T1, T2, T3, TResult> method, object group = null)
         {
-            return Handler.Listen(eventName, method);
+            return Handler.Listen(eventName, method, group);
         }
 
         /// <summary>
@@ -318,10 +327,11 @@ namespace CatLib
         /// </summary>
         /// <param name="eventName">事件名称</param>
         /// <param name="method">事件处理方法</param>
+        /// <param name="group">事件分组</param>
         /// <returns>事件对象</returns>
-        public static IEvent Listen<T1, T2, T3, T4, TResult>(string eventName, Func<T1, T2, T3, T4, TResult> method)
+        public static IEvent Listen<T1, T2, T3, T4, TResult>(string eventName, Func<T1, T2, T3, T4, TResult> method, object group = null)
         {
-            return Handler.Listen(eventName, method);
+            return Handler.Listen(eventName, method, group);
         }
 
         /// <summary>
