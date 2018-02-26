@@ -71,10 +71,14 @@ namespace CatLib
         public static IEvent On(this IDispatcher dispatcher, string eventName, Action method, object group = null)
         {
             Guard.Requires<ArgumentNullException>(method != null);
+#if CATLIB_PERFORMANCE
             var globalDispatcher = dispatcher as GlobalDispatcher;
             return globalDispatcher != null
                     ? globalDispatcher.On(eventName, method, group)
                     : dispatcher.On(eventName, method.Target, method.Method, group);
+#else
+            dispatcher.On(eventName, method.Target, method.Method, group);
+#endif
         }
 
         /// <summary>
@@ -88,10 +92,14 @@ namespace CatLib
         public static IEvent On<T1>(this IDispatcher dispatcher, string eventName, Action<T1> method, object group = null)
         {
             Guard.Requires<ArgumentNullException>(method != null);
+#if CATLIB_PERFORMANCE
             var globalDispatcher = dispatcher as GlobalDispatcher;
             return globalDispatcher != null
                 ? globalDispatcher.On(eventName, method, group)
                 : dispatcher.On(eventName, method.Target, method.Method, group);
+#else
+            dispatcher.On(eventName, method.Target, method.Method, group);
+#endif
         }
 
         /// <summary>
@@ -105,10 +113,14 @@ namespace CatLib
         public static IEvent On<T1, T2>(this IDispatcher dispatcher, string eventName, Action<T1, T2> method, object group = null)
         {
             Guard.Requires<ArgumentNullException>(method != null);
+#if CATLIB_PERFORMANCE
             var globalDispatcher = dispatcher as GlobalDispatcher;
             return globalDispatcher != null
                 ? globalDispatcher.On(eventName, method, group)
                 : dispatcher.On(eventName, method.Target, method.Method, group);
+#else
+            dispatcher.On(eventName, method.Target, method.Method, group);
+#endif
         }
 
         /// <summary>
@@ -122,10 +134,14 @@ namespace CatLib
         public static IEvent On<T1, T2, T3>(this IDispatcher dispatcher, string eventName, Action<T1, T2, T3> method, object group = null)
         {
             Guard.Requires<ArgumentNullException>(method != null);
+#if CATLIB_PERFORMANCE
             var globalDispatcher = dispatcher as GlobalDispatcher;
             return globalDispatcher != null
                 ? globalDispatcher.On(eventName, method, group)
                 : dispatcher.On(eventName, method.Target, method.Method, group);
+#else
+            dispatcher.On(eventName, method.Target, method.Method, group);
+#endif
         }
 
         /// <summary>
@@ -139,10 +155,14 @@ namespace CatLib
         public static IEvent On<T1, T2, T3, T4>(this IDispatcher dispatcher, string eventName, Action<T1, T2, T3, T4> method, object group = null)
         {
             Guard.Requires<ArgumentNullException>(method != null);
+#if CATLIB_PERFORMANCE
             var globalDispatcher = dispatcher as GlobalDispatcher;
             return globalDispatcher != null
                 ? globalDispatcher.On(eventName, method, group)
                 : dispatcher.On(eventName, method.Target, method.Method, group);
+#else
+            dispatcher.On(eventName, method.Target, method.Method, group);
+#endif
         }
 
         /// <summary>
@@ -156,10 +176,14 @@ namespace CatLib
         public static IEvent Listen<TResult>(this IDispatcher dispatcher, string eventName, Func<TResult> method, object group = null)
         {
             Guard.Requires<ArgumentNullException>(method != null);
+#if CATLIB_PERFORMANCE
             var globalDispatcher = dispatcher as GlobalDispatcher;
             return globalDispatcher != null
                 ? globalDispatcher.Listen(eventName, method, group)
                 : dispatcher.On(eventName, method.Target, method.Method, group);
+#else
+            dispatcher.On(eventName, method.Target, method.Method, group);
+#endif
         }
 
         /// <summary>
@@ -173,10 +197,14 @@ namespace CatLib
         public static IEvent Listen<T1, TResult>(this IDispatcher dispatcher, string eventName, Func<T1, TResult> method, object group = null)
         {
             Guard.Requires<ArgumentNullException>(method != null);
+#if CATLIB_PERFORMANCE
             var globalDispatcher = dispatcher as GlobalDispatcher;
             return globalDispatcher != null
                 ? globalDispatcher.Listen(eventName, method, group)
                 : dispatcher.On(eventName, method.Target, method.Method, group);
+#else
+            dispatcher.On(eventName, method.Target, method.Method, group);
+#endif
         }
 
         /// <summary>
@@ -189,11 +217,15 @@ namespace CatLib
         /// <returns>事件对象</returns>
         public static IEvent Listen<T1, T2, TResult>(this IDispatcher dispatcher, string eventName, Func<T1, T2, TResult> method, object group = null)
         {
+#if CATLIB_PERFORMANCE
             Guard.Requires<ArgumentNullException>(method != null);
             var globalDispatcher = dispatcher as GlobalDispatcher;
             return globalDispatcher != null
                 ? globalDispatcher.Listen(eventName, method, group)
                 : dispatcher.On(eventName, method.Target, method.Method, group);
+#else
+            dispatcher.On(eventName, method.Target, method.Method, group);
+#endif
         }
 
         /// <summary>
@@ -207,10 +239,14 @@ namespace CatLib
         public static IEvent Listen<T1, T2, T3, TResult>(this IDispatcher dispatcher, string eventName, Func<T1, T2, T3, TResult> method, object group = null)
         {
             Guard.Requires<ArgumentNullException>(method != null);
+#if CATLIB_PERFORMANCE
             var globalDispatcher = dispatcher as GlobalDispatcher;
             return globalDispatcher != null
                 ? globalDispatcher.Listen(eventName, method, group)
                 : dispatcher.On(eventName, method.Target, method.Method, group);
+#else
+            dispatcher.On(eventName, method.Target, method.Method, group);
+#endif
         }
 
         /// <summary>
@@ -224,10 +260,14 @@ namespace CatLib
         public static IEvent Listen<T1, T2, T3, T4, TResult>(this IDispatcher dispatcher, string eventName, Func<T1, T2, T3, T4, TResult> method, object group = null)
         {
             Guard.Requires<ArgumentNullException>(method != null);
+#if CATLIB_PERFORMANCE
             var globalDispatcher = dispatcher as GlobalDispatcher;
             return globalDispatcher != null
                 ? globalDispatcher.Listen(eventName, method, group)
                 : dispatcher.On(eventName, method.Target, method.Method, group);
+#else
+            dispatcher.On(eventName, method.Target, method.Method, group);
+#endif
         }
     }
 }
