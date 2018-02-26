@@ -217,8 +217,8 @@ namespace CatLib
         /// <returns>事件对象</returns>
         public static IEvent Listen<T1, T2, TResult>(this IDispatcher dispatcher, string eventName, Func<T1, T2, TResult> method, object group = null)
         {
-#if CATLIB_PERFORMANCE
             Guard.Requires<ArgumentNullException>(method != null);
+#if CATLIB_PERFORMANCE
             var globalDispatcher = ToGlobalDispatcher(dispatcher);
             return globalDispatcher != null
                 ? globalDispatcher.Listen(eventName, method, group)
