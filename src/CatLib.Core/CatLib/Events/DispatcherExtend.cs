@@ -72,7 +72,7 @@ namespace CatLib
         {
             Guard.Requires<ArgumentNullException>(method != null);
 #if CATLIB_PERFORMANCE
-            var globalDispatcher = dispatcher as GlobalDispatcher;
+            var globalDispatcher = ToGlobalDispatcher(dispatcher);
             return globalDispatcher != null
                     ? globalDispatcher.On(eventName, method, group)
                     : dispatcher.On(eventName, method.Target, method.Method, group);
@@ -93,7 +93,7 @@ namespace CatLib
         {
             Guard.Requires<ArgumentNullException>(method != null);
 #if CATLIB_PERFORMANCE
-            var globalDispatcher = dispatcher as GlobalDispatcher;
+            var globalDispatcher = ToGlobalDispatcher(dispatcher);
             return globalDispatcher != null
                 ? globalDispatcher.On(eventName, method, group)
                 : dispatcher.On(eventName, method.Target, method.Method, group);
@@ -114,7 +114,7 @@ namespace CatLib
         {
             Guard.Requires<ArgumentNullException>(method != null);
 #if CATLIB_PERFORMANCE
-            var globalDispatcher = dispatcher as GlobalDispatcher;
+            var globalDispatcher = ToGlobalDispatcher(dispatcher);
             return globalDispatcher != null
                 ? globalDispatcher.On(eventName, method, group)
                 : dispatcher.On(eventName, method.Target, method.Method, group);
@@ -135,7 +135,7 @@ namespace CatLib
         {
             Guard.Requires<ArgumentNullException>(method != null);
 #if CATLIB_PERFORMANCE
-            var globalDispatcher = dispatcher as GlobalDispatcher;
+            var globalDispatcher = ToGlobalDispatcher(dispatcher);
             return globalDispatcher != null
                 ? globalDispatcher.On(eventName, method, group)
                 : dispatcher.On(eventName, method.Target, method.Method, group);
@@ -156,7 +156,7 @@ namespace CatLib
         {
             Guard.Requires<ArgumentNullException>(method != null);
 #if CATLIB_PERFORMANCE
-            var globalDispatcher = dispatcher as GlobalDispatcher;
+            var globalDispatcher = ToGlobalDispatcher(dispatcher);
             return globalDispatcher != null
                 ? globalDispatcher.On(eventName, method, group)
                 : dispatcher.On(eventName, method.Target, method.Method, group);
@@ -177,7 +177,7 @@ namespace CatLib
         {
             Guard.Requires<ArgumentNullException>(method != null);
 #if CATLIB_PERFORMANCE
-            var globalDispatcher = dispatcher as GlobalDispatcher;
+            var globalDispatcher = ToGlobalDispatcher(dispatcher);
             return globalDispatcher != null
                 ? globalDispatcher.Listen(eventName, method, group)
                 : dispatcher.On(eventName, method.Target, method.Method, group);
@@ -198,7 +198,7 @@ namespace CatLib
         {
             Guard.Requires<ArgumentNullException>(method != null);
 #if CATLIB_PERFORMANCE
-            var globalDispatcher = dispatcher as GlobalDispatcher;
+            var globalDispatcher = ToGlobalDispatcher(dispatcher);
             return globalDispatcher != null
                 ? globalDispatcher.Listen(eventName, method, group)
                 : dispatcher.On(eventName, method.Target, method.Method, group);
@@ -219,7 +219,7 @@ namespace CatLib
         {
 #if CATLIB_PERFORMANCE
             Guard.Requires<ArgumentNullException>(method != null);
-            var globalDispatcher = dispatcher as GlobalDispatcher;
+            var globalDispatcher = ToGlobalDispatcher(dispatcher);
             return globalDispatcher != null
                 ? globalDispatcher.Listen(eventName, method, group)
                 : dispatcher.On(eventName, method.Target, method.Method, group);
@@ -240,7 +240,7 @@ namespace CatLib
         {
             Guard.Requires<ArgumentNullException>(method != null);
 #if CATLIB_PERFORMANCE
-            var globalDispatcher = dispatcher as GlobalDispatcher;
+            var globalDispatcher = ToGlobalDispatcher(dispatcher);
             return globalDispatcher != null
                 ? globalDispatcher.Listen(eventName, method, group)
                 : dispatcher.On(eventName, method.Target, method.Method, group);
@@ -261,13 +261,32 @@ namespace CatLib
         {
             Guard.Requires<ArgumentNullException>(method != null);
 #if CATLIB_PERFORMANCE
-            var globalDispatcher = dispatcher as GlobalDispatcher;
+            var globalDispatcher = ToGlobalDispatcher(dispatcher);
             return globalDispatcher != null
                 ? globalDispatcher.Listen(eventName, method, group)
                 : dispatcher.On(eventName, method.Target, method.Method, group);
 #else
             return dispatcher.On(eventName, method.Target, method.Method, group);
 #endif
+        }
+
+        /// <summary>
+        /// 将调度器转为全局调度器
+        /// </summary>
+        /// <param name="dispatcher"></param>
+        /// <returns></returns>
+        internal static IGlobalDispatcher ToGlobalDispatcher(this IDispatcher dispatcher)
+        {
+            var originalDispatcher = dispatcher as IOriginalDispatcher;
+            var globalDispatcher = originalDispatcher == null
+                ? null
+                : originalDispatcher.Dispatcher as IGlobalDispatcher;
+            if (globalDispatcher != null)
+            {
+                return globalDispatcher;
+            }
+
+            return dispatcher as IGlobalDispatcher;
         }
     }
 }

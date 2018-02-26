@@ -19,7 +19,7 @@ namespace CatLib
     /// <summary>
     /// CatLib程序
     /// </summary>
-    public class Application : Container, IApplication
+    public class Application : Container, IApplication, IOriginalDispatcher
     {
         /// <summary>
         /// 版本号
@@ -133,7 +133,7 @@ namespace CatLib
         /// <summary>
         /// 事件系统
         /// </summary>
-        private IDispatcher Dispatcher
+        public IDispatcher Dispatcher
         {
             get
             {
@@ -152,6 +152,15 @@ namespace CatLib
             RegisterCoreService();
             OnFindType(finder => { return Type.GetType(finder); });
             DebugLevel = DebugLevels.Prod;
+        }
+
+        /// <summary>
+        /// 构建一个新的Application实例
+        /// </summary>
+        /// <returns>Application实例</returns>
+        public static Application New()
+        {
+            return new Application();
         }
 
         /// <summary>

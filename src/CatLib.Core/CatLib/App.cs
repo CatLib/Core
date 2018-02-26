@@ -41,7 +41,7 @@ namespace CatLib
             {
                 if (instance == null)
                 {
-                    new Application();
+                    Application.New();
                 }
                 return instance;
             }
@@ -200,6 +200,18 @@ namespace CatLib
         public static object TriggerHalt(string eventName, params object[] payloads)
         {
             return Handler.TriggerHalt(eventName, payloads);
+        }
+
+        /// <summary>
+        /// 注册一个事件监听器
+        /// </summary>
+        /// <param name="eventName">事件名称</param>
+        /// <param name="execution">事件调用方法</param>
+        /// <param name="group">事件分组</param>
+        /// <returns>事件对象</returns>
+        public static IEvent On(string eventName, Func<string, object[], object> execution, object group = null)
+        {
+            return Handler.On(eventName, execution, group);
         }
 
         /// <summary>

@@ -17,7 +17,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;CATLIB</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;CATLIB;CATLIB_PERFORMANCE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
@@ -41,6 +41,8 @@
     <Compile Include="CatLib\ApplicationEvents.cs" />
     <Compile Include="CatLib\DebugLevels.cs" />
     <Compile Include="CatLib\Events\GlobalDispatcher.cs" />
+    <Compile Include="CatLib\Events\IGlobalDispatcher.cs" />
+    <Compile Include="CatLib\Events\IOriginalDispatcher.cs" />
     <Compile Include="CatLib\Facade.cs" />
     <Compile Include="CatLib\IApplication.cs" />
     <Compile Include="CatLib\IBootstrap.cs" />

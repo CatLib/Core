@@ -45,7 +45,7 @@
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DefineConstants>TRACE;DEBUG;NETSTANDARD2_0;CATLIB;</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;NETSTANDARD2_0;CATLIB;CATLIB_PERFORMANCE;NETSTANDARD2_0</DefineConstants>
     <DocumentationFile></DocumentationFile>
   </PropertyGroup>
 
@@ -60,6 +60,8 @@
     <Compile Include="..\CatLib.Core\CatLib\DebugLevels.cs" Link="CatLib\DebugLevels.cs" />
     <Compile Include="..\CatLib.Core\CatLib\Events\DispatcherExtend.cs" Link="CatLib\Events\DispatcherExtend.cs" />
     <Compile Include="..\CatLib.Core\CatLib\Events\GlobalDispatcher.cs" Link="CatLib\Events\GlobalDispatcher.cs" />
+    <Compile Include="..\CatLib.Core\CatLib\Events\IGlobalDispatcher.cs" Link="CatLib\Events\IGlobalDispatcher.cs" />
+    <Compile Include="..\CatLib.Core\CatLib\Events\IOriginalDispatcher.cs" Link="CatLib\Events\IOriginalDispatcher.cs" />
     <Compile Include="..\CatLib.Core\CatLib\Facade.cs" Link="CatLib\Facade.cs" />
     <Compile Include="..\CatLib.Core\CatLib\IApplication.cs" Link="CatLib\IApplication.cs" />
     <Compile Include="..\CatLib.Core\CatLib\IBootstrap.cs" Link="CatLib\IBootstrap.cs" />

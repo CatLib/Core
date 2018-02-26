@@ -17,7 +17,7 @@ namespace CatLib
     /// <summary>
     /// 全局事件系统
     /// </summary>
-    internal sealed class GlobalDispatcher : Dispatcher
+    internal sealed class GlobalDispatcher : Dispatcher, IGlobalDispatcher
     {
         /// <summary>
         /// 依赖解决器
