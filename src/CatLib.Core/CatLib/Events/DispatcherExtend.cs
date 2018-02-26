@@ -77,7 +77,7 @@ namespace CatLib
                     ? globalDispatcher.On(eventName, method, group)
                     : dispatcher.On(eventName, method.Target, method.Method, group);
 #else
-            dispatcher.On(eventName, method.Target, method.Method, group);
+            return dispatcher.On(eventName, method.Target, method.Method, group);
 #endif
         }
 
@@ -98,7 +98,7 @@ namespace CatLib
                 ? globalDispatcher.On(eventName, method, group)
                 : dispatcher.On(eventName, method.Target, method.Method, group);
 #else
-            dispatcher.On(eventName, method.Target, method.Method, group);
+            return dispatcher.On(eventName, method.Target, method.Method, group);
 #endif
         }
 
@@ -119,7 +119,7 @@ namespace CatLib
                 ? globalDispatcher.On(eventName, method, group)
                 : dispatcher.On(eventName, method.Target, method.Method, group);
 #else
-            dispatcher.On(eventName, method.Target, method.Method, group);
+            return dispatcher.On(eventName, method.Target, method.Method, group);
 #endif
         }
 
@@ -140,7 +140,7 @@ namespace CatLib
                 ? globalDispatcher.On(eventName, method, group)
                 : dispatcher.On(eventName, method.Target, method.Method, group);
 #else
-            dispatcher.On(eventName, method.Target, method.Method, group);
+            return dispatcher.On(eventName, method.Target, method.Method, group);
 #endif
         }
 
@@ -161,7 +161,7 @@ namespace CatLib
                 ? globalDispatcher.On(eventName, method, group)
                 : dispatcher.On(eventName, method.Target, method.Method, group);
 #else
-            dispatcher.On(eventName, method.Target, method.Method, group);
+            return dispatcher.On(eventName, method.Target, method.Method, group);
 #endif
         }
 
@@ -182,7 +182,7 @@ namespace CatLib
                 ? globalDispatcher.Listen(eventName, method, group)
                 : dispatcher.On(eventName, method.Target, method.Method, group);
 #else
-            dispatcher.On(eventName, method.Target, method.Method, group);
+            return dispatcher.On(eventName, method.Target, method.Method, group);
 #endif
         }
 
@@ -203,7 +203,7 @@ namespace CatLib
                 ? globalDispatcher.Listen(eventName, method, group)
                 : dispatcher.On(eventName, method.Target, method.Method, group);
 #else
-            dispatcher.On(eventName, method.Target, method.Method, group);
+            return dispatcher.On(eventName, method.Target, method.Method, group);
 #endif
         }
 
@@ -224,7 +224,7 @@ namespace CatLib
                 ? globalDispatcher.Listen(eventName, method, group)
                 : dispatcher.On(eventName, method.Target, method.Method, group);
 #else
-            dispatcher.On(eventName, method.Target, method.Method, group);
+            return dispatcher.On(eventName, method.Target, method.Method, group);
 #endif
         }
 
@@ -245,7 +245,7 @@ namespace CatLib
                 ? globalDispatcher.Listen(eventName, method, group)
                 : dispatcher.On(eventName, method.Target, method.Method, group);
 #else
-            dispatcher.On(eventName, method.Target, method.Method, group);
+            return dispatcher.On(eventName, method.Target, method.Method, group);
 #endif
         }
 
@@ -266,7 +266,7 @@ namespace CatLib
                 ? globalDispatcher.Listen(eventName, method, group)
                 : dispatcher.On(eventName, method.Target, method.Method, group);
 #else
-            dispatcher.On(eventName, method.Target, method.Method, group);
+            return dispatcher.On(eventName, method.Target, method.Method, group);
 #endif
         }
     }
