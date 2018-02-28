@@ -206,12 +206,12 @@ namespace CatLib
         /// 注册一个事件监听器
         /// </summary>
         /// <param name="eventName">事件名称</param>
-        /// <param name="execution">事件调用方法</param>
-        /// <param name="group">事件分组</param>
+        /// <param name="target">事件调用目标</param>
+        /// <param name="method">事件处理方法</param>
         /// <returns>事件对象</returns>
-        public static IEvent On(string eventName, Func<string, object[], object> execution, object group = null)
+        public static IEvent On(string eventName, object target, string method = null)
         {
-            return Handler.On(eventName, execution, group);
+            return Handler.On(eventName, target, method);
         }
 
         /// <summary>
@@ -224,18 +224,6 @@ namespace CatLib
         public static IEvent On(string eventName, Action method, object group = null)
         {
             return Handler.On(eventName, method, group);
-        }
-
-        /// <summary>
-        /// 注册一个事件监听器
-        /// </summary>
-        /// <param name="eventName">事件名称</param>
-        /// <param name="target">事件调用目标</param>
-        /// <param name="method">事件处理方法</param>
-        /// <returns>事件对象</returns>
-        public static IEvent On(string eventName, object target, string method = null)
-        {
-            return Handler.On(eventName, target, method);
         }
 
         /// <summary>
@@ -284,6 +272,18 @@ namespace CatLib
         public static IEvent On<T1, T2, T3, T4>(string eventName, Action<T1, T2, T3, T4> method, object group = null)
         {
             return Handler.On(eventName, method, group);
+        }
+
+        /// <summary>
+        /// 注册一个事件监听器
+        /// </summary>
+        /// <param name="eventName">事件名称</param>
+        /// <param name="execution">事件调用方法</param>
+        /// <param name="group">事件分组</param>
+        /// <returns>事件对象</returns>
+        public static IEvent Listen(string eventName, Func<string, object[], object> execution, object group = null)
+        {
+            return Handler.On(eventName, execution, group);
         }
 
         /// <summary>

@@ -24,7 +24,7 @@ namespace CatLib.Tests
             var n = string.Empty;
             var a = new object[]{};
             var r = new object();
-            App.On("Events.On", (name, args) =>
+            App.Listen("Events.On", (name, args) =>
             {
                 n = name;
                 a = args;
