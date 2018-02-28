@@ -1391,13 +1391,15 @@ namespace CatLib
                 return null;
             }
 
-            var results = new List<object>(baseParams.Length);
+            var results = new object[baseParams.Length];
 
             // 获取一个参数匹配器用于筛选参数
             var matcher = GetParamsMatcher(ref userParams);
 
-            foreach (var baseParam in baseParams)
+            for (var i = 0; i < baseParams.Length; i++)
             {
+                var baseParam = baseParams[i];
+
                 // 使用参数匹配器对参数进行匹配，参数匹配器是最先进行的，因为他们的匹配精度是最准确的
                 var param = (matcher == null) ? null : matcher(baseParam);
 
@@ -1443,10 +1445,10 @@ namespace CatLib
                     throw new UnresolvableException(error);
                 }
 
-                results.Add(param);
+                results[i] = param;
             }
 
-            return results.ToArray();
+            return results;
         }
 
         /// <summary>
