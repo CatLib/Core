@@ -318,6 +318,9 @@ namespace CatLib.Tests
             object[] data = null;
             Assert.AreEqual(true, container.Release(ref data));
 
+            data = new object[0];
+            Assert.AreEqual(true, container.Release(ref data));
+
             data = new object[] {"abc", 10};
             Assert.AreEqual(true, container.Release(ref data));
             Assert.AreEqual(true, data.Length == 0);
