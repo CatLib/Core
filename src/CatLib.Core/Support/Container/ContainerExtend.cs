@@ -493,12 +493,18 @@ namespace CatLib
         /// </summary>
         /// <param name="container">服务容器</param>
         /// <param name="instances">需要释放静态化实例对象</param>
+        /// <param name="reverse">以相反的顺序开始释放</param>
         /// <returns>只要有一个没有释放成功那么返回false, <paramref name="instances"/>为没有释放掉的实例</returns>
-        public static bool Release(this IContainer container, ref object[] instances)
+        public static bool Release(this IContainer container, ref object[] instances, bool reverse = true)
         {
-            if (instances == null)
+            if (instances == null || instances.Length <= 0)
             {
                 return true;
+            }
+
+            if (reverse)
+            {
+                Array.Reverse(instances);
             }
 
             var errorIndex = 0;
@@ -517,6 +523,12 @@ namespace CatLib
             }
 
             Array.Resize(ref instances, errorIndex);
+
+            if (reverse && errorIndex > 0)
+            {
+                Array.Reverse(instances);
+            }
+
             return errorIndex <= 0;
         }
 

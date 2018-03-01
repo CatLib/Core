@@ -1071,10 +1071,11 @@ namespace CatLib
         /// 根据实例对象释放静态化实例
         /// </summary>
         /// <param name="instances">需要释放静态化实例对象</param>
+        /// <param name="reverse">以相反的顺序释放实例</param>
         /// <returns>只要有一个没有释放成功那么返回false，<paramref name="instances"/>为没有释放掉的实例</returns>
-        public static bool Release(ref object[] instances)
+        public static bool Release(ref object[] instances, bool reverse = true)
         {
-            return Handler.Release(ref instances);
+            return Handler.Release(ref instances, reverse);
         }
 
         /// <summary>
