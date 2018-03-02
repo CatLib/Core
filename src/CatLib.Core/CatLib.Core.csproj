@@ -48,6 +48,7 @@
     <Compile Include="CatLib\IBootstrap.cs" />
     <Compile Include="CatLib\IServiceProvider.cs" />
     <Compile Include="CatLib\IServiceProviderType.cs" />
+    <Compile Include="CatLib\ServiceProvider.cs" />
     <Compile Include="Support\Container\Bindable.cs" />
     <Compile Include="Support\Container\BindDataExtend.cs" />
     <Compile Include="Support\Container\IBindable.cs" />
