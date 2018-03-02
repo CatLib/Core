@@ -33,7 +33,7 @@ namespace CatLib
             Guard.Requires<ArgumentException>(method != string.Empty);
             Guard.Requires<ArgumentNullException>(target != null);
 
-            var methodInfo = target.GetType().GetMethod(method ?? Str.Method(eventName));
+            var methodInfo = target.GetType().GetMethod(method ?? Str.Method(eventName), BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
             Guard.Requires<ArgumentNullException>(methodInfo != null);
             return dispatcher.On(eventName, target, methodInfo, target);
         }
