@@ -67,6 +67,7 @@
     <Compile Include="..\CatLib.Core\CatLib\IBootstrap.cs" Link="CatLib\IBootstrap.cs" />
     <Compile Include="..\CatLib.Core\CatLib\IServiceProvider.cs" Link="CatLib\IServiceProvider.cs" />
     <Compile Include="..\CatLib.Core\CatLib\IServiceProviderType.cs" Link="CatLib\IServiceProviderType.cs" />
+    <Compile Include="..\CatLib.Core\CatLib\ServiceProvider.cs" Link="CatLib\ServiceProvider.cs" />
     <Compile Include="..\CatLib.Core\Support\Attribute\ExcludeFromCodeCoverageAttribute.cs" Link="Support\Attribute\ExcludeFromCodeCoverageAttribute.cs" />
     <Compile Include="..\CatLib.Core\Support\Attribute\PriorityAttribute.cs" Link="Support\Attribute\PriorityAttribute.cs" />
     <Compile Include="..\CatLib.Core\Support\Container\Bindable.cs" Link="Support\Container\Bindable.cs" />
