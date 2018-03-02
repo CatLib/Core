@@ -30,6 +30,20 @@ namespace CatLib.Tests.Events
             return app;
         }
 
+        private int TestCall()
+        {
+            return 199478;
+        }
+
+        [TestMethod]
+        public void TestProtectedFunction()
+        {
+            var app = MakeEnv();
+            var dispatcher = app.Make<IDispatcher>();
+            dispatcher.On("event.name", this, "TestCall");
+            Assert.AreEqual(199478, dispatcher.TriggerHalt("event.name"));
+        }
+
         [TestMethod]
         public void TestSimpleOnEvents()
         {
