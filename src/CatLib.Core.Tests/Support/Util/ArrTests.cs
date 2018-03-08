@@ -633,5 +633,63 @@ namespace CatLib.Tests.Support.Util
 
             Assert.AreEqual(true, isCall);
         }
+
+        [TestMethod]
+        public void TestCut()
+        {
+            var data = new char[] { '1', '2', '3', '4', '5' };
+
+            Arr.Cut(ref data, 1);
+            Assert.AreEqual('2', data[0]);
+            Assert.AreEqual(4, data.Length);
+            Arr.Cut(ref data, -1);
+            Assert.AreEqual('4', data[2]);
+            Assert.AreEqual(3, data.Length);
+            Arr.Cut(ref data, 0);
+            Assert.AreEqual(3, data.Length);
+            Arr.Cut(ref data, 10);
+            Assert.AreEqual(0, data.Length);
+            data = new char[] { '1', '2', '3', '4', '5' };
+            Arr.Cut(ref data, -10);
+            Assert.AreEqual(0, data.Length);
+            data = new char[] { '1', '2', '3', '4', '5' };
+            Arr.Cut(ref data, 3);
+            Assert.AreEqual('4', data[0]);
+            Assert.AreEqual(2, data.Length);
+            data = new char[] { '1', '2', '3', '4', '5' };
+            Arr.Cut(ref data, -3);
+            Assert.AreEqual('2', data[1]);
+            Assert.AreEqual(2, data.Length);
+            char[] obj = null;
+            Arr.Cut(ref obj, 100);
+            obj = new char[0];
+            Arr.Cut(ref obj, 100);
+        }
+
+        [TestMethod]
+        public void TestRemove()
+        {
+            var data = new char[] { '1', '2', '3', '4', '5' };
+            var result = Arr.Remove(ref data, (c) => c == '3');
+            Assert.AreEqual(1, result.Length);
+            Assert.AreEqual('3', result[0]);
+            Assert.AreEqual(4, data.Length);
+            Assert.AreEqual('4', data[2]);
+
+            var data2 = new int[] { 1, 2, 3, 4, 5 };
+            var result2 = Arr.Remove(ref data2, (c) => c % 2 == 0);
+            Assert.AreEqual(2, result2.Length);
+            Assert.AreEqual(2, result2[0]);
+            Assert.AreEqual(4, result2[1]);
+            Assert.AreEqual(3, data2.Length);
+            Assert.AreEqual(1, data2[0]);
+            Assert.AreEqual(3, data2[1]);
+            Assert.AreEqual(5, data2[2]);
+
+            var data3 = new int[0];
+            var result3 = Arr.Remove(ref data3, (c) => c % 2 == 0);
+            Assert.AreEqual(0, result3.Length);
+            Assert.AreEqual(0, data3.Length);
+        }
     }
 }
