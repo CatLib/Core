@@ -12,6 +12,7 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Text;
 
 namespace CatLib
 {
@@ -1150,7 +1151,7 @@ namespace CatLib
         protected virtual string GetBuildStackDebugMessage()
         {
             var previous = string.Join(", ", BuildStack.ToArray());
-            return " While building [" + previous + "].";
+            return " While building stack [" + previous + "].";
         }
 
         /// <summary>
@@ -1165,7 +1166,7 @@ namespace CatLib
             string message;
             if (makeServiceType != null)
             {
-                message = "Target [" + makeServiceType + "] build faild. Service is [" + makeService + "].";
+                message = "Class [" + makeServiceType + "] build faild. Service is [" + makeService + "].";
             }
             else
             {
@@ -1173,7 +1174,32 @@ namespace CatLib
             }
 
             message += GetBuildStackDebugMessage();
+            message += GetInnerExceptionMessage(innerException);
             return new UnresolvableException(message, innerException);
+        }
+
+        /// <summary>
+        /// 获取内部异常提示消息
+        /// </summary>
+        /// <param name="innerException">内部异常</param>
+        /// <returns>提示消息内容</returns>
+        protected virtual string GetInnerExceptionMessage(Exception innerException)
+        {
+            if (innerException == null)
+            {
+                return string.Empty;
+            }
+
+            var stack = new StringBuilder();
+            do
+            {
+                if (stack.Length > 0)
+                {
+                    stack.Append(", ");
+                }
+                stack.Append(innerException);
+            } while ((innerException = innerException.InnerException) != null);
+            return " InnerException message stack: [" + stack + "]";
         }
 
         /// <summary>
