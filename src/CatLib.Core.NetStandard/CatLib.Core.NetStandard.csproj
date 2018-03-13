@@ -100,6 +100,7 @@
     <Compile Include="..\CatLib.Core\Support\QuickList\InternalList.cs" Link="Support\QuickList\InternalList.cs" />
     <Compile Include="..\CatLib.Core\Support\QuickList\IQuickList.cs" Link="Support\QuickList\IQuickList.cs" />
     <Compile Include="..\CatLib.Core\Support\QuickList\QuickList.cs" Link="Support\QuickList\QuickList.cs" />
+    <Compile Include="..\CatLib.Core\Support\RingBuffer\RingBuffer.cs" Link="Support\RingBuffer\RingBuffer.cs" />
     <Compile Include="..\CatLib.Core\Support\SortSet\ISortSet.cs" Link="Support\SortSet\ISortSet.cs" />
     <Compile Include="..\CatLib.Core\Support\SortSet\SortSet.cs" Link="Support\SortSet\SortSet.cs" />
     <Compile Include="..\CatLib.Core\Support\Template\IManaged.cs" Link="Support\Template\IManaged.cs" />
@@ -133,6 +134,7 @@
     <Folder Include="Support\QuickList\" />
     <Folder Include="Support\SortSet\" />
     <Folder Include="Support\Template\" />
+    <Folder Include="Support\RingBuffer\" />
   </ItemGroup>
 
 </Project>

@@ -83,6 +83,7 @@
     <Compile Include="Support\QuickList\InternalList.cs" />
     <Compile Include="Support\QuickList\IQuickList.cs" />
     <Compile Include="Support\QuickList\QuickList.cs" />
+    <Compile Include="Support\RingBuffer\RingBuffer.cs" />
     <Compile Include="Support\Util\Dict.cs" />
     <Compile Include="Support\SortSet\ISortSet.cs" />
     <Compile Include="Support\SortSet\SortSet.cs" />
