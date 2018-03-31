@@ -41,7 +41,7 @@ namespace CatLib
             {
                 if (instance == null)
                 {
-                    new Application();
+                    Application.New();
                 }
                 return instance;
             }
@@ -206,17 +206,6 @@ namespace CatLib
         /// 注册一个事件监听器
         /// </summary>
         /// <param name="eventName">事件名称</param>
-        /// <param name="method">事件处理方法</param>
-        /// <returns>事件对象</returns>
-        public static IEvent On(string eventName, Action method)
-        {
-            return Handler.On(eventName, method);
-        }
-
-        /// <summary>
-        /// 注册一个事件监听器
-        /// </summary>
-        /// <param name="eventName">事件名称</param>
         /// <param name="target">事件调用目标</param>
         /// <param name="method">事件处理方法</param>
         /// <returns>事件对象</returns>
@@ -230,10 +219,11 @@ namespace CatLib
         /// </summary>
         /// <param name="eventName">事件名称</param>
         /// <param name="method">事件处理方法</param>
+        /// <param name="group">事件分组</param>
         /// <returns>事件对象</returns>
-        public static IEvent On<T1>(string eventName, Action<T1> method)
+        public static IEvent On(string eventName, Action method, object group = null)
         {
-            return Handler.On(eventName, method);
+            return Handler.On(eventName, method, group);
         }
 
         /// <summary>
@@ -241,10 +231,11 @@ namespace CatLib
         /// </summary>
         /// <param name="eventName">事件名称</param>
         /// <param name="method">事件处理方法</param>
+        /// <param name="group">事件分组</param>
         /// <returns>事件对象</returns>
-        public static IEvent On<T1, T2>(string eventName, Action<T1, T2> method)
+        public static IEvent On<T1>(string eventName, Action<T1> method, object group = null)
         {
-            return Handler.On(eventName, method);
+            return Handler.On(eventName, method, group);
         }
 
         /// <summary>
@@ -252,10 +243,11 @@ namespace CatLib
         /// </summary>
         /// <param name="eventName">事件名称</param>
         /// <param name="method">事件处理方法</param>
+        /// <param name="group">事件分组</param>
         /// <returns>事件对象</returns>
-        public static IEvent On<T1, T2, T3>(string eventName, Action<T1, T2, T3> method)
+        public static IEvent On<T1, T2>(string eventName, Action<T1, T2> method, object group = null)
         {
-            return Handler.On(eventName, method);
+            return Handler.On(eventName, method, group);
         }
 
         /// <summary>
@@ -263,10 +255,11 @@ namespace CatLib
         /// </summary>
         /// <param name="eventName">事件名称</param>
         /// <param name="method">事件处理方法</param>
+        /// <param name="group">事件分组</param>
         /// <returns>事件对象</returns>
-        public static IEvent On<T1, T2, T3, T4>(string eventName, Action<T1, T2, T3, T4> method)
+        public static IEvent On<T1, T2, T3>(string eventName, Action<T1, T2, T3> method, object group = null)
         {
-            return Handler.On(eventName, method);
+            return Handler.On(eventName, method, group);
         }
 
         /// <summary>
@@ -274,10 +267,23 @@ namespace CatLib
         /// </summary>
         /// <param name="eventName">事件名称</param>
         /// <param name="method">事件处理方法</param>
+        /// <param name="group">事件分组</param>
         /// <returns>事件对象</returns>
-        public static IEvent Listen<TResult>(string eventName, Func<TResult> method)
+        public static IEvent On<T1, T2, T3, T4>(string eventName, Action<T1, T2, T3, T4> method, object group = null)
         {
-            return Handler.Listen(eventName, method);
+            return Handler.On(eventName, method, group);
+        }
+
+        /// <summary>
+        /// 注册一个事件监听器
+        /// </summary>
+        /// <param name="eventName">事件名称</param>
+        /// <param name="execution">事件调用方法</param>
+        /// <param name="group">事件分组</param>
+        /// <returns>事件对象</returns>
+        public static IEvent Listen(string eventName, Func<string, object[], object> execution, object group = null)
+        {
+            return Handler.On(eventName, execution, group);
         }
 
         /// <summary>
@@ -285,10 +291,11 @@ namespace CatLib
         /// </summary>
         /// <param name="eventName">事件名称</param>
         /// <param name="method">事件处理方法</param>
+        /// <param name="group">事件分组</param>
         /// <returns>事件对象</returns>
-        public static IEvent Listen<T1, TResult>(string eventName, Func<T1, TResult> method)
+        public static IEvent Listen<TResult>(string eventName, Func<TResult> method, object group = null)
         {
-            return Handler.Listen(eventName, method);
+            return Handler.Listen(eventName, method, group);
         }
 
         /// <summary>
@@ -296,10 +303,11 @@ namespace CatLib
         /// </summary>
         /// <param name="eventName">事件名称</param>
         /// <param name="method">事件处理方法</param>
+        /// <param name="group">事件分组</param>
         /// <returns>事件对象</returns>
-        public static IEvent Listen<T1, T2, TResult>(string eventName, Func<T1, T2, TResult> method)
+        public static IEvent Listen<T1, TResult>(string eventName, Func<T1, TResult> method, object group = null)
         {
-            return Handler.Listen(eventName, method);
+            return Handler.Listen(eventName, method, group);
         }
 
         /// <summary>
@@ -307,10 +315,11 @@ namespace CatLib
         /// </summary>
         /// <param name="eventName">事件名称</param>
         /// <param name="method">事件处理方法</param>
+        /// <param name="group">事件分组</param>
         /// <returns>事件对象</returns>
-        public static IEvent Listen<T1, T2, T3, TResult>(string eventName, Func<T1, T2, T3, TResult> method)
+        public static IEvent Listen<T1, T2, TResult>(string eventName, Func<T1, T2, TResult> method, object group = null)
         {
-            return Handler.Listen(eventName, method);
+            return Handler.Listen(eventName, method, group);
         }
 
         /// <summary>
@@ -318,10 +327,23 @@ namespace CatLib
         /// </summary>
         /// <param name="eventName">事件名称</param>
         /// <param name="method">事件处理方法</param>
+        /// <param name="group">事件分组</param>
         /// <returns>事件对象</returns>
-        public static IEvent Listen<T1, T2, T3, T4, TResult>(string eventName, Func<T1, T2, T3, T4, TResult> method)
+        public static IEvent Listen<T1, T2, T3, TResult>(string eventName, Func<T1, T2, T3, TResult> method, object group = null)
         {
-            return Handler.Listen(eventName, method);
+            return Handler.Listen(eventName, method, group);
+        }
+
+        /// <summary>
+        /// 注册一个事件监听器
+        /// </summary>
+        /// <param name="eventName">事件名称</param>
+        /// <param name="method">事件处理方法</param>
+        /// <param name="group">事件分组</param>
+        /// <returns>事件对象</returns>
+        public static IEvent Listen<T1, T2, T3, T4, TResult>(string eventName, Func<T1, T2, T3, T4, TResult> method, object group = null)
+        {
+            return Handler.Listen(eventName, method, group);
         }
 
         /// <summary>
@@ -1049,10 +1071,11 @@ namespace CatLib
         /// 根据实例对象释放静态化实例
         /// </summary>
         /// <param name="instances">需要释放静态化实例对象</param>
-        /// <returns>只要有一个没有释放成功那么返回false</returns>
-        public static bool Release(params object[] instances)
+        /// <param name="reverse">以相反的顺序释放实例</param>
+        /// <returns>只要有一个没有释放成功那么返回false，<paramref name="instances"/>为没有释放掉的实例</returns>
+        public static bool Release(ref object[] instances, bool reverse = true)
         {
-            return Handler.Release(instances);
+            return Handler.Release(ref instances, reverse);
         }
 
         /// <summary>

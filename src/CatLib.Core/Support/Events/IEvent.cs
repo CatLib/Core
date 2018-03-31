@@ -9,8 +9,6 @@
  * Document: http://catlib.io/
  */
 
-using System.Reflection;
-
 namespace CatLib
 {
     /// <summary>
@@ -19,24 +17,19 @@ namespace CatLib
     public interface IEvent
     {
         /// <summary>
-        /// 事件名
+        /// 原始事件名
         /// </summary>
-        string EventName { get; }
+        string Name { get; }
 
         /// <summary>
-        /// 事件目标
+        /// 事件分组
         /// </summary>
-        object Target { get; }
-
-        /// <summary>
-        /// 方法信息
-        /// </summary>
-        MethodInfo Method { get; }
+        object Group { get; }
 
         /// <summary>
         /// 调用事件
         /// </summary>
-        /// <param name="eventName">事件名</param>
+        /// <param name="eventName">完整的事件名</param>
         /// <param name="payloads">载荷</param>
         /// <returns>事件结果</returns>
         object Call(string eventName, params object[] payloads);

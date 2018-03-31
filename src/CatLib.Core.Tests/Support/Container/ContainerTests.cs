@@ -22,6 +22,42 @@ namespace CatLib.Tests.Stl
     [TestClass]
     public class ContainerTest
     {
+        public class InnerExceptionClass
+        {
+            public InnerExceptionClass()
+            {
+                throw new ArgumentException("Exception in InnerExceptionClass");
+            }
+        }
+
+        public class TestExceptionClass
+        {
+            public TestExceptionClass()
+            {
+                new InnerExceptionClass();
+            }
+        }
+
+        [TestMethod]
+        public void TestInnerException()
+        {
+            var container = MakeContainer();
+            container.Bind("TestExceptionClass", typeof(TestExceptionClass), false);
+
+            var isThrow = false;
+            try
+            {
+                container.Make("TestExceptionClass");
+            }
+            catch (Exception ex)
+            {
+                isThrow = true;
+                Console.WriteLine(ex.Message);
+            }
+
+            Assert.AreEqual(true, isThrow);
+        }
+
         #region Tag
         /// <summary>
         /// 是否可以标记服务

@@ -28,7 +28,7 @@
 **使用Nuget安装**
 
 ```PM
-Install-Package CatLib.Core -Version 1.2.5
+Install-Package CatLib.Core -Version 1.2.6
 ```
 
 **直接下载发布版本**

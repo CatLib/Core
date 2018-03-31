@@ -45,7 +45,7 @@
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DefineConstants>TRACE;DEBUG;NETSTANDARD2_0;CATLIB;</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;NETSTANDARD2_0;CATLIB;CATLIB_PERFORMANCE;NETSTANDARD2_0</DefineConstants>
     <DocumentationFile></DocumentationFile>
   </PropertyGroup>
 
@@ -58,11 +58,16 @@
     <Compile Include="..\CatLib.Core\CatLib\Application.cs" Link="CatLib\Application.cs" />
     <Compile Include="..\CatLib.Core\CatLib\ApplicationEvents.cs" Link="CatLib\ApplicationEvents.cs" />
     <Compile Include="..\CatLib.Core\CatLib\DebugLevels.cs" Link="CatLib\DebugLevels.cs" />
+    <Compile Include="..\CatLib.Core\CatLib\Events\DispatcherExtend.cs" Link="CatLib\Events\DispatcherExtend.cs" />
+    <Compile Include="..\CatLib.Core\CatLib\Events\GlobalDispatcher.cs" Link="CatLib\Events\GlobalDispatcher.cs" />
+    <Compile Include="..\CatLib.Core\CatLib\Events\IGlobalDispatcher.cs" Link="CatLib\Events\IGlobalDispatcher.cs" />
+    <Compile Include="..\CatLib.Core\CatLib\Events\IOriginalDispatcher.cs" Link="CatLib\Events\IOriginalDispatcher.cs" />
     <Compile Include="..\CatLib.Core\CatLib\Facade.cs" Link="CatLib\Facade.cs" />
     <Compile Include="..\CatLib.Core\CatLib\IApplication.cs" Link="CatLib\IApplication.cs" />
     <Compile Include="..\CatLib.Core\CatLib\IBootstrap.cs" Link="CatLib\IBootstrap.cs" />
     <Compile Include="..\CatLib.Core\CatLib\IServiceProvider.cs" Link="CatLib\IServiceProvider.cs" />
     <Compile Include="..\CatLib.Core\CatLib\IServiceProviderType.cs" Link="CatLib\IServiceProviderType.cs" />
+    <Compile Include="..\CatLib.Core\CatLib\ServiceProvider.cs" Link="CatLib\ServiceProvider.cs" />
     <Compile Include="..\CatLib.Core\Support\Attribute\ExcludeFromCodeCoverageAttribute.cs" Link="Support\Attribute\ExcludeFromCodeCoverageAttribute.cs" />
     <Compile Include="..\CatLib.Core\Support\Attribute\PriorityAttribute.cs" Link="Support\Attribute\PriorityAttribute.cs" />
     <Compile Include="..\CatLib.Core\Support\Container\Bindable.cs" Link="Support\Container\Bindable.cs" />
@@ -84,7 +89,6 @@
     <Compile Include="..\CatLib.Core\Support\Container\Params.cs" Link="Support\Container\Params.cs" />
     <Compile Include="..\CatLib.Core\Support\Container\UnresolvableException.cs" Link="Support\Container\UnresolvableException.cs" />
     <Compile Include="..\CatLib.Core\Support\Events\Dispatcher.cs" Link="Support\Events\Dispatcher.cs" />
-    <Compile Include="..\CatLib.Core\Support\Events\DispatcherExtend.cs" Link="Support\Events\DispatcherExtend.cs" />
     <Compile Include="..\CatLib.Core\Support\Events\Event.cs" Link="Support\Events\Event.cs" />
     <Compile Include="..\CatLib.Core\Support\Events\IDispatcher.cs" Link="Support\Events\IDispatcher.cs" />
     <Compile Include="..\CatLib.Core\Support\Events\IEvent.cs" Link="Support\Events\IEvent.cs" />
@@ -96,6 +100,7 @@
     <Compile Include="..\CatLib.Core\Support\QuickList\InternalList.cs" Link="Support\QuickList\InternalList.cs" />
     <Compile Include="..\CatLib.Core\Support\QuickList\IQuickList.cs" Link="Support\QuickList\IQuickList.cs" />
     <Compile Include="..\CatLib.Core\Support\QuickList\QuickList.cs" Link="Support\QuickList\QuickList.cs" />
+    <Compile Include="..\CatLib.Core\Support\RingBuffer\RingBuffer.cs" Link="Support\RingBuffer\RingBuffer.cs" />
     <Compile Include="..\CatLib.Core\Support\SortSet\ISortSet.cs" Link="Support\SortSet\ISortSet.cs" />
     <Compile Include="..\CatLib.Core\Support\SortSet\SortSet.cs" Link="Support\SortSet\SortSet.cs" />
     <Compile Include="..\CatLib.Core\Support\Template\IManaged.cs" Link="Support\Template\IManaged.cs" />
@@ -120,7 +125,7 @@
 
   <ItemGroup>
     <Folder Include="..\CatLib.Core\Properties\" />
-    <Folder Include="CatLib\" />
+    <Folder Include="CatLib\Events\" />
     <Folder Include="Support\Attribute\" />
     <Folder Include="Support\Events\" />
     <Folder Include="Support\Exception\" />
@@ -129,6 +134,7 @@
     <Folder Include="Support\QuickList\" />
     <Folder Include="Support\SortSet\" />
     <Folder Include="Support\Template\" />
+    <Folder Include="Support\RingBuffer\" />
   </ItemGroup>
 
 </Project>

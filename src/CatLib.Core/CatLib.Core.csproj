@@ -17,7 +17,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;CATLIB</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;CATLIB;CATLIB_PERFORMANCE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
@@ -40,11 +40,15 @@
     <Compile Include="CatLib\Application.cs" />
     <Compile Include="CatLib\ApplicationEvents.cs" />
     <Compile Include="CatLib\DebugLevels.cs" />
+    <Compile Include="CatLib\Events\GlobalDispatcher.cs" />
+    <Compile Include="CatLib\Events\IGlobalDispatcher.cs" />
+    <Compile Include="CatLib\Events\IOriginalDispatcher.cs" />
     <Compile Include="CatLib\Facade.cs" />
     <Compile Include="CatLib\IApplication.cs" />
     <Compile Include="CatLib\IBootstrap.cs" />
     <Compile Include="CatLib\IServiceProvider.cs" />
     <Compile Include="CatLib\IServiceProviderType.cs" />
+    <Compile Include="CatLib\ServiceProvider.cs" />
     <Compile Include="Support\Container\Bindable.cs" />
     <Compile Include="Support\Container\BindDataExtend.cs" />
     <Compile Include="Support\Container\IBindable.cs" />
@@ -55,7 +59,7 @@
     <Compile Include="Support\Container\MethodContainer.cs" />
     <Compile Include="Support\Container\Params.cs" />
     <Compile Include="Support\Container\UnresolvableException.cs" />
-    <Compile Include="Support\Events\DispatcherExtend.cs" />
+    <Compile Include="CatLib\Events\DispatcherExtend.cs" />
     <Compile Include="Support\Events\IDispatcher.cs" />
     <Compile Include="Support\Events\IEvent.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -79,6 +83,7 @@
     <Compile Include="Support\QuickList\InternalList.cs" />
     <Compile Include="Support\QuickList\IQuickList.cs" />
     <Compile Include="Support\QuickList\QuickList.cs" />
+    <Compile Include="Support\RingBuffer\RingBuffer.cs" />
     <Compile Include="Support\Util\Dict.cs" />
     <Compile Include="Support\SortSet\ISortSet.cs" />
     <Compile Include="Support\SortSet\SortSet.cs" />
