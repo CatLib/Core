@@ -17,7 +17,7 @@ namespace CatLib
     /// <summary>
     /// 环型缓冲区
     /// </summary>
-    public sealed class RingBuffer : IDisposable
+    public sealed class RingBuffer : IRingBuffer, IDisposable
     {
         /// <summary>
         /// 容量
@@ -91,7 +91,7 @@ namespace CatLib
         /// </summary>
         public int ReadableCapacity
         {
-            get { return (int) GetCanReadSize(); }
+            get { return (int)GetCanReadSize(); }
         }
 
         /// <summary>
@@ -212,7 +212,7 @@ namespace CatLib
         }
 
         /// <summary>
-        /// 将环型缓冲区的数据读取到<see cref="buffer"/>中，但是不前移读取位置
+        /// 将环型缓冲区的数据读取到<paramref name="buffer"/>中，但是不前移读取位置
         /// </summary>
         /// <param name="buffer">输出的数据</param>
         /// <returns>实际输出的长度</returns>
@@ -223,7 +223,7 @@ namespace CatLib
         }
 
         /// <summary>
-        /// 将环型缓冲区的数据读取到<see cref="buffer"/>中，但是不前移读取位置
+        /// 将环型缓冲区的数据读取到<paramref name="buffer"/>中，但是不前移读取位置
         /// </summary>
         /// <param name="buffer">输出的数据</param>
         /// <param name="offset">输出数组偏移多少作为起始</param>
@@ -235,7 +235,7 @@ namespace CatLib
         }
 
         /// <summary>
-        /// 将环型缓冲区的数据读取到<see cref="buffer"/>中，但是不前移读取位置
+        /// 将环型缓冲区的数据读取到<paramref name="buffer"/>中，但是不前移读取位置
         /// </summary>
         /// <param name="buffer">输出的数据</param>
         /// <param name="offset">输出数组偏移多少作为起始</param>
