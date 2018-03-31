@@ -30,6 +30,20 @@ namespace CatLib.Tests.Events
             return app;
         }
 
+        private int TestCall()
+        {
+            return 199478;
+        }
+
+        [TestMethod]
+        public void TestProtectedFunction()
+        {
+            var app = MakeEnv();
+            var dispatcher = app.Make<IDispatcher>();
+            dispatcher.On("event.name", this, "TestCall");
+            Assert.AreEqual(199478, dispatcher.TriggerHalt("event.name"));
+        }
+
         [TestMethod]
         public void TestSimpleOnEvents()
         {
@@ -174,6 +188,36 @@ namespace CatLib.Tests.Events
             App.Off(handler);
 
             Assert.AreEqual(2, dispatcher.TriggerHalt("event.name", 123));
+            Assert.AreEqual(false, isCall);
+        }
+
+        [TestMethod]
+        public void TestCancelHandlerString()
+        {
+            var app = MakeEnv();
+
+            var dispatcher = app.Make<IDispatcher>();
+            var isCall = false;
+            dispatcher.Listen("event.name", (object payload) =>
+            {
+                isCall = true;
+                Assert.AreEqual(123, payload);
+                return 1;
+            }, "1");
+            dispatcher.Listen("event.name", (object payload) =>
+            {
+                Assert.AreEqual(123, payload);
+                return 2;
+            }, "1");
+            dispatcher.Listen("event.*", (string eventName, object payload) =>
+            {
+                Assert.AreEqual(123, payload);
+                return 3;
+            }, "1");
+
+            App.Off("1");
+
+            Assert.AreEqual(null, dispatcher.TriggerHalt("event.name", 123));
             Assert.AreEqual(false, isCall);
         }
 

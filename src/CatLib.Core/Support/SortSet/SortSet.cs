@@ -223,6 +223,11 @@ namespace CatLib
         private readonly System.Random random = new System.Random();
 
         /// <summary>
+        /// 比较器
+        /// </summary>
+        private readonly IComparer<TScore> comparer;
+
+        /// <summary>
         /// 有序集的基数
         /// </summary>
         public int Count { get; private set; }
@@ -258,6 +263,19 @@ namespace CatLib
             {
                 Level = new SkipNode.SkipNodeLevel[maxLevel]
             };
+        }
+
+        /// <summary>
+        /// 创建一个有序集
+        /// </summary>
+        /// <param name="comparer">比较器</param>
+        /// <param name="probable">可能出现层数的概率系数(0-1之间的数)</param>
+        /// <param name="maxLevel">最大层数</param>
+        public SortSet(IComparer<TScore> comparer, double probable = 0.25, int maxLevel = 32)
+            : this(probable, maxLevel)
+        {
+            Guard.Requires<ArgumentNullException>(comparer != null);
+            this.comparer = comparer;
         }
 
         /// <summary>
@@ -452,7 +470,7 @@ namespace CatLib
         {
             Guard.Requires<ArgumentNullException>(start != null);
             Guard.Requires<ArgumentNullException>(end != null);
-            Guard.Requires<ArgumentOutOfRangeException>(start.CompareTo(end) <= 0);
+            Guard.Requires<ArgumentOutOfRangeException>(Compare(start, end) <= 0);
 
             int rank = 0, bakRank = 0;
             SkipNode bakCursor = null;
@@ -465,8 +483,8 @@ namespace CatLib
                 for (var i = level - 1; i >= 0; --i)
                 {
                     while (cursor.Level[i].Forward != null &&
-                           ((!isRight && cursor.Level[i].Forward.Score.CompareTo(start) < 0) ||
-                            (isRight && cursor.Level[i].Forward.Score.CompareTo(end) <= 0)))
+                           ((!isRight && Compare(cursor.Level[i].Forward.Score, start) < 0) ||
+                            (isRight && Compare(cursor.Level[i].Forward.Score, end) <= 0)))
                     {
                         rank += cursor.Level[i].Span;
                         cursor = cursor.Level[i].Forward;
@@ -556,15 +574,15 @@ namespace CatLib
         {
             Guard.Requires<ArgumentNullException>(startScore != null);
             Guard.Requires<ArgumentNullException>(stopScore != null);
-            Guard.Requires<ArgumentOutOfRangeException>(startScore.CompareTo(stopScore) <= 0);
+            Guard.Requires<ArgumentOutOfRangeException>(Compare(startScore, stopScore) <= 0);
 
-            int removed = 0;
+            var removed = 0;
             var update = new SkipNode[maxLevel];
             var cursor = header;
             for (var i = level - 1; i >= 0; --i)
             {
                 while (cursor.Level[i].Forward != null &&
-                       cursor.Level[i].Forward.Score.CompareTo(startScore) < 0)
+                       Compare(cursor.Level[i].Forward.Score, startScore) < 0)
                 {
                     cursor = cursor.Level[i].Forward;
                 }
@@ -574,7 +592,7 @@ namespace CatLib
             cursor = cursor.Level[0].Forward;
 
             while (cursor != null &&
-                   cursor.Score.CompareTo(stopScore) <= 0)
+                   Compare(cursor.Score, stopScore) <= 0)
             {
                 var next = cursor.Level[0].Forward;
                 dict.Remove(cursor.Element);
@@ -661,13 +679,13 @@ namespace CatLib
         {
             Guard.Requires<ArgumentNullException>(startScore != null);
             Guard.Requires<ArgumentNullException>(stopScore != null);
-            Guard.Requires<ArgumentOutOfRangeException>(startScore.CompareTo(stopScore) <= 0);
+            Guard.Requires<ArgumentOutOfRangeException>(Compare(startScore, stopScore) <= 0);
 
             var cursor = header;
             for (var i = level - 1; i >= 0; --i)
             {
                 while (cursor.Level[i].Forward != null &&
-                       cursor.Level[i].Forward.Score.CompareTo(startScore) < 0)
+                       Compare(cursor.Level[i].Forward.Score, startScore) < 0)
                 {
                     cursor = cursor.Level[i].Forward;
                 }
@@ -677,7 +695,7 @@ namespace CatLib
 
             var result = new List<TElement>();
             while (cursor != null &&
-                   cursor.Score.CompareTo(stopScore) <= 0)
+                   Compare(cursor.Score, stopScore) <= 0)
             {
                 result.Add(cursor.Element);
                 cursor = cursor.Level[0].Forward;
@@ -746,7 +764,7 @@ namespace CatLib
                 //rank为上一级结点的跨度数作为起点
                 rank[i] = i == (level - 1) ? 0 : rank[i + 1];
                 while (cursor.Level[i].Forward != null &&
-                        (cursor.Level[i].Forward.Score.CompareTo(score) < 0))
+                        (Compare(cursor.Level[i].Forward.Score, score) < 0))
                 {
                     rank[i] += cursor.Level[i].Span;
                     cursor = cursor.Level[i].Forward;
@@ -852,7 +870,7 @@ namespace CatLib
             for (var i = level - 1; i >= 0; --i)
             {
                 while (cursor.Level[i].Forward != null &&
-                            (cursor.Level[i].Forward.Score.CompareTo(score) <= 0 &&
+                            (Compare(cursor.Level[i].Forward.Score, score) <= 0 &&
                                 !cursor.Level[i].Forward.Element.Equals(element)))
                 {
                     cursor = cursor.Level[i].Forward;
@@ -865,7 +883,7 @@ namespace CatLib
             cursor = update[0].Level[0].Forward;
 
             if (cursor == null ||
-                    cursor.Score.CompareTo(score) != 0 ||
+                Compare(cursor.Score, score) != 0 ||
                         !cursor.Element.Equals(element))
             {
                 return false;
@@ -889,7 +907,7 @@ namespace CatLib
             for (var i = level - 1; i >= 0; --i)
             {
                 while (cursor.Level[i].Forward != null &&
-                        (cursor.Level[i].Forward.Score.CompareTo(score) <= 0 &&
+                        (Compare(cursor.Level[i].Forward.Score, score) <= 0 &&
                             !cursor.Level[i].Forward.Equals(element)))
                 {
                     rank += cursor.Level[i].Span;
@@ -952,6 +970,22 @@ namespace CatLib
                 ++newLevel;
             }
             return (newLevel < maxLevel) ? newLevel : maxLevel;
+        }
+
+        /// <summary>
+        /// 比较左值和右值
+        /// <para>如果左值小于右值返回值需要小于0</para>
+        /// <para>如果左值等于右值返回值需要等于0</para>
+        /// <para>如果左值大于右值返回值需要大于0</para>
+        /// </summary>
+        /// <param name="left"></param>
+        /// <param name="right"></param>
+        /// <returns></returns>
+        private int Compare(TScore left, TScore right)
+        {
+            return comparer != null 
+                ? comparer.Compare(left, right) 
+                : left.CompareTo(right);
         }
     }
 }

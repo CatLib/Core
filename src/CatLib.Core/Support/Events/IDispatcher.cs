@@ -10,7 +10,6 @@
  */
 
 using System;
-using System.Reflection;
 
 namespace CatLib
 {
@@ -50,10 +49,10 @@ namespace CatLib
         /// 注册一个事件监听器
         /// </summary>
         /// <param name="eventName">事件名称</param>
-        /// <param name="target">调用目标</param>
-        /// <param name="method">调用方法</param>
+        /// <param name="execution">事件调用方法</param>
+        /// <param name="group">事件分组，为<code>Null</code>则不进行分组</param>
         /// <returns>事件对象</returns>
-        IEvent On(string eventName, object target, MethodInfo method);
+        IEvent On(string eventName, Func<string, object[], object> execution, object group = null);
 
         /// <summary>
         /// 解除注册的事件监听器
@@ -62,7 +61,7 @@ namespace CatLib
         /// 事件解除目标
         /// <para>如果传入的是字符串(<code>string</code>)将会解除对应事件名的所有事件</para>
         /// <para>如果传入的是事件对象(<code>IEvent</code>)那么解除对应事件</para>
-        /// <para>如果传入的是其他实例(<code>object</code>)会解除该实例下的所有事件</para>
+        /// <para>如果传入的是分组(<code>object</code>)会解除该分组下的所有事件</para>
         /// </param>
         void Off(object target);
     }

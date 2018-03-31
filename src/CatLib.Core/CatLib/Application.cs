@@ -19,7 +19,7 @@ namespace CatLib
     /// <summary>
     /// CatLib程序
     /// </summary>
-    public class Application : Container, IApplication
+    public class Application : Container, IApplication, IOriginalDispatcher
     {
         /// <summary>
         /// 版本号
@@ -133,7 +133,7 @@ namespace CatLib
         /// <summary>
         /// 事件系统
         /// </summary>
-        private IDispatcher Dispatcher
+        public IDispatcher Dispatcher
         {
             get
             {
@@ -152,6 +152,15 @@ namespace CatLib
             RegisterCoreService();
             OnFindType(finder => { return Type.GetType(finder); });
             DebugLevel = DebugLevels.Prod;
+        }
+
+        /// <summary>
+        /// 构建一个新的Application实例
+        /// </summary>
+        /// <returns>Application实例</returns>
+        public static Application New()
+        {
+            return new Application();
         }
 
         /// <summary>
@@ -345,12 +354,12 @@ namespace CatLib
         /// 注册一个事件监听器
         /// </summary>
         /// <param name="eventName">事件名称</param>
-        /// <param name="target">调用目标</param>
-        /// <param name="method">调用方法</param>
+        /// <param name="execution">事件调用方法</param>
+        /// <param name="group">事件分组</param>
         /// <returns>事件对象</returns>
-        public IEvent On(string eventName, object target, MethodInfo method)
+        public IEvent On(string eventName, Func<string, object[], object> execution, object group = null)
         {
-            return Dispatcher.On(eventName, target, method);
+            return Dispatcher.On(eventName, execution, group);
         }
 
         /// <summary>
@@ -432,7 +441,8 @@ namespace CatLib
         /// </summary>
         protected virtual void RegisterCoreService()
         {
-            this.Singleton<Dispatcher>().Alias<IDispatcher>();
+            var bindable = new BindData(this, null, null, false);
+            this.Singleton<GlobalDispatcher>((_, __) => new GlobalDispatcher((paramInfos, userParams) => GetDependencies(bindable, paramInfos, userParams))).Alias<IDispatcher>();
         }
 
         /// <summary>

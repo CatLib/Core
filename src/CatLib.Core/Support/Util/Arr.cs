@@ -164,6 +164,40 @@ namespace CatLib
         }
 
         /// <summary>
+        /// 修剪数组
+        /// </summary>
+        /// <typeparam name="T">数组类型</typeparam>
+        /// <param name="source">源数组</param>
+        /// <param name="count">裁剪范围，负数为从后向前修剪</param>
+        public static void Cut<T>(ref T[] source, int count)
+        {
+            if (source == null || source.Length <= 0 || count == 0)
+            {
+                return;
+            }
+
+            if (Math.Abs(count) >= source.Length)
+            {
+                if (source.Length > 0)
+                {
+                    Array.Resize(ref source, 0);
+                }
+                return;
+            }
+
+            if (count > 0)
+            {
+                var size = source.Length - count;
+                Array.Copy(source, count, source, 0, size);
+                Array.Resize(ref source, size);
+            }
+            else
+            {
+                Array.Resize(ref source, source.Length - Math.Abs(count));
+            }
+        }
+
+        /// <summary>
         /// 将数组分为新的数组块
         /// <para>其中每个数组的单元数目由 <paramref name="size"/> 参数决定。最后一个数组的单元数目可能会少几个。</para>
         /// </summary>
@@ -247,19 +281,21 @@ namespace CatLib
                 return new T[] { };
             }
 
-            var results = new List<T>();
-
+            var results = new T[source.Length];
+            var n = 0;
             for (var i = source.Length - 1; i >= 0; i--)
             {
                 if (!predicate.Invoke(source[i]))
                 {
                     continue;
                 }
-                results.Add(source[i]);
+                results[n++] = source[i];
                 RemoveAt(ref source, i);
             }
 
-            return Reverse(results.ToArray());
+            Array.Reverse(results, 0, n);
+            Array.Resize(ref results, n);
+            return results;
         }
 
         /// <summary>

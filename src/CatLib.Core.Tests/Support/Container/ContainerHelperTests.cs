@@ -315,9 +315,33 @@ namespace CatLib.Tests
             var container = new Container();
             container.Instance<string>("abc");
             container.Instance<int>(10);
-            Assert.AreEqual(true, container.Release("abc", 10, null));
             object[] data = null;
-            Assert.AreEqual(true, container.Release(data));
+            Assert.AreEqual(true, container.Release(ref data));
+
+            data = new object[0];
+            Assert.AreEqual(true, container.Release(ref data));
+
+            data = new object[] {"abc", 10};
+            Assert.AreEqual(true, container.Release(ref data));
+            Assert.AreEqual(true, data.Length == 0);
+
+            data = new object[] { "abc", 10, 998 };
+            Assert.AreEqual(false, container.Release(ref data));
+            Assert.AreEqual(true, data.Length == 3);
+
+            container.Instance<int>(10);
+            data = new object[] { "abc", 10, 998 };
+            Assert.AreEqual(false, container.Release(ref data, false));
+            Assert.AreEqual(true, data.Length == 2);
+            Assert.AreEqual("abc", data[0]);
+            Assert.AreEqual(998, data[1]);
+
+            container.Instance<string>("abc");
+            data = new object[] { 10 , "abc", 998 };
+            Assert.AreEqual(false, container.Release(ref data));
+            Assert.AreEqual(true, data.Length == 2);
+            Assert.AreEqual(10, data[0]);
+            Assert.AreEqual(998, data[1]);
         }
 
         /// <summary>

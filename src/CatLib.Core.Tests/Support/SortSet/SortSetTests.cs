@@ -11,6 +11,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace CatLib.Tests.Stl
@@ -21,6 +22,53 @@ namespace CatLib.Tests.Stl
     [TestClass]
     public class SortSetTests
     {
+        private class PriorityComparer : IComparer<int>
+        {
+            public int Compare(int x, int y)
+            {
+                return y - x;
+            }
+        }
+
+        [TestMethod]
+        public void TestCustomComparer()
+        {
+            var list = new SortSet<object, int>(new PriorityComparer());
+
+            for (var i = 0; i < 10; i++)
+            {
+                list.Add(i, i);
+            }
+
+            Assert.AreEqual(9, list.Shift());
+            Assert.AreEqual(8, list.Shift());
+            Assert.AreEqual(7, list.Shift());
+            Assert.AreEqual(6, list.Shift());
+            Assert.AreEqual(5, list.Shift());
+            Assert.AreEqual(4, list.Shift());
+            Assert.AreEqual(3, list.Shift());
+            Assert.AreEqual(2, list.Shift());
+            Assert.AreEqual(1, list.Shift());
+            Assert.AreEqual(0, list.Shift());
+
+            list = new SortSet<object, int>();
+            for (var i = 0; i < 10; i++)
+            {
+                list.Add(i, i);
+            }
+
+            Assert.AreEqual(0, list.Shift());
+            Assert.AreEqual(1, list.Shift());
+            Assert.AreEqual(2, list.Shift());
+            Assert.AreEqual(3, list.Shift());
+            Assert.AreEqual(4, list.Shift());
+            Assert.AreEqual(5, list.Shift());
+            Assert.AreEqual(6, list.Shift());
+            Assert.AreEqual(7, list.Shift());
+            Assert.AreEqual(8, list.Shift());
+            Assert.AreEqual(9, list.Shift());
+        }
+
         /// <summary>
         /// 对象插入测试
         /// </summary>
