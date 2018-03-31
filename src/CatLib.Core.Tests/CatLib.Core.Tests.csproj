@@ -49,6 +49,7 @@
     <Compile Include="Support\FilterChain\FilterChainTests.cs" />
     <Compile Include="Support\QuickList\InternalListTests.cs" />
     <Compile Include="Support\QuickList\QuickListTests.cs" />
+    <Compile Include="Support\RingBuffer\RingBufferTests.cs" />
     <Compile Include="Support\SortSet\SortSetTests.cs" />
     <Compile Include="Support\Template\ManagerTests.cs" />
     <Compile Include="Support\Template\SingleManagerTests.cs" />

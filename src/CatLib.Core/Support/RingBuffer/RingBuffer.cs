@@ -9,7 +9,7 @@ namespace CatLib
     /// <summary>
     /// 环型缓冲区
     /// </summary>
-    public sealed class RingBufferStream : IDisposable
+    public sealed class RingBuffer : IDisposable
     {
         /// <summary>
         /// 容量
@@ -71,42 +71,54 @@ namespace CatLib
         }
 
         /// <summary>
-        /// 可以进行读取
+        /// 可写容量
         /// </summary>
-        public bool CanRead
+        public int WriteableCapacity
         {
-            get { return GetCanReadSize() > 0; }
+            get { return (int)GetCanWriteSize(); }
         }
 
         /// <summary>
-        /// 是否可以进行写入
+        /// 可读容量
         /// </summary>
-        public bool CanWrite()
+        public int ReadableCapacity
         {
-            return CanWrite(1);
+            get { return (int) GetCanReadSize(); }
+        }
+
+        /// <summary>
+        /// 构建一个新的环型缓冲区实例
+        /// </summary>
+        /// <param name="capacity">容量,将为临近2的次方（向上取）</param>
+        /// <param name="exposable">是否可以访问内部数组</param>
+        public RingBuffer(int capacity = 8192, bool exposable = true)
+        {
+            Guard.Requires<ArgumentOutOfRangeException>(capacity > 0);
+            buffer = new byte[this.capacity = GetPrime(capacity)];
+            mask = this.capacity - 1;
+            write = 0;
+            read = 0;
+            this.exposable = exposable;
+        }
+
+        /// <summary>
+        /// 是否可以进行读取
+        /// </summary>
+        /// <param name="count">指定的长度</param>
+        public bool CanRead(int count = 1)
+        {
+            Guard.Requires<ArgumentOutOfRangeException>(capacity > 0);
+            return GetCanReadSize() >= count;
         }
 
         /// <summary>
         /// 是否可以进行写入
         /// </summary>
         /// <param name="count">指定的长度</param>
-        public bool CanWrite(int count)
+        public bool CanWrite(int count = 1)
         {
+            Guard.Requires<ArgumentOutOfRangeException>(capacity > 0);
             return GetCanWriteSize() >= count;
-        }
-
-        /// <summary>
-        /// 构建一个新的环型缓冲区实例
-        /// </summary>
-        /// <param name="capacity">容量</param>
-        /// <param name="exposable">是否可以访问内部数组</param>
-        public RingBufferStream(int capacity, bool exposable = true)
-        {
-            buffer = new byte[this.capacity = GetPrime(capacity)];
-            mask = this.capacity - 1;
-            write = 0;
-            read = 0;
-            this.exposable = exposable;
         }
 
         /// <summary>
@@ -128,15 +140,14 @@ namespace CatLib
         /// <returns>可以读取的数据</returns>
         public byte[] Read()
         {
-            var readSize = GetCanReadSize();
-            if (readSize <= 0)
+            var buffer = MakeReadableBuffer();
+            if (buffer == null)
             {
-                return null;
+                return new byte[0];
             }
 
-            var result = new byte[readSize];
-            Read(result);
-            return result;
+            Read(buffer);
+            return buffer;
         }
 
         /// <summary>
@@ -170,6 +181,59 @@ namespace CatLib
         /// <param name="count">输出的长度</param>
         /// <returns>实际输出的长度</returns>
         public int Read(byte[] buffer, int offset, int count)
+        {
+            var readSize = Peek(buffer, offset, count);
+            read += readSize;
+            return readSize;
+        }
+
+        /// <summary>
+        /// 将环型缓冲区的数据全部返回，但是不前移读取位置
+        /// </summary>
+        /// <returns>实际输出的长度</returns>
+        public byte[] Peek()
+        {
+            var buffer = MakeReadableBuffer();
+            if (buffer == null)
+            {
+                return new byte[0];
+            }
+
+            Peek(buffer, 0, buffer.Length);
+            return buffer;
+        }
+
+        /// <summary>
+        /// 将环型缓冲区的数据读取到<see cref="buffer"/>中，但是不前移读取位置
+        /// </summary>
+        /// <param name="buffer">输出的数据</param>
+        /// <returns>实际输出的长度</returns>
+        public int Peek(byte[] buffer)
+        {
+            Guard.Requires<ArgumentNullException>(buffer != null);
+            return Peek(buffer, 0, buffer.Length);
+        }
+
+        /// <summary>
+        /// 将环型缓冲区的数据读取到<see cref="buffer"/>中，但是不前移读取位置
+        /// </summary>
+        /// <param name="buffer">输出的数据</param>
+        /// <param name="offset">输出数组偏移多少作为起始</param>
+        /// <returns>实际输出的长度</returns>
+        public int Peek(byte[] buffer, int offset)
+        {
+            Guard.Requires<ArgumentNullException>(buffer != null);
+            return Peek(buffer, offset, buffer.Length - offset);
+        }
+
+        /// <summary>
+        /// 将环型缓冲区的数据读取到<see cref="buffer"/>中，但是不前移读取位置
+        /// </summary>
+        /// <param name="buffer">输出的数据</param>
+        /// <param name="offset">输出数组偏移多少作为起始</param>
+        /// <param name="count">输出的长度</param>
+        /// <returns>实际输出的长度</returns>
+        public int Peek(byte[] buffer, int offset, int count)
         {
             Guard.Requires<ArgumentNullException>(buffer != null);
             Guard.Requires<ArgumentOutOfRangeException>(offset >= 0);
@@ -207,7 +271,6 @@ namespace CatLib
                 }
             }
 
-            read = nextReadPos;
             return (int)readSize;
         }
 
@@ -324,6 +387,16 @@ namespace CatLib
         }
 
         /// <summary>
+        /// 获取当前可读的buffer
+        /// </summary>
+        /// <returns>可以被读取的buffer</returns>
+        private byte[] MakeReadableBuffer()
+        {
+            var readSize = GetCanReadSize();
+            return readSize <= 0 ? null : new byte[readSize];
+        }
+
+        /// <summary>
         /// 计算规定值最近的二的次幂的容量
         /// </summary>
         /// <param name="min">规定值值</param>
@@ -332,15 +405,17 @@ namespace CatLib
         {
             min = Math.Max(0, min);
 
+            var result = 8192;
             for (var i = 2; i < int.MaxValue; i = i << 1)
             {
                 if (i >= min)
                 {
-                    return i;
+                    result = i;
+                    break;
                 }
             }
 
-            throw new RuntimeException("Can not get prime");
+            return result;
         }
     }
 }
