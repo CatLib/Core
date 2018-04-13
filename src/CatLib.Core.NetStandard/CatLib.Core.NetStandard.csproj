@@ -116,8 +116,6 @@
     <Compile Include="..\CatLib.Core\Support\Util\Dict.cs" Link="Support\Util\Dict.cs" />
     <Compile Include="..\CatLib.Core\Support\Util\Enum.cs" Link="Support\Util\Enum.cs" />
     <Compile Include="..\CatLib.Core\Support\Util\IAwait.cs" Link="Support\Util\IAwait.cs" />
-    <Compile Include="..\CatLib.Core\Support\Util\IReferenceCount.cs" Link="Support\Util\IReferenceCount.cs" />
-    <Compile Include="..\CatLib.Core\Support\Util\ReferenceCount.cs" Link="Support\Util\ReferenceCount.cs" />
     <Compile Include="..\CatLib.Core\Support\Util\Str.cs" Link="Support\Util\Str.cs" />
     <Compile Include="..\CatLib.Core\Support\Util\SystemTime.cs" Link="Support\Util\SystemTime.cs" />
     <Compile Include="..\CatLib.Core\Support\Util\Util.cs" Link="Support\Util\Util.cs" />
