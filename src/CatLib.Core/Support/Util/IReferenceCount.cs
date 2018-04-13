@@ -9,6 +9,8 @@
  * Document: http://catlib.io/
  */
 
+using System;
+
 namespace CatLib
 {
     /// <summary>
@@ -19,6 +21,12 @@ namespace CatLib
         /// <summary>
         /// 当前引用计数
         /// </summary>
+        int Quote { get; }
+
+        /// <summary>
+        /// 当前引用计数(别名自<see cref="Quote"/>)
+        /// </summary>
+        [Obsolete("Please use Quote")]
         int RefCount { get; }
 
         /// <summary>

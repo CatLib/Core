@@ -32,7 +32,7 @@ namespace CatLib
             internal struct SkipNodeLevel
             {
                 /// <summary>
-                /// 前一个结点
+                /// 下一个结点
                 /// </summary>
                 internal SkipNode Forward;
 
@@ -337,7 +337,7 @@ namespace CatLib
         {
             var elements = new TElement[Count];
             var node = header.Level[0];
-            int i = 0;
+            var i = 0;
             while (node.Forward != null)
             {
                 elements[i++] = node.Forward.Element;
@@ -489,19 +489,23 @@ namespace CatLib
                         rank += cursor.Level[i].Span;
                         cursor = cursor.Level[i].Forward;
                     }
-                    if (bakCursor == null)
+
+                    if (bakCursor != null)
                     {
-                        bakCursor = cursor;
-                        bakRank = rank;
+                        continue;
                     }
+
+                    bakCursor = cursor;
+                    bakRank = rank;
                 }
 
-                if (!isRight)
+                if (isRight)
                 {
-                    cursor = bakCursor;
-                    rank ^= bakRank ^= rank ^= bakRank;
+                    continue;
                 }
 
+                cursor = bakCursor;
+                rank ^= bakRank ^= rank ^= bakRank;
             } while (isRight = !isRight);
 
             return Math.Max(0, rank - bakRank);
@@ -713,7 +717,7 @@ namespace CatLib
         {
             rank = Math.Max(0, rank);
             rank += 1;
-            int traversed = 0;
+            var traversed = 0;
             var cursor = header;
             for (var i = level - 1; i >= 0; i--)
             {
@@ -723,15 +727,18 @@ namespace CatLib
                     traversed += cursor.Level[i].Span;
                     cursor = cursor.Level[i].Forward;
                 }
+
                 if (traversed == rank)
                 {
                     return cursor.Element;
                 }
             }
+
             if (Count > 0)
             {
                 throw new ArgumentOutOfRangeException("Rank is out of range [" + rank + "]");
             }
+
             throw new InvalidOperationException("SortSet is Null");
         }
 
@@ -869,9 +876,7 @@ namespace CatLib
             //从跳跃层高到低的进行查找
             for (var i = level - 1; i >= 0; --i)
             {
-                while (cursor.Level[i].Forward != null &&
-                            (Compare(cursor.Level[i].Forward.Score, score) <= 0 &&
-                                !cursor.Level[i].Forward.Element.Equals(element)))
+                while (IsFindNext(cursor.Level[i].Forward, element, score, i))
                 {
                     cursor = cursor.Level[i].Forward;
                 }
@@ -902,25 +907,62 @@ namespace CatLib
         /// <returns>排名，排名以0为底</returns>
         private int GetRank(TElement element, TScore score)
         {
-            int rank = 0;
+            var rank = 0;
             var cursor = header;
             for (var i = level - 1; i >= 0; --i)
             {
-                while (cursor.Level[i].Forward != null &&
-                        (Compare(cursor.Level[i].Forward.Score, score) <= 0 &&
-                            !cursor.Level[i].Forward.Equals(element)))
+                while (IsFindNext(cursor.Level[i].Forward, element, score, i))
                 {
                     rank += cursor.Level[i].Span;
                     cursor = cursor.Level[i].Forward;
                 }
-                if (cursor != header &&
-                        cursor.Element != null &&
-                            cursor.Element.Equals(element))
-                {
-                    return rank - 1;
-                }
             }
+
+            cursor = cursor.Level[0].Forward;
+
+            if (cursor != null && cursor != header &&
+                cursor.Element != null &&
+                cursor.Element.Equals(element))
+            {
+                return rank;
+            }
+
             return -1;
+        }
+
+        /// <summary>
+        /// 是否查询下一个元素
+        /// </summary>
+        /// <param name="node">跳跃结点</param>
+        /// <param name="element">元素</param>
+        /// <param name="score">分数</param>
+        /// <param name="level">层级</param>
+        /// <returns>是否查找下一个</returns>
+        private bool IsFindNext(SkipNode node, TElement element, TScore score, int level)
+        {
+            if (node == null)
+            {
+                return false;
+            }
+
+            var compare = Compare(node.Score, score);
+            if (compare < 0 || compare > 0)
+            {
+                return compare < 0;
+            }
+
+            // 如果层级大于0，说明有可能直接定位到元素2，从而导致bug
+            // 所以我们认为层级大于 0 那么值相等依旧返回前序跳跃结点
+            //
+            // ------------------------------------------
+            // |  元素1（分数：50）  | 元素2 （分数：50）
+            // ------------------------------------------
+            if (level > 0)
+            {
+                return false;
+            }
+
+            return !node.Element.Equals(element);
         }
 
         /// <summary>

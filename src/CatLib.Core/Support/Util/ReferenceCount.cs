@@ -32,12 +32,21 @@ namespace CatLib
         /// <summary>
         /// 当前计数
         /// </summary>
-        public int RefCount
+        public int Quote
         {
             get
             {
                 return count;
             }
+        }
+
+        /// <summary>
+        /// 当前计数
+        /// </summary>
+        [Obsolete("Please use Quote")]
+        public int RefCount
+        {
+            get { return Quote; }
         }
 
         /// <summary>
