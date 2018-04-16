@@ -83,6 +83,7 @@
     <Compile Include="Support\QuickList\InternalList.cs" />
     <Compile Include="Support\QuickList\IQuickList.cs" />
     <Compile Include="Support\QuickList\QuickList.cs" />
+    <Compile Include="Support\RingBuffer\IRingBuffer.cs" />
     <Compile Include="Support\RingBuffer\RingBuffer.cs" />
     <Compile Include="Support\Util\Dict.cs" />
     <Compile Include="Support\SortSet\ISortSet.cs" />
@@ -98,8 +99,6 @@
     <Compile Include="Support\Util\Arr.cs" />
     <Compile Include="Support\Util\Enum.cs" />
     <Compile Include="Support\Util\IAwait.cs" />
-    <Compile Include="Support\Util\IReferenceCount.cs" />
-    <Compile Include="Support\Util\ReferenceCount.cs" />
     <Compile Include="Support\Util\Str.cs" />
     <Compile Include="Support\Util\SystemTime.cs" />
     <Compile Include="Support\Util\Util.cs" />

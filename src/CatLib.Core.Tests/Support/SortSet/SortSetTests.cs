@@ -9,10 +9,9 @@
  * Document: http://catlib.io/
  */
 
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
-using System.Reflection;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace CatLib.Tests.Stl
 {
@@ -28,6 +27,56 @@ namespace CatLib.Tests.Stl
             {
                 return y - x;
             }
+        }
+
+        [TestMethod]
+        public void TestRandValue()
+        {
+            var sortSets = new SortSet<int, int>();
+            var random = new Random();
+
+            for (var i = 1000; i >= 1; i--)
+            {
+                sortSets.Add(i, random.Next(0, 1000));
+            }
+
+            for (var i = 1; i <= 1000; i++)
+            {
+                if (sortSets.Remove(i))
+                {
+                    continue;
+                }
+
+                Assert.Fail("can not remove i : " + i);
+            }
+
+            Assert.AreEqual(0, sortSets.Count);
+            foreach (var sortSet in sortSets)
+            {
+                Assert.Fail();
+            }
+        }
+
+        [TestMethod]
+        public void TestRank()
+        {
+            var sortSets = new SortSet<int, int>();
+
+            sortSets.Add(1000, 85);
+            sortSets.Add(999, 75);
+            sortSets.Add(998, 185);
+            sortSets.Add(997, 85);
+            sortSets.Add(996, 185);
+            sortSets.Add(995, 85);
+
+            Assert.AreEqual(1, sortSets.GetRank(995));
+            Assert.AreEqual(995, sortSets.GetElementByRank(1));
+            Assert.AreEqual(997, sortSets.GetElementByRank(2));
+            Assert.AreEqual(1000, sortSets.GetElementByRank(3));
+            Assert.AreEqual(996, sortSets.GetElementByRank(4));
+            Assert.AreEqual(998, sortSets.GetElementByRank(5));
+
+            Assert.AreEqual(3, sortSets.GetRangeCount(80, 90));
         }
 
         [TestMethod]
