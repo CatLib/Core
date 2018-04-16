@@ -100,6 +100,7 @@
     <Compile Include="..\CatLib.Core\Support\QuickList\InternalList.cs" Link="Support\QuickList\InternalList.cs" />
     <Compile Include="..\CatLib.Core\Support\QuickList\IQuickList.cs" Link="Support\QuickList\IQuickList.cs" />
     <Compile Include="..\CatLib.Core\Support\QuickList\QuickList.cs" Link="Support\QuickList\QuickList.cs" />
+    <Compile Include="..\CatLib.Core\Support\RingBuffer\IRingBuffer.cs" Link="Support\RingBuffer\IRingBuffer.cs" />
     <Compile Include="..\CatLib.Core\Support\RingBuffer\RingBuffer.cs" Link="Support\RingBuffer\RingBuffer.cs" />
     <Compile Include="..\CatLib.Core\Support\SortSet\ISortSet.cs" Link="Support\SortSet\ISortSet.cs" />
     <Compile Include="..\CatLib.Core\Support\SortSet\SortSet.cs" Link="Support\SortSet\SortSet.cs" />
@@ -115,8 +116,6 @@
     <Compile Include="..\CatLib.Core\Support\Util\Dict.cs" Link="Support\Util\Dict.cs" />
     <Compile Include="..\CatLib.Core\Support\Util\Enum.cs" Link="Support\Util\Enum.cs" />
     <Compile Include="..\CatLib.Core\Support\Util\IAwait.cs" Link="Support\Util\IAwait.cs" />
-    <Compile Include="..\CatLib.Core\Support\Util\IReferenceCount.cs" Link="Support\Util\IReferenceCount.cs" />
-    <Compile Include="..\CatLib.Core\Support\Util\ReferenceCount.cs" Link="Support\Util\ReferenceCount.cs" />
     <Compile Include="..\CatLib.Core\Support\Util\Str.cs" Link="Support\Util\Str.cs" />
     <Compile Include="..\CatLib.Core\Support\Util\SystemTime.cs" Link="Support\Util\SystemTime.cs" />
     <Compile Include="..\CatLib.Core\Support\Util\Util.cs" Link="Support\Util\Util.cs" />
