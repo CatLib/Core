@@ -16,24 +16,24 @@ using System.Reflection;
 namespace CatLib
 {
     /// <summary>
-    /// CatLib实例
+    /// CatLib instance.
     /// </summary>
     [ExcludeFromCodeCoverage]
     public abstract class App
     {
         #region Original
         /// <summary>
-        /// 当新建Application时
+        /// Callback when a new application instance is created.
         /// </summary>
         public static event Action<IApplication> OnNewApplication;
 
         /// <summary>
-        /// CatLib实例
+        /// CatLib instance.
         /// </summary>
         private static IApplication instance;
 
         /// <summary>
-        /// CatLib实例
+        /// Gets or sets the CatLib instance.
         /// </summary>
         public static IApplication Handler
         {
@@ -58,7 +58,7 @@ namespace CatLib
 
         #region Application API
         /// <summary>
-        /// 终止CatLib框架
+        /// Terminates the CatLib framework.
         /// </summary>
         public static void Terminate()
         {
@@ -66,35 +66,35 @@ namespace CatLib
         }
 
         /// <summary>
-        /// 注册服务提供者
+        /// Registers the given service provider.
         /// </summary>
-        /// <param name="provider">服务提供者</param>
+        /// <param name="provider">Service provider.</param>
         public static void Register(IServiceProvider provider)
         {
             Handler.Register(provider);
         }
 
         /// <summary>
-        /// 服务提供者是否已经注册过
+        /// Checks whether the given service provider is registered.
         /// </summary>
-        /// <param name="provider">服务提供者</param>
-        /// <returns>服务提供者是否已经注册过</returns>
+        /// <param name="provider">Service provider.</param>
+        /// <returns>Whether the given service provider is registered.</returns>
         public static bool IsRegisted(IServiceProvider provider)
         {
             return Handler.IsRegisted(provider);
         }
 
         /// <summary>
-        /// 获取运行时唯一Id
+        /// Gets the unique runtime ID.
         /// </summary>
-        /// <returns>运行时的唯一Id</returns>
+        /// <returns>The unique runtime ID.</returns>
         public static long GetRuntimeId()
         {
             return Handler.GetRuntimeId();
         }
 
         /// <summary>
-        /// 是否是主线程
+        /// Gets whether we're on the main thread.
         /// </summary>
         public static bool IsMainThread
         {
@@ -105,7 +105,7 @@ namespace CatLib
         }
 
         /// <summary>
-        /// CatLib版本(遵循semver)
+        /// Gets the CatLib version, which complies to semver.
         /// </summary>
         public static string Version
         {
@@ -116,47 +116,47 @@ namespace CatLib
         }
 
         /// <summary>
-        /// 比较CatLib版本(遵循semver)
-        /// <para>输入版本大于当前版本则返回<code>-1</code></para>
-        /// <para>输入版本等于当前版本则返回<code>0</code></para>
-        /// <para>输入版本小于当前版本则返回<code>1</code></para>
+        /// Compares to another CatLib version, which complies to semver.
+        /// <para>Returns <code>-1</code> when the input version is greater than the current.</para>
+        /// <para>Returns <code>0</code> when the input version is equal to the current.</para>
+        /// <para>Returns <code>1</code> when the input version is less than the current.</para>
         /// </summary>
-        /// <param name="major">主版本号</param>
-        /// <param name="minor">次版本号</param>
-        /// <param name="revised">修订版本号</param>
-        /// <returns>比较结果</returns>
+        /// <param name="major">The major version number.</param>
+        /// <param name="minor">The minor version number.</param>
+        /// <param name="revised">The revised version number.</param>
+        /// <returns>The comparison result.</returns>
         public static int Compare(int major, int minor, int revised)
         {
             return Handler.Compare(major, minor, revised);
         }
 
         /// <summary>
-        /// 比较CatLib版本(遵循semver)
-        /// <para>输入版本大于当前版本则返回<code>-1</code></para>
-        /// <para>输入版本等于当前版本则返回<code>0</code></para>
-        /// <para>输入版本小于当前版本则返回<code>1</code></para>
+        /// Compares to another CatLib version, which complies to semver.
+        /// <para>Returns <code>-1</code> when the input version is greater than the current.</para>
+        /// <para>Returns <code>0</code> when the input version is equal to the current.</para>
+        /// <para>Returns <code>1</code> when the input version is less than the current.</para>
         /// </summary>
-        /// <param name="version">版本号</param>
-        /// <returns>比较结果</returns>
+        /// <param name="version">Another version in string.</param>
+        /// <returns>The comparison result.</returns>
         public static int Compare(string version)
         {
             return Handler.Compare(version);
         }
 
         /// <summary>
-        /// 获取优先级，如果存在方法优先级定义那么优先返回方法的优先级
-        /// 如果不存在优先级定义那么返回<c>int.MaxValue</c>
+        /// Gets the prioirty. If there exists a method priority definition then returns it.
+        /// Otherwise, returns <c>int.MaxValue</c>.
         /// </summary>
-        /// <param name="type">获取优先级的类型</param>
-        /// <param name="method">获取优先级的调用方法</param>
-        /// <returns>优先级</returns>
+        /// <param name="type">The type of priority to get.</param>
+        /// <param name="method">The method via which to get the prioirty.</param>
+        /// <returns>The priority.</returns>
         public static int GetPriority(Type type, string method = null)
         {
             return Handler.GetPriority(type, method);
         }
 
         /// <summary>
-        /// 调试等级
+        /// Gets or sets the debug level.
         /// </summary>
         public static DebugLevels DebugLevel
         {
@@ -167,193 +167,193 @@ namespace CatLib
 
         #region Dispatcher API
         /// <summary>
-        /// 判断给定事件是否存在事件监听器
+        /// Check whether the given event has any listener.
         /// </summary>
-        /// <param name="eventName">事件名</param>
+        /// <param name="eventName">The event name.</param>
         /// <param name="strict">
-        /// 严格模式
-        /// <para>启用严格模式则不使用正则来进行匹配事件监听器</para>
+        /// Strict mode.
+        /// <para>When on, regular expressions are not used to match listeners.</para>
         /// </param>
-        /// <returns>是否存在事件监听器</returns>
+        /// <returns>Whether the given event has any listener.</returns>
         public static bool HasListeners(string eventName, bool strict = false)
         {
             return Handler.HasListeners(eventName, strict);
         }
 
         /// <summary>
-        /// 触发一个事件,并获取事件的返回结果
+        /// Triggers an event, and returns the result.
         /// </summary>
-        /// <param name="eventName">事件名称</param>
-        /// <param name="payloads">载荷</param>
-        /// <returns>事件结果</returns>
+        /// <param name="eventName">The event name.</param>
+        /// <param name="payloads">The payloads.</param>
+        /// <returns>The result of the event.</returns>
         public static object[] Trigger(string eventName, params object[] payloads)
         {
             return Handler.Trigger(eventName, payloads);
         }
 
         /// <summary>
-        /// 触发一个事件,遇到第一个事件存在处理结果后终止,并获取事件的返回结果
+        /// Triggers an event, halts event dispatching once a listener gives a result and returns this result.
         /// </summary>
-        /// <param name="eventName">事件名</param>
-        /// <param name="payloads">载荷</param>
-        /// <returns>事件结果</returns>
+        /// <param name="eventName">The event name.</param>
+        /// <param name="payloads">The payloads.</param>
+        /// <returns>The result of the event.</returns>
         public static object TriggerHalt(string eventName, params object[] payloads)
         {
             return Handler.TriggerHalt(eventName, payloads);
         }
 
         /// <summary>
-        /// 注册一个事件监听器
+        /// Registers a listener for the given event.
         /// </summary>
-        /// <param name="eventName">事件名称</param>
-        /// <param name="target">事件调用目标</param>
-        /// <param name="method">事件处理方法</param>
-        /// <returns>事件对象</returns>
+        /// <param name="eventName">The event name.</param>
+        /// <param name="target">The target of the event.</param>
+        /// <param name="method">The method to handle the event.</param>
+        /// <returns>The event object.</returns>
         public static IEvent On(string eventName, object target, string method = null)
         {
             return Handler.On(eventName, target, method);
         }
 
         /// <summary>
-        /// 注册一个事件监听器
+        /// Registers a listener for the given event.
         /// </summary>
-        /// <param name="eventName">事件名称</param>
-        /// <param name="method">事件处理方法</param>
-        /// <param name="group">事件分组</param>
-        /// <returns>事件对象</returns>
+        /// <param name="eventName">The event name.</param>
+        /// <param name="method">The method to handle the event.</param>
+        /// <param name="group">The group of the event.</param>
+        /// <returns>The event object.</returns>
         public static IEvent On(string eventName, Action method, object group = null)
         {
             return Handler.On(eventName, method, group);
         }
 
         /// <summary>
-        /// 注册一个事件监听器
+        /// Registers a listener for the given event.
         /// </summary>
-        /// <param name="eventName">事件名称</param>
-        /// <param name="method">事件处理方法</param>
-        /// <param name="group">事件分组</param>
-        /// <returns>事件对象</returns>
+        /// <param name="eventName">The event name.</param>
+        /// <param name="method">The method to handle the event.</param>
+        /// <param name="group">The group of the event.</param>
+        /// <returns>The event object.</returns>
         public static IEvent On<T1>(string eventName, Action<T1> method, object group = null)
         {
             return Handler.On(eventName, method, group);
         }
 
         /// <summary>
-        /// 注册一个事件监听器
+        /// Registers a listener for the given event.
         /// </summary>
-        /// <param name="eventName">事件名称</param>
-        /// <param name="method">事件处理方法</param>
-        /// <param name="group">事件分组</param>
-        /// <returns>事件对象</returns>
+        /// <param name="eventName">The event name.</param>
+        /// <param name="method">The method to handle the event.</param>
+        /// <param name="group">The group of the event.</param>
+        /// <returns>The event object.</returns>
         public static IEvent On<T1, T2>(string eventName, Action<T1, T2> method, object group = null)
         {
             return Handler.On(eventName, method, group);
         }
 
         /// <summary>
-        /// 注册一个事件监听器
+        /// Registers a listener for the given event.
         /// </summary>
-        /// <param name="eventName">事件名称</param>
-        /// <param name="method">事件处理方法</param>
-        /// <param name="group">事件分组</param>
-        /// <returns>事件对象</returns>
+        /// <param name="eventName">The event name.</param>
+        /// <param name="method">The method to handle the event.</param>
+        /// <param name="group">The group of the event.</param>
+        /// <returns>The event object.</returns>
         public static IEvent On<T1, T2, T3>(string eventName, Action<T1, T2, T3> method, object group = null)
         {
             return Handler.On(eventName, method, group);
         }
 
         /// <summary>
-        /// 注册一个事件监听器
+        /// Registers a listener for the given event.
         /// </summary>
-        /// <param name="eventName">事件名称</param>
-        /// <param name="method">事件处理方法</param>
-        /// <param name="group">事件分组</param>
-        /// <returns>事件对象</returns>
+        /// <param name="eventName">The event name.</param>
+        /// <param name="method">The method to handle the event.</param>
+        /// <param name="group">The group of the event.</param>
+        /// <returns>The event object.</returns>
         public static IEvent On<T1, T2, T3, T4>(string eventName, Action<T1, T2, T3, T4> method, object group = null)
         {
             return Handler.On(eventName, method, group);
         }
 
         /// <summary>
-        /// 注册一个事件监听器
+        /// Registers a listener for the given event.
         /// </summary>
-        /// <param name="eventName">事件名称</param>
-        /// <param name="execution">事件调用方法</param>
-        /// <param name="group">事件分组</param>
-        /// <returns>事件对象</returns>
+        /// <param name="eventName">The event name.</param>
+        /// <param name="method">The method to handle the event.</param>
+        /// <param name="group">The group of the event.</param>
+        /// <returns>The event object.</returns>
         public static IEvent Listen(string eventName, Func<string, object[], object> execution, object group = null)
         {
             return Handler.On(eventName, execution, group);
         }
 
         /// <summary>
-        /// 注册一个事件监听器
+        /// Registers a listener for the given event.
         /// </summary>
-        /// <param name="eventName">事件名称</param>
-        /// <param name="method">事件处理方法</param>
-        /// <param name="group">事件分组</param>
-        /// <returns>事件对象</returns>
+        /// <param name="eventName">The event name.</param>
+        /// <param name="method">The method to handle the event.</param>
+        /// <param name="group">The group of the event.</param>
+        /// <returns>The event object.</returns>
         public static IEvent Listen<TResult>(string eventName, Func<TResult> method, object group = null)
         {
             return Handler.Listen(eventName, method, group);
         }
 
         /// <summary>
-        /// 注册一个事件监听器
+        /// Registers a listener for the given event.
         /// </summary>
-        /// <param name="eventName">事件名称</param>
-        /// <param name="method">事件处理方法</param>
-        /// <param name="group">事件分组</param>
-        /// <returns>事件对象</returns>
+        /// <param name="eventName">The event name.</param>
+        /// <param name="method">The method to handle the event.</param>
+        /// <param name="group">The group of the event.</param>
+        /// <returns>The event object.</returns>
         public static IEvent Listen<T1, TResult>(string eventName, Func<T1, TResult> method, object group = null)
         {
             return Handler.Listen(eventName, method, group);
         }
 
         /// <summary>
-        /// 注册一个事件监听器
+        /// Registers a listener for the given event.
         /// </summary>
-        /// <param name="eventName">事件名称</param>
-        /// <param name="method">事件处理方法</param>
-        /// <param name="group">事件分组</param>
-        /// <returns>事件对象</returns>
+        /// <param name="eventName">The event name.</param>
+        /// <param name="method">The method to handle the event.</param>
+        /// <param name="group">The group of the event.</param>
+        /// <returns>The event object.</returns>
         public static IEvent Listen<T1, T2, TResult>(string eventName, Func<T1, T2, TResult> method, object group = null)
         {
             return Handler.Listen(eventName, method, group);
         }
 
         /// <summary>
-        /// 注册一个事件监听器
+        /// Registers a listener for the given event.
         /// </summary>
-        /// <param name="eventName">事件名称</param>
-        /// <param name="method">事件处理方法</param>
-        /// <param name="group">事件分组</param>
-        /// <returns>事件对象</returns>
+        /// <param name="eventName">The event name.</param>
+        /// <param name="method">The method to handle the event.</param>
+        /// <param name="group">The group of the event.</param>
+        /// <returns>The event object.</returns>
         public static IEvent Listen<T1, T2, T3, TResult>(string eventName, Func<T1, T2, T3, TResult> method, object group = null)
         {
             return Handler.Listen(eventName, method, group);
         }
 
         /// <summary>
-        /// 注册一个事件监听器
+        /// Registers a listener for the given event.
         /// </summary>
-        /// <param name="eventName">事件名称</param>
-        /// <param name="method">事件处理方法</param>
-        /// <param name="group">事件分组</param>
-        /// <returns>事件对象</returns>
+        /// <param name="eventName">The event name.</param>
+        /// <param name="method">The method to handle the event.</param>
+        /// <param name="group">The group of the event.</param>
+        /// <returns>The event object.</returns>
         public static IEvent Listen<T1, T2, T3, T4, TResult>(string eventName, Func<T1, T2, T3, T4, TResult> method, object group = null)
         {
             return Handler.Listen(eventName, method, group);
         }
 
         /// <summary>
-        /// 解除注册的事件监听器
+        /// Unregisters event listeners.
         /// </summary>
         /// <param name="target">
-        /// 事件解除目标
-        /// <para>如果传入的是字符串(<code>string</code>)将会解除对应事件名的所有事件</para>
-        /// <para>如果传入的是事件对象(<code>IEvent</code>)那么解除对应事件</para>
-        /// <para>如果传入的是其他实例(<code>object</code>)会解除该实例下的所有事件</para>
+        /// The target to unregister.
+        /// <para>If the target is an event name (<code>string</code>), then all the listeners to this event will be unregistered.</para>
+        /// <para>If the target is an event object (<code>IEvent</code>), then this event object will be unregistered.</para>
+        /// <para>If the target is something else (<code>object</code>), all the listeners under it will be unregistered.</para>
         /// </param>
         public static void Off(object target)
         {
@@ -363,10 +363,10 @@ namespace CatLib
 
         #region Container API
         /// <summary>
-        /// 获取服务的绑定数据,如果绑定不存在则返回null
+        /// Gets the data to bind to the given service. If there is no data to bind, returns null.
         /// </summary>
-        /// <param name="service">服务名或者别名</param>
-        /// <returns>服务绑定数据或者null</returns>
+        /// <param name="service">The service name or alias.</param>
+        /// <returns>The data to bind, or null.</returns>
         public static IBindData GetBind(string service)
         {
             return Handler.GetBind(service);
