@@ -363,30 +363,30 @@ namespace CatLib
 
         #region Container API
         /// <summary>
-        /// Gets the data to bind to the given service. If there is no data to bind, returns null.
+        /// Gets the binding data of the given service. If there is no binding data, returns null.
         /// </summary>
         /// <param name="service">The service name or alias.</param>
-        /// <returns>The data to bind, or null.</returns>
+        /// <returns>The binding data, or null.</returns>
         public static IBindData GetBind(string service)
         {
             return Handler.GetBind(service);
         }
 
         /// <summary>
-        /// 是否已经绑定了服务
+        /// Checks whether the given service has been bound.
         /// </summary>
-        /// <param name="service">服务名或者别名</param>
-        /// <returns>返回一个bool值代表服务是否被绑定</returns>
+        /// <param name="service">The service name or alias.</param>
+        /// <returns>Whether the given service has been bound.</returns>
         public static bool HasBind(string service)
         {
             return Handler.HasBind(service);
         }
 
         /// <summary>
-        /// 是否已经实例静态化
+        /// Checks whether the service has been made static.
         /// </summary>
-        /// <typeparam name="TService">服务名</typeparam>
-        /// <returns>是否已经静态化</returns>
+        /// <typeparam name="TService">The service type.</typeparam>
+        /// <returns>Whether the service has been made static.</returns>
         public static bool HasInstance<TService>()
         {
 #if CATLIB_PERFORMANCE
@@ -397,115 +397,115 @@ namespace CatLib
         }
 
         /// <summary>
-        /// 服务是否已经被解决过
+        /// Checks whether the service has been resolved.
         /// </summary>
-        /// <typeparam name="TService">服务名</typeparam>
-        /// <returns>是否已经被解决过</returns>
+        /// <typeparam name="TService">The service class.</typeparam>
+        /// <returns>Whether the service has been resolved.</returns>
         public static bool IsResolved<TService>()
         {
             return Handler.IsResolved<TService>();
         }
 
         /// <summary>
-        /// 是否可以生成服务
+        /// Checks whether the given service can be made.
         /// </summary>
-        /// <param name="service">服务名或者别名</param>
-        /// <returns>是否可以生成服务</returns>
+        /// <param name="service">The service name or alias.</param>
+        /// <returns>Whether the given service can be made.</returns>
         public static bool CanMake(string service)
         {
             return Handler.CanMake(service);
         }
 
         /// <summary>
-        /// 服务是否是静态化的,如果服务不存在也将返回false
+        /// Checks whether the given service is static. When the service doesn't exist, also returns <code>false</code>.
         /// </summary>
-        /// <param name="service">服务名或者别名</param>
-        /// <returns>是否是静态化的</returns>
+        /// <param name="service">The service name or alias.</param>
+        /// <returns>Whether the given service is static.</returns>
         public static bool IsStatic(string service)
         {
             return Handler.IsStatic(service);
         }
 
         /// <summary>
-        /// 是否是别名
+        /// Checks whether the given name is an alias.
         /// </summary>
-        /// <param name="name">名字</param>
-        /// <returns>是否是别名</returns>
+        /// <param name="name">The name.</param>
+        /// <returns>Whether the given name is an alias.</returns>
         public static bool IsAlias(string name)
         {
             return Handler.IsAlias(name);
         }
 
         /// <summary>
-        /// 绑定一个服务
+        /// Binds a service.
         /// </summary>
-        /// <param name="service">服务名</param>
-        /// <param name="concrete">服务实现</param>
-        /// <param name="isStatic">服务是否静态化</param>
-        /// <returns>服务绑定数据</returns>
+        /// <param name="service">The service name.</param>
+        /// <param name="concrete">The service implementation type.</param>
+        /// <param name="isStatic">Whether the service is static.</param>
+        /// <returns>The binding data.</returns>
         public static IBindData Bind(string service, Type concrete, bool isStatic)
         {
             return Handler.Bind(service, concrete, isStatic);
         }
 
         /// <summary>
-        /// 绑定一个服务
+        /// Binds a service.
         /// </summary>
-        /// <param name="service">服务名</param>
-        /// <param name="concrete">服务实体</param>
-        /// <param name="isStatic">服务是否静态化</param>
-        /// <returns>服务绑定数据</returns>
+        /// <param name="service">The service name.</param>
+        /// <param name="concrete">The service implementation type.</param>
+        /// <param name="isStatic">Whether the service is static.</param>
+        /// <returns>>The binding data..</returns>
         public static IBindData Bind(string service, Func<IContainer, object[], object> concrete, bool isStatic)
         {
             return Handler.Bind(service, concrete, isStatic);
         }
 
         /// <summary>
-        /// 如果服务不存在那么则绑定服务
+        /// Binds a service if it doesn't exists.
         /// </summary>
-        /// <param name="service">服务名</param>
-        /// <param name="concrete">服务实现</param>
-        /// <param name="isStatic">服务是否是静态的</param>
-        /// <param name="bindData">如果绑定失败则返回历史绑定对象</param>
-        /// <returns>服务绑定数据</returns>
+        /// <param name="service">The service name.</param>
+        /// <param name="concrete">The service implementation type.</param>
+        /// <param name="isStatic">Whether the service is static.</param>
+        /// <param name="bindData">If the binding fails, the history bound data.</param>
+        /// <returns>Whether the binding succeeds.</returns>
         public static bool BindIf(string service, Func<IContainer, object[], object> concrete, bool isStatic, out IBindData bindData)
         {
             return Handler.BindIf(service, concrete, isStatic, out bindData);
         }
 
         /// <summary>
-        /// 如果服务不存在那么则绑定服务
+        /// Binds a service if it doesn't exists.
         /// </summary>
-        /// <param name="service">服务名</param>
-        /// <param name="concrete">服务实现</param>
-        /// <param name="isStatic">服务是否是静态的</param>
-        /// <param name="bindData">如果绑定失败则返回历史绑定对象</param>
-        /// <returns>服务绑定数据</returns>
+        /// <param name="service">The service name.</param>
+        /// <param name="concrete">The service implementation type.</param>
+        /// <param name="isStatic">Whether the service is static.</param>
+        /// <param name="bindData">If the binding fails, the history bound data.</param>
+        /// <returns>Whether the binding succeeds.</returns>
         public static bool BindIf(string service, Type concrete, bool isStatic, out IBindData bindData)
         {
             return Handler.BindIf(service, concrete, isStatic, out bindData);
         }
 
         /// <summary>
-        /// 绑定一个方法到容器
+        /// Binds a method to the container.
         /// </summary>
-        /// <param name="method">方法名</param>
-        /// <param name="target">调用目标</param>
-        /// <param name="call">调用方法</param>
-        /// <returns>方法绑定数据</returns>
+        /// <param name="method">The method name.</param>
+        /// <param name="target">The invoking target.</param>
+        /// <param name="call">The method info to invoke.</param>
+        /// <returns>The method binding data.</returns>
         public static IMethodBind BindMethod(string method, object target, MethodInfo call)
         {
             return Handler.BindMethod(method, target, call);
         }
 
         /// <summary>
-        /// 解除绑定的方法
+        /// Unbinds a method from the container.
         /// </summary>
         /// <param name="target">
-        /// 解除目标
-        /// <para>如果为字符串则作为调用方法名</para>
-        /// <para>如果为<code>IMethodBind</code>则作为指定方法</para>
-        /// <para>如果为其他对象则作为调用目标做全体解除</para>
+        /// The target.
+        /// <para>A <code>string</code> will be taken as the method name.</para>
+        /// <para>A <code>IMethodBind</code> will be taken as a given method.</para>
+        /// <para>Other object will be taken as the invoking target.</para>
         /// </param>
         public static void UnbindMethod(object target)
         {
@@ -513,177 +513,178 @@ namespace CatLib
         }
 
         /// <summary>
-        /// 解除绑定服务
+        /// Unbinds a service.
         /// </summary>
-        /// <param name="service">服务名或者别名</param>
+        /// <param name="service">The service name or alias.</param>
         public static void Unbind(string service)
         {
             Handler.Unbind(service);
         }
 
         /// <summary>
-        /// 为一个及以上的服务定义一个标记
+        /// Tags the given serivces.
         /// </summary>
-        /// <param name="tag">标记名</param>
-        /// <param name="service">服务名</param>
+        /// <param name="tag">The tag name.</param>
+        /// <param name="service">The service names.</param>
         public static void Tag(string tag, params string[] service)
         {
             Handler.Tag(tag, service);
         }
 
         /// <summary>
-        /// 根据标记名生成标记所对应的所有服务实例
+        /// Makes all the services tagged with the given tag name.
         /// </summary>
-        /// <param name="tag">标记名</param>
-        /// <returns>将会返回标记所对应的所有服务实例</returns>
+        /// <param name="tag">The tag name.</param>
+        /// <returns>All the services tagged with the given tag name.</returns>
         public static object[] Tagged(string tag)
         {
             return Handler.Tagged(tag);
         }
 
         /// <summary>
-        /// 静态化一个服务
+        /// Makes a service static.
         /// </summary>
-        /// <param name="service">服务名或者别名</param>
-        /// <param name="instance">服务实例</param>
+        /// <param name="service">The service name or alias.</param>
+        /// <param name="instance">The service instance.</param>
         public static object Instance(string service, object instance)
         {
             return Handler.Instance(service, instance);
         }
 
         /// <summary>
-        /// 释放某个静态化实例
+        /// Release a static service.
         /// </summary>
-        /// <param name="service">服务名或别名</param>
+        /// <param name="service">The service name or alias.</param>
         public static bool Release(string service)
         {
             return Handler.Release(service);
         }
 
         /// <summary>
-        /// 调用一个已经被绑定的方法
+        /// Invokes a bound method.
         /// </summary>
-        /// <param name="method">方法名</param>
-        /// <param name="userParams">用户提供的参数</param>
-        /// <returns>调用结果</returns>
+        /// <param name="method">The method name.</param>
+        /// <param name="userParams">The user parameters.</param>
+        /// <returns>The invocation result.</returns>
         public static object Invoke(string method, params object[] userParams)
         {
             return Handler.Invoke(method, userParams);
         }
 
         /// <summary>
-        /// 以依赖注入形式调用一个方法
+        /// Calls a method with dependency injection.
         /// </summary>
-        /// <param name="instance">方法对象</param>
-        /// <param name="methodInfo">方法信息</param>
-        /// <param name="userParams">用户传入的参数</param>
-        /// <returns>方法返回值</returns>
+        /// <param name="instance">The instance on which to call the method.</param>
+        /// <param name="methodInfo">The method info.</param>
+        /// <param name="userParams">The user params.</param>
+        /// <returns>The return value of method.</returns>
         public static object Call(object instance, MethodInfo methodInfo, params object[] userParams)
         {
             return Handler.Call(instance, methodInfo, userParams);
         }
 
         /// <summary>
-        /// 构造服务
+        /// Makes a service.
         /// </summary>
-        /// <param name="service">服务名或别名</param>
-        /// <param name="userParams">用户传入的参数</param>
-        /// <returns>服务实例，如果构造失败那么返回null</returns>
+        /// <param name="service">The service name or alias.</param>
+        /// <param name="userParams">The user parameters.</param>
+        /// <returns>The serivce instance, or null if making fails.</returns>
         public static object Make(string service, params object[] userParams)
         {
             return Handler.Make(service, userParams);
         }
 
         /// <summary>
-        /// 获取一个回调，当执行回调可以生成指定的服务
+        /// Gets a callback, which makes a service when called.
         /// </summary>
-        /// <param name="service">服务名或别名</param>
-        /// <returns>回调方案</returns>
+        /// <param name="service">The service name.</param>
+        /// <returns>The callback.</returns>
         public static Func<object> Factory(string service)
         {
             return Handler.Factory(service);
         }
 
         /// <summary>
-        /// 为服务设定一个别名
+        /// Sets an alias to a service.
         /// </summary>
-        /// <param name="alias">别名</param>
-        /// <param name="service">映射到的服务名</param>
-        /// <returns>当前容器对象</returns>
+        /// <param name="alias">The alias.</param>
+        /// <param name="service">The serivce name.</param>
+        /// <returns>The current container.</returns>
         public static IContainer Alias(string alias, string service)
         {
             return Handler.Alias(alias, service);
         }
 
         /// <summary>
-        /// 当服务被解决时触发的事件
+        /// Add a callback for when a service is resolved.
         /// </summary>
-        /// <param name="func">回调函数</param>
-        /// <returns>当前容器实例</returns>
+        /// <param name="func">The callback.</param>
+        /// <returns>The current container.</returns>
         public static IContainer OnResolving(Func<IBindData, object, object> func)
         {
             return Handler.OnResolving(func);
         }
 
         /// <summary>
-        /// 当静态服务被释放时
+        /// Adds a callback for when a static service is released. 
         /// </summary>
-        /// <param name="action">处理释放时的回调</param>
+        /// <param name="action">The callback.</param>
+        /// <returns>The current container.</returns>
         public static IContainer OnRelease(Action<IBindData, object> action)
         {
             return Handler.OnRelease(action);
         }
 
         /// <summary>
-        /// 当查找类型无法找到时会尝试去调用开发者提供的查找类型函数
+        /// Adds a callback for when type finding fails.
         /// </summary>
-        /// <param name="func">查找类型的回调</param>
-        /// <param name="priority">查询优先级(值越小越优先)</param>
-        /// <returns>当前容器实例</returns>
+        /// <param name="func">The callback.</param>
+        /// <param name="priority">The priority. (The smaller, the higher.)</param>
+        /// <returns>The current container.</returns>
         public static IContainer OnFindType(Func<string, Type> func, int priority = int.MaxValue)
         {
             return Handler.OnFindType(func, priority);
         }
 
         /// <summary>
-        /// 当一个已经被解决的服务，发生重定义时触发
+        /// Adds a callback for when a resolved service is rebound.
         /// </summary>
-        /// <param name="service">服务名</param>
-        /// <param name="callback">回调</param>
-        /// <returns>服务容器</returns>
+        /// <param name="service">The service name.</param>
+        /// <param name="callback">The callback.</param>
+        /// <returns>The current container.</returns>
         public static IContainer OnRebound(string service, Action<object> callback)
         {
             return Handler.OnRebound(service, callback);
         }
 
         /// <summary>
-        /// 关注指定的服务，当服务触发重定义时调用指定对象的指定方法
-        /// <para>调用是以依赖注入的形式进行的</para>
-        /// <para>服务的新建（第一次解决服务）操作并不会触发重定义</para>
+        /// Watches the service, so as to invoke the given method on the given target when the service is rebound.
+        /// <para>The invocation runs in the form of dependency injection.</para>
+        /// <para>Won't be triggered when the serivce is resovled for the first time.</para>
         /// </summary>
-        /// <param name="service">关注的服务名</param>
-        /// <param name="target">当服务发生重定义时调用的目标</param>
-        /// <param name="methodInfo">方法信息</param>
+        /// <param name="service">The service name.</param>
+        /// <param name="target">The invocation target.</param>
+        /// <param name="methodInfo">The method info.</param>
         public static void Watch(string service, object target, MethodInfo methodInfo)
         {
             Handler.Watch(service, target, methodInfo);
         }
 
         /// <summary>
-        /// 在回调区间内暂时性的静态化服务实例
+        /// Temporarily makes the given services static in the callback lifetime.
         /// </summary>
-        /// <param name="callback">回调区间</param>
-        /// <param name="services">服务映射</param>
+        /// <param name="callback">The callback.</param>
+        /// <param name="services">The services.</param>
         public static void Flash(Action callback, params KeyValuePair<string, object>[] services)
         {
             Handler.Flash(callback, services);
         }
 
         /// <summary>
-        /// 类型转为服务名
+        /// Converts the given type to the service name.
         /// </summary>
-        /// <param name="type">类型</param>
-        /// <returns>转换后的服务名</returns>
+        /// <param name="type">The type.</param>
+        /// <returns>The service name.</returns>
         public static string Type2Service(Type type)
         {
             return Handler.Type2Service(type);
