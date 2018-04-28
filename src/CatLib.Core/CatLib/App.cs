@@ -105,7 +105,7 @@ namespace CatLib
         }
 
         /// <summary>
-        /// Gets the CatLib version, which complies to semver.)
+        /// Gets the CatLib version, which complies to semver.
         /// </summary>
         public static string Version
         {
