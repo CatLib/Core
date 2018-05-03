@@ -1112,10 +1112,10 @@ namespace CatLib
         }
 
         /// <summary>
-        /// 以依赖注入的形式调用一个方法
+        /// Calls a method with dependency injection.
         /// </summary>
-        /// <param name="method">方法</param>
-        /// <param name="userParams">用户传入的参数</param>
+        /// <param name="method">The method.</param>
+        /// <param name="userParams">The user parameters.</param>
         public static void Call<T1, T2, T3>(Action<T1, T2, T3> method, params object[] userParams)
         {
             Handler.Call(method, userParams);
