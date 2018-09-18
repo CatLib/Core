@@ -33,12 +33,12 @@ namespace CatLib
         /// <summary>
         /// 存储的数据
         /// </summary>
-        private LinkedList<byte[]> storage;
+        private LinkedList<ArraySegment<byte>> storage;
 
         /// <summary>
         /// 当前游标所处的内存区块
         /// </summary>
-        private LinkedListNode<byte[]> current;
+        private LinkedListNode<ArraySegment<byte>> current;
 
         /// <summary>
         /// 当前游标所处的位置
@@ -54,6 +54,11 @@ namespace CatLib
         /// 是否已经被释放了
         /// </summary>
         private bool disabled;
+
+        /// <summary>
+        /// 是否是可写的
+        /// </summary>
+        private bool writable;
 
         /// <summary>
         /// 偏移量
@@ -102,7 +107,7 @@ namespace CatLib
         /// </summary>
         public override bool CanWrite
         {
-            get { return !disabled; }
+            get { return !disabled && writable; }
         }
 
         /// <summary>
@@ -122,6 +127,14 @@ namespace CatLib
         }
 
         /// <summary>
+        /// 构建一个内存块数据流实例
+        /// </summary>
+        protected MemoryBlockStream()
+        {
+            
+        }
+
+        /// <summary>
         /// 内存块数据流
         /// </summary>
         /// <param name="blockSize">单个内存块的分块</param>
@@ -132,16 +145,7 @@ namespace CatLib
         }
 
         /// <summary>
-        /// 克隆
-        /// </summary>
-        /// <returns></returns>
-        public object Clone()
-        {
-            return null;
-        }
-
-        /// <summary>
-        /// 内存块数据流
+        /// 构建一个内存块数据流实例
         /// </summary>
         /// <param name="maxMemoryUsable">最大内存使用量</param>
         /// <param name="blockSize">单个内存块的分块</param>
@@ -149,11 +153,43 @@ namespace CatLib
         {
             BlockSize = blockSize;
             MaxMemoryUsable = Math.Max(maxMemoryUsable, blockSize);
-            storage = new LinkedList<byte[]>();
+            storage = new LinkedList<ArraySegment<byte>>();
             length = 0;
             position = 0;
             disabled = false;
+            writable = true;
             current = null;
+        }
+
+        /// <summary>
+        /// 克隆一个只读流
+        /// </summary>
+        /// <returns></returns>
+        public object Clone()
+        {
+            return new MemoryBlockStream
+            {
+                storage = storage,
+                BlockSize = BlockSize,
+                MaxMemoryUsable = MaxMemoryUsable,
+                length = length,
+                position = 0,
+                disabled = false,
+                writable = false,
+                current = storage.First
+            };
+        }
+
+        /// <summary>
+        /// 获取缓冲区
+        /// </summary>
+        /// <returns>获取缓冲区</returns>
+        public byte[] GetBuffer()
+        {
+            AssertDisabled();
+
+            var buffer = new byte[length];
+            var data = GetNearstBlockStartOffset(length);
         }
 
         /// <summary>
@@ -204,7 +240,11 @@ namespace CatLib
                 throw new IOException("seek position less than 0");
             }
 
-            EnsureStorage(tempPosition);
+            if (tempPosition > length)
+            {
+                throw new IOException("seek position is large then length(" + length + ")");
+            }
+
             position = tempPosition;
             RefreshCurrentNode(position);
             return position;
@@ -230,6 +270,34 @@ namespace CatLib
         /// <param name="count">需要写入的长度</param>
         public override void Write(byte[] buffer, int offset, int count)
         {
+            Guard.Requires<ArgumentNullException>(buffer != null);
+            Guard.Requires<ArgumentOutOfRangeException>(offset >= 0);
+            Guard.Requires<ArgumentOutOfRangeException>(count >= 0);
+            AssertDisabled();
+
+            EnsureStorage(Length + count);
+
+            var nearstBlockStartOffset = GetNearstBlockStartOffset(position);
+            var nearstBlockEndOffset = nearstBlockStartOffset + BlockSize;
+            var nearstBlockCurrentOffset = (int) (position - nearstBlockStartOffset);
+
+            if (count < nearstBlockEndOffset - position)
+            {
+                // 如果当前区块可以写入全部的数据
+                Buffer.BlockCopy(buffer, offset, current.Value.Array, nearstBlockCurrentOffset, count);
+                count = 0;
+            }
+            else
+            {
+                var blockFreeSize = (int) (nearstBlockEndOffset - position);
+                Buffer.BlockCopy(buffer, offset, current.Value.Array, nearstBlockCurrentOffset, blockFreeSize);
+                count -= blockFreeSize;
+                offset += blockFreeSize;
+                current = current.Next;
+                position += count;
+                Guard.Requires<AssertException>(current != null);
+            }
+
             
         }
 
@@ -243,6 +311,25 @@ namespace CatLib
         public override int Read(byte[] buffer, int offset, int count)
         {
             return 0;
+        }
+
+        /// <summary>
+        /// 释放资源
+        /// </summary>
+        /// <param name="disposing">是否进行释放</param>
+        protected override void Dispose(bool disposing)
+        {
+            try
+            {
+                if (disposing)
+                {
+                    disabled = true;
+                }
+            }
+            finally
+            {
+                base.Dispose(disposing);
+            }
         }
 
         /// <summary>
@@ -268,12 +355,39 @@ namespace CatLib
         }
 
         /// <summary>
+        /// 创建缓冲区
+        /// </summary>
+        /// <returns>缓冲区</returns>
+        protected virtual ArraySegment<byte> CreateBuffer(int blockSize)
+        {
+            return new ArraySegment<byte>(new byte[blockSize]);
+        }
+
+        /// <summary>
+        /// 释放缓冲区
+        /// </summary>
+        /// <param name="buffer"></param>
+        protected virtual void ReleaseBuffer(ArraySegment<byte> buffer)
+        {
+
+        }
+
+        /// <summary>
         /// 刷新当前的游标节点
         /// </summary>
         /// <param name="position">偏移量</param>
         private void RefreshCurrentNode(long position)
         {
-            // 将current 刷新至position可读节点
+            var nodeIndex = position / BlockSize;
+            LinkedListNode<ArraySegment<byte>> node = null;
+
+            do
+            {
+                Guard.Requires<AssertException>(node == null || node.Next != null);
+                node = (node == null) ? storage.First : node.Next;
+            } while (nodeIndex-- > 0);
+
+            current = node;
         }
 
         /// <summary>
@@ -283,6 +397,34 @@ namespace CatLib
         private void EnsureStorage(long value)
         {
             AssertMemoryUseable(value);
+
+            if (value <= 0)
+            {
+                return;
+            }
+
+            var minBlockCount = (value / BlockSize) + 1;
+            if (storage.Count >= minBlockCount)
+            {
+                return;
+            }
+
+            var needsBlock = minBlockCount - storage.Count;
+
+            while (needsBlock-- > 0)
+            {
+                storage.AddLast(CreateBuffer(BlockSize));
+            }
+        }
+
+        /// <summary>
+        /// 获取最近区块的写入点
+        /// </summary>
+        /// <param name="position">基础偏移量</param>
+        /// <returns>最近区块的起始偏移量</returns>
+        private long GetNearstBlockStartOffset(long position)
+        {
+            return position / BlockSize * BlockSize;
         }
 
         /// <summary>
@@ -293,6 +435,17 @@ namespace CatLib
             if (disabled)
             {
                 throw new ObjectDisposedException(null, "[" + GetType() + "] Stream is closed.");
+            }
+        }
+
+        /// <summary>
+        /// 断言是否能够写入
+        /// </summary>
+        private void AssertWritable()
+        {
+            if (!writable)
+            {
+                throw new NotSupportedException("Not supported writable");
             }
         }
 
