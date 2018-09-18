@@ -56,6 +56,7 @@
     <Compile Include="Support\Util\ArrTests.cs" />
     <Compile Include="Support\Util\DictTests.cs" />
     <Compile Include="Support\Util\EnumTests.cs" />
+    <Compile Include="Support\Util\StreamExtensionTests.cs" />
     <Compile Include="Support\Util\StrTests.cs" />
     <Compile Include="Support\Util\SystemTimeTests.cs" />
     <Compile Include="Support\VersionTests.cs" />
