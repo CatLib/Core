@@ -51,9 +51,7 @@ namespace CatLib
             }
             set
             {
-                AssertDisabled();
-                Guard.Requires<ArgumentOutOfRangeException>(value >= 0);
-                position = value;
+                Seek(value, SeekOrigin.Begin);
             }
         }
 
@@ -118,14 +116,14 @@ namespace CatLib
 
             if (writable)
             {
-                if (storage.Locker.TryEnterWriteLock(timeout))
+                if (!storage.Locker.TryEnterWriteLock(timeout))
                 {
                     throw GetOccupyException();
                 }
             }
             else
             {
-                if (storage.Locker.TryEnterReadLock(timeout))
+                if (!storage.Locker.TryEnterReadLock(timeout))
                 {
                     throw GetOccupyException();
                 }
@@ -252,23 +250,25 @@ namespace CatLib
         {
             try
             {
-                if (disposing)
+                if (!disposing)
                 {
-                    disabled = true;
+                    return;
+                }
 
-                    if (storage.Disabled)
-                    {
-                        return;
-                    }
+                disabled = true;
 
-                    if (writable)
-                    {
-                        storage.Locker.ExitWriteLock();
-                    }
-                    else
-                    {
-                        storage.Locker.ExitReadLock();
-                    }
+                if (storage.Disabled)
+                {
+                    return;
+                }
+
+                if (writable)
+                {
+                    storage.Locker.ExitWriteLock();
+                }
+                else
+                {
+                    storage.Locker.ExitReadLock();
                 }
             }
             finally

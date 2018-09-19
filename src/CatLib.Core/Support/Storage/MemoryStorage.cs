@@ -110,7 +110,7 @@ namespace CatLib
             get
             {
                 AssertDisabled();
-                return locker ?? (locker = new ReaderWriterLockSlim());
+                return locker ?? (locker = new ReaderWriterLockSlim(LockRecursionPolicy.SupportsRecursion));
             }
         }
 
