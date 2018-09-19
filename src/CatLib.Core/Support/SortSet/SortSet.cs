@@ -472,8 +472,8 @@ namespace CatLib
             Guard.Requires<ArgumentNullException>(end != null);
             Guard.Requires<ArgumentOutOfRangeException>(Compare(start, end) <= 0);
 
-            int rank = 0, bakRank = 0;
-            SkipNode bakCursor = null;
+            int rank = 0, leftRank = 0;
+            SkipNode leftCursor = null;
 
             var isRight = false;
             var cursor = header;
@@ -490,13 +490,15 @@ namespace CatLib
                         cursor = cursor.Level[i].Forward;
                     }
 
-                    if (bakCursor != null)
+                    if (leftCursor != null)
                     {
                         continue;
                     }
 
-                    bakCursor = cursor;
-                    bakRank = rank;
+                    // 设定最左边最高层的跳跃游标和排名
+                    // 之后将由这个游标来开始向下查找
+                    leftCursor = cursor;
+                    leftRank = rank;
                 }
 
                 if (isRight)
@@ -504,11 +506,12 @@ namespace CatLib
                     continue;
                 }
 
-                cursor = bakCursor;
-                rank ^= bakRank ^= rank ^= bakRank;
+                cursor = leftCursor;
+                leftRank ^= (rank ^= leftRank);
+                rank ^= leftRank;
             } while (isRight = !isRight);
 
-            return Math.Max(0, rank - bakRank);
+            return Math.Max(0, rank - leftRank);
         }
 
         /// <summary>

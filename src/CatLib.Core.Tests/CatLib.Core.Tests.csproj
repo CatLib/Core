@@ -51,6 +51,7 @@
     <Compile Include="Support\QuickList\QuickListTests.cs" />
     <Compile Include="Support\RingBuffer\RingBufferTests.cs" />
     <Compile Include="Support\SortSet\SortSetTests.cs" />
+    <Compile Include="Support\Storage\MemoryStorageTests.cs" />
     <Compile Include="Support\Template\ManagerTests.cs" />
     <Compile Include="Support\Template\SingleManagerTests.cs" />
     <Compile Include="Support\Util\ArrTests.cs" />
