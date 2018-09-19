@@ -86,7 +86,7 @@
     <Compile Include="Support\RingBuffer\IRingBuffer.cs" />
     <Compile Include="Support\RingBuffer\RingBuffer.cs" />
     <Compile Include="Support\Storage\IStorage.cs" />
-    <Compile Include="Support\Stream\MemoryStorageStream.cs" />
+    <Compile Include="Support\Stream\StorageStream.cs" />
     <Compile Include="Support\Storage\MemoryStorage.cs" />
     <Compile Include="Support\Util\Dict.cs" />
     <Compile Include="Support\SortSet\ISortSet.cs" />
