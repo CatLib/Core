@@ -386,18 +386,18 @@ namespace CatLib
                 return;
             }
 
+            if (locker != null)
+            {
+                locker.Dispose();
+                locker = null;
+            }
+
             Disabled = true;
             foreach (var block in storage)
             {
                 ReleaseBlock(block);
             }
             storage = null;
-
-            if (locker != null)
-            {
-                locker.Dispose();
-                locker = null;
-            }
         }
 
         /// <summary>

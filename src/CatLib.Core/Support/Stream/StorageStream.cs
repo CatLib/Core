@@ -109,6 +109,11 @@ namespace CatLib
         {
             Guard.Requires<ArgumentNullException>(storage != null);
 
+            if (storage.Disabled)
+            {
+                throw new ObjectDisposedException("storage", "Storage is disposed");
+            }
+
             this.storage = storage;
             this.writable = writable;
             position = 0;
@@ -146,7 +151,6 @@ namespace CatLib
         /// <returns>新的位置</returns>
         public override long Seek(long offset, SeekOrigin origin)
         {
-            Guard.Requires<ArgumentOutOfRangeException>(offset >= 0);
             AssertDisabled();
 
             long tempPosition;
@@ -250,17 +254,12 @@ namespace CatLib
         {
             try
             {
-                if (!disposing)
+                if (!disposing || disabled)
                 {
                     return;
                 }
 
                 disabled = true;
-
-                if (storage.Disabled)
-                {
-                    return;
-                }
 
                 if (writable)
                 {
