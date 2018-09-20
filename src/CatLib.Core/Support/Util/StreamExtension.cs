@@ -23,15 +23,7 @@ namespace CatLib
         /// 默认的缓冲区
         /// </summary>
         [ThreadStatic]
-        private static readonly byte[] buffer;
-
-        /// <summary>
-        /// Stream扩展函数
-        /// </summary>
-        static StreamExtension()
-        {
-            buffer = new byte[4096];
-        }
+        private static readonly byte[] buffer = new byte[4096];
 
         /// <summary>
         /// 将当前流追加到目标流中
