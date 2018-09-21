@@ -270,5 +270,26 @@ namespace CatLib
             stream.Dispose();
             var a = stream.Position;
         }
+
+        [TestMethod]
+        public void TestNotAppend()
+        {
+            var storage = new MemoryStorage(4, 4);
+
+            var stream = new StorageStream(storage);
+            stream.Write(Encoding.Default.GetBytes("hello world"), 0, 11);
+            stream.Dispose();
+
+            stream = new StorageStream(storage);
+            stream.Write(Encoding.Default.GetBytes("hello 12345"), 0, 11);
+
+            using (var readStream = new StorageStream(storage, false))
+            {
+                var data = new byte[32];
+                Assert.AreEqual(11, readStream.Read(data, 0, data.Length));
+                Assert.AreEqual("hello 12345", Encoding.Default.GetString(data, 0, 11));
+                Assert.AreEqual(0, readStream.Read(data, 0, data.Length));
+            }
+        }
     }
 }

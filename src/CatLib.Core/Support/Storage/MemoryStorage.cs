@@ -162,7 +162,6 @@ namespace CatLib
 
             EnsureStorageBlock(index + count);
             var blockMeta = GetBlockByPosition(index);
-            length = Math.Max(length, index);
 
             do
             {
@@ -171,7 +170,7 @@ namespace CatLib
                     // 如果当前区块可以写入全部的数据
                     Buffer.BlockCopy(buffer, offset, blockMeta.Storage.Array, blockMeta.GetRelativeOffset(index),
                         count);
-                    length += count;
+                    index += count;
                     count = 0;
                 }
                 else
@@ -179,13 +178,14 @@ namespace CatLib
                     var blockFreeSize = blockMeta.GetFreeSize(index);
                     Buffer.BlockCopy(buffer, offset, blockMeta.Storage.Array, blockMeta.GetRelativeOffset(index),
                         blockFreeSize);
-                    length += blockFreeSize;
                     index += blockFreeSize;
                     offset += blockFreeSize;
                     count -= blockFreeSize;
                     blockMeta = GetBlockByIndex(blockMeta.BlockIndex + 1);
                 }
             } while (count > 0);
+
+            length = Math.Max(length, index + count);
         }
 
         /// <summary>
