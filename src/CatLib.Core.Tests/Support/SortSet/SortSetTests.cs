@@ -58,25 +58,36 @@ namespace CatLib.Tests.Stl
         }
 
         [TestMethod]
+        
         public void TestRank()
         {
-            var sortSets = new SortSet<int, int>();
+            var n = 100;
+            while (n-- > 0)
+            {
+                var sortSets = new SortSet<int, int>();
 
-            sortSets.Add(1000, 85);
-            sortSets.Add(999, 75);
-            sortSets.Add(998, 185);
-            sortSets.Add(997, 85);
-            sortSets.Add(996, 185);
-            sortSets.Add(995, 85);
+                sortSets.Add(1000, 85);
+                sortSets.Add(999, 75);
+                sortSets.Add(998, 185);
+                sortSets.Add(997, 85);
+                sortSets.Add(996, 185);
+                sortSets.Add(995, 85);
 
-            Assert.AreEqual(1, sortSets.GetRank(995));
-            Assert.AreEqual(995, sortSets.GetElementByRank(1));
-            Assert.AreEqual(997, sortSets.GetElementByRank(2));
-            Assert.AreEqual(1000, sortSets.GetElementByRank(3));
-            Assert.AreEqual(996, sortSets.GetElementByRank(4));
-            Assert.AreEqual(998, sortSets.GetElementByRank(5));
+                Assert.AreEqual(1, sortSets.GetRank(995));
+                Assert.AreEqual(995, sortSets.GetElementByRank(1));
+                Assert.AreEqual(997, sortSets.GetElementByRank(2));
+                Assert.AreEqual(1000, sortSets.GetElementByRank(3));
+                Assert.AreEqual(996, sortSets.GetElementByRank(4));
+                Assert.AreEqual(998, sortSets.GetElementByRank(5));
 
-            Assert.AreEqual(3, sortSets.GetRangeCount(80, 90));
+                var i = 100;
+                var faild = 0;
+                while (i-- > 0)
+                {
+                    Assert.AreEqual(3, sortSets.GetRangeCount(80, 90));
+                }
+                Console.WriteLine(faild);
+            }
         }
 
         [TestMethod]
