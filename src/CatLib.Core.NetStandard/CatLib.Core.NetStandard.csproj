@@ -104,6 +104,9 @@
     <Compile Include="..\CatLib.Core\Support\RingBuffer\RingBuffer.cs" Link="Support\RingBuffer\RingBuffer.cs" />
     <Compile Include="..\CatLib.Core\Support\SortSet\ISortSet.cs" Link="Support\SortSet\ISortSet.cs" />
     <Compile Include="..\CatLib.Core\Support\SortSet\SortSet.cs" Link="Support\SortSet\SortSet.cs" />
+    <Compile Include="..\CatLib.Core\Support\Storage\IStorage.cs" Link="Support\Storage\IStorage.cs" />
+    <Compile Include="..\CatLib.Core\Support\Storage\MemoryStorage.cs" Link="Support\Storage\MemoryStorage.cs" />
+    <Compile Include="..\CatLib.Core\Support\Stream\StorageStream.cs" Link="Support\Stream\StorageStream.cs" />
     <Compile Include="..\CatLib.Core\Support\Template\IManaged.cs" Link="Support\Template\IManaged.cs" />
     <Compile Include="..\CatLib.Core\Support\Template\IManager.cs" Link="Support\Template\IManager.cs" />
     <Compile Include="..\CatLib.Core\Support\Template\ISingleManaged.cs" Link="Support\Template\ISingleManaged.cs" />
@@ -132,8 +135,10 @@
     <Folder Include="Support\Guard\" />
     <Folder Include="Support\QuickList\" />
     <Folder Include="Support\SortSet\" />
+    <Folder Include="Support\Stream\" />
     <Folder Include="Support\Template\" />
     <Folder Include="Support\RingBuffer\" />
+    <Folder Include="Support\Storage\" />
   </ItemGroup>
 
 </Project>
