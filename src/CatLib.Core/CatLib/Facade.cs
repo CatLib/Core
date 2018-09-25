@@ -62,7 +62,7 @@ namespace CatLib
         /// </summary>
         public static TService Instance
         {
-            get { return Make(); }
+            get { return HasInstance ? instance : Resolve(); }
         }
 
         /// <summary>
