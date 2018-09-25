@@ -103,8 +103,9 @@
     <Compile Include="Support\Util\Enum.cs" />
     <Compile Include="Support\Util\IAwait.cs" />
     <Compile Include="Support\Util\Str.cs" />
-    <Compile Include="Support\Util\StreamExtension.cs" />
+    <Compile Include="Support\Util\Extension\StreamExtension.cs" />
     <Compile Include="Support\Util\SystemTime.cs" />
+    <Compile Include="Support\Util\ThreadStatic.cs" />
     <Compile Include="Support\Util\Util.cs" />
     <Compile Include="Support\Util\Version.cs" />
   </ItemGroup>
