@@ -80,6 +80,22 @@ namespace CatLib
         }
 
         /// <summary>
+        /// 为服务打上一个标签
+        /// </summary>
+        /// <param name="tag">标签名</param>
+        /// <returns>服务绑定数据</returns>
+        public IBindData Tag(string tag)
+        {
+            lock (SyncRoot)
+            {
+                GuardIsDestroy();
+                Guard.NotEmptyOrNull(tag, "tag");
+                Container.Tag(tag, Service);
+                return this;
+            }
+        }
+
+        /// <summary>
         /// 解决服务时触发的回调
         /// </summary>
         /// <param name="func">解决事件</param>
