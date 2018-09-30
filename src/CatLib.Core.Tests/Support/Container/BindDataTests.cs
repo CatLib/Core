@@ -116,6 +116,28 @@ namespace CatLib.Tests.Stl
         }
         #endregion
 
+        #region Tag
+        /// <summary>
+        /// 是否能增加标签
+        /// </summary>
+        [TestMethod]
+        public void CanAddTag()
+        {
+            var container = new Container();
+            var bindData = container.Bind("data", (app, param) => "hello world", false);
+
+            bindData.Tag("tag1").Tag("tag2");
+
+            var data = container.Tagged("tag1");
+            Assert.AreEqual(1, data.Length);
+            Assert.AreEqual("hello world", data[0]);
+
+            data = container.Tagged("tag2");
+            Assert.AreEqual(1, data.Length);
+            Assert.AreEqual("hello world", data[0]);
+        }
+        #endregion
+
         #region OnRelease
         /// <summary>
         /// 是否能追加到释放事件

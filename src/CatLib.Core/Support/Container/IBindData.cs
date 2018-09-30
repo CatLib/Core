@@ -43,6 +43,13 @@ namespace CatLib
         IBindData Alias(string alias);
 
         /// <summary>
+        /// 为服务打上一个标签
+        /// </summary>
+        /// <param name="tag">标签名</param>
+        /// <returns>服务绑定数据</returns>
+        IBindData Tag(string tag);
+
+        /// <summary>
         /// 解决服务时触发的回调
         /// </summary>
         /// <param name="func">解决事件</param>

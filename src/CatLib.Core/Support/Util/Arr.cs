@@ -511,7 +511,7 @@ namespace CatLib
         }
 
         /// <summary>
-        /// 从数组中检索指定的值并返回所在的下标，如果返回-1则代表没有出现
+        /// 从数组中检索符合全部匹配值的初始元素下标，如果返回-1则代表没有出现
         /// </summary>
         /// <typeparam name="T">数组类型</typeparam>
         /// <param name="source">规定数组</param>
@@ -545,6 +545,35 @@ namespace CatLib
                 if (isFinded)
                 {
                     return i;
+                }
+            }
+
+            return -1;
+        }
+
+        /// <summary>
+        /// 从数组中检索指定的任意匹配值所在的下标，如果返回-1则代表没有出现
+        /// </summary>
+        /// <typeparam name="T">数组类型</typeparam>
+        /// <param name="source">规定数组</param>
+        /// <param name="match">要匹配的值</param>
+        /// <returns>如果要检索的值没有出现，则该方法返回 -1</returns>
+        public static int IndexOfAny<T>(T[] source, params T[] match)
+        {
+            if (match == null || match.Length <= 0
+                || source == null || source.Length <= 0)
+            {
+                return -1;
+            }
+
+            for (int i = 0, n; i < source.Length; i++)
+            {
+                for (n = 0; n < match.Length; n++)
+                {
+                    if (source[i].Equals(match[n]))
+                    {
+                        return i;
+                    }
                 }
             }
 

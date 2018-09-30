@@ -21,96 +21,132 @@ namespace CatLib
     public abstract class Managed<TInterface> : IManaged<TInterface>
     {
         /// <summary>
-        /// 自定义解决器
+        /// 扩展解决器
         /// </summary>
-        private readonly Dictionary<string, Func<TInterface>> resolve = new Dictionary<string, Func<TInterface>>();
+        private readonly Dictionary<string, Func<TInterface>> extendBuilder;
 
         /// <summary>
-        /// 自定义解决方案
+        /// 当扩展被实现时
         /// </summary>
-        /// <param name="resolve">解决方案</param>
-        /// <param name="name">名字</param>
-        public void Extend(Func<TInterface> resolve, string name = null)
+        public event Action<TInterface> OnResolving;
+
+        /// <summary>
+        /// 构建一个新的管理器模板
+        /// </summary>
+        protected Managed()
         {
-            Guard.Requires<ArgumentNullException>(resolve != null);
+            extendBuilder = new Dictionary<string, Func<TInterface>>();
+        }
+
+        /// <summary>
+        /// 自定义一个扩展构建器
+        /// </summary>
+        /// <param name="builder">扩展构建器</param>
+        /// <param name="name">扩展名</param>
+        public void Extend(Func<TInterface> builder, string name = null)
+        {
+            Guard.Requires<ArgumentNullException>(builder != null);
 
             StandardName(ref name);
 
-            if (this.resolve.ContainsKey(name))
+            if (extendBuilder.ContainsKey(name))
             {
                 throw new RuntimeException("Extend [" + name + "](" + GetType() + ") is already exists.");
             }
 
-            this.resolve.Add(name, resolve);
+            extendBuilder.Add(name, builder);
         }
 
         /// <summary>
-        /// 释放扩展解决器
+        /// 释放指定扩展的构建器
         /// </summary>
-        /// <param name="name">名字</param>
+        /// <param name="name">扩展名</param>
+        [Obsolete("Please use RemoveExtend();")]
         public void ReleaseExtend(string name = null)
         {
-            StandardName(ref name);
-            resolve.Remove(name);
+            RemoveExtend(name);
         }
 
         /// <summary>
-        /// 是否包含指定拓展
+        /// 释放指定扩展的构建器
         /// </summary>
-        /// <param name="name">名字</param>
+        /// <param name="name">扩展名</param>
+        public void RemoveExtend(string name = null)
+        {
+            StandardName(ref name);
+
+            if (!extendBuilder.ContainsKey(name))
+            {
+                return;
+            }
+
+            extendBuilder.Remove(name);
+        }
+
+        /// <summary>
+        /// 是否包含指定扩展构建器
+        /// </summary>
+        /// <param name="name">扩展名</param>
         public bool ContainsExtend(string name = null)
         {
             StandardName(ref name);
-            return resolve.ContainsKey(name);
+            return extendBuilder.ContainsKey(name);
         }
 
         /// <summary>
-        /// 获取解决方案拓展
+        /// 使用指定的扩展构建器生成扩展实现
         /// </summary>
-        /// <param name="name">名字</param>
-        /// <returns>拓展</returns>
-        protected Func<TInterface> GetExtend(string name)
+        /// <param name="name">扩展名</param>
+        /// <returns>扩展实现</returns>
+        protected virtual TInterface MakeExtend(string name)
         {
-            StandardName(ref name);
-            Func<TInterface> result;
-            if (!resolve.TryGetValue(name, out result))
+            var extend = GetExtend(name)();
+
+            if (OnResolving != null)
             {
-                throw new RuntimeException("Can not find [" + name + "](" + GetType() + ") Extend.");
+                OnResolving(extend);
             }
-            return result;
+
+            return extend;
         }
 
         /// <summary>
-        /// 生成解决的扩展方案
+        /// 获取默认的扩展名
         /// </summary>
-        /// <param name="name">名字</param>
-        /// <returns>解决方案</returns>
-        protected TInterface MakeExtend(string name)
-        {
-            var result = GetExtend(name);
-            return result.Invoke();
-        }
-
-        /// <summary>
-        /// 获取默认名字
-        /// </summary>
-        /// <returns>默认名字</returns>
+        /// <returns>默认的扩展名</returns>
         protected virtual string GetDefaultName()
         {
             return "default";
         }
 
         /// <summary>
-        /// 标准化名字
+        /// 标准化扩展名
         /// </summary>
-        /// <param name="name">名字</param>
-        protected string StandardName(ref string name)
+        /// <param name="name">扩展名</param>
+        protected void StandardName(ref string name)
         {
             if (string.IsNullOrEmpty(name))
             {
                 name = GetDefaultName();
             }
-            return name;
+        }
+
+        /// <summary>
+        /// 获取扩展的构建闭包
+        /// </summary>
+        /// <param name="name">名字</param>
+        /// <returns>拓展</returns>
+        private Func<TInterface> GetExtend(string name)
+        {
+            StandardName(ref name);
+
+            Func<TInterface> result;
+            if (!extendBuilder.TryGetValue(name, out result))
+            {
+                throw new RuntimeException("Can not find [" + name + "](" + GetType() + ") Extend.");
+            }
+
+            return result;
         }
     }
 }
