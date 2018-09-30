@@ -17,20 +17,20 @@ namespace CatLib
     public abstract class Manager<TInterface> : Managed<TInterface>, IManager<TInterface>
     {
         /// <summary>
-        /// 获取解决方案
+        /// 获取扩展实现
         /// </summary>
-        /// <param name="name">解决方案名</param>
-        /// <returns>解决方案</returns>
+        /// <param name="name">扩展名</param>
+        /// <returns>扩展实现</returns>
         public TInterface Get(string name = null)
         {
             return MakeExtend(name);
         }
 
         /// <summary>
-        /// 获取解决方案
+        /// 获取扩展实现
         /// </summary>
-        /// <param name="name">解决方案名</param>
-        /// <returns>解决方案</returns>
+        /// <param name="name">扩展名</param>
+        /// <returns>扩展实现</returns>
         public TInterface this[string name]
         {
             get

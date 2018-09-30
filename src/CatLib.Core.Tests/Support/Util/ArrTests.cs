@@ -500,6 +500,15 @@ namespace CatLib.Tests.Support.Util
         }
 
         [TestMethod]
+        public void TestIndexOfString2()
+        {
+            var data = new[] { "a", "b", "c", "d", "e" };
+            var result = Arr.IndexOf(data, new[] { "d"});
+
+            Assert.AreEqual(3, result);
+        }
+
+        [TestMethod]
         public void TestIndexOfNull()
         {
             Assert.AreEqual(-1, Arr.IndexOf(null, new[] {"d", "e"}));
@@ -510,6 +519,36 @@ namespace CatLib.Tests.Support.Util
         {
             var data = new[] { "a", "b", "c", "d", "e" };
             var result = Arr.IndexOf(data, new[] { "e", "d" });
+
+            Assert.AreEqual(-1, result);
+        }
+
+        [TestMethod]
+        public void TestIndexOfAny()
+        {
+            var data = new[] { 'a', 'b', 'c', 'd', 'e' };
+            var result = Arr.IndexOfAny(data, new[] { 'e', 'd' , 'b' });
+
+            Assert.AreEqual(1, result);
+        }
+
+        [TestMethod]
+        public void TestIndexAnyNotFind()
+        {
+            var data = new[] { 'a', 'b', 'c', 'd', 'e' };
+            var result = Arr.IndexOfAny(data, new[] { 'z' });
+
+            Assert.AreEqual(-1, result);
+        }
+
+        [TestMethod]
+        public void TestIndexOfAnyNull()
+        {
+            var data = new[] { 'a', 'b', 'c', 'd', 'e' };
+            var result = Arr.IndexOfAny(data, null);
+
+            Assert.AreEqual(-1, result);
+            result = Arr.IndexOfAny<string>(null, null);
 
             Assert.AreEqual(-1, result);
         }

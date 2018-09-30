@@ -118,9 +118,12 @@
     <Compile Include="..\CatLib.Core\Support\Util\Arr.cs" Link="Support\Util\Arr.cs" />
     <Compile Include="..\CatLib.Core\Support\Util\Dict.cs" Link="Support\Util\Dict.cs" />
     <Compile Include="..\CatLib.Core\Support\Util\Enum.cs" Link="Support\Util\Enum.cs" />
+    <Compile Include="..\CatLib.Core\Support\Util\Extension\IntExtension.cs" Link="Support\Util\Extension\IntExtension.cs" />
+    <Compile Include="..\CatLib.Core\Support\Util\Extension\StreamExtension.cs" Link="Support\Util\Extension\StreamExtension.cs" />
     <Compile Include="..\CatLib.Core\Support\Util\IAwait.cs" Link="Support\Util\IAwait.cs" />
     <Compile Include="..\CatLib.Core\Support\Util\Str.cs" Link="Support\Util\Str.cs" />
     <Compile Include="..\CatLib.Core\Support\Util\SystemTime.cs" Link="Support\Util\SystemTime.cs" />
+    <Compile Include="..\CatLib.Core\Support\Util\ThreadStatic.cs" Link="Support\Util\ThreadStatic.cs" />
     <Compile Include="..\CatLib.Core\Support\Util\Util.cs" Link="Support\Util\Util.cs" />
     <Compile Include="..\CatLib.Core\Support\Util\Version.cs" Link="Support\Util\Version.cs" />
   </ItemGroup>
@@ -139,6 +142,7 @@
     <Folder Include="Support\Template\" />
     <Folder Include="Support\RingBuffer\" />
     <Folder Include="Support\Storage\" />
+    <Folder Include="Support\Util\Extension\" />
   </ItemGroup>
 
 </Project>

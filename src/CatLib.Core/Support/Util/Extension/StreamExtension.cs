@@ -20,12 +20,6 @@ namespace CatLib
     public static class StreamExtension
     {
         /// <summary>
-        /// 默认的缓冲区
-        /// </summary>
-        [ThreadStatic]
-        private static readonly byte[] buffer = new byte[4096];
-
-        /// <summary>
         /// 将当前流追加到目标流中
         /// </summary>
         /// <param name="source">源数据流</param>
@@ -33,7 +27,7 @@ namespace CatLib
         /// <returns>总共传输了多少数据</returns>
         public static long AppendTo(this Stream source, Stream destination)
         {
-            return source.AppendTo(destination, buffer);
+            return source.AppendTo(destination, ThreadStatic.Buffer);
         }
 
         /// <summary>

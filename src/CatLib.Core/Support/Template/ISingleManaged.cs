@@ -9,6 +9,8 @@
  * Document: http://catlib.io/
  */
 
+using System;
+
 namespace CatLib
 {
     /// <summary>
@@ -17,9 +19,21 @@ namespace CatLib
     public interface ISingleManaged<TInterface> : IManaged<TInterface>
     {
         /// <summary>
-        /// 释放解决方案单例
+        /// 当扩展被释放时
         /// </summary>
-        /// <param name="name">解决方案名</param>
+        event Action<TInterface> OnRelease;
+
+        /// <summary>
+        /// 释放指定的扩展实现
+        /// </summary>
+        /// <param name="name">扩展名</param>
         void Release(string name = null);
+
+        /// <summary>
+        /// 是否包含指定的扩展实现
+        /// </summary>
+        /// <param name="name">扩展名</param>
+        /// <returns>是否包含扩展实现</returns>
+        bool Contains(string name = null);
     }
 }

@@ -102,7 +102,7 @@ namespace CatLib
         public RingBuffer(int capacity = 8192, bool exposable = true)
         {
             Guard.Requires<ArgumentOutOfRangeException>(capacity > 0);
-            buffer = new byte[this.capacity = GetPrime(capacity)];
+            buffer = new byte[this.capacity = capacity.ToPrime()];
             mask = this.capacity - 1;
             write = 0;
             read = 0;
@@ -402,28 +402,6 @@ namespace CatLib
         {
             var readSize = GetCanReadSize();
             return readSize <= 0 ? null : new byte[readSize];
-        }
-
-        /// <summary>
-        /// 计算规定值最近的二的次幂的容量
-        /// </summary>
-        /// <param name="min">规定值值</param>
-        /// <returns>容量</returns>
-        private static int GetPrime(int min)
-        {
-            min = Math.Max(0, min);
-
-            var result = 8192;
-            for (var i = 2; i < int.MaxValue; i = i << 1)
-            {
-                if (i >= min)
-                {
-                    result = i;
-                    break;
-                }
-            }
-
-            return result;
         }
     }
 }
