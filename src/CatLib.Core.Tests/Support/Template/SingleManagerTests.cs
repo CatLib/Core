@@ -52,6 +52,31 @@ namespace CatLib.Tests.Stl
         }
 
         [TestMethod]
+        public void TestContains()
+        {
+            var manager = new TestManager();
+            manager.Extend(() => new InterfaceImpl());
+            bool resolve = false, release = false;
+            manager.OnResolving += (_) =>
+            {
+                resolve = true;
+            };
+            manager.OnRelease += (_) =>
+            {
+                release = true;
+            };
+            Assert.AreEqual(false, manager.Contains());
+            Assert.AreEqual(false, resolve);
+            Assert.AreEqual(false, release);
+            manager.Get();
+            Assert.AreEqual(true, resolve);
+            Assert.AreEqual(true, manager.Contains());
+            manager.Release();
+            Assert.AreEqual(true, release);
+            Assert.AreEqual(false, manager.Contains());
+        }
+
+        [TestMethod]
         public void TestCoverToInterfaceSingleManagerGet()
         {
             var manager = new TestManager();
@@ -76,7 +101,7 @@ namespace CatLib.Tests.Stl
         public void TestContainsExtend()
         {
             var manager = new TestManager();
-            manager.Extend(() => new InterfaceImpl() , "hello");
+            manager.Extend(() => new InterfaceImpl(), "hello");
 
             Assert.AreEqual(false, manager.ContainsExtend());
             Assert.AreEqual(true, manager.ContainsExtend("hello"));

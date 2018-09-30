@@ -9,7 +9,6 @@
  * Document: http://catlib.io/
  */
 
-using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace CatLib.Tests.Stl
@@ -19,9 +18,9 @@ namespace CatLib.Tests.Stl
     {
         private class TestManagerClass : Manager<TestManagerClass>
         {
-            public Func<TestManagerClass> GetResolvePublic(string name)
+            public void GetResolvePublic(string name)
             {
-                return GetExtend(name);
+                MakeExtend(name);
             }
         }
 
@@ -86,8 +85,6 @@ namespace CatLib.Tests.Stl
             {
                 return new TestManagerClass();
             });
-
-            Assert.AreNotEqual(null, cls.GetResolvePublic(null));
         }
     }
 }

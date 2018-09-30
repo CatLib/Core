@@ -9,6 +9,7 @@
  * Document: http://catlib.io/
  */
 
+using System;
 using System.Collections.Generic;
 
 namespace CatLib
@@ -16,38 +17,81 @@ namespace CatLib
     /// <summary>
     /// 管理器模版（拓展解决方案为单例）- 扩展内容不对外可见
     /// </summary>
-    public abstract class SingleManaged<TInterface> : Managed<TInterface> , ISingleManaged<TInterface>
+    public abstract class SingleManaged<TInterface> : Managed<TInterface>, ISingleManaged<TInterface>
     {
         /// <summary>
-        /// 解决方案字典
+        /// 扩展实现
         /// </summary>
-        private readonly Dictionary<string, TInterface> instances = new Dictionary<string, TInterface>();
-        
+        private readonly Dictionary<string, TInterface> instances;
+
         /// <summary>
-        /// 释放解决方案
+        /// 当释放时
         /// </summary>
-        /// <param name="name">解决方案名</param>
-        public void Release(string name = null)
+        public event Action<TInterface> OnRelease;
+
+        /// <summary>
+        /// 构建一个新的管理器模版
+        /// </summary>
+        protected SingleManaged()
         {
-            instances.Remove(StandardName(ref name));
+            instances = new Dictionary<string, TInterface>();
         }
 
         /// <summary>
-        /// 生成解决方案
+        /// 释放指定的扩展实现
         /// </summary>
-        /// <param name="name">解决方案名</param>
-        /// <returns>解决方案实现</returns>
-        protected new TInterface MakeExtend(string name)
+        /// <param name="name">扩展名</param>
+        public void Release(string name = null)
         {
             StandardName(ref name);
-            TInterface element;
-            if (instances.TryGetValue(name, out element))
+
+            TInterface extend;
+            if (!instances.TryGetValue(name, out extend))
             {
-                return element;
+                return;
             }
-            element = base.MakeExtend(name);
-            instances.Add(name, element);
-            return element;
+
+            if (OnRelease != null)
+            {
+                OnRelease(extend);
+            }
+
+            var dispose = extend as IDisposable;
+            if (dispose != null)
+            {
+                dispose.Dispose();
+            }
+
+            instances.Remove(name);
+        }
+
+        /// <summary>
+        /// 是否包含指定的扩展实现
+        /// </summary>
+        /// <param name="name">扩展名</param>
+        /// <returns>是否包含扩展实现</returns>
+        public bool Contains(string name = null)
+        {
+            StandardName(ref name);
+            return instances.ContainsKey(name);
+        }
+
+        /// <summary>
+        /// 生成扩展实现
+        /// </summary>
+        /// <param name="name">扩展名</param>
+        /// <returns>扩展实现</returns>
+        protected override TInterface MakeExtend(string name)
+        {
+            StandardName(ref name);
+
+            TInterface extend;
+            if (instances.TryGetValue(name, out extend))
+            {
+                return extend;
+            }
+
+            return instances[name] = base.MakeExtend(name);
         }
     }
 }
