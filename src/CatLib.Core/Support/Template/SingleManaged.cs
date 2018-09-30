@@ -17,7 +17,7 @@ namespace CatLib
     /// <summary>
     /// 管理器模版（拓展解决方案为单例）- 扩展内容不对外可见
     /// </summary>
-    public abstract class SingleManaged<TInterface> : Managed<TInterface>, ISingleManaged<TInterface>
+    public abstract class SingleManaged<TInterface> : Managed<TInterface>, ISingleManaged<TInterface>, IDisposable
     {
         /// <summary>
         /// 扩展实现
@@ -51,17 +51,7 @@ namespace CatLib
                 return;
             }
 
-            if (OnRelease != null)
-            {
-                OnRelease(extend);
-            }
-
-            var dispose = extend as IDisposable;
-            if (dispose != null)
-            {
-                dispose.Dispose();
-            }
-
+            InternalRelease(extend);
             instances.Remove(name);
         }
 
@@ -74,6 +64,36 @@ namespace CatLib
         {
             StandardName(ref name);
             return instances.ContainsKey(name);
+        }
+
+        /// <summary>
+        /// 释放管理器时
+        /// </summary>
+        public virtual void Dispose()
+        {
+            foreach (var instance in instances)
+            {
+                InternalRelease(instance.Value);
+            }
+            instances.Clear();
+        }
+
+        /// <summary>
+        /// 释放扩展
+        /// </summary>
+        /// <param name="extend">扩展实现</param>
+        private void InternalRelease(TInterface extend)
+        {
+            if (OnRelease != null)
+            {
+                OnRelease(extend);
+            }
+
+            var dispose = extend as IDisposable;
+            if (dispose != null)
+            {
+                dispose.Dispose();
+            }
         }
 
         /// <summary>
