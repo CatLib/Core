@@ -77,6 +77,21 @@ namespace CatLib.Tests.Stl
         }
 
         [TestMethod]
+        public void TestDispose()
+        {
+            var manager = new TestManager();
+            manager.Extend(() => new InterfaceImpl());
+            manager.Extend(() => new InterfaceImpl(), "name-2");
+            manager.Get();
+            manager.Get("name-2");
+            Assert.AreEqual(true, manager.Contains());
+            Assert.AreEqual(true, manager.Contains("name-2"));
+            manager.Dispose();
+            Assert.AreEqual(false, manager.Contains());
+            Assert.AreEqual(false, manager.Contains("name-2"));
+        }
+
+        [TestMethod]
         public void TestCoverToInterfaceSingleManagerGet()
         {
             var manager = new TestManager();
