@@ -101,6 +101,7 @@
     <Compile Include="Support\Template\SingleManager.cs" />
     <Compile Include="Support\Util\Arr.cs" />
     <Compile Include="Support\Util\Enum.cs" />
+    <Compile Include="Support\Util\Extension\IntExtension.cs" />
     <Compile Include="Support\Util\IAwait.cs" />
     <Compile Include="Support\Util\Str.cs" />
     <Compile Include="Support\Util\Extension\StreamExtension.cs" />
