@@ -26,7 +26,7 @@ using System.Runtime.InteropServices;
 
 [assembly: Guid("4204658e-81fd-4106-a347-890cd369c8a4")]
 
-[assembly: AssemblyVersion("1.2.10.0")]
+[assembly: AssemblyVersion("1.2.0.0")]
 [assembly: AssemblyFileVersion("1.2.10.0")]
 
 [assembly: InternalsVisibleTo("Assembly-CSharp-Editor"),
