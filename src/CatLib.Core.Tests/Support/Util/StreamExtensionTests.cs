@@ -28,5 +28,42 @@ namespace CatLib.Core.Tests.Support.Util
             Assert.AreEqual(11, count);
             Assert.AreEqual("Hello world", Encoding.Default.GetString(stream2.GetBuffer(), 0, (int)stream2.Length));
         }
+
+        [TestMethod]
+        public void TestStreamToText()
+        {
+            var stream1 = new MemoryStream(Encoding.Default.GetBytes("Hello world"));
+            Assert.AreEqual("Hello world", stream1.ToText());
+        }
+
+        [TestMethod]
+        public void TestStreamToTextOtherStream()
+        {
+            var stream1 = new StorageStream(new MemoryStorage());
+            stream1.Write(Encoding.Default.GetBytes("Hello world"), 0, 11);
+            stream1.Seek(0, SeekOrigin.Begin);
+            Assert.AreEqual("Hello world", stream1.ToText());
+        }
+
+        [TestMethod]
+        public void TestStreamToTextLarage()
+        {
+            var stream1 = new StorageStream(new MemoryStorage());
+            var builder = new StringBuilder();
+            for (var i = 0; i < (ThreadStatic.Buffer.Length / 10) + 1; i++)
+            {
+                stream1.Write(Encoding.Default.GetBytes("1234567890"), 0, 10);
+                builder.Append("1234567890");
+            }
+            stream1.Seek(0, SeekOrigin.Begin);
+            Assert.AreEqual(builder.ToString(), stream1.ToText());
+        }
+
+        [TestMethod]
+        public void TestStreamToTextEmpty()
+        {
+            var stream1 = new MemoryStream(0);
+            Assert.AreEqual(string.Empty, stream1.ToText());
+        }
     }
 }

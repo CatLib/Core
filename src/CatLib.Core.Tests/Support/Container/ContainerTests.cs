@@ -742,7 +742,7 @@ namespace CatLib.Tests.Stl
             {
                 container.Call(cls, "GetNumber", new object[256]);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 isThrow = true;
             }
