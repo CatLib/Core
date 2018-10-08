@@ -31,13 +31,26 @@ namespace CatLib
             var length = 0;
             foreach (var source in sources)
             {
+                if (source == null || source.Length <= 0)
+                {
+                    continue;
+                }
                 length += source.Length;
+            }
+
+            if (length <= 0)
+            {
+                return new T[0];
             }
 
             var merge = new T[length];
             var current = 0;
             foreach (var source in sources)
             {
+                if (source == null || source.Length <= 0)
+                {
+                    continue;
+                }
                 Array.Copy(source, 0, merge, current, source.Length);
                 current += source.Length;
             }
