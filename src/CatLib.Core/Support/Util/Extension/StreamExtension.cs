@@ -53,7 +53,7 @@ namespace CatLib
 
             long result = 0;
             int read;
-            while ((read = source.Read(buffer, 0, buffer.Length)) != 0)
+            while ((read = source.Read(buffer, 0, buffer.Length)) > 0)
             {
                 destination.Write(buffer, 0, read);
                 result += read;
