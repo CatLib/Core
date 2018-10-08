@@ -65,5 +65,15 @@ namespace CatLib.Core.Tests.Support.Util
             var stream1 = new MemoryStream(0);
             Assert.AreEqual(string.Empty, stream1.ToText());
         }
+
+        [TestMethod]
+        public void TestStreamClosed()
+        {
+            var stream1 = new MemoryStream(0);
+            Assert.AreEqual(string.Empty, stream1.ToText(null, false));
+            Assert.AreEqual(true, stream1.CanWrite);
+            Assert.AreEqual(string.Empty, stream1.ToText());
+            Assert.AreEqual(false, stream1.CanWrite);
+        }
     }
 }

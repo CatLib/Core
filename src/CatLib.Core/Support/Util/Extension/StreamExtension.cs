@@ -67,50 +67,61 @@ namespace CatLib
         /// </summary>
         /// <param name="source">源数据流</param>
         /// <param name="encoding">编码</param>
+        /// <param name="closed">是否自动关闭流</param>
         /// <returns>字符串</returns>
-        public static string ToText(this Stream source, Encoding encoding = null)
+        public static string ToText(this Stream source, Encoding encoding = null, bool closed = true)
         {
-            encoding = encoding ?? Encoding;
-            if (source is MemoryStream)
-            {
-                var memoryStream = (MemoryStream)source;
-                byte[] buffer;
-                try
-                {
-                    buffer = memoryStream.GetBuffer();
-                }
-                catch (UnauthorizedAccessException)
-                {
-                    buffer = memoryStream.ToArray();
-                }
-
-                return encoding.GetString(buffer, 0, (int)memoryStream.Length);
-            }
-
-            var length = 0;
             try
             {
-                length = (int)source.Length;
-            }
-            catch (NotSupportedException)
-            {
-                // ignore
-            }
+                encoding = encoding ?? Encoding;
+                if (source is MemoryStream)
+                {
+                    var memoryStream = (MemoryStream) source;
+                    byte[] buffer;
+                    try
+                    {
+                        buffer = memoryStream.GetBuffer();
+                    }
+                    catch (UnauthorizedAccessException)
+                    {
+                        buffer = memoryStream.ToArray();
+                    }
 
-            MemoryStream targetStream;
-            if (length > 0 && length <= ThreadStatic.Buffer.Length)
-            {
-                targetStream = new MemoryStream(ThreadStatic.Buffer, 0, ThreadStatic.Buffer.Length, true, true);
-            }
-            else
-            {
-                targetStream = new MemoryStream(length);
-            }
+                    return encoding.GetString(buffer, 0, (int) memoryStream.Length);
+                }
 
-            using (targetStream)
+                var length = 0;
+                try
+                {
+                    length = (int) source.Length;
+                }
+                catch (NotSupportedException)
+                {
+                    // ignore
+                }
+
+                MemoryStream targetStream;
+                if (length > 0 && length <= ThreadStatic.Buffer.Length)
+                {
+                    targetStream = new MemoryStream(ThreadStatic.Buffer, 0, ThreadStatic.Buffer.Length, true, true);
+                }
+                else
+                {
+                    targetStream = new MemoryStream(length);
+                }
+
+                using (targetStream)
+                {
+                    var read = source.AppendTo(targetStream);
+                    return encoding.GetString(targetStream.GetBuffer(), 0, (int) read);
+                }
+            }
+            finally
             {
-                var read = source.AppendTo(targetStream);
-                return encoding.GetString(targetStream.GetBuffer(), 0, (int) read);
+                if (closed)
+                {
+                    source.Dispose();
+                }
             }
         }
     }
