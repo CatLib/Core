@@ -106,6 +106,7 @@
     <Compile Include="..\CatLib.Core\Support\SortSet\SortSet.cs" Link="Support\SortSet\SortSet.cs" />
     <Compile Include="..\CatLib.Core\Support\Storage\IStorage.cs" Link="Support\Storage\IStorage.cs" />
     <Compile Include="..\CatLib.Core\Support\Storage\MemoryStorage.cs" Link="Support\Storage\MemoryStorage.cs" />
+    <Compile Include="..\CatLib.Core\Support\Stream\PipelineStream.cs" Link="Support\Stream\PipelineStream.cs" />
     <Compile Include="..\CatLib.Core\Support\Stream\StorageStream.cs" Link="Support\Stream\StorageStream.cs" />
     <Compile Include="..\CatLib.Core\Support\Template\IManaged.cs" Link="Support\Template\IManaged.cs" />
     <Compile Include="..\CatLib.Core\Support\Template\IManager.cs" Link="Support\Template\IManager.cs" />
