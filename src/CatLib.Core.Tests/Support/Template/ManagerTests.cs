@@ -51,7 +51,7 @@ namespace CatLib.Tests.Stl
                 return tmp = new TestManagerClass();
             });
 
-            cls.ReleaseExtend();
+            cls.RemoveExtend();
 
             ExceptionAssert.Throws<RuntimeException>(() =>
             {
