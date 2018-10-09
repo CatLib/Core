@@ -1,4 +1,4 @@
-<p align="center"><img width="173" height="57" src="http://catlib.io/images/logo.txt.png"></p>
+﻿<p align="center"><img width="173" height="57" src="http://catlib.io/images/logo.txt.png"></p>
 
 <p align="center">
 <a href="https://github.com/Catlib/Core/blob/master/LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue.svg" title="license-mit" /></a>
@@ -28,7 +28,7 @@
 **使用Nuget安装**
 
 ```PM
-Install-Package CatLib.Core -Version 1.2.9
+Install-Package CatLib.Core -Version 1.2.10
 ```
 
 **直接下载发布版本**

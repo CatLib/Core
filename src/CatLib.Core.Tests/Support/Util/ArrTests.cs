@@ -34,6 +34,36 @@ namespace CatLib.Tests.Support.Util
         }
 
         [TestMethod]
+        public void TestMergeNull()
+        {
+            var arr1 = new[] { "1", "2" };
+            string[] arr2 = null;
+            var arr3 = new[] { "3" };
+            var newArr = Arr.Merge(arr1, arr2, arr3);
+            Assert.AreEqual(3, newArr.Length);
+            var i = 0;
+            foreach (var result in newArr)
+            {
+                Assert.AreEqual((++i).ToString(), result);
+            }
+        }
+
+        [TestMethod]
+        public void TestMergeEmpty()
+        {
+            var arr1 = new[] { "1", "2" };
+            var arr2 = new string[0];
+            var arr3 = new[] { "3" };
+            var newArr = Arr.Merge(arr1, arr2, arr3);
+            Assert.AreEqual(3, newArr.Length);
+            var i = 0;
+            foreach (var result in newArr)
+            {
+                Assert.AreEqual((++i).ToString(), result);
+            }
+        }
+
+        [TestMethod]
         public void TestRandom()
         {
             var arr = new[] { "1", "2", "3", "4", "5", "6", "7", "8", "9", "0" };

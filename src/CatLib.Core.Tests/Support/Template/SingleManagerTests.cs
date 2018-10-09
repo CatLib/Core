@@ -129,7 +129,7 @@ namespace CatLib.Tests.Stl
             manager.Extend(() => new InterfaceImpl(), "hello");
 
             Assert.AreEqual(true, manager.ContainsExtend("hello"));
-            manager.ReleaseExtend("hello");
+            manager.RemoveExtend("hello");
             Assert.AreEqual(false, manager.ContainsExtend());
             Assert.AreEqual(false, manager.ContainsExtend("hello"));
         }
