@@ -52,6 +52,7 @@
     <Compile Include="Support\RingBuffer\RingBufferTests.cs" />
     <Compile Include="Support\SortSet\SortSetTests.cs" />
     <Compile Include="Support\Storage\MemoryStorageTests.cs" />
+    <Compile Include="Support\Stream\PipelineStreamTests.cs" />
     <Compile Include="Support\Stream\StorageStreamTests.cs" />
     <Compile Include="Support\Template\ManagerTests.cs" />
     <Compile Include="Support\Template\SingleManagerTests.cs" />
