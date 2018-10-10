@@ -118,7 +118,6 @@ namespace CatLib.Core.Tests.Support.Stream
         }
 
         [TestMethod]
-        [ExpectedException(typeof(NotSupportedException))]
         public void TestSetLength()
         {
             var stream = new PipelineStream(256);
@@ -134,19 +133,17 @@ namespace CatLib.Core.Tests.Support.Stream
         }
 
         [TestMethod]
-        [ExpectedException(typeof(NotSupportedException))]
         public void TestGetPosition()
         {
             var stream = new PipelineStream(256);
-            var pos = stream.Position;
+            Assert.AreEqual(0, stream.Position);
         }
 
         [TestMethod]
-        [ExpectedException(typeof(NotSupportedException))]
         public void TestGetLength()
         {
             var stream = new PipelineStream(256);
-            var length = stream.Length;
+            Assert.AreEqual(0, stream.Length);
         }
     }
 }
