@@ -42,9 +42,9 @@ namespace CatLib
         private readonly RingBuffer ringBuffer;
 
         /// <summary>
-        /// 当写入完成后触发
+        /// 当完成读取后触发
         /// </summary>
-        public event Action<Stream> OnWrote;
+        public event Action<Stream> OnRead;
 
         /// <summary>
         /// 是否已经被释放了
@@ -55,11 +55,6 @@ namespace CatLib
         /// 是否已经关闭流了
         /// </summary>
         private volatile bool closed;
-
-        /// <summary>
-        /// 总流量
-        /// </summary>
-        public long TotalFlow { get; private set; }
 
         /// <summary>
         /// 是否可以被读取
@@ -78,20 +73,30 @@ namespace CatLib
         }
 
         /// <summary>
+        /// 当前流的位置
+        /// </summary>
+        private long position;
+
+        /// <summary>
         /// 偏移位置（不支持）
         /// </summary>
         public override long Position
         {
-            get { throw new NotSupportedException(); }
+            get { return position; }
             set { throw new NotSupportedException(); }
         }
 
         /// <summary>
         /// 流的长度
         /// </summary>
+        private long length;
+
+        /// <summary>
+        /// 流的长度
+        /// </summary>
         public override long Length
         {
-            get { throw new NotSupportedException(); }
+            get { return length; }
         }
 
         /// <summary>
@@ -119,7 +124,6 @@ namespace CatLib
         {
             this.capacity = capacity.ToPrime();
             this.sleep = Math.Max(0, sleep);
-            TotalFlow = 0;
             ringBuffer = new RingBuffer(this.capacity, false);
         }
 
@@ -148,7 +152,7 @@ namespace CatLib
         /// <param name="value">长度</param>
         public override void SetLength(long value)
         {
-            throw new NotSupportedException();
+            length = Math.Max(0, value);
         }
 
         /// <summary>
@@ -198,7 +202,13 @@ namespace CatLib
                     {
                         var read = ringBuffer.Read(buffer, offset, count);
                         this.count -= read;
-                        TotalFlow += read;
+                        position += read;
+
+                        if (OnRead != null)
+                        {
+                            OnRead(this);
+                        }
+
                         return read;
                     }
                     finally
@@ -242,12 +252,6 @@ namespace CatLib
 
                     Guard.Requires<AssertException>(ringBuffer.Write(buffer, offset, count) == count);
                     this.count += count;
-
-                    if (OnWrote != null)
-                    {
-                        OnWrote(this);
-                    }
-
                     return;
                 }
             }

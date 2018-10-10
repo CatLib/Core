@@ -28,10 +28,10 @@ namespace CatLib.Core.Tests.Support.Stream
             stream = new PipelineStream(256);
             ThreadPool.QueueUserWorkItem(WriteThread);
 
-            var wrote = false;
-            stream.OnWrote += (_) =>
+            var readed = false;
+            stream.OnRead += (_) =>
             {
-                wrote = true;
+                readed = true;
             };
             var data = new byte[100];
             int read;
@@ -52,7 +52,7 @@ namespace CatLib.Core.Tests.Support.Stream
             }
            
             Assert.AreEqual(expected.ToString(), actual.ToString());
-            Assert.AreEqual(true, wrote);
+            Assert.AreEqual(true, readed);
         }
 
         public void WriteThread(object obj)
