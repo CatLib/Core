@@ -78,7 +78,7 @@ namespace CatLib
         private long position;
 
         /// <summary>
-        /// 偏移位置（不支持）
+        /// 流位置
         /// </summary>
         public override long Position
         {
@@ -136,7 +136,7 @@ namespace CatLib
         }
 
         /// <summary>
-        /// 偏移位置（不支持）
+        /// 设定流位置（不支持）
         /// </summary>
         /// <param name="offset">偏移量</param>
         /// <param name="origin">偏移方向</param>
@@ -147,7 +147,7 @@ namespace CatLib
         }
 
         /// <summary>
-        /// 设定流的长度（不支持）
+        /// 设定流的长度
         /// </summary>
         /// <param name="value">长度</param>
         public override void SetLength(long value)
