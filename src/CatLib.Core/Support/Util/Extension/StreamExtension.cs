@@ -21,14 +21,6 @@ namespace CatLib
     public static class StreamExtension
     {
         /// <summary>
-        /// 编码
-        /// </summary>
-        private static Encoding Encoding
-        {
-            get { return Encoding.UTF8; }
-        }
-
-        /// <summary>
         /// 将当前流追加到目标流中
         /// </summary>
         /// <param name="source">源数据流</param>
@@ -73,7 +65,7 @@ namespace CatLib
         {
             try
             {
-                encoding = encoding ?? Encoding;
+                encoding = encoding ?? Util.Encoding;
                 if (source is MemoryStream)
                 {
                     var memoryStream = (MemoryStream) source;

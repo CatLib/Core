@@ -11,6 +11,7 @@
 
 using System;
 using System.Reflection;
+using System.Text;
 
 namespace CatLib
 {
@@ -19,6 +20,19 @@ namespace CatLib
     /// </summary>
     public static class Util
     {
+        /// <summary>
+        /// 编码
+        /// </summary>
+        public static Encoding Encoding { get; set; }
+
+        /// <summary>
+        /// 通用支持初始化时
+        /// </summary>
+        static Util()
+        {
+            Encoding = Encoding.UTF8;
+        }
+
         /// <summary>
         /// 获取优先级
         /// </summary>
