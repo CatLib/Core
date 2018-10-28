@@ -44,6 +44,10 @@
     <Compile Include="CatLib\Events\IGlobalDispatcher.cs" />
     <Compile Include="CatLib\Events\IOriginalDispatcher.cs" />
     <Compile Include="CatLib\Facade.cs" />
+    <Compile Include="CatLib\Facades\Template\Managed.cs" />
+    <Compile Include="CatLib\Facades\Template\Manager.cs" />
+    <Compile Include="CatLib\Facades\Template\SingleManaged.cs" />
+    <Compile Include="CatLib\Facades\Template\SingleManager.cs" />
     <Compile Include="CatLib\IApplication.cs" />
     <Compile Include="CatLib\IBootstrap.cs" />
     <Compile Include="CatLib\IServiceProvider.cs" />
