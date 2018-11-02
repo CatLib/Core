@@ -53,7 +53,8 @@ namespace CatLib
         /// <param name="source">规定字典</param>
         /// <param name="predicate">回调函数</param>
         /// <return>被移除的元素</return>
-        public static KeyValuePair<TKey,TValue>[] Remove<TKey, TValue>(IDictionary<TKey, TValue> source, Func<TKey, TValue, bool> predicate)
+        public static KeyValuePair<TKey,TValue>[] Remove<TKey, TValue>(IDictionary<TKey, TValue> source
+            , Func<TKey, TValue, bool> predicate)
         {
             Guard.Requires<ArgumentNullException>(source != null);
             Guard.Requires<ArgumentNullException>(predicate != null);
@@ -82,7 +83,8 @@ namespace CatLib
         /// <typeparam name="TValue">字典值类型</typeparam>
         /// <param name="source">规定字典</param>
         /// <param name="callback">回调函数</param>
-        public static void Modify<TKey, TValue>(IDictionary<TKey, TValue> source, Func<TKey, TValue, TValue> callback)
+        public static void Modify<TKey, TValue>(IDictionary<TKey, TValue> source
+            , Func<TKey, TValue, TValue> callback)
         {
             Guard.Requires<ArgumentNullException>(source != null);
             Guard.Requires<ArgumentNullException>(callback != null);
@@ -91,11 +93,16 @@ namespace CatLib
             foreach (var result in source)
             {
                 var value = callback.Invoke(result.Key, result.Value);
-                if (!result.Equals(value))
+                if (!result.Value.Equals(value))
                 {
                     elements = elements ?? new Dictionary<TKey, TValue>();
                     elements[result.Key] = value;
                 }
+            }
+
+            if(elements == null)
+            {
+                return;
             }
 
             foreach (var result in elements)
@@ -112,7 +119,8 @@ namespace CatLib
         /// <param name="source">目标字典</param>
         /// <param name="added">增加的内容</param>
         /// <param name="replaced">遇到重复是否替换，如果不进行替换遇到重复将会抛出一个异常</param>
-        public static void AddRange<TKey, TValue>(IDictionary<TKey, TValue> source, IDictionary<TKey, TValue> added, bool replaced = true)
+        public static void AddRange<TKey, TValue>(IDictionary<TKey, TValue> source
+            , IDictionary<TKey, TValue> added, bool replaced = true)
         {
             Guard.Requires<ArgumentNullException>(source != null);
             if (added == null)
@@ -141,7 +149,8 @@ namespace CatLib
         /// <param name="source">规定字典</param>
         /// <param name="callback">自定义函数</param>
         /// <returns>处理后的字典</returns>
-        public static IDictionary<TKey, TValue> Map<TKey, TValue>(IDictionary<TKey, TValue> source, Func<TKey, TValue, TValue> callback)
+        public static IDictionary<TKey, TValue> Map<TKey, TValue>(IDictionary<TKey, TValue> source
+              , Func<TKey, TValue, TValue> callback)
         {
             Guard.Requires<ArgumentNullException>(source != null);
             Guard.Requires<ArgumentNullException>(callback != null);

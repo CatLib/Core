@@ -85,7 +85,7 @@ namespace CatLib
                 var length = 0;
                 try
                 {
-                    length = (int) source.Length;
+                    length = (int)source.Length;
                 }
                 catch (NotSupportedException)
                 {
@@ -105,7 +105,7 @@ namespace CatLib
                 using (targetStream)
                 {
                     var read = source.AppendTo(targetStream);
-                    return encoding.GetString(targetStream.GetBuffer(), 0, (int) read);
+                    return encoding.GetString(targetStream.GetBuffer(), 0, (int)read);
                 }
             }
             finally
