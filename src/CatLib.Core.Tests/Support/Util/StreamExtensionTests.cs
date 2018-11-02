@@ -60,6 +60,21 @@ namespace CatLib.Core.Tests.Support.Util
         }
 
         [TestMethod]
+        public void TestChineseText()
+        {
+            var stream1 = new StorageStream(new MemoryStorage());
+            var builder = new StringBuilder();
+            for (var i = 0; i < (ThreadStatic.Buffer.Length / 10) + 1; i++)
+            {
+                var data = Encoding.UTF8.GetBytes("12中文34测试的5这是67890");
+                stream1.Write(data, 0, data.Length);
+                builder.Append("12中文34测试的5这是67890");
+            }
+            stream1.Seek(0, SeekOrigin.Begin);
+            Assert.AreEqual(builder.ToString(), stream1.ToText());
+        }
+
+        [TestMethod]
         public void TestStreamToTextEmpty()
         {
             var stream1 = new MemoryStream(0);

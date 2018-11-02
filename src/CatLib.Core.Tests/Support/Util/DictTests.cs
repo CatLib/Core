@@ -78,6 +78,14 @@ namespace CatLib.Core.Tests.Support.Util
         }
 
         [TestMethod]
+        public void TestSetNotObject()
+        {
+            var dict = new Dictionary<string, object>();
+            dict.Add("string", "string");
+            Dict.Set(dict, "string.hello", "hello");
+        }
+
+        [TestMethod]
         public void TestKeys()
         {
             var dict = new Dictionary<string, object>
