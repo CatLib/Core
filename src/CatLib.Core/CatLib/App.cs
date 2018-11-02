@@ -41,7 +41,7 @@ namespace CatLib
             {
                 if (instance == null)
                 {
-                    Application.New();
+                    return New();
                 }
                 return instance;
             }
@@ -53,6 +53,15 @@ namespace CatLib
                     OnNewApplication.Invoke(instance);
                 }
             }
+        }
+
+        /// <summary>
+        /// 创建CatLib实例
+        /// </summary>
+        /// <returns>CatLib实例</returns>
+        public static IApplication New()
+        {
+            return Application.New();
         }
         #endregion
 
