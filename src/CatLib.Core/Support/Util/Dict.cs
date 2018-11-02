@@ -91,11 +91,16 @@ namespace CatLib
             foreach (var result in source)
             {
                 var value = callback.Invoke(result.Key, result.Value);
-                if (!result.Equals(value))
+                if (!result.Value.Equals(value))
                 {
                     elements = elements ?? new Dictionary<TKey, TValue>();
                     elements[result.Key] = value;
                 }
+            }
+
+            if(elements == null)
+            {
+                return;
             }
 
             foreach (var result in elements)
