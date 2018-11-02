@@ -64,6 +64,7 @@ namespace CatLib.Tests
         }
 
         [TestMethod]
+        [ExpectedException(typeof(RuntimeException))]
         public void RepeatInitTest()
         {
             var app = MakeApplication();
@@ -104,6 +105,98 @@ namespace CatLib.Tests
             {
                 app.Init();
             });
+        }
+
+        public class StopBootstrap : IBootstrap
+        {
+            public string value = string.Empty;
+            public bool stop = false;
+            public void Bootstrap()
+            {
+                value = "bootstrap";
+            }
+        }
+
+        [TestMethod]
+        public void TestStopBootstrap()
+        {
+            var bootstrapStopped = new StopBootstrap() { stop = true };
+            var bootstrapNotStopped = new StopBootstrap();
+            var application = Application.New();
+            application.Listen<IBootstrap, object>(ApplicationEvents.Bootstrapping, (b) =>
+              {
+                  if (((StopBootstrap)b).stop)
+                  {
+                      return false;
+                  }
+                  return null;
+              });
+            application.Bootstrap(bootstrapStopped, bootstrapNotStopped);
+            Assert.AreEqual(string.Empty, bootstrapStopped.value);
+            Assert.AreEqual("bootstrap", bootstrapNotStopped.value);
+        }
+
+        public class StopProvider : IServiceProvider
+        {
+            public string value = string.Empty;
+            public bool stop = false;
+            public void Register()
+            {
+                value = "register";
+            }
+            public void Init()
+            {
+            }
+        }
+
+        [TestMethod]
+        public void TestStopRegisterProvider()
+        {
+            var providerStopped = new StopProvider() { stop = true };
+            var providerNotStopped = new StopProvider();
+
+            var application = Application.New();
+            application.Listen<IServiceProvider, object>(ApplicationEvents.OnRegisterProvider, (b) =>
+            {
+                if (((StopProvider)b).stop)
+                {
+                    return false;
+                }
+                return null;
+            });
+            application.Register(providerStopped);
+            application.Register(providerNotStopped);
+            Assert.AreEqual(string.Empty, providerStopped.value);
+            Assert.AreEqual("register", providerNotStopped.value);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(RuntimeException))]
+        public void TestInitingRegisterProvider()
+        {
+            var application = Application.New();
+            application.Register(new StopProvider());
+            application.On<IServiceProvider>(ApplicationEvents.OnIniting, (b) =>
+            {
+                application.Register(new TestServiceProvider());
+            });
+            application.Bootstrap();
+            application.Init();
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(RuntimeException))]
+        public void TestTerminateRegisterProvider()
+        {
+            var application = Application.New();
+            application.Register(new StopProvider());
+            application.On(ApplicationEvents.OnTerminate, () =>
+            {
+                application.Register(new TestServiceProvider());
+            });
+            application.Bootstrap();
+            application.Init();
+            application.Terminate();
         }
 
         /// <summary>
@@ -164,7 +257,7 @@ namespace CatLib.Tests
         public void GetCurrentProcess()
         {
             var app = MakeApplication();
-            Assert.AreEqual(Application.StartProcess.Inited, app.Process);
+            Assert.AreEqual(Application.StartProcess.Running, app.Process);
         }
 
         [TestMethod]
@@ -178,13 +271,13 @@ namespace CatLib.Tests
         /// 重复的引导测试
         /// </summary>
         [TestMethod]
+        [ExpectedException(typeof(RuntimeException))]
         public void RepeatBootstrap()
         {
             var app = new Application();
             app.Bootstrap();
             app.Init();
             app.Bootstrap();
-            Assert.AreEqual(Application.StartProcess.Inited, app.Process);
         }
 
         /// <summary>

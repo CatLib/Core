@@ -36,34 +36,54 @@ namespace CatLib
             Construct = 0,
 
             /// <summary>
-            /// 引导流程
+            /// 引导流程之前
             /// </summary>
             Bootstrap = 1,
 
             /// <summary>
-            /// 引导流程结束
+            /// 引导流程进行中
             /// </summary>
-            Bootstraped = 2,
+            Bootstrapping = 2,
+
+            /// <summary>
+            /// 引导流程结束之后
+            /// </summary>
+            Bootstraped = 3,
+
+            /// <summary>
+            /// 初始化开始之前
+            /// </summary>
+            Init = 4,
 
             /// <summary>
             /// 初始化中
             /// </summary>
-            Initing = 3,
+            Initing = 5,
 
             /// <summary>
-            /// 初始化完成
+            /// 初始化完成后
             /// </summary>
-            Inited = 4,
+            Inited = 6,
+
+            /// <summary>
+            /// 框架运行中
+            /// </summary>
+            Running = 7,
 
             /// <summary>
             /// 框架终止之前
             /// </summary>
-            Terminate = 5,
+            Terminate = 8,
+
+            /// <summary>
+            /// 框架终止进行中
+            /// </summary>
+            Terminating = 9,
 
             /// <summary>
             /// 框架终止之后
             /// </summary>
-            Terminated = 6,
+            Terminated = 10,
         }
 
         /// <summary>
@@ -89,7 +109,7 @@ namespace CatLib
         /// <summary>
         /// 启动流程
         /// </summary>
-        private StartProcess process = StartProcess.Construct;
+        private StartProcess process;
 
         /// <summary>
         /// 启动流程
@@ -150,7 +170,8 @@ namespace CatLib
             RegisterCoreAlias();
             RegisterCoreService();
             OnFindType(finder => { return Type.GetType(finder); });
-            DebugLevel = DebugLevels.Prod;
+            DebugLevel = DebugLevels.Production;
+            Process = StartProcess.Construct;
         }
 
         /// <summary>
@@ -169,6 +190,7 @@ namespace CatLib
         {
             Process = StartProcess.Terminate;
             Trigger(ApplicationEvents.OnTerminate, this);
+            Process = StartProcess.Terminating;
             Flush();
             App.Handler = null;
             Process = StartProcess.Terminated;
@@ -185,12 +207,14 @@ namespace CatLib
         {
             Guard.Requires<ArgumentNullException>(bootstraps != null);
 
-            if (bootstrapped)
+            if (bootstrapped || Process != StartProcess.Construct)
             {
-                return;
+                throw new RuntimeException("Cannot repeatedly trigger the Bootstrap()");
             }
 
             Process = StartProcess.Bootstrap;
+            Trigger(ApplicationEvents.OnBootstrap, this);
+            Process = StartProcess.Bootstrapping;
 
             var sorting = new SortSet<IBootstrap, int>();
 
@@ -201,7 +225,8 @@ namespace CatLib
 
             foreach (var bootstrap in sorting)
             {
-                if (bootstrap != null)
+                var allow = TriggerHalt(ApplicationEvents.Bootstrapping, bootstrap) == null;
+                if (bootstrap != null && allow)
                 {
                     bootstrap.Bootstrap();
                 }
@@ -223,11 +248,13 @@ namespace CatLib
                 throw new RuntimeException("You must call Bootstrap() first.");
             }
 
-            if (inited)
+            if (inited || Process != StartProcess.Bootstraped)
             {
-                return;
+                throw new RuntimeException("Cannot repeatedly trigger the Init()");
             }
 
+            Process = StartProcess.Init;
+            Trigger(ApplicationEvents.OnInit, this);
             Process = StartProcess.Initing;
 
             foreach (var provider in serviceProviders)
@@ -238,7 +265,9 @@ namespace CatLib
 
             inited = true;
             Process = StartProcess.Inited;
+            Trigger(ApplicationEvents.OnInited, this);
 
+            Process = StartProcess.Running;
             Trigger(ApplicationEvents.OnStartCompleted, this);
         }
 
@@ -254,6 +283,22 @@ namespace CatLib
             if (IsRegisted(provider))
             {
                 throw new RuntimeException("Provider [" + provider.GetType() + "] is already register.");
+            }
+
+            if(Process == StartProcess.Initing)
+            {
+                throw new RuntimeException("Unable to add service provider during StartProcess.Initing");
+            }
+
+            if(Process > StartProcess.Running)
+            {
+                throw new RuntimeException("Unable to Terminate in-process registration service provider");
+            }
+
+            var allow = TriggerHalt(ApplicationEvents.OnRegisterProvider, provider) == null;
+            if (!allow)
+            {
+                return;
             }
 
             provider.Register();

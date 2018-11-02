@@ -59,7 +59,7 @@ namespace CatLib
         /// 创建CatLib实例
         /// </summary>
         /// <returns>CatLib实例</returns>
-        public static IApplication New()
+        protected static IApplication New()
         {
             return Application.New();
         }
