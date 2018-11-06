@@ -10,6 +10,7 @@
  */
 
 using System;
+using IEnumerator = System.Collections.IEnumerator;
 using System.Collections.Generic;
 using System.Threading;
 
@@ -23,7 +24,7 @@ namespace CatLib
         /// <summary>
         /// 版本号
         /// </summary>
-        private readonly Version version = new Version("1.2.12");
+        private readonly Version version = new Version("1.3.0");
 
         /// <summary>
         /// 框架启动流程
@@ -109,19 +110,7 @@ namespace CatLib
         /// <summary>
         /// 启动流程
         /// </summary>
-        private StartProcess process;
-
-        /// <summary>
-        /// 启动流程
-        /// </summary>
-        public StartProcess Process
-        {
-            get
-            {
-                return process;
-            }
-            private set { process = value; }
-        }
+        public StartProcess Process { get; private set; }
 
         /// <summary>
         /// 增量Id
@@ -240,8 +229,16 @@ namespace CatLib
         /// <summary>
         /// 初始化
         /// </summary>
-        /// <exception cref="RuntimeException">没有调用<c>Bootstrap(...)</c>就尝试初始化时触发</exception>
         public virtual void Init()
+        {
+            StartCoroutine(CoroutineInit());
+        }
+
+        /// <summary>
+        /// 初始化
+        /// </summary>
+        /// <exception cref="RuntimeException">没有调用<c>Bootstrap(...)</c>就尝试初始化时触发</exception>
+        protected IEnumerator CoroutineInit()
         {
             if (!bootstrapped)
             {
@@ -259,8 +256,7 @@ namespace CatLib
 
             foreach (var provider in serviceProviders)
             {
-                Trigger(ApplicationEvents.OnIniting, provider);
-                provider.Init();
+                yield return InitProvider(provider);
             }
 
             inited = true;
@@ -278,6 +274,16 @@ namespace CatLib
         /// <exception cref="RuntimeException">服务提供者被重复注册时触发</exception>
         public virtual void Register(IServiceProvider provider)
         {
+            StartCoroutine(CoroutineRegister(provider));
+        }
+
+        /// <summary>
+        /// 注册服务提供者
+        /// </summary>
+        /// <param name="provider">注册服务提供者</param>
+        /// <exception cref="RuntimeException">服务提供者被重复注册时触发</exception>
+        protected IEnumerator CoroutineRegister(IServiceProvider provider)
+        {
             Guard.Requires<ArgumentNullException>(provider != null);
 
             if (IsRegisted(provider))
@@ -285,12 +291,12 @@ namespace CatLib
                 throw new RuntimeException("Provider [" + provider.GetType() + "] is already register.");
             }
 
-            if(Process == StartProcess.Initing)
+            if (Process == StartProcess.Initing)
             {
                 throw new RuntimeException("Unable to add service provider during StartProcess.Initing");
             }
 
-            if(Process > StartProcess.Running)
+            if (Process > StartProcess.Running)
             {
                 throw new RuntimeException("Unable to Terminate in-process registration service provider");
             }
@@ -298,7 +304,7 @@ namespace CatLib
             var allow = TriggerHalt(ApplicationEvents.OnRegisterProvider, provider) == null;
             if (!allow)
             {
-                return;
+                yield break;
             }
 
             provider.Register();
@@ -307,9 +313,25 @@ namespace CatLib
 
             if (inited)
             {
-                Trigger(ApplicationEvents.OnIniting, provider);
-                provider.Init();
+                yield return InitProvider(provider);
             }
+        }
+
+        /// <summary>
+        /// 初始化服务提供者
+        /// </summary>
+        /// <param name="provider">服务提供者</param>
+        private IEnumerator InitProvider(IServiceProvider provider)
+        {
+            Trigger(ApplicationEvents.OnProviderInit, provider);
+
+            provider.Init();
+            if (provider is ICoroutineInit coroutine)
+            {
+                yield return coroutine.CoroutineInit();
+            }
+
+            Trigger(ApplicationEvents.OnProviderInited, provider);
         }
 
         /// <summary>
@@ -498,6 +520,28 @@ namespace CatLib
         {
             var providerType = provider as IServiceProviderType;
             return providerType == null ? provider.GetType() : providerType.BaseType;
+        }
+
+        /// <summary>
+        /// 启动迭代器
+        /// </summary>
+        /// <param name="coroutine">迭代程序</param>
+        private void StartCoroutine(IEnumerator coroutine)
+        {
+            var stack = new Stack<IEnumerator>();
+            stack.Push(coroutine);
+            do
+            {
+                coroutine = stack.Pop();
+                while (coroutine.MoveNext())
+                {
+                    if (coroutine.Current is IEnumerator nextCoroutine)
+                    {
+                        stack.Push(coroutine);
+                        coroutine = nextCoroutine;
+                    }
+                }
+            } while (stack.Count > 0);
         }
     }
 }

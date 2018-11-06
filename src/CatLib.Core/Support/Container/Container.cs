@@ -95,28 +95,12 @@ namespace CatLib
         /// <summary>
         /// 编译堆栈
         /// </summary>
-        private readonly Stack<string> buildStack;
-
-        /// <summary>
-        /// 编译堆栈
-        /// </summary>
-        protected Stack<string> BuildStack
-        {
-            get { return buildStack; }
-        }
+        protected Stack<string> BuildStack { get; private set; }
 
         /// <summary>
         /// 用户参数堆栈
         /// </summary>
-        private readonly Stack<object[]> userParamsStack;
-
-        /// <summary>
-        /// 用户参数堆栈
-        /// </summary>
-        protected Stack<object[]> UserParamsStack
-        {
-            get { return userParamsStack; }
-        }
+        protected Stack<object[]> UserParamsStack { get; private set; }
 
         /// <summary>
         /// 是否在清空过程中
@@ -141,8 +125,8 @@ namespace CatLib
             findType = new SortSet<Func<string, Type>, int>();
             findTypeCache = new Dictionary<string, Type>(prime * 4);
             rebound = new Dictionary<string, List<Action<object>>>(prime);
-            buildStack = new Stack<string>(32);
-            userParamsStack = new Stack<object[]>(32);
+            BuildStack = new Stack<string>(32);
+            UserParamsStack = new Stack<object[]>(32);
 
             injectTarget = typeof(InjectAttribute);
             methodContainer = new MethodContainer(this, GetDependencies);
@@ -166,11 +150,9 @@ namespace CatLib
             lock (syncRoot)
             {
                 GuardFlushing();
-                List<string> list;
-                if (!tags.TryGetValue(tag, out list))
+                if (!tags.TryGetValue(tag, out List<string> list))
                 {
                     tags[tag] = list = new List<string>();
-
                 }
                 list.AddRange(service);
             }
@@ -188,8 +170,7 @@ namespace CatLib
             Guard.NotEmptyOrNull(tag, "tag");
             lock (syncRoot)
             {
-                List<string> services;
-                if (!tags.TryGetValue(tag, out services))
+                if (!tags.TryGetValue(tag, out List<string> services))
                 {
                     throw new RuntimeException("Tag [" + tag + "] is not exist.");
                 }
@@ -216,8 +197,7 @@ namespace CatLib
             lock (syncRoot)
             {
                 service = AliasToService(service);
-                BindData bindData;
-                return binds.TryGetValue(service, out bindData) ? bindData : null;
+                return binds.TryGetValue(service, out BindData bindData) ? bindData : null;
             }
         }
 
@@ -341,8 +321,7 @@ namespace CatLib
 
                 aliases.Add(alias, service);
 
-                List<string> serviceList;
-                if (!aliasesReverse.TryGetValue(service, out serviceList))
+                if (!aliasesReverse.TryGetValue(service, out List<string> serviceList))
                 {
                     aliasesReverse[service] = serviceList = new List<string>();
                 }
@@ -617,8 +596,7 @@ namespace CatLib
             {
                 service = AliasToService(service);
 
-                object instance;
-                if (!instances.TryGetValue(service, out instance))
+                if (!instances.TryGetValue(service, out object instance))
                 {
                     return false;
                 }
@@ -696,8 +674,7 @@ namespace CatLib
                 GuardFlushing();
                 service = AliasToService(service);
 
-                List<Action<object>> list;
-                if (!rebound.TryGetValue(service, out list))
+                if (!rebound.TryGetValue(service, out List<Action<object>> list))
                 {
                     rebound[service] = list = new List<Action<object>>();
                 }
@@ -768,8 +745,8 @@ namespace CatLib
                     resolved.Clear();
                     findType.Clear();
                     findTypeCache.Clear();
-                    buildStack.Clear();
-                    userParamsStack.Clear();
+                    BuildStack.Clear();
+                    UserParamsStack.Clear();
                     rebound.Clear();
                     methodContainer.Flush();
                 }
@@ -799,8 +776,7 @@ namespace CatLib
             lock (syncRoot)
             {
                 Release(bindable.Service);
-                List<string> serviceList;
-                if (aliasesReverse.TryGetValue(bindable.Service, out serviceList))
+                if (aliasesReverse.TryGetValue(bindable.Service, out List<string> serviceList))
                 {
                     foreach (var alias in serviceList)
                     {
@@ -1279,9 +1255,7 @@ namespace CatLib
         /// <returns>服务类型</returns>
         protected virtual Type SpeculatedServiceType(string service)
         {
-            Type result;
-
-            if (findTypeCache.TryGetValue(service, out result))
+            if (findTypeCache.TryGetValue(service, out Type result))
             {
                 return result;
             }
@@ -1531,8 +1505,7 @@ namespace CatLib
         private string AliasToService(string service)
         {
             service = FormatService(service);
-            string alias;
-            return aliases.TryGetValue(service, out alias) ? alias : service;
+            return aliases.TryGetValue(service, out string alias) ? alias : service;
         }
 
         /// <summary>
@@ -1600,8 +1573,7 @@ namespace CatLib
         /// <param name="obj">实例</param>
         private void DisposeInstance(object obj)
         {
-            var disposable = obj as IDisposable;
-            if (disposable != null)
+            if (obj is IDisposable disposable)
             {
                 disposable.Dispose();
             }
@@ -1624,8 +1596,7 @@ namespace CatLib
         /// <returns>回调列表</returns>
         private IList<Action<object>> GetOnReboundCallbacks(string service)
         {
-            List<Action<object>> result;
-            return !rebound.TryGetValue(service, out result) ? null : result;
+            return !rebound.TryGetValue(service, out List<Action<object>> result) ? null : result;
         }
 
         /// <summary>
@@ -1655,19 +1626,18 @@ namespace CatLib
             {
                 service = AliasToService(service);
 
-                object instance;
-                if (instances.TryGetValue(service, out instance))
+                if (instances.TryGetValue(service, out object instance))
                 {
                     return instance;
                 }
 
-                if (buildStack.Contains(service))
+                if (BuildStack.Contains(service))
                 {
                     throw MakeCircularDependencyException(service);
                 }
 
-                buildStack.Push(service);
-                userParamsStack.Push(userParams);
+                BuildStack.Push(service);
+                UserParamsStack.Push(userParams);
                 try
                 {
                     var bindData = GetBindFillable(service);
@@ -1677,8 +1647,8 @@ namespace CatLib
                 }
                 finally
                 {
-                    userParamsStack.Pop();
-                    buildStack.Pop();
+                    UserParamsStack.Pop();
+                    BuildStack.Pop();
                 }
             }
         }
@@ -1754,8 +1724,7 @@ namespace CatLib
         /// <returns>服务绑定数据</returns>
         private BindData GetBindFillable(string service)
         {
-            BindData bindData;
-            return service != null && binds.TryGetValue(service, out bindData)
+            return service != null && binds.TryGetValue(service, out BindData bindData)
                 ? bindData
                 : MakeEmptyBindData(service);
         }
@@ -1790,8 +1759,7 @@ namespace CatLib
             {
                 foreach (var table in tables)
                 {
-                    object result;
-                    if (!table.TryGetValue(parameterInfo.Name, out result))
+                    if (!table.TryGetValue(parameterInfo.Name, out object result))
                     {
                         continue;
                     }

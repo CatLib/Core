@@ -102,8 +102,7 @@ namespace CatLib
             {
                 return needs;
             }
-            string contextualNeeds;
-            return contextual.TryGetValue(needs, out contextualNeeds) ? contextualNeeds : needs;
+            return contextual.TryGetValue(needs, out string contextualNeeds) ? contextualNeeds : needs;
         }
 
         /// <summary>

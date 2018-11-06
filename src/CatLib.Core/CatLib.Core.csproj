@@ -50,6 +50,7 @@
     <Compile Include="CatLib\Facades\Template\SingleManager.cs" />
     <Compile Include="CatLib\IApplication.cs" />
     <Compile Include="CatLib\IBootstrap.cs" />
+    <Compile Include="CatLib\ICoroutineInit.cs" />
     <Compile Include="CatLib\IServiceProvider.cs" />
     <Compile Include="CatLib\IServiceProviderType.cs" />
     <Compile Include="CatLib\ServiceProvider.cs" />

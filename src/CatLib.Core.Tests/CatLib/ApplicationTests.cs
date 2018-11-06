@@ -176,7 +176,7 @@ namespace CatLib.Tests
         {
             var application = Application.New();
             application.Register(new StopProvider());
-            application.On<IServiceProvider>(ApplicationEvents.OnIniting, (b) =>
+            application.On<IServiceProvider>(ApplicationEvents.OnProviderInit, (b) =>
             {
                 application.Register(new TestServiceProvider());
             });
