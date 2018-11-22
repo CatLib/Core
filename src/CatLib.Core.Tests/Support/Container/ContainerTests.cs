@@ -2366,6 +2366,104 @@ namespace CatLib.Tests.Stl
 
             Assert.AreEqual(true, isError);
         }
+
+        public class TestFlushOrderDependencyClass
+        {
+            
+        }
+
+        public class TestFlushOrderClass
+        {
+            public TestFlushOrderClass(TestFlushOrderDependencyClass cls)
+            {
+                
+            }
+        }
+
+        [TestMethod]
+        public void TestFlushOrder()
+        {
+            var container = new Container();
+            container.Instance<Container>(container);
+
+            var list = new List<object>();
+
+            container.OnRelease((_) =>
+            {
+                list.Add(_);
+            });
+
+            container.Singleton<TestFlushOrderDependencyClass>();
+            container.Singleton<TestFlushOrderClass>();
+
+            container.Make<TestFlushOrderClass>();
+
+            container.Flush();
+
+            Assert.AreEqual(3, list.Count);
+            Assert.AreEqual(typeof(TestFlushOrderClass), list[0].GetType());
+            Assert.AreEqual(typeof(TestFlushOrderDependencyClass), list[1].GetType());
+            Assert.AreEqual(typeof(Container), list[2].GetType());
+        }
+
+        [TestMethod]
+        public void TestRebuildAndFlush()
+        {
+            var container = new Application();
+            var list = new List<object>();
+
+            container.Singleton<TestFlushOrderDependencyClass>();
+            container.Singleton<TestFlushOrderClass>();
+
+            container.Make<TestFlushOrderClass>();
+            var temp = Facade<TestFlushOrderDependencyClass>.Instance;
+            container.Release<TestFlushOrderDependencyClass>();
+
+            container.OnRelease((_) =>
+            {
+                if(typeof(TestFlushOrderDependencyClass) ==  _.GetType()
+                   || typeof(Application) == _.GetType()
+                   || typeof(TestFlushOrderClass) == _.GetType())
+                list.Add(_);
+            });
+            container.Instance<TestFlushOrderDependencyClass>(new TestFlushOrderDependencyClass());
+
+            container.Flush();
+
+            Assert.AreEqual(3, list.Count);
+            Assert.AreEqual(typeof(TestFlushOrderClass), list[0].GetType());
+            Assert.AreEqual(typeof(TestFlushOrderDependencyClass), list[1].GetType());
+            Assert.AreEqual(typeof(Application), list[2].GetType());
+        }
+
+        [TestMethod]
+        public void TestRebuildAndFlushNotWatch()
+        {
+            var container = new Application();
+            var list = new List<object>();
+
+            container.Singleton<TestFlushOrderDependencyClass>();
+            container.Singleton<TestFlushOrderClass>();
+
+            container.Make<TestFlushOrderClass>();
+            container.Release<TestFlushOrderDependencyClass>();
+
+            container.OnRelease((_) =>
+            {
+                if (typeof(TestFlushOrderDependencyClass) == _.GetType()
+                    || typeof(Application) == _.GetType()
+                    || typeof(TestFlushOrderClass) == _.GetType())
+                    list.Add(_);
+            });
+            container.Instance<TestFlushOrderDependencyClass>(new TestFlushOrderDependencyClass());
+
+            container.Flush();
+
+            Assert.AreEqual(3, list.Count);
+            Assert.AreEqual(typeof(TestFlushOrderDependencyClass), list[0].GetType());
+            Assert.AreEqual(typeof(TestFlushOrderClass), list[1].GetType());
+            Assert.AreEqual(typeof(Application), list[2].GetType());
+        }
         #endregion
 
         /// <summary>

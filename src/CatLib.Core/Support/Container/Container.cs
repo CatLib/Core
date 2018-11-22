@@ -13,7 +13,6 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
-using System.Threading;
 
 namespace CatLib
 {
@@ -539,10 +538,7 @@ namespace CatLib
         /// </summary>
         /// <param name="service">服务名或者别名</param>
         /// <returns>服务实例，如果构造失败那么返回null</returns>
-        public object this[string service]
-        {
-            get { return Make(service); }
-        }
+        public object this[string service] => Make(service);
 
         /// <summary>
         /// 获取一个回调，当执行回调可以生成指定的服务
@@ -594,7 +590,7 @@ namespace CatLib
 
                 if (!instanceTiming.Contains(service))
                 {
-                    instanceTiming.Add(service, Interlocked.Increment(ref instanceId));
+                    instanceTiming.Add(service, instanceId++);
                 }
 
                 if (isResolved)
@@ -627,6 +623,11 @@ namespace CatLib
                 TriggerOnRelease(bindData, instance);
                 DisposeInstance(instance);
                 instances.Remove(service);
+
+                if (!HasOnReboundCallbacks(service))
+                {
+                    instanceTiming.Remove(service);
+                }
 
                 return true;
             }
@@ -735,10 +736,7 @@ namespace CatLib
         {
             service = AliasToService(service);
             var bind = GetBind(service);
-            if (bind != null)
-            {
-                bind.Unbind();
-            }
+            bind?.Unbind();
         }
 
         /// <summary>
@@ -772,6 +770,8 @@ namespace CatLib
                     UserParamsStack.Clear();
                     rebound.Clear();
                     methodContainer.Flush();
+                    instanceTiming.Clear();
+                    instanceId = 0;
                 }
                 finally
                 {
@@ -927,11 +927,13 @@ namespace CatLib
             {
                 var userParam = userParams[n];
 
-                if (ChangeType(ref userParam, baseParam.ParameterType))
+                if (!ChangeType(ref userParam, baseParam.ParameterType))
                 {
-                    Arr.RemoveAt(ref userParams, n);
-                    return userParam;
+                    continue;
                 }
+
+                Arr.RemoveAt(ref userParams, n);
+                return userParam;
             }
 
             return null;
@@ -1424,7 +1426,7 @@ namespace CatLib
                 var baseParam = baseParams[i];
 
                 // 使用参数匹配器对参数进行匹配，参数匹配器是最先进行的，因为他们的匹配精度是最准确的
-                var param = (matcher == null) ? null : matcher(baseParam);
+                var param = matcher?.Invoke(baseParam);
 
                 // 当容器发现开发者使用 object 或者 object[] 作为参数类型时
                 // 我们尝试将所有用户传入的用户参数紧缩注入
@@ -1616,10 +1618,22 @@ namespace CatLib
         /// <summary>
         /// 获取重定义的服务所对应的回调
         /// </summary>
+        /// <param name="service">服务名</param>
         /// <returns>回调列表</returns>
         private IList<Action<object>> GetOnReboundCallbacks(string service)
         {
             return !rebound.TryGetValue(service, out List<Action<object>> result) ? null : result;
+        }
+
+        /// <summary>
+        /// 是否拥有重定义的服务所对应的回调
+        /// </summary>
+        /// <param name="service">服务名</param>
+        /// <returns>是否存在回调</returns>
+        private bool HasOnReboundCallbacks(string service)
+        {
+            var result = GetOnReboundCallbacks(service);
+            return result != null && result.Count > 0;
         }
 
         /// <summary>
