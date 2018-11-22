@@ -299,7 +299,16 @@ namespace CatLib
         /// </summary>
         public void ReverseIterator()
         {
-            forward = !forward;
+            ReverseIterator(!forward);
+        }
+
+        /// <summary>
+        /// 反转遍历顺序(并不是反转整个有序集)
+        /// </summary>
+        /// <param name="forward">反转顺序</param>
+        public void ReverseIterator(bool forward)
+        {
+            this.forward = forward;
         }
 
         /// <summary>

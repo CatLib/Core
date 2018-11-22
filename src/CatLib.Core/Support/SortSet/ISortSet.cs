@@ -139,6 +139,12 @@ namespace CatLib
         void ReverseIterator();
 
         /// <summary>
+        /// 反转遍历顺序(并不是反转整个有序集)
+        /// </summary>
+        /// <param name="forward">指定的反转顺序</param>
+        void ReverseIterator(bool forward);
+
+        /// <summary>
         /// 获取第一个元素
         /// </summary>
         /// <returns>第一个元素</returns>

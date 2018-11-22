@@ -13,6 +13,7 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
+using System.Threading;
 
 namespace CatLib
 {
@@ -73,6 +74,11 @@ namespace CatLib
         private readonly HashSet<string> resolved;
 
         /// <summary>
+        /// 单例服务构建时序
+        /// </summary>
+        private readonly SortSet<string, int> instanceTiming;
+
+        /// <summary>
         /// 重定义事件
         /// </summary>
         private readonly Dictionary<string, List<Action<object>>> rebound;
@@ -108,6 +114,11 @@ namespace CatLib
         private bool flushing;
 
         /// <summary>
+        /// 单例化Id
+        /// </summary>
+        private int instanceId;
+
+        /// <summary>
         /// 构造一个容器
         /// </summary>
         /// <param name="prime">初始预计服务数量</param>
@@ -125,12 +136,15 @@ namespace CatLib
             findType = new SortSet<Func<string, Type>, int>();
             findTypeCache = new Dictionary<string, Type>(prime * 4);
             rebound = new Dictionary<string, List<Action<object>>>(prime);
+            instanceTiming = new SortSet<string, int>();
+            instanceTiming.ReverseIterator(false);
             BuildStack = new Stack<string>(32);
             UserParamsStack = new Stack<object[]>(32);
 
             injectTarget = typeof(InjectAttribute);
             methodContainer = new MethodContainer(this, GetDependencies);
             flushing = false;
+            instanceId = 0;
         }
 
         /// <summary>
@@ -423,18 +437,20 @@ namespace CatLib
                 var bindData = new BindData(this, service, concrete, isStatic);
                 binds.Add(service, bindData);
 
-                if (IsResolved(service))
+                if (!IsResolved(service))
                 {
-                    if (isStatic)
-                    {
-                        // 如果为 静态的 那么直接解决这个服务
-                        // 在服务静态化的过程会触发 TriggerOnRebound
-                        Resolve(service);
-                    }
-                    else
-                    {
-                        TriggerOnRebound(service);
-                    }
+                    return bindData;
+                }
+
+                if (isStatic)
+                {
+                    // 如果为 静态的 那么直接解决这个服务
+                    // 在服务静态化的过程会触发 TriggerOnRebound
+                    Resolve(service);
+                }
+                else
+                {
+                    TriggerOnRebound(service);
                 }
 
                 return bindData;
@@ -575,6 +591,11 @@ namespace CatLib
 
                 instance = TriggerOnResolving(bindData, instance);
                 instances.Add(service, instance);
+
+                if (!instanceTiming.Contains(service))
+                {
+                    instanceTiming.Add(service, Interlocked.Increment(ref instanceId));
+                }
 
                 if (isResolved)
                 {
@@ -730,10 +751,12 @@ namespace CatLib
                 try
                 {
                     flushing = true;
-                    foreach (var service in Dict.Keys(instances))
+                    foreach (var service in instanceTiming)
                     {
                         Release(service);
                     }
+
+                    Guard.Requires<AssertException>(instances.Count <= 0);
 
                     tags.Clear();
                     aliases.Clear();
