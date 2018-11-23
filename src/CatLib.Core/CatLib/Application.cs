@@ -108,6 +108,11 @@ namespace CatLib
         private bool inited;
 
         /// <summary>
+        /// 是否正在注册中
+        /// </summary>
+        private bool registering;
+
+        /// <summary>
         /// 启动流程
         /// </summary>
         public StartProcess Process { get; private set; }
@@ -125,13 +130,7 @@ namespace CatLib
         /// <summary>
         /// 是否是主线程
         /// </summary>
-        public bool IsMainThread
-        {
-            get
-            {
-                return mainThreadId == Thread.CurrentThread.ManagedThreadId;
-            }
-        }
+        public bool IsMainThread => mainThreadId == Thread.CurrentThread.ManagedThreadId;
 
         /// <summary>
         /// 事件系统
@@ -141,13 +140,7 @@ namespace CatLib
         /// <summary>
         /// 事件系统
         /// </summary>
-        public IDispatcher Dispatcher
-        {
-            get
-            {
-                return dispatcher ?? (dispatcher = this.Make<IDispatcher>());
-            }
-        }
+        public IDispatcher Dispatcher => dispatcher ?? (dispatcher = this.Make<IDispatcher>());
 
         /// <summary>
         /// 构建一个CatLib实例
@@ -209,7 +202,10 @@ namespace CatLib
 
             foreach (var bootstrap in bootstraps)
             {
-                sorting.Add(bootstrap, GetPriority(bootstrap.GetType(), "Bootstrap"));
+                if (bootstrap != null)
+                {
+                    sorting.Add(bootstrap, GetPriority(bootstrap.GetType(), "Bootstrap"));
+                }
             }
 
             foreach (var bootstrap in sorting)
@@ -307,7 +303,15 @@ namespace CatLib
                 yield break;
             }
 
-            provider.Register();
+            try
+            {
+                registering = true;
+                provider.Register();
+            }
+            finally
+            {
+                registering = false;
+            }
             serviceProviders.Add(provider, GetPriority(provider.GetType(), "Init"));
             serviceProviderTypes.Add(GetProviderBaseType(provider));
 
@@ -370,14 +374,8 @@ namespace CatLib
         /// </summary>
         public DebugLevels DebugLevel
         {
-            get
-            {
-                return (DebugLevels)Make(Type2Service(typeof(DebugLevels)));
-            }
-            set
-            {
-                Instance(Type2Service(typeof(DebugLevels)), value);
-            }
+            get => (DebugLevels)Make(Type2Service(typeof(DebugLevels)));
+            set => Instance(Type2Service(typeof(DebugLevels)), value);
         }
 
         /// <summary>
@@ -446,13 +444,7 @@ namespace CatLib
         /// CatLib版本(遵循semver)
         /// </summary>
         [ExcludeFromCodeCoverage]
-        public string Version
-        {
-            get
-            {
-                return version.ToString();
-            }
-        }
+        public string Version => version.ToString();
 
         /// <summary>
         /// 比较CatLib版本(遵循semver)
@@ -467,7 +459,7 @@ namespace CatLib
         [ExcludeFromCodeCoverage]
         public int Compare(int major, int minor, int revised)
         {
-            return Compare(string.Format("{0}.{1}.{2}", major, minor, revised));
+            return Compare($"{major}.{minor}.{revised}");
         }
 
         /// <summary>
@@ -485,9 +477,24 @@ namespace CatLib
         }
 
         /// <summary>
+        /// 验证构建状态
+        /// </summary>
+        /// <param name="method">函数名</param>
+        protected override void GuardConstruct(string method)
+        {
+            if (registering)
+            {
+                throw new CodeStandardException(
+                    "It is not allowed to make services or dependency injection in the registration process, method:" +
+                    method);
+            }
+            base.GuardConstruct(method);
+        }
+
+        /// <summary>
         /// 注册核心别名
         /// </summary>
-        protected virtual void RegisterCoreAlias()
+        private void RegisterCoreAlias()
         {
             var application = Type2Service(typeof(Application));
             Instance(application, this);
@@ -505,7 +512,7 @@ namespace CatLib
         /// <summary>
         /// 注册核心服务
         /// </summary>
-        protected virtual void RegisterCoreService()
+        private void RegisterCoreService()
         {
             var bindable = new BindData(this, null, null, false);
             this.Singleton<GlobalDispatcher>((_, __) => new GlobalDispatcher((paramInfos, userParams) => GetDependencies(bindable, paramInfos, userParams))).Alias<IDispatcher>();
@@ -535,11 +542,13 @@ namespace CatLib
                 coroutine = stack.Pop();
                 while (coroutine.MoveNext())
                 {
-                    if (coroutine.Current is IEnumerator nextCoroutine)
+                    if (!(coroutine.Current is IEnumerator nextCoroutine))
                     {
-                        stack.Push(coroutine);
-                        coroutine = nextCoroutine;
+                        continue;
                     }
+
+                    stack.Push(coroutine);
+                    coroutine = nextCoroutine;
                 }
             } while (stack.Count > 0);
         }

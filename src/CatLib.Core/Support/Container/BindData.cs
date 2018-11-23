@@ -175,6 +175,7 @@ namespace CatLib
             {
                 return;
             }
+
             foreach (var action in release)
             {
                 action.Invoke(this, obj);

@@ -263,8 +263,8 @@ namespace CatLib.Tests
         [TestMethod]
         public void TestDebugLevel()
         {
-            App.DebugLevel = DebugLevels.Dev;
-            Assert.AreEqual(DebugLevels.Dev, App.DebugLevel);
+            App.DebugLevel = DebugLevels.Development;
+            Assert.AreEqual(DebugLevels.Development, App.DebugLevel);
         }
 
         /// <summary>
@@ -439,6 +439,22 @@ namespace CatLib.Tests
         {
             var app = MakeApplication();
             Assert.AreEqual(true, app.IsMainThread);
+        }
+
+        public class TestRegisterProcessMakeServiceProvider : ServiceProvider
+        {
+            public override void Register()
+            {
+                App.Make<object>();
+            }
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(CodeStandardException))]
+        public void TestRegisterProcessMake()
+        {
+            var app = MakeApplication();
+            app.Register(new TestRegisterProcessMakeServiceProvider());
         }
 
         private Application MakeApplication()

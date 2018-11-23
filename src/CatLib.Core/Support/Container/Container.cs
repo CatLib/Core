@@ -31,6 +31,11 @@ namespace CatLib
         ///</summary>
         private readonly Dictionary<string, object> instances;
 
+        /// <summary>
+        /// 单例化对象的反查表
+        /// </summary>
+        private readonly Dictionary<object, string> instancesReverse;
+
         ///<summary>
         /// 服务的别名(key: 别名 , value: 映射的服务名)
         ///</summary>
@@ -128,6 +133,7 @@ namespace CatLib
             aliases = new Dictionary<string, string>(prime * 4);
             aliasesReverse = new Dictionary<string, List<string>>(prime * 4);
             instances = new Dictionary<string, object>(prime * 4);
+            instancesReverse = new Dictionary<object, string>(prime * 4);
             binds = new Dictionary<string, BindData>(prime * 4);
             resolving = new List<Func<IBindData, object, object>>((int)(prime * 0.25));
             release = new List<Action<IBindData, object>>((int)(prime * 0.25));
@@ -491,6 +497,7 @@ namespace CatLib
         /// <returns>调用结果</returns>
         public object Invoke(string method, params object[] userParams)
         {
+            GuardConstruct(nameof(Invoke));
             return methodContainer.Invoke(method, userParams);
         }
 
@@ -509,6 +516,7 @@ namespace CatLib
             {
                 Guard.Requires<ArgumentNullException>(target != null);
             }
+            GuardConstruct(nameof(Call));
 
             var parameter = methodInfo.GetParameters();
 
@@ -562,6 +570,7 @@ namespace CatLib
         public object Instance(string service, object instance)
         {
             Guard.NotEmptyOrNull(service, "service");
+
             lock (syncRoot)
             {
                 GuardFlushing();
@@ -581,12 +590,25 @@ namespace CatLib
                     bindData = MakeEmptyBindData(service);
                 }
 
-                var isResolved = IsResolved(service);
+                instance = TriggerOnResolving(bindData, instance);
 
+                if (instance != null
+                    && instancesReverse.TryGetValue(instance, out string realService)
+                    && realService != service)
+                {
+                    throw new CodeStandardException("The instance has been registered as a singleton in " +
+                                                    realService);
+                }
+
+                var isResolved = IsResolved(service);
                 Release(service);
 
-                instance = TriggerOnResolving(bindData, instance);
                 instances.Add(service, instance);
+
+                if (instance != null)
+                {
+                    instancesReverse.Add(instance, service);
+                }
 
                 if (!instanceTiming.Contains(service))
                 {
@@ -618,10 +640,15 @@ namespace CatLib
                     return false;
                 }
 
-                var bindData = GetBindFillable(service);
-                bindData.TriggerRelease(instance);
-                TriggerOnRelease(bindData, instance);
-                DisposeInstance(instance);
+                if (instance != null)
+                {
+                    var bindData = GetBindFillable(service);
+                    bindData.TriggerRelease(instance);
+                    TriggerOnRelease(bindData, instance);
+                    DisposeInstance(instance);
+                    instancesReverse.Remove(instance);
+                }
+
                 instances.Remove(service);
 
                 if (!HasOnReboundCallbacks(service))
@@ -1512,6 +1539,14 @@ namespace CatLib
         }
 
         /// <summary>
+        /// 验证构建状态
+        /// </summary>
+        /// <param name="method">函数名</param>
+        protected virtual void GuardConstruct(string method)
+        {
+        }
+
+        /// <summary>
         /// 验证重置状态
         /// </summary>
         private void GuardFlushing()
@@ -1588,8 +1623,7 @@ namespace CatLib
                         instance = Make(service);
                     }
                 }
-            }, Pair(typeof(IBindData), bind),
-            Pair(typeof(BindData), bind));
+            }, Pair(typeof(IBindData), bind));
         }
 
         /// <summary>
@@ -1658,6 +1692,7 @@ namespace CatLib
         /// <returns>服务实例</returns>
         private object Resolve(string service, params object[] userParams)
         {
+            GuardConstruct(nameof(Make));
             Guard.NotEmptyOrNull(service, "service");
             lock (syncRoot)
             {

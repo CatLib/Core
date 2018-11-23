@@ -81,6 +81,7 @@
     <Compile Include="Support\Events\Dispatcher.cs" />
     <Compile Include="Support\Events\Event.cs" />
     <Compile Include="Support\Exception\AssertException.cs" />
+    <Compile Include="Support\Exception\CodeStandardException.cs" />
     <Compile Include="Support\Exception\RuntimeException.cs" />
     <Compile Include="Support\FilterChain\FilterChain.cs" />
     <Compile Include="Support\FilterChain\IFilterChain.cs" />

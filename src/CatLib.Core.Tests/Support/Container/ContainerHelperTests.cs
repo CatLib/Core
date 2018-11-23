@@ -362,7 +362,7 @@ namespace CatLib.Tests
         {
             var container = new Container();
             container.Instance("ContainerHelperTests", this);
-            container.Instance(container.Type2Service(typeof(ContainerHelperTests)), this);
+            container.Alias(container.Type2Service(typeof(ContainerHelperTests)), "ContainerHelperTests");
             return container;
         }
     }
