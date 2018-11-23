@@ -105,12 +105,12 @@ namespace CatLib
         /// <summary>
         /// 编译堆栈
         /// </summary>
-        protected Stack<string> BuildStack { get; private set; }
+        protected Stack<string> BuildStack { get; }
 
         /// <summary>
         /// 用户参数堆栈
         /// </summary>
-        protected Stack<object[]> UserParamsStack { get; private set; }
+        protected Stack<object[]> UserParamsStack { get; }
 
         /// <summary>
         /// 是否在清空过程中
@@ -380,12 +380,13 @@ namespace CatLib
         /// <returns>服务绑定数据</returns>
         public bool BindIf(string service, Type concrete, bool isStatic, out IBindData bindData)
         {
-            if (IsUnableType(concrete))
+            if (!IsUnableType(concrete))
             {
-                bindData = null;
-                return false;
+                return BindIf(service, WrapperTypeBuilder(service, concrete), isStatic, out bindData);
             }
-            return BindIf(service, WrapperTypeBuilder(service, concrete), isStatic, out bindData);
+
+            bindData = null;
+            return false;
         }
 
         /// <summary>
@@ -1827,7 +1828,7 @@ namespace CatLib
         {
             // 默认匹配器策略将会将参数名和参数表的参数名进行匹配
             // 最先匹配到的有效参数值将作为返回值返回
-            return (parameterInfo) =>
+            return parameterInfo =>
             {
                 foreach (var table in tables)
                 {
