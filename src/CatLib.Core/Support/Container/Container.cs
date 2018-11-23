@@ -641,11 +641,12 @@ namespace CatLib
                     return false;
                 }
 
+                var bindData = GetBindFillable(service);
+                bindData.TriggerRelease(instance);
+                TriggerOnRelease(bindData, instance);
+
                 if (instance != null)
                 {
-                    var bindData = GetBindFillable(service);
-                    bindData.TriggerRelease(instance);
-                    TriggerOnRelease(bindData, instance);
                     DisposeInstance(instance);
                     instancesReverse.Remove(instance);
                 }
