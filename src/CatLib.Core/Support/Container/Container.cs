@@ -724,6 +724,11 @@ namespace CatLib
                 GuardFlushing();
                 service = AliasToService(service);
 
+                if (!IsResolved(service) && !CanMake(service))
+                {
+                    throw new CodeStandardException("Must be monitored if the service can be make, Please bind or singleton first.");
+                }
+
                 if (!rebound.TryGetValue(service, out List<Action<object>> list))
                 {
                     rebound[service] = list = new List<Action<object>>();

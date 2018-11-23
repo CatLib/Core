@@ -2210,13 +2210,14 @@ namespace CatLib.Tests.Stl
         {
             var container = new Container();
             var callRebound = false;
+
+            var temp = container.Bind("TestService", (c, p) => 100);
             container.OnRebound("TestService", (instance) =>
             {
                 Assert.AreEqual(300, instance);
                 callRebound = true;
             });
-
-            container.Bind("TestService", (c, p) => 100).Unbind();
+            temp.Unbind();
             var bind = container.Bind("TestService", (c, p) => 200);
             container.Make("TestService");
             bind.Unbind();
@@ -2230,13 +2231,13 @@ namespace CatLib.Tests.Stl
         {
             var container = new Container();
             var callRebound = false;
+
+            container.Instance("TestService", 100);
             container.OnRebound("TestService", (instance) =>
             {
                 Assert.AreEqual(300, instance);
                 callRebound = true;
             });
-
-            container.Instance("TestService", 100);
             container.Instance("TestService", 300);
 
             Assert.AreEqual(true, callRebound);
@@ -2261,9 +2262,9 @@ namespace CatLib.Tests.Stl
             var container = new Container();
 
             container.Instance<IContainer>(container);
-            var cls = new TestWatchCLass();
-            container.Watch("WatchService", cls, "OnChange");
+            var cls = new TestWatchCLass();           
             container.Instance("WatchService", 100);
+            container.Watch("WatchService", cls, "OnChange");
             container.Instance("WatchService", 200);
 
             Assert.AreEqual(200, cls.value);
@@ -2292,9 +2293,8 @@ namespace CatLib.Tests.Stl
             var container = new Container();
             container.Instance<IBindData>(null);
             var cls = new TestWatchCLass();
-            container.Watch("WatchService", cls, "OnChange");
             container.Instance("WatchService", 100);
-
+            container.Watch("WatchService", cls, "OnChange");
             var isThrow = false;
             try
             {
@@ -2463,6 +2463,12 @@ namespace CatLib.Tests.Stl
             Assert.AreEqual(typeof(TestFlushOrderDependencyClass), list[0].GetType());
             Assert.AreEqual(typeof(TestFlushOrderClass), list[1].GetType());
             Assert.AreEqual(typeof(Application), list[2].GetType());
+        }
+
+        [TestMethod]
+        public void TestCannotWatch()
+        {
+            
         }
         #endregion
 
