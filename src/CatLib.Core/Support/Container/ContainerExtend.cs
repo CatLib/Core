@@ -97,6 +97,16 @@ namespace CatLib
         }
 
         /// <summary>
+        /// 为服务设定一个别名
+        /// </summary>
+        /// <typeparam name="TAlias">别名</typeparam>
+        /// <typeparam name="TService">服务名</typeparam>
+        public static IContainer Alias<TAlias, TService>(this IContainer container)
+        {
+            return container.Alias(container.Type2Service(typeof(TAlias)), container.Type2Service(typeof(TService)));
+        }
+
+        /// <summary>
         /// 常规绑定一个服务
         /// </summary>
         /// <typeparam name="TService">服务名，同时也是服务实现</typeparam>

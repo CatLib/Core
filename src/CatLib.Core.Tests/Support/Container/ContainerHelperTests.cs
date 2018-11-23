@@ -344,6 +344,16 @@ namespace CatLib.Tests
             Assert.AreEqual(998, data[1]);
         }
 
+        [TestMethod]
+        public void TestSetAlias()
+        {
+            var container = new Container();
+            container.Instance<object>("abc");
+            container.Alias<string, object>();
+
+            Assert.AreEqual("abc", container.Make<string>());
+        }
+
         /// <summary>
         /// 生成容器
         /// </summary>

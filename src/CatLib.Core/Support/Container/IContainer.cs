@@ -152,6 +152,7 @@ namespace CatLib
         /// </summary>
         /// <param name="service">服务名或者别名</param>
         /// <param name="instance">服务实例</param>
+        /// <returns>被修饰器处理后的新的实例</returns>
         object Instance(string service, object instance);
 
         /// <summary>
@@ -206,7 +207,7 @@ namespace CatLib
         Func<object> Factory(string service, params object[] userParams);
 
         /// <summary>
-        /// 以全局的方式为服务设定一个别名
+        /// 为服务设定一个别名
         /// </summary>
         /// <param name="alias">别名</param>
         /// <param name="service">映射到的服务名</param>
