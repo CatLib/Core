@@ -125,7 +125,7 @@ namespace CatLib
         /// <summary>
         /// 服务禁用字符
         /// </summary>
-        private static readonly char[] ServiceBanChars = { '@', ':' };
+        private static readonly char[] ServiceBanChars = { '@', ':' ,'$'};
 
         /// <summary>
         /// 构造一个容器
