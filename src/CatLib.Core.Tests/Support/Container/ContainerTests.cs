@@ -701,7 +701,7 @@ namespace CatLib.Tests.Stl
         {
             var container = MakeContainer();
             container.Instance("num", 777);
-            container.Alias("@num", "num");
+            container.Alias("$num", "num");
             var result = container.Call(this, "TestContainerCall", null);
             Assert.AreEqual(777, result);
         }
@@ -710,7 +710,7 @@ namespace CatLib.Tests.Stl
         public void TestContainerCallWithErrorParams()
         {
             var container = MakeContainer();
-            container.Singleton("num", (_, __) => "helloworld").Alias("@num");
+            container.Singleton("num", (_, __) => "helloworld").Alias("$num");
             ExceptionAssert.Throws<UnresolvableException>(() =>
             {
                 container.Call(this, "TestContainerCall", null);
@@ -850,7 +850,7 @@ namespace CatLib.Tests.Stl
         {
             var container = MakeContainer();
             container.Bind<NoClassAttrInject>();
-            container.Bind("Time", (c, p) => 100, false).Alias("@Time");
+            container.Bind("Time", (c, p) => 100, false).Alias("$Time");
 
             var result = container.Make<NoClassAttrInject>();
             Assert.AreEqual(100, result.Time);
@@ -907,7 +907,7 @@ namespace CatLib.Tests.Stl
             var container = MakeContainer();
             container.Bind<MakeTestNoParamClass>();
             container.Bind<MakeTestClassDependency>();
-            container.Singleton("i", (_,__) => 77).Alias("@i");
+            container.Singleton("i", (_,__) => 77).Alias("$i");
             var result = container.Make<MakeTestNoParamClass>();
             Assert.AreEqual(77, result.I);
             Assert.AreNotEqual(null, result.Dependency);
@@ -1890,7 +1890,7 @@ namespace CatLib.Tests.Stl
         {
             var container = new Container();
             container.Instance("num", 10);
-            container.Alias("@num", "num");
+            container.Alias("$num", "num");
             Assert.AreEqual(10, container.Call(this, "TestContainerCall", new ContainerTest()));
         }
 
@@ -2064,12 +2064,12 @@ namespace CatLib.Tests.Stl
             var container = new Container();
             container.Bind<TestResloveAttrClassSpeculationService>();
             container.Instance("ex", new UnresolvableException());
-            container.Alias("@ex", "ex");
+            container.Alias("$ex", "ex");
             container.Instance("rex", new UnresolvableException());
-            container.Alias("@rex", "rex");
+            container.Alias("$rex", "rex");
             var cls = container.Make<TestResloveAttrClassSpeculationService>();
 
-            Assert.AreSame(container.Make("@ex"), cls.ex);
+            Assert.AreSame(container.Make("$ex"), cls.ex);
         }
 
         [TestMethod]
@@ -2078,7 +2078,7 @@ namespace CatLib.Tests.Stl
             var container = new Container();
             container.Bind<TestResloveAttrClassSpeculationService>();
             container.Instance("ex", new UnresolvableException());
-            container.Alias("@ex", "ex");
+            container.Alias("$ex", "ex");
 
             ExceptionAssert.Throws<UnresolvableException>(() =>
             {

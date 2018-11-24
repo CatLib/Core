@@ -1179,15 +1179,32 @@ namespace CatLib
         /// <returns>推测的服务</returns>
         protected virtual object SpeculationServiceByParamName(Bindable makeServiceBindData, string paramName, Type paramType)
         {
-            var service = makeServiceBindData.GetContextual($"@{paramName}");
-
-            if (!CanMake(service))
+            foreach (var tag in GetVariableTags())
             {
-                return null;
+                var service = makeServiceBindData.GetContextual($"{tag}{paramName}");
+
+                if (!CanMake(service))
+                {
+                    continue;
+                }
+
+                var instance = Make(service);
+                if (ChangeType(ref instance, paramType))
+                {
+                    return instance;
+                }
             }
 
-            var instance = Make(service);
-            return ChangeType(ref instance, paramType) ? instance : null;
+            return null;
+        }
+
+        /// <summary>
+        /// 获取变量标签
+        /// </summary>
+        /// <returns>变量标签</returns>
+        protected virtual char[] GetVariableTags()
+        {
+            return new [] {'$', '@'};
         }
 
         /// <summary>
