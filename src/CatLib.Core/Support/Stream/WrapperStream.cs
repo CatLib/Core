@@ -12,7 +12,7 @@
 using System;
 using System.IO;
 
-namespace CatLib.Core
+namespace CatLib
 {
     /// <summary>
     /// 包装流
