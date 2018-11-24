@@ -10,6 +10,7 @@
  */
 
 using System;
+using System.Collections.Generic;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace CatLib.Tests.Support.Util
@@ -394,6 +395,24 @@ namespace CatLib.Tests.Support.Util
         public void TestMap()
         {
             var data = new[] {1, 2, 3};
+            var result = Arr.Map(data, (i) => i * 2);
+            Assert.AreEqual(2, result[0]);
+            Assert.AreEqual(4, result[1]);
+            Assert.AreEqual(6, result[2]);
+
+            Assert.AreEqual(1, data[0]);
+            Assert.AreEqual(2, data[1]);
+            Assert.AreEqual(3, data[2]);
+        }
+
+        [TestMethod]
+        public void TestMapIEnumerable()
+        {
+            var data = new List<int>
+            {
+                1,2,3
+            };
+
             var result = Arr.Map(data, (i) => i * 2);
             Assert.AreEqual(2, result[0]);
             Assert.AreEqual(4, result[1]);
