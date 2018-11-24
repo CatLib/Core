@@ -19,7 +19,7 @@ namespace CatLib
     /// 管道通讯流
     /// <para>一读一写线程安全</para>
     /// </summary>
-    public class PipelineStream : Stream
+    public class PipelineStream : WrapperStream
     {
         /// <summary>
         /// 可以被读取的长度

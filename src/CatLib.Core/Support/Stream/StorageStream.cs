@@ -17,7 +17,7 @@ namespace CatLib
     /// <summary>
     /// 存储数据流
     /// </summary>
-    public class StorageStream : Stream
+    public class StorageStream : WrapperStream
     {
         /// <summary>
         /// 当前游标所处的位置
