@@ -339,6 +339,30 @@ namespace CatLib
         }
 
         /// <summary>
+        /// 将规定迭代器中的每个值传给回调函数,如果回调函数返回 true，则把规定迭代器中的当前值加入结果数组中
+        /// </summary>
+        /// <typeparam name="T">数组类型</typeparam>
+        /// <param name="source">规定迭代器</param>
+        /// <param name="predicate">回调函数</param>
+        /// <returns>需求数组</returns>
+        public static T[] Filter<T>(IEnumerable<T> source, Predicate<T> predicate)
+        {
+            Guard.Requires<ArgumentNullException>(source != null);
+            Guard.Requires<ArgumentNullException>(predicate != null);
+
+            var results = new List<T>();
+            foreach (var result in source)
+            {
+                if (predicate.Invoke(result))
+                {
+                    results.Add(result);
+                }
+            }
+
+            return results.ToArray();
+        }
+
+        /// <summary>
         /// 将数组值传入用户自定义函数，自定义函数返回的值作为新的数组值
         /// </summary>
         /// <typeparam name="T">数组类型</typeparam>

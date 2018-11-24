@@ -382,7 +382,19 @@ namespace CatLib.Tests.Support.Util
         [TestMethod]
         public void TestFilter()
         {
-            var result = Arr.Filter(new[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 0 }, (i) => i % 2 == 0);
+            var result = Arr.Filter(new [] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 0 }, (i) => i % 2 == 0);
+            Assert.AreEqual(2, result[0]);
+            Assert.AreEqual(4, result[1]);
+            Assert.AreEqual(6, result[2]);
+            Assert.AreEqual(8, result[3]);
+            Assert.AreEqual(0, result[4]);
+            Assert.AreEqual(5, result.Length);
+        }
+
+        [TestMethod]
+        public void TestFilterIEnumerable()
+        {
+            var result = Arr.Filter(new List<int> { 1, 2, 3, 4, 5, 6, 7, 8, 9, 0 }, (i) => i % 2 == 0);
             Assert.AreEqual(2, result[0]);
             Assert.AreEqual(4, result[1]);
             Assert.AreEqual(6, result[2]);
