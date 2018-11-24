@@ -94,6 +94,7 @@
     <Compile Include="Support\Storage\IStorage.cs" />
     <Compile Include="Support\Stream\CombineStream.cs" />
     <Compile Include="Support\Stream\PipelineStream.cs" />
+    <Compile Include="Support\Stream\SegmentStream.cs" />
     <Compile Include="Support\Stream\StorageStream.cs" />
     <Compile Include="Support\Storage\MemoryStorage.cs" />
     <Compile Include="Support\Stream\WrapperStream.cs" />

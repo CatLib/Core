@@ -46,7 +46,7 @@ namespace CatLib
         public override long Position
         {
             get => BaseStream.Position;
-            set => BaseStream.Position = value;
+            set => Seek(value, SeekOrigin.Begin);
         }
 
         /// <summary>
