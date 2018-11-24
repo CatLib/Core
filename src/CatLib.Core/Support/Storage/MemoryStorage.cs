@@ -141,7 +141,7 @@ namespace CatLib
             MaxMemoryUsable = maxMemoryUsable;
             BlockSize = blockBuffer;
             length = 0;
-            storage = new BlockMeta[GetPrime(capacity)];
+            storage = new BlockMeta[capacity.ToPrime()];
         }
 
         /// <summary>
@@ -370,7 +370,7 @@ namespace CatLib
                 return;
             }
 
-            var newStorage = new BlockMeta[GetPrime(minBlockCount)];
+            var newStorage = new BlockMeta[minBlockCount.ToPrime()];
             Array.Copy(storage, 0, newStorage, 0, storage.Length);
             storage = newStorage;
         }
@@ -398,30 +398,6 @@ namespace CatLib
                 ReleaseBlock(block);
             }
             storage = null;
-        }
-
-        /// <summary>
-        /// 计算规定值最近的二的次幂的容量
-        /// </summary>
-        /// <param name="min">规定值</param>
-        /// <returns>容量</returns>
-        private static int GetPrime(int min)
-        {
-            min = Math.Max(0, min);
-
-            var result = 8192;
-            for (var i = 2; i < int.MaxValue; i = i << 1)
-            {
-                if (i < min)
-                {
-                    continue;
-                }
-
-                result = i;
-                break;
-            }
-
-            return result;
         }
 
         /// <summary>
