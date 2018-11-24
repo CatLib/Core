@@ -49,13 +49,7 @@ namespace CatLib
         /// </summary>
         /// <param name="offset">偏移量</param>
         /// <returns>元素</returns>
-        internal TElement this[int offset]
-        {
-            get
-            {
-                return items[offset];
-            }
-        }
+        internal TElement this[int offset] => items[offset];
 
         /// <summary>
         /// 在指定位置插入元素
@@ -79,7 +73,7 @@ namespace CatLib
         internal void RemoveAt(int offset)
         {
             Array.Copy(items, offset + 1, items, offset, Count - offset - 1);
-            Array.Clear(items , Count - 1 , 1);
+            Array.Clear(items, Count - 1, 1);
             --Count;
         }
 
@@ -100,7 +94,7 @@ namespace CatLib
         /// </summary>
         /// <param name="element">元素</param>
         /// <param name="offset">偏移量</param>
-        internal void ReplaceAt(TElement element ,int offset)
+        internal void ReplaceAt(TElement element, int offset)
         {
             items[offset] = element;
         }

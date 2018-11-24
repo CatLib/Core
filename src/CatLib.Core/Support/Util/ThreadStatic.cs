@@ -27,9 +27,6 @@ namespace CatLib
         /// <summary>
         /// 默认缓冲区
         /// </summary>
-        public static byte[] Buffer
-        {
-            get { return buffer; }
-        }
+        public static byte[] Buffer => buffer;
     }
 }

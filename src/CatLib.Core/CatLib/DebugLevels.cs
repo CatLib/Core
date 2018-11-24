@@ -21,7 +21,7 @@ namespace CatLib
         /// <summary>
         /// 生产环境
         /// </summary>
-        [Obsolete("Please use Production")]
+        [Obsolete("Please use " + nameof(Production))]
         Prod,
 
         /// <summary>
@@ -37,7 +37,7 @@ namespace CatLib
         /// <summary>
         /// 开发者模式
         /// </summary>
-        [Obsolete("Please use Development")]
+        [Obsolete("Please use " + nameof(Development))]
         Dev,
 
         /// <summary>

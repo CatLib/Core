@@ -22,7 +22,7 @@ namespace CatLib
         /// <summary>
         /// 断言异常
         /// </summary>
-        public AssertException() : base()
+        public AssertException()
         {
         }
 

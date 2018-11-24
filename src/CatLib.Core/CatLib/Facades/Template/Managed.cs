@@ -31,8 +31,8 @@ namespace CatLib.Facades.Template
         /// </summary>
         public static event Action<TExtend> OnResolving
         {
-            add { Instance.OnResolving += value; }
-            remove { Instance.OnResolving -= value; }
+            add => Instance.OnResolving += value;
+            remove => Instance.OnResolving -= value;
         }
 
         /// <summary>

@@ -125,7 +125,7 @@ namespace CatLib
         /// <summary>
         /// 服务禁用字符
         /// </summary>
-        private static readonly char[] ServiceBanChars = {'@', ':'};
+        private static readonly char[] ServiceBanChars = { '@', ':' };
 
         /// <summary>
         /// 构造一个容器
@@ -166,10 +166,10 @@ namespace CatLib
         /// <exception cref="ArgumentNullException"><paramref name="service"/>为<c>null</c>或者<paramref name="service"/>中的元素为<c>null</c>或者空字符串</exception>
         public void Tag(string tag, params string[] service)
         {
-            Guard.NotEmptyOrNull(tag, "tag");
-            Guard.NotNull(service, "service");
-            Guard.CountGreaterZero(service, "service");
-            Guard.ElementNotEmptyOrNull(service, "service");
+            Guard.NotEmptyOrNull(tag, nameof(tag));
+            Guard.NotNull(service, nameof(service));
+            Guard.CountGreaterZero(service, nameof(service));
+            Guard.ElementNotEmptyOrNull(service, nameof(service));
 
             lock (syncRoot)
             {
@@ -191,7 +191,7 @@ namespace CatLib
         /// <exception cref="ArgumentNullException"><paramref name="tag"/>为<c>null</c>或者空字符串</exception>
         public object[] Tagged(string tag)
         {
-            Guard.NotEmptyOrNull(tag, "tag");
+            Guard.NotEmptyOrNull(tag, nameof(tag));
             lock (syncRoot)
             {
                 if (!tags.TryGetValue(tag, out List<string> services))
@@ -217,7 +217,7 @@ namespace CatLib
         /// <exception cref="ArgumentNullException"><paramref name="service"/>为<c>null</c>或者空字符串</exception>
         public IBindData GetBind(string service)
         {
-            Guard.NotEmptyOrNull(service, "service");
+            Guard.NotEmptyOrNull(service, nameof(service));
             lock (syncRoot)
             {
                 service = AliasToService(service);
@@ -242,7 +242,7 @@ namespace CatLib
         /// <returns>是否已经静态化</returns>
         public bool HasInstance(string service)
         {
-            Guard.NotEmptyOrNull(service, "service");
+            Guard.NotEmptyOrNull(service, nameof(service));
             lock (syncRoot)
             {
                 service = AliasToService(service);
@@ -257,7 +257,7 @@ namespace CatLib
         /// <returns>是否已经被解决过</returns>
         public bool IsResolved(string service)
         {
-            Guard.NotEmptyOrNull(service, "service");
+            Guard.NotEmptyOrNull(service, nameof(service));
             lock (syncRoot)
             {
                 service = AliasToService(service);
@@ -272,7 +272,7 @@ namespace CatLib
         /// <returns>是否可以生成服务</returns>
         public bool CanMake(string service)
         {
-            Guard.NotEmptyOrNull(service, "service");
+            Guard.NotEmptyOrNull(service, nameof(service));
             lock (syncRoot)
             {
                 service = AliasToService(service);
@@ -319,8 +319,8 @@ namespace CatLib
         /// <exception cref="ArgumentNullException"><paramref name="alias"/>,<paramref name="service"/>为<c>null</c>或者空字符串</exception>
         public IContainer Alias(string alias, string service)
         {
-            Guard.NotEmptyOrNull(alias, "alias");
-            Guard.NotEmptyOrNull(service, "service");
+            Guard.NotEmptyOrNull(alias, nameof(alias));
+            Guard.NotEmptyOrNull(service, nameof(service));
 
             if (alias == service)
             {
@@ -340,7 +340,8 @@ namespace CatLib
 
                 if (!binds.ContainsKey(service) && !instances.ContainsKey(service))
                 {
-                    throw new CodeStandardException("You must Bind() or Instance() serivce before you can call Alias().");
+                    throw new CodeStandardException(
+                        $"You must {nameof(Bind)}() or {nameof(Instance)}() serivce before you can call {nameof(Alias)}().");
                 }
 
                 aliases.Add(alias, service);
@@ -404,7 +405,7 @@ namespace CatLib
         /// <exception cref="ArgumentNullException"><paramref name="concrete"/>为<c>null</c>或者空字符串</exception>
         public IBindData Bind(string service, Type concrete, bool isStatic)
         {
-            Guard.NotNull(concrete, "concrete");
+            Guard.NotNull(concrete, nameof(concrete));
             if (IsUnableType(concrete))
             {
                 throw new RuntimeException($"Bind type [{concrete}] can not built");
@@ -423,8 +424,8 @@ namespace CatLib
         /// <exception cref="ArgumentNullException"><paramref name="concrete"/>为<c>null</c></exception>
         public IBindData Bind(string service, Func<IContainer, object[], object> concrete, bool isStatic)
         {
-            Guard.NotEmptyOrNull(service, "service");
-            Guard.NotNull(concrete, "concrete");
+            Guard.NotEmptyOrNull(service, nameof(service));
+            Guard.NotNull(concrete, nameof(concrete));
             GuardServiceName(service);
 
             service = FormatService(service);
@@ -578,7 +579,7 @@ namespace CatLib
         /// <returns>被修饰器处理后的新的实例</returns>
         public object Instance(string service, object instance)
         {
-            Guard.NotEmptyOrNull(service, "service");
+            Guard.NotEmptyOrNull(service, nameof(service));
 
             lock (syncRoot)
             {
@@ -640,7 +641,7 @@ namespace CatLib
         /// <param name="service">服务名或别名</param>
         public bool Release(string service)
         {
-            Guard.NotEmptyOrNull(service, "service");
+            Guard.NotEmptyOrNull(service, nameof(service));
             lock (syncRoot)
             {
                 service = AliasToService(service);
@@ -679,7 +680,7 @@ namespace CatLib
         /// <returns>当前容器实例</returns>
         public IContainer OnFindType(Func<string, Type> finder, int priority = int.MaxValue)
         {
-            Guard.NotNull(finder, "finder");
+            Guard.NotNull(finder, nameof(finder));
             lock (syncRoot)
             {
                 GuardFlushing();
@@ -695,7 +696,7 @@ namespace CatLib
         /// <returns>当前容器实例</returns>
         public IContainer OnRelease(Action<IBindData, object> callback)
         {
-            Guard.NotNull(callback, "callback");
+            Guard.NotNull(callback, nameof(callback));
             lock (syncRoot)
             {
                 GuardFlushing();
@@ -711,7 +712,7 @@ namespace CatLib
         /// <returns>当前容器对象</returns>
         public IContainer OnResolving(Func<IBindData, object, object> callback)
         {
-            Guard.NotNull(callback, "callback");
+            Guard.NotNull(callback, nameof(callback));
             lock (syncRoot)
             {
                 GuardFlushing();
@@ -728,7 +729,7 @@ namespace CatLib
         /// <returns>服务容器</returns>
         public IContainer OnRebound(string service, Action<object> callback)
         {
-            Guard.NotNull(callback, "callback");
+            Guard.NotNull(callback, nameof(callback));
             lock (syncRoot)
             {
                 GuardFlushing();
@@ -736,7 +737,8 @@ namespace CatLib
 
                 if (!IsResolved(service) && !CanMake(service))
                 {
-                    throw new CodeStandardException("Must be monitored if the service can be make, Please bind or instance first.");
+                    throw new CodeStandardException(
+                        $"Must be monitored if the service can be make, Please {nameof(Bind)} or {nameof(Instance)} first.");
                 }
 
                 if (!rebound.TryGetValue(service, out List<Action<object>> list))
@@ -880,7 +882,8 @@ namespace CatLib
                             // 所以我们抛出一个异常来终止该操作。
                             if (HasBind(service.Key))
                             {
-                                throw new RuntimeException($"Flash service [{service.Key}] name has be used for bind or alias.");
+                                throw new RuntimeException(
+                                    $"Flash service [{service.Key}] name has be used for {nameof(Bind)} or {nameof(Alias)}.");
                             }
                         }
                         catch
@@ -1176,7 +1179,7 @@ namespace CatLib
         /// <returns>推测的服务</returns>
         protected virtual object SpeculationServiceByParamName(Bindable makeServiceBindData, string paramName, Type paramType)
         {
-            var service = makeServiceBindData.GetContextual("@" + paramName);
+            var service = makeServiceBindData.GetContextual($"@{paramName}");
 
             if (!CanMake(service))
             {
@@ -1206,8 +1209,8 @@ namespace CatLib
         /// <returns>运行时异常</returns>
         protected virtual UnresolvableException MakeBuildFaildException(string makeService, Type makeServiceType, Exception innerException)
         {
-            var message = makeServiceType != null 
-                ? $"Class [{makeServiceType}] build faild. Service is [{makeService}]." 
+            var message = makeServiceType != null
+                ? $"Class [{makeServiceType}] build faild. Service is [{makeService}]."
                 : $"Service [{makeService}] is not exists.";
 
             message += GetBuildStackDebugMessage();
@@ -1566,7 +1569,8 @@ namespace CatLib
             {
                 if (service.IndexOf(c) >= 0)
                 {
-                    throw new CodeStandardException($"Service name {service} contains disabled characters : {c}. please use Alias replacement");
+                    throw new CodeStandardException(
+                        $"Service name {service} contains disabled characters : {c}. please use Alias replacement");
                 }
             }
         }
@@ -1577,7 +1581,7 @@ namespace CatLib
         /// <param name="method">函数名</param>
         protected virtual void GuardMethodName(string method)
         {
-            
+
         }
 
         /// <summary>
@@ -1727,7 +1731,7 @@ namespace CatLib
         private object Resolve(string service, params object[] userParams)
         {
             GuardConstruct(nameof(Make));
-            Guard.NotEmptyOrNull(service, "service");
+            Guard.NotEmptyOrNull(service, nameof(service));
             lock (syncRoot)
             {
                 service = AliasToService(service);

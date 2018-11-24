@@ -30,11 +30,12 @@ namespace CatLib
             var result = 0;
             for (var i = 2; i < int.MaxValue; i = i << 1)
             {
-                if (i >= min)
+                if (i < min)
                 {
-                    result = i;
-                    break;
+                    continue;
                 }
+                result = i;
+                break;
             }
 
             return result;

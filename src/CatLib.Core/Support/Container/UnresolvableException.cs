@@ -22,7 +22,7 @@ namespace CatLib
         /// <summary>
         /// 未能解决异常
         /// </summary>
-        public UnresolvableException() : base()
+        public UnresolvableException()
         {
 
         }

@@ -85,7 +85,7 @@ namespace CatLib
                 }
                 if (contextual.ContainsKey(needs))
                 {
-                    throw new RuntimeException("Needs [" + needs + "] is already exist.");
+                    throw new RuntimeException($"Needs [{needs}] is already exist.");
                 }
                 contextual.Add(needs, given);
             }
@@ -149,7 +149,7 @@ namespace CatLib
         /// <returns>绑定关系临时数据</returns>
         public IGivenData<TReturn> Needs(string service)
         {
-            Guard.NotEmptyOrNull(service, "service");
+            Guard.NotEmptyOrNull(service, nameof(service));
             lock (SyncRoot)
             {
                 GuardIsDestroy();

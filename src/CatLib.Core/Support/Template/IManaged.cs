@@ -35,7 +35,7 @@ namespace CatLib
         /// 释放指定扩展的构建器
         /// </summary>
         /// <param name="name">扩展名</param>
-        [Obsolete("Please use RemoveExtend();")]
+        [Obsolete("Please use " + nameof(RemoveExtend) + "();")]
         void ReleaseExtend(string name = null);
 
         /// <summary>

@@ -49,10 +49,7 @@ namespace CatLib
                 AssertDisabled();
                 return position;
             }
-            set
-            {
-                Seek(value, SeekOrigin.Begin);
-            }
+            set => Seek(value, SeekOrigin.Begin);
         }
 
         /// <summary>
@@ -70,34 +67,22 @@ namespace CatLib
         /// <summary>
         /// 是否是可以写入数据的
         /// </summary>
-        public override bool CanWrite
-        {
-            get { return !Disposed && writable; }
-        }
+        public override bool CanWrite => !Disposed && writable;
 
         /// <summary>
         /// 是否可以进行游标偏移
         /// </summary>
-        public override bool CanSeek
-        {
-            get { return !Disposed; }
-        }
+        public override bool CanSeek => !Disposed;
 
         /// <summary>
         /// 是否可以读取数据
         /// </summary>
-        public override bool CanRead
-        {
-            get { return !Disposed; }
-        }
+        public override bool CanRead => !Disposed;
 
         /// <summary>
         /// 是否已经被释放
         /// </summary>
-        protected bool Disposed
-        {
-            get { return disabled || storage.Disabled; }
-        }
+        protected bool Disposed => disabled || storage.Disabled;
 
         /// <summary>
         /// 存储数据流
@@ -111,7 +96,7 @@ namespace CatLib
 
             if (storage.Disabled)
             {
-                throw new ObjectDisposedException("storage", "Storage is disposed");
+                throw new ObjectDisposedException(nameof(storage), $"Storage is {storage.Disabled}");
             }
 
             this.storage = storage;
@@ -173,17 +158,17 @@ namespace CatLib
                         break;
                     }
                 default:
-                    throw new ArgumentException("Unknow SeekOrigin");
+                    throw new ArgumentException($"Unknow {nameof(SeekOrigin)}:{origin}");
             }
 
             if (tempPosition < 0)
             {
-                throw new IOException("seek position less than 0");
+                throw new IOException($"Seek {position} less than 0");
             }
 
             if (tempPosition > Length)
             {
-                throw new IOException("seek position is large then length(" + Length + ")");
+                throw new IOException($"Seek {position} is large then length : {Length}");
             }
 
             position = tempPosition;
@@ -285,7 +270,7 @@ namespace CatLib
         {
             if (Disposed)
             {
-                throw new ObjectDisposedException(null, "[" + GetType() + "] Stream is closed.");
+                throw new ObjectDisposedException(null, $"[{GetType()}] Stream is closed.");
             }
         }
 

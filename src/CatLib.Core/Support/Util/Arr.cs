@@ -256,7 +256,7 @@ namespace CatLib
             Guard.Requires<ArgumentOutOfRangeException>(start >= 0);
             Guard.Requires<ArgumentOutOfRangeException>(length > 0);
             var count = start + length;
-            var requested = new T[source == null ? count : source.Length + count];
+            var requested = new T[source?.Length + count ?? count];
 
             if (start > 0 && source != null)
             {
@@ -413,7 +413,7 @@ namespace CatLib
             {
                 requested = callback.Invoke(requested, segments);
             }
-            return requested == null ? null : requested.ToString();
+            return requested?.ToString();
         }
 
         /// <summary>

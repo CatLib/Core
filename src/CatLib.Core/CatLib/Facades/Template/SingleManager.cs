@@ -37,9 +37,6 @@ namespace CatLib.Facades.Template
         /// <summary>
         /// 默认的扩展实现
         /// </summary>
-        public static TExtend Default
-        {
-            get { return Instance.Default; }
-        }
+        public static TExtend Default => Instance.Default;
     }
 }

@@ -89,7 +89,7 @@ namespace CatLib.Tests
         }
 
         [TestMethod]
-        [ExpectedException(typeof(RuntimeException))]
+        [ExpectedException(typeof(CodeStandardException))]
         public void RepeatInitTest()
         {
             var app = MakeApplication();
@@ -196,7 +196,7 @@ namespace CatLib.Tests
         }
 
         [TestMethod]
-        [ExpectedException(typeof(RuntimeException))]
+        [ExpectedException(typeof(CodeStandardException))]
         public void TestInitingRegisterProvider()
         {
             var application = Application.New();
@@ -210,7 +210,7 @@ namespace CatLib.Tests
         }
 
         [TestMethod]
-        [ExpectedException(typeof(RuntimeException))]
+        [ExpectedException(typeof(CodeStandardException))]
         public void TestTerminateRegisterProvider()
         {
             var application = Application.New();
@@ -296,7 +296,7 @@ namespace CatLib.Tests
         /// 重复的引导测试
         /// </summary>
         [TestMethod]
-        [ExpectedException(typeof(RuntimeException))]
+        [ExpectedException(typeof(CodeStandardException))]
         public void RepeatBootstrap()
         {
             var app = new Application();

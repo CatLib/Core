@@ -31,8 +31,8 @@ namespace CatLib.Facades.Template
         /// </summary>
         public static event Action<TExtend> OnRelease
         {
-            add { Instance.OnRelease += value; }
-            remove { Instance.OnRelease -= value; }
+            add => Instance.OnRelease += value;
+            remove => Instance.OnRelease -= value;
         }
 
         /// <summary>

@@ -51,7 +51,7 @@ namespace CatLib
 
             if (extendBuilder.ContainsKey(name))
             {
-                throw new RuntimeException("Extend [" + name + "](" + GetType() + ") is already exists.");
+                throw new RuntimeException($"Extend [{name}]({GetType()}) is already exists.");
             }
 
             extendBuilder.Add(name, builder);
@@ -61,7 +61,7 @@ namespace CatLib
         /// 释放指定扩展的构建器
         /// </summary>
         /// <param name="name">扩展名</param>
-        [Obsolete("Please use RemoveExtend();")]
+        [Obsolete("Please use " + nameof(RemoveExtend) + "();")]
         public void ReleaseExtend(string name = null)
         {
             RemoveExtend(name);
@@ -102,10 +102,7 @@ namespace CatLib
         {
             var extend = GetExtend(name)();
 
-            if (OnResolving != null)
-            {
-                OnResolving(extend);
-            }
+            OnResolving?.Invoke(extend);
 
             return extend;
         }
@@ -140,10 +137,9 @@ namespace CatLib
         {
             StandardName(ref name);
 
-            Func<TInterface> result;
-            if (!extendBuilder.TryGetValue(name, out result))
+            if (!extendBuilder.TryGetValue(name, out Func<TInterface> result))
             {
-                throw new RuntimeException("Can not find [" + name + "](" + GetType() + ") Extend.");
+                throw new RuntimeException($"Can not find [{name}]({GetType()}) Extend.");
             }
 
             return result;

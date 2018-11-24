@@ -191,7 +191,7 @@ namespace CatLib
 
             if (bootstrapped || Process != StartProcess.Construct)
             {
-                throw new RuntimeException("Cannot repeatedly trigger the Bootstrap()");
+                throw new CodeStandardException($"Cannot repeatedly trigger the {nameof(Bootstrap)}()");
             }
 
             Process = StartProcess.Bootstrap;
@@ -204,7 +204,7 @@ namespace CatLib
             {
                 if (bootstrap != null)
                 {
-                    sorting.Add(bootstrap, GetPriority(bootstrap.GetType(), "Bootstrap"));
+                    sorting.Add(bootstrap, GetPriority(bootstrap.GetType(), nameof(IBootstrap.Bootstrap)));
                 }
             }
 
@@ -238,12 +238,12 @@ namespace CatLib
         {
             if (!bootstrapped)
             {
-                throw new RuntimeException("You must call Bootstrap() first.");
+                throw new CodeStandardException($"You must call {nameof(Bootstrap)}() first.");
             }
 
             if (inited || Process != StartProcess.Bootstraped)
             {
-                throw new RuntimeException("Cannot repeatedly trigger the Init()");
+                throw new CodeStandardException($"Cannot repeatedly trigger the {nameof(Init)}()");
             }
 
             Process = StartProcess.Init;
@@ -284,17 +284,17 @@ namespace CatLib
 
             if (IsRegisted(provider))
             {
-                throw new RuntimeException("Provider [" + provider.GetType() + "] is already register.");
+                throw new RuntimeException($"Provider [{provider.GetType()}] is already register.");
             }
 
             if (Process == StartProcess.Initing)
             {
-                throw new RuntimeException("Unable to add service provider during StartProcess.Initing");
+                throw new CodeStandardException($"Unable to add service provider during {nameof(StartProcess.Initing)}");
             }
 
             if (Process > StartProcess.Running)
             {
-                throw new RuntimeException("Unable to Terminate in-process registration service provider");
+                throw new CodeStandardException($"Unable to {nameof(Terminate)} in-process registration service provider");
             }
 
             var allow = TriggerHalt(ApplicationEvents.OnRegisterProvider, provider) == null;
@@ -312,7 +312,7 @@ namespace CatLib
             {
                 registering = false;
             }
-            serviceProviders.Add(provider, GetPriority(provider.GetType(), "Init"));
+            serviceProviders.Add(provider, GetPriority(provider.GetType(), nameof(IServiceProvider.Init)));
             serviceProviderTypes.Add(GetProviderBaseType(provider));
 
             if (inited)
@@ -485,8 +485,7 @@ namespace CatLib
             if (registering)
             {
                 throw new CodeStandardException(
-                    "It is not allowed to make services or dependency injection in the registration process, method:" +
-                    method);
+                    $"It is not allowed to make services or dependency injection in the registration process, method:{method}");
             }
             base.GuardConstruct(method);
         }
@@ -515,7 +514,10 @@ namespace CatLib
         private void RegisterCoreService()
         {
             var bindable = new BindData(this, null, null, false);
-            this.Singleton<GlobalDispatcher>((_, __) => new GlobalDispatcher((paramInfos, userParams) => GetDependencies(bindable, paramInfos, userParams))).Alias<IDispatcher>();
+            this.Singleton<GlobalDispatcher>(
+                    (_, __) => new GlobalDispatcher(
+                        (paramInfos, userParams) => GetDependencies(bindable, paramInfos, userParams)))
+                .Alias<IDispatcher>();
         }
 
         /// <summary>

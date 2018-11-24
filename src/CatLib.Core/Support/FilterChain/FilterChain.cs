@@ -28,13 +28,7 @@ namespace CatLib
         /// <summary>
         /// 过滤器列表
         /// </summary>
-        public Action<TIn, Action<TIn>>[] FilterList
-        {
-            get
-            {
-                return filterList.ToArray();
-            }
-        }
+        public Action<TIn, Action<TIn>>[] FilterList => filterList.ToArray();
 
         /// <summary>
         /// 堆栈 用于解决内部递归调用过滤器链所出现的问题
@@ -71,10 +65,7 @@ namespace CatLib
         {
             if (filterList.Count <= 0)
             {
-                if (then != null)
-                {
-                    then.Invoke(inData);
-                }
+                then?.Invoke(inData);
                 return;
             }
 
@@ -96,10 +87,7 @@ namespace CatLib
                 stack.Push(++index);
                 if (index >= filterList.Count)
                 {
-                    if (then != null)
-                    {
-                        then.Invoke(inData);
-                    }
+                    then?.Invoke(inData);
                     return;
                 }
                 filterList[index].Invoke(inData, Next(then));
@@ -122,13 +110,7 @@ namespace CatLib
         /// <summary>
         /// 过滤器列表
         /// </summary>
-        public Action<TIn, TOut, Action<TIn, TOut>>[] FilterList
-        {
-            get
-            {
-                return filterList.ToArray();
-            }
-        }
+        public Action<TIn, TOut, Action<TIn, TOut>>[] FilterList => filterList.ToArray();
 
         /// <summary>
         /// 堆栈 用于解决内部递归调用过滤器链所出现的问题
@@ -166,10 +148,7 @@ namespace CatLib
         {
             if (filterList.Count <= 0)
             {
-                if (then != null)
-                {
-                    then.Invoke(inData, outData);
-                }
+                then?.Invoke(inData, outData);
                 return;
             }
 
@@ -191,10 +170,7 @@ namespace CatLib
                 stack.Push(++index);
                 if (index >= filterList.Count)
                 {
-                    if (then != null)
-                    {
-                        then.Invoke(inData, outData);
-                    }
+                    then?.Invoke(inData, outData);
                     return;
                 }
                 filterList[index].Invoke(inData, outData, Next(then));
@@ -218,13 +194,7 @@ namespace CatLib
         /// <summary>
         /// 过滤器列表
         /// </summary>
-        public Action<TIn, TOut, TException, Action<TIn, TOut, TException>>[] FilterList
-        {
-            get
-            {
-                return filterList.ToArray();
-            }
-        }
+        public Action<TIn, TOut, TException, Action<TIn, TOut, TException>>[] FilterList => filterList.ToArray();
 
         /// <summary>
         /// 堆栈 用于解决内部递归调用过滤器链所出现的问题
@@ -263,10 +233,7 @@ namespace CatLib
         {
             if (filterList.Count <= 0)
             {
-                if (then != null)
-                {
-                    then.Invoke(inData, outData, exception);
-                }
+                then?.Invoke(inData, outData, exception);
                 return;
             }
 
@@ -288,10 +255,7 @@ namespace CatLib
                 stack.Push(++index);
                 if (index >= filterList.Count)
                 {
-                    if (then != null)
-                    {
-                        then.Invoke(inData, outData, exception);
-                    }
+                    then?.Invoke(inData, outData, exception);
                     return;
                 }
                 filterList[index].Invoke(inData, outData, exception, Next(then));

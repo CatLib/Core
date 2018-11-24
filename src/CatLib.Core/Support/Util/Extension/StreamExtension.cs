@@ -66,9 +66,9 @@ namespace CatLib
             try
             {
                 encoding = encoding ?? Util.Encoding;
-                if (source is MemoryStream)
+                var memoryStream = source as MemoryStream;
+                if (memoryStream != null)
                 {
-                    var memoryStream = (MemoryStream) source;
                     byte[] buffer;
                     try
                     {
@@ -79,7 +79,7 @@ namespace CatLib
                         buffer = memoryStream.ToArray();
                     }
 
-                    return encoding.GetString(buffer, 0, (int) memoryStream.Length);
+                    return encoding.GetString(buffer, 0, (int)memoryStream.Length);
                 }
 
                 var length = 0;

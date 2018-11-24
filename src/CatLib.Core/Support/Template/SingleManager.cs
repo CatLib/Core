@@ -29,25 +29,13 @@ namespace CatLib
         /// <summary>
         /// 默认的扩展实现
         /// </summary>
-        public TInterface Default
-        {
-            get
-            {
-                return this[null];
-            }
-        }
+        public TInterface Default => this[null];
 
         /// <summary>
         /// 获取指定的扩展实现
         /// </summary>
         /// <param name="name">扩展名</param>
         /// <returns>扩展实现</returns>
-        public TInterface this[string name]
-        {
-            get
-            {
-                return Get(name);
-            }
-        }
+        public TInterface this[string name] => Get(name);
     }
 }

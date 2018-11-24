@@ -58,8 +58,8 @@ namespace CatLib
             for (var i = pattern.Length - 1; i >= 0; i--)
             {
                 var segment = pattern[i];
-                if ((segment >= 'A' && segment <= 'Z') 
-                    || (segment >= 'a' && segment <= 'z') 
+                if ((segment >= 'A' && segment <= 'Z')
+                    || (segment >= 'a' && segment <= 'z')
                     || (segment >= '0' && segment <= '9')
                     || segment == '_')
                 {
@@ -303,13 +303,8 @@ namespace CatLib
             Guard.Requires<ArgumentNullException>(str != null);
             Guard.Requires<ArgumentNullException>(search != null);
 
-            var index = str.IndexOf(search);
-            if (index < 0)
-            {
-                return str;
-            }
-
-            return str.Substring(index + search.Length, str.Length - index - search.Length);
+            var index = str.IndexOf(search, StringComparison.Ordinal);
+            return index < 0 ? str : str.Substring(index + search.Length, str.Length - index - search.Length);
         }
 
         /// <summary>

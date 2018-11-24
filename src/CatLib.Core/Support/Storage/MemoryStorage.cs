@@ -68,12 +68,12 @@ namespace CatLib
         /// <summary>
         /// 当前存储最大内存使用量
         /// </summary>
-        public long MaxMemoryUsable { get; private set; }
+        public long MaxMemoryUsable { get; }
 
         /// <summary>
         /// 单个内存块的大小
         /// </summary>
-        public int BlockSize { get; private set; }
+        public int BlockSize { get; }
 
         /// <summary>
         /// 数据长度
@@ -364,7 +364,7 @@ namespace CatLib
                 return;
             }
 
-            var minBlockCount = (int) ((value / BlockSize) + ((value % BlockSize) == 0 ? 0 : 1));
+            var minBlockCount = (int)((value / BlockSize) + ((value % BlockSize) == 0 ? 0 : 1));
             if (storage.Length >= minBlockCount)
             {
                 return;
@@ -412,11 +412,13 @@ namespace CatLib
             var result = 8192;
             for (var i = 2; i < int.MaxValue; i = i << 1)
             {
-                if (i >= min)
+                if (i < min)
                 {
-                    result = i;
-                    break;
+                    continue;
                 }
+
+                result = i;
+                break;
             }
 
             return result;
@@ -429,7 +431,7 @@ namespace CatLib
         {
             if (Disabled)
             {
-                throw new ObjectDisposedException(null, "[" + GetType() + "] Stream is closed.");
+                throw new ObjectDisposedException(null, $"[{GetType()}] Stream is closed.");
             }
         }
 
@@ -439,20 +441,22 @@ namespace CatLib
         /// <param name="value">内存占用</param>
         private void AssertMemoryUseable(long value)
         {
-            if (value > MaxMemoryUsable)
+            if (value <= MaxMemoryUsable)
             {
-                if (MaxMemoryUsable >= 1048576)
-                {
-                    throw new OutOfMemoryException("Memory exceeds usage limit " + (MaxMemoryUsable / 1048576) + " MB");
-                }
-
-                if (MaxMemoryUsable >= 1024)
-                {
-                    throw new OutOfMemoryException("Memory exceeds usage limit " + (MaxMemoryUsable / 1024) + " KB");
-                }
-
-                throw new OutOfMemoryException("Memory exceeds usage limit " + MaxMemoryUsable + " bit");
+                return;
             }
+
+            if (MaxMemoryUsable >= 1048576)
+            {
+                throw new OutOfMemoryException($"Memory exceeds usage limit {MaxMemoryUsable / 1048576} MB");
+            }
+
+            if (MaxMemoryUsable >= 1024)
+            {
+                throw new OutOfMemoryException($"Memory exceeds usage limit {MaxMemoryUsable / 1024} KB");
+            }
+
+            throw new OutOfMemoryException($"Memory exceeds usage limit {MaxMemoryUsable} bit");
         }
     }
 }

@@ -22,7 +22,7 @@ namespace CatLib
         /// <summary>
         /// 代码规范异常
         /// </summary>
-        public CodeStandardException() : base()
+        public CodeStandardException()
         {
 
         }
