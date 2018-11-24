@@ -141,8 +141,11 @@ namespace CatLib.Core.Tests.Support.Container
         public void TestContainerMethodContextual()
         {
             new Application();
-            App.Instance("@input", 1000);
-            App.Instance("@input2", 2000);
+
+            App.Instance("input", 1000);
+            App.Alias("@input", "input");
+            App.Instance("input2", 2000);
+            App.Alias("@input2", "input2");
 
             var cls = new TestContainerClass();
             App.BindMethod("Helloworld.Func1", cls).Needs("@input").Given("@input2");

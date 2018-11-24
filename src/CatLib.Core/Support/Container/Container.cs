@@ -123,6 +123,11 @@ namespace CatLib
         private int instanceId;
 
         /// <summary>
+        /// 服务禁用字符
+        /// </summary>
+        private static readonly char[] ServiceBanChars = {'@', ':'};
+
+        /// <summary>
         /// 构造一个容器
         /// </summary>
         /// <param name="prime">初始预计服务数量</param>
@@ -191,7 +196,7 @@ namespace CatLib
             {
                 if (!tags.TryGetValue(tag, out List<string> services))
                 {
-                    throw new RuntimeException("Tag [" + tag + "] is not exist.");
+                    throw new RuntimeException($"Tag [{tag}] is not exist.");
                 }
 
                 var result = new object[services.Count];
@@ -319,7 +324,7 @@ namespace CatLib
 
             if (alias == service)
             {
-                throw new RuntimeException("Alias is Same as Service Name: [" + alias + "].");
+                throw new RuntimeException($"Alias is same as service name: [{alias}].");
             }
 
             alias = FormatService(alias);
@@ -330,7 +335,7 @@ namespace CatLib
                 GuardFlushing();
                 if (aliases.ContainsKey(alias))
                 {
-                    throw new RuntimeException("Alias [" + alias + "] is already exists.");
+                    throw new RuntimeException($"Alias [{alias}] is already exists.");
                 }
 
                 if (!binds.ContainsKey(service) && !instances.ContainsKey(service))
@@ -402,7 +407,7 @@ namespace CatLib
             Guard.NotNull(concrete, "concrete");
             if (IsUnableType(concrete))
             {
-                throw new RuntimeException("Bind type [" + concrete + "] can not built");
+                throw new RuntimeException($"Bind type [{concrete}] can not built");
             }
             return Bind(service, WrapperTypeBuilder(service, concrete), isStatic);
         }
@@ -420,6 +425,8 @@ namespace CatLib
         {
             Guard.NotEmptyOrNull(service, "service");
             Guard.NotNull(concrete, "concrete");
+            GuardServiceName(service);
+
             service = FormatService(service);
             lock (syncRoot)
             {
@@ -427,17 +434,17 @@ namespace CatLib
 
                 if (binds.ContainsKey(service))
                 {
-                    throw new RuntimeException("Bind [" + service + "] already exists.");
+                    throw new RuntimeException($"Bind [{service}] already exists.");
                 }
 
                 if (instances.ContainsKey(service))
                 {
-                    throw new RuntimeException("Instances [" + service + "] is already exists.");
+                    throw new RuntimeException($"Instances [{service}] is already exists.");
                 }
 
                 if (aliases.ContainsKey(service))
                 {
-                    throw new RuntimeException("Aliase [" + service + "] is already exists.");
+                    throw new RuntimeException($"Aliase [{service}] is already exists.");
                 }
 
                 var bindData = new BindData(this, service, concrete, isStatic);
@@ -473,6 +480,7 @@ namespace CatLib
         public IMethodBind BindMethod(string method, object target, MethodInfo call)
         {
             GuardFlushing();
+            GuardMethodName(method);
             return methodContainer.Bind(method, target, call);
         }
 
@@ -575,6 +583,8 @@ namespace CatLib
             lock (syncRoot)
             {
                 GuardFlushing();
+                GuardServiceName(service);
+
                 service = AliasToService(service);
 
                 var bindData = GetBind(service);
@@ -582,7 +592,7 @@ namespace CatLib
                 {
                     if (!bindData.IsStatic)
                     {
-                        throw new RuntimeException("Service [" + service + "] is not Singleton(Static) Bind.");
+                        throw new RuntimeException($"Service [{service}] is not Singleton(Static) Bind.");
                     }
                     instance = ((BindData)bindData).TriggerResolving(instance);
                 }
@@ -597,8 +607,7 @@ namespace CatLib
                     && instancesReverse.TryGetValue(instance, out string realService)
                     && realService != service)
                 {
-                    throw new CodeStandardException("The instance has been registered as a singleton in " +
-                                                    realService);
+                    throw new CodeStandardException($"The instance has been registered as a singleton in {realService}");
                 }
 
                 var isResolved = IsResolved(service);
@@ -871,8 +880,7 @@ namespace CatLib
                             // 所以我们抛出一个异常来终止该操作。
                             if (HasBind(service.Key))
                             {
-                                throw new RuntimeException("Flash service [" + service.Key +
-                                                           "] name has be used for bind or alias.");
+                                throw new RuntimeException($"Flash service [{service.Key}] name has be used for bind or alias.");
                             }
                         }
                         catch
@@ -1186,7 +1194,7 @@ namespace CatLib
         protected virtual string GetBuildStackDebugMessage()
         {
             var previous = string.Join(", ", BuildStack.ToArray());
-            return " While building stack [" + previous + "].";
+            return $" While building stack [{previous}].";
         }
 
         /// <summary>
@@ -1198,15 +1206,9 @@ namespace CatLib
         /// <returns>运行时异常</returns>
         protected virtual UnresolvableException MakeBuildFaildException(string makeService, Type makeServiceType, Exception innerException)
         {
-            string message;
-            if (makeServiceType != null)
-            {
-                message = "Class [" + makeServiceType + "] build faild. Service is [" + makeService + "].";
-            }
-            else
-            {
-                message = "Service [" + makeService + "] is not exists.";
-            }
+            var message = makeServiceType != null 
+                ? $"Class [{makeServiceType}] build faild. Service is [{makeService}]." 
+                : $"Service [{makeService}] is not exists.";
 
             message += GetBuildStackDebugMessage();
             message += GetInnerExceptionMessage(innerException);
@@ -1234,7 +1236,7 @@ namespace CatLib
                 }
                 stack.Append(innerException);
             } while ((innerException = innerException.InnerException) != null);
-            return " InnerException message stack: [" + stack + "]";
+            return $" InnerException message stack: [{stack}]";
         }
 
         /// <summary>
@@ -1245,8 +1247,8 @@ namespace CatLib
         /// <returns>运行时异常</returns>
         protected virtual UnresolvableException MakeUnresolvablePrimitiveException(string name, Type declaringClass)
         {
-            var message = "Unresolvable primitive dependency , resolving [" + name + "] in class [" + declaringClass + "]";
-            return new UnresolvableException(message);
+            return new UnresolvableException(
+                $"Unresolvable primitive dependency , resolving [{name}] in class [{declaringClass}]");
         }
 
         /// <summary>
@@ -1256,7 +1258,7 @@ namespace CatLib
         /// <returns>运行时异常</returns>
         protected virtual RuntimeException MakeCircularDependencyException(string service)
         {
-            var message = "Circular dependency detected while for [" + service + "].";
+            var message = $"Circular dependency detected while for [{service}].";
             message += GetBuildStackDebugMessage();
             return new RuntimeException(message);
         }
@@ -1368,7 +1370,8 @@ namespace CatLib
 
                 if (!CanInject(property.PropertyType, instance))
                 {
-                    throw new UnresolvableException("[" + makeServiceBindData.Service + "] Attr inject type must be [" + property.PropertyType + "] , But instance is [" + instance.GetType() + "] , Make service is [" + needService + "].");
+                    throw new UnresolvableException(
+                        $"[{makeServiceBindData.Service}] Attr inject type must be [{property.PropertyType}] , But instance is [{instance.GetType()}] , Make service is [{needService}].");
                 }
 
                 property.SetValue(makeServiceInstance, instance, null);
@@ -1490,15 +1493,15 @@ namespace CatLib
                 // 对筛选到的参数进行注入检查
                 if (!CanInject(baseParam.ParameterType, param))
                 {
-                    var error = "[" + makeServiceBindData.Service + "] Params inject type must be [" +
-                                baseParam.ParameterType + "] , But instance is [" + param.GetType() + "]";
+                    var error =
+                        $"[{makeServiceBindData.Service}] Params inject type must be [{baseParam.ParameterType}] , But instance is [{param.GetType()}]";
                     if (needService == null)
                     {
                         error += " Inject params from user incoming parameters.";
                     }
                     else
                     {
-                        error += " Make service is [" + needService + "].";
+                        error += $" Make service is [{needService}].";
                     }
 
                     throw new UnresolvableException(error);
@@ -1554,13 +1557,37 @@ namespace CatLib
         }
 
         /// <summary>
+        /// 验证服务名有效性
+        /// </summary>
+        /// <param name="service">服务名</param>
+        protected virtual void GuardServiceName(string service)
+        {
+            foreach (var c in ServiceBanChars)
+            {
+                if (service.IndexOf(c) >= 0)
+                {
+                    throw new CodeStandardException($"Service name {service} contains disabled characters : {c}. please use Alias replacement");
+                }
+            }
+        }
+
+        /// <summary>
+        /// 验证函数名有效性
+        /// </summary>
+        /// <param name="method">函数名</param>
+        protected virtual void GuardMethodName(string method)
+        {
+            
+        }
+
+        /// <summary>
         /// 验证重置状态
         /// </summary>
         private void GuardFlushing()
         {
             if (flushing)
             {
-                throw new RuntimeException("Container is flushing can not ");
+                throw new RuntimeException("Container is flushing can not do it");
             }
         }
 
