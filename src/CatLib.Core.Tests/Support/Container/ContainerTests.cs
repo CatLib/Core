@@ -2200,6 +2200,58 @@ namespace CatLib.Tests.Stl
             Assert.AreEqual(true, isCall);
         }
 
+        [TestMethod]
+        [ExpectedException(typeof(CodeStandardException))]
+        public void TestNotSupportBindChars()
+        {
+            var container = new Container();
+            container.Bind("@", (_, __) => 123);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(CodeStandardException))]
+        public void TestNotSupportInstanceChars()
+        {
+            var container = new Container();
+            container.Instance("char:char", 123);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(CodeStandardException))]
+        public void TestRegisterSameObjectInstance()
+        {
+            var container = new Container();
+            var data = new object();
+            container.Instance("char1", data);
+            container.Instance("char2", data);
+        }
+
+        [TestMethod]
+        public void TestRegisterNotSameObjectInstance()
+        {
+            var container = new Container();
+            container.Instance("char1", 1);
+            container.Instance("char2", 2);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(CodeStandardException))]
+        public void TestReboundNotExistsService()
+        {
+            var container = new Container();
+            container.OnRebound("123", (_) =>
+            {
+
+            });
+        }
+
+        [TestMethod]
+        public void TestNullUnbind()
+        {
+            var container = new Container();
+            container.Unbind("Not Exists");
+        }
+
         /// <summary>
         /// 测试基础容器调用
         /// </summary>

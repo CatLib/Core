@@ -231,6 +231,7 @@ namespace CatLib
         /// <summary>
         /// 清除当前流的缓冲区
         /// </summary>
+        [ExcludeFromCodeCoverage]
         public override void Flush()
         {
             // 只有存在数据落地或者转移的情况下此函数才有效
@@ -241,6 +242,7 @@ namespace CatLib
         /// 获取线程占用异常
         /// </summary>
         /// <returns>异常</returns>
+        [ExcludeFromCodeCoverage]
         protected IOException GetOccupyException()
         {
             return new IOException("The resource is already occupied by other threads");

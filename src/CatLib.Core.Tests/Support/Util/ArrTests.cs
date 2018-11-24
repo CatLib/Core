@@ -34,6 +34,13 @@ namespace CatLib.Tests.Support.Util
         }
 
         [TestMethod]
+        public void TestMergeAllEmpty()
+        {
+            var newArr = Arr.Merge(new int[0], new int[0]);
+            Assert.AreEqual(0, newArr.Length);
+        }
+
+        [TestMethod]
         public void TestMergeNull()
         {
             var arr1 = new[] { "1", "2" };
