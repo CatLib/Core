@@ -57,7 +57,7 @@ namespace CatLib.Core
         /// <summary>
         /// 构建一个包装流
         /// </summary>
-        /// <param name="stream"></param>
+        /// <param name="stream">基础流</param>
         public WrapperStream(Stream stream)
         {
             Guard.Requires<ArgumentNullException>(stream != null);
