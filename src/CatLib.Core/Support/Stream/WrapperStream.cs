@@ -57,6 +57,14 @@ namespace CatLib
         /// <summary>
         /// 构建一个包装流
         /// </summary>
+        public WrapperStream()
+        {
+            BaseStream = this;
+        }
+
+        /// <summary>
+        /// 构建一个包装流
+        /// </summary>
         /// <param name="stream">基础流</param>
         public WrapperStream(Stream stream)
         {

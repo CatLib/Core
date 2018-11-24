@@ -17,7 +17,7 @@ namespace CatLib
     /// <summary>
     /// 组合流，允许将多个不同的流组合成一个流
     /// </summary>
-    public class CombineStream : Stream
+    public class CombineStream : WrapperStream
     {
         /// <summary>
         /// 全局游标位置
