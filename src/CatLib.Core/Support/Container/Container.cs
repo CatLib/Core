@@ -340,7 +340,7 @@ namespace CatLib
 
                 if (!binds.ContainsKey(service) && !instances.ContainsKey(service))
                 {
-                    throw new RuntimeException("You must Bind() or Instance() serivce before you can call Alias().");
+                    throw new CodeStandardException("You must Bind() or Instance() serivce before you can call Alias().");
                 }
 
                 aliases.Add(alias, service);
@@ -1587,7 +1587,7 @@ namespace CatLib
         {
             if (flushing)
             {
-                throw new RuntimeException("Container is flushing can not do it");
+                throw new CodeStandardException("Container is flushing can not do it");
             }
         }
 
