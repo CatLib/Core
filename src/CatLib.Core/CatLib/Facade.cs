@@ -60,20 +60,14 @@ namespace CatLib
         /// <summary>
         /// 门面实例
         /// </summary>
-        public static TService Instance
-        {
-            get { return HasInstance ? instance : Resolve(); }
-        }
+        public static TService Instance => HasInstance ? instance : Resolve();
 
         /// <summary>
         /// 是否拥有门面实例
         /// <para>如果为非静态绑定那么永远返回<code>false</code></para>
         /// <para>门面实例判断不能代替:<code>Container.HasInstance</code></para>
         /// </summary>
-        internal static bool HasInstance
-        {
-            get { return binder != null && binder.IsStatic && !released && instance != null; }
-        }
+        internal static bool HasInstance => binder != null && binder.IsStatic && !released && instance != null;
 
         /// <summary>
         /// 构建一个服务实例

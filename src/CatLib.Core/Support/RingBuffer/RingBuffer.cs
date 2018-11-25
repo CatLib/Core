@@ -27,10 +27,7 @@ namespace CatLib
         /// <summary>
         /// 缓冲区容量
         /// </summary>
-        public int Capacity
-        {
-            get { return (int)capacity; }
-        }
+        public int Capacity => (int)capacity;
 
         /// <summary>
         /// 缓冲区大小
@@ -81,18 +78,12 @@ namespace CatLib
         /// <summary>
         /// 可写容量
         /// </summary>
-        public int WriteableCapacity
-        {
-            get { return (int)GetCanWriteSize(); }
-        }
+        public int WriteableCapacity => (int)GetCanWriteSize();
 
         /// <summary>
         /// 可读容量
         /// </summary>
-        public int ReadableCapacity
-        {
-            get { return (int)GetCanReadSize(); }
-        }
+        public int ReadableCapacity => (int)GetCanReadSize();
 
         /// <summary>
         /// 构建一个新的环型缓冲区实例

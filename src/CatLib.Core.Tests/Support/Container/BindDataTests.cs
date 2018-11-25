@@ -209,6 +209,21 @@ namespace CatLib.Tests.Stl
             Assert.AreEqual("hello world", data);
         }
 
+        [TestMethod]
+        public void TestAddOnResolvingWithExtendNoneInstance()
+        {
+            var container = new Container();
+            var bindData = new BindData(container, "CanAddOnResolving", (app, param) => "hello world", false);
+            var call = false;
+            bindData.OnResolving(() =>
+            {
+                call = true;
+            });
+            var data = bindData.TriggerResolving("hello world");
+            Assert.AreEqual("hello world", data);
+            Assert.AreEqual(true, call);
+        }
+
         /// <summary>
         /// 是否能追加到解决事件
         /// </summary>

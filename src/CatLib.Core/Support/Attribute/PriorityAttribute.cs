@@ -22,7 +22,7 @@ namespace CatLib
         /// <summary>
         /// 优先级
         /// </summary>
-        public int Priorities { get; private set; }
+        public int Priorities { get; }
 
         /// <summary>
         /// 优先级(0最高)

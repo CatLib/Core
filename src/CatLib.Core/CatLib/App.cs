@@ -37,21 +37,11 @@ namespace CatLib
         /// </summary>
         public static IApplication Handler
         {
-            get
-            {
-                if (instance == null)
-                {
-                    return New();
-                }
-                return instance;
-            }
+            get => instance ?? New();
             set
             {
                 instance = value;
-                if (OnNewApplication != null)
-                {
-                    OnNewApplication.Invoke(instance);
-                }
+                OnNewApplication?.Invoke(instance);
             }
         }
 
@@ -105,24 +95,12 @@ namespace CatLib
         /// <summary>
         /// 是否是主线程
         /// </summary>
-        public static bool IsMainThread
-        {
-            get
-            {
-                return Handler.IsMainThread;
-            }
-        }
+        public static bool IsMainThread => Handler.IsMainThread;
 
         /// <summary>
         /// CatLib版本(遵循semver)
         /// </summary>
-        public static string Version
-        {
-            get
-            {
-                return Handler.Version;
-            }
-        }
+        public static string Version => Handler.Version;
 
         /// <summary>
         /// 比较CatLib版本(遵循semver)
@@ -169,8 +147,8 @@ namespace CatLib
         /// </summary>
         public static DebugLevels DebugLevel
         {
-            get { return Handler.DebugLevel; }
-            set { Handler.DebugLevel = value; }
+            get => Handler.DebugLevel;
+            set => Handler.DebugLevel = value;
         }
         #endregion
 
@@ -748,6 +726,16 @@ namespace CatLib
         public static bool IsAlias<TService>()
         {
             return Handler.IsAlias<TService>();
+        }
+
+        /// <summary>
+        /// 为服务设定一个别名
+        /// </summary>
+        /// <typeparam name="TAlias">别名</typeparam>
+        /// <typeparam name="TService">服务名</typeparam>
+        public static IContainer Alias<TAlias, TService>()
+        {
+            return Handler.Alias(Handler.Type2Service(typeof(TAlias)), Handler.Type2Service(typeof(TService)));
         }
 
         /// <summary>

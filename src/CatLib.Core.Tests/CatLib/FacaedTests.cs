@@ -190,8 +190,6 @@ namespace CatLib.Tests
         public void TestStructBindAndRebound()
         {
             var app = new Application();
-            Assert.AreEqual(0, Facade<int>.Instance);
-            Assert.AreEqual(0, Facade<int>.Instance); // double check
             var makeCount = 0;
             var binder = app.Bind<int>(() =>
             {
@@ -200,7 +198,7 @@ namespace CatLib.Tests
             });
             Assert.AreEqual(100, Facade<int>.Instance);
             Assert.AreEqual(100, Facade<int>.Instance); // double check
-            Assert.AreEqual(3, makeCount); // 这里为3是因为最开始的facade触发已经引发了解决事件
+            Assert.AreEqual(2, makeCount);
             binder.Unbind();
             Assert.AreEqual(0, Facade<int>.Instance);
             Assert.AreEqual(0, Facade<int>.Instance); // double check
@@ -211,7 +209,7 @@ namespace CatLib.Tests
             });
             Assert.AreEqual(200, Facade<int>.Instance);
             Assert.AreEqual(200, Facade<int>.Instance); // double check
-            Assert.AreEqual(6, makeCount);
+            Assert.AreEqual(5, makeCount); // 其中多出的一个计数是门面的watch导致的。
         }
 
         [TestMethod]

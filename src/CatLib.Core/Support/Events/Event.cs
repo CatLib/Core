@@ -21,12 +21,12 @@ namespace CatLib
         /// <summary>
         /// 原始事件名
         /// </summary>
-        public string Name { get; private set; }
+        public string Name { get; }
 
         /// <summary>
         /// 事件根源对象
         /// </summary>
-        public object Group { get; private set; }
+        public object Group { get; }
 
         /// <summary>
         /// 依赖解决器

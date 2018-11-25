@@ -10,6 +10,7 @@
  */
 
 using System;
+using System.Collections.Generic;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace CatLib.Tests.Support.Util
@@ -31,6 +32,13 @@ namespace CatLib.Tests.Support.Util
                 Assert.AreEqual((++i).ToString(), result);
             }
             Assert.AreEqual(3, newArr.Length);
+        }
+
+        [TestMethod]
+        public void TestMergeAllEmpty()
+        {
+            var newArr = Arr.Merge(new int[0], new int[0]);
+            Assert.AreEqual(0, newArr.Length);
         }
 
         [TestMethod]
@@ -374,7 +382,19 @@ namespace CatLib.Tests.Support.Util
         [TestMethod]
         public void TestFilter()
         {
-            var result = Arr.Filter(new[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 0 }, (i) => i % 2 == 0);
+            var result = Arr.Filter(new [] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 0 }, (i) => i % 2 == 0);
+            Assert.AreEqual(2, result[0]);
+            Assert.AreEqual(4, result[1]);
+            Assert.AreEqual(6, result[2]);
+            Assert.AreEqual(8, result[3]);
+            Assert.AreEqual(0, result[4]);
+            Assert.AreEqual(5, result.Length);
+        }
+
+        [TestMethod]
+        public void TestFilterIEnumerable()
+        {
+            var result = Arr.Filter(new List<int> { 1, 2, 3, 4, 5, 6, 7, 8, 9, 0 }, (i) => i % 2 == 0);
             Assert.AreEqual(2, result[0]);
             Assert.AreEqual(4, result[1]);
             Assert.AreEqual(6, result[2]);
@@ -387,6 +407,24 @@ namespace CatLib.Tests.Support.Util
         public void TestMap()
         {
             var data = new[] {1, 2, 3};
+            var result = Arr.Map(data, (i) => i * 2);
+            Assert.AreEqual(2, result[0]);
+            Assert.AreEqual(4, result[1]);
+            Assert.AreEqual(6, result[2]);
+
+            Assert.AreEqual(1, data[0]);
+            Assert.AreEqual(2, data[1]);
+            Assert.AreEqual(3, data[2]);
+        }
+
+        [TestMethod]
+        public void TestMapIEnumerable()
+        {
+            var data = new List<int>
+            {
+                1,2,3
+            };
+
             var result = Arr.Map(data, (i) => i * 2);
             Assert.AreEqual(2, result[0]);
             Assert.AreEqual(4, result[1]);

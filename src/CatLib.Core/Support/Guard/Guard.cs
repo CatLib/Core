@@ -25,7 +25,7 @@ namespace CatLib
         /// <typeparam name="TException">异常</typeparam>
         /// <param name="condition">条件</param>
         [System.Diagnostics.DebuggerNonUserCode]
-        public static void Requires<TException>(bool condition) where TException : Exception , new()
+        public static void Requires<TException>(bool condition) where TException : Exception, new()
         {
             if (condition)
             {
@@ -75,7 +75,7 @@ namespace CatLib
             {
                 if (string.IsNullOrEmpty(val))
                 {
-                    throw new ArgumentNullException(argumentName, "Argument element can not be Empty or Null.");
+                    throw new ArgumentNullException(argumentName, $"Argument element can not be {nameof(string.Empty)} or null.");
                 }
             }
         }

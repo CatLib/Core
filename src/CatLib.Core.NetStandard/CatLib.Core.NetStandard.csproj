@@ -69,6 +69,7 @@
     <Compile Include="..\CatLib.Core\CatLib\Facades\Template\SingleManager.cs" Link="CatLib\Facades\Template\SingleManager.cs" />
     <Compile Include="..\CatLib.Core\CatLib\IApplication.cs" Link="CatLib\IApplication.cs" />
     <Compile Include="..\CatLib.Core\CatLib\IBootstrap.cs" Link="CatLib\IBootstrap.cs" />
+    <Compile Include="..\CatLib.Core\CatLib\ICoroutineInit.cs" Link="CatLib\ICoroutineInit.cs" />
     <Compile Include="..\CatLib.Core\CatLib\IServiceProvider.cs" Link="CatLib\IServiceProvider.cs" />
     <Compile Include="..\CatLib.Core\CatLib\IServiceProviderType.cs" Link="CatLib\IServiceProviderType.cs" />
     <Compile Include="..\CatLib.Core\CatLib\ServiceProvider.cs" Link="CatLib\ServiceProvider.cs" />
@@ -97,6 +98,7 @@
     <Compile Include="..\CatLib.Core\Support\Events\IDispatcher.cs" Link="Support\Events\IDispatcher.cs" />
     <Compile Include="..\CatLib.Core\Support\Events\IEvent.cs" Link="Support\Events\IEvent.cs" />
     <Compile Include="..\CatLib.Core\Support\Exception\AssertException.cs" Link="Support\Exception\AssertException.cs" />
+    <Compile Include="..\CatLib.Core\Support\Exception\CodeStandardException.cs" Link="Support\Exception\CodeStandardException.cs" />
     <Compile Include="..\CatLib.Core\Support\Exception\RuntimeException.cs" Link="Support\Exception\RuntimeException.cs" />
     <Compile Include="..\CatLib.Core\Support\FilterChain\FilterChain.cs" Link="Support\FilterChain\FilterChain.cs" />
     <Compile Include="..\CatLib.Core\Support\FilterChain\IFilterChain.cs" Link="Support\FilterChain\IFilterChain.cs" />

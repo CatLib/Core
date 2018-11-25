@@ -29,7 +29,7 @@ namespace CatLib
         /// <returns>事件对象</returns>
         public static IEvent On(this IDispatcher dispatcher, string eventName, object target, string method = null)
         {
-            Guard.NotEmptyOrNull(eventName, "eventName");
+            Guard.NotEmptyOrNull(eventName, nameof(eventName));
             Guard.Requires<ArgumentException>(method != string.Empty);
             Guard.Requires<ArgumentNullException>(target != null);
 
@@ -49,7 +49,7 @@ namespace CatLib
         /// <returns></returns>
         public static IEvent On(this IDispatcher dispatcher, string eventName, object target, MethodInfo methodInfo, object group = null)
         {
-            Guard.NotEmptyOrNull(eventName, "eventName");
+            Guard.NotEmptyOrNull(eventName, nameof(eventName));
             Guard.Requires<ArgumentNullException>(methodInfo != null);
 
             if (!methodInfo.IsStatic)
@@ -278,9 +278,7 @@ namespace CatLib
         internal static IGlobalDispatcher ToGlobalDispatcher(this IDispatcher dispatcher)
         {
             var originalDispatcher = dispatcher as IOriginalDispatcher;
-            var globalDispatcher = originalDispatcher == null
-                ? null
-                : originalDispatcher.Dispatcher as IGlobalDispatcher;
+            var globalDispatcher = originalDispatcher?.Dispatcher as IGlobalDispatcher;
             if (globalDispatcher != null)
             {
                 return globalDispatcher;

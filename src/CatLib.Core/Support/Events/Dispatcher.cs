@@ -43,10 +43,7 @@ namespace CatLib
         /// <summary>
         /// 跳出标记
         /// </summary>
-        protected virtual object BreakFlag
-        {
-            get { return false; }
-        }
+        protected virtual object BreakFlag => false;
 
         /// <summary>
         /// 构建一个事件调度器
@@ -127,7 +124,7 @@ namespace CatLib
         /// <returns>事件对象</returns>
         public IEvent On(string eventName, Func<string, object[], object> execution, object group = null)
         {
-            Guard.NotEmptyOrNull(eventName, "eventName");
+            Guard.NotEmptyOrNull(eventName, nameof(eventName));
             Guard.Requires<ArgumentNullException>(execution != null);
 
             lock (syncRoot)
@@ -143,8 +140,7 @@ namespace CatLib
                     return result;
                 }
 
-                List<IEvent> listener;
-                if (!groupMapping.TryGetValue(group, out listener))
+                if (!groupMapping.TryGetValue(group, out List<IEvent> listener))
                 {
                     groupMapping[group] = listener = new List<IEvent>();
                 }
@@ -286,8 +282,7 @@ namespace CatLib
         {
             var outputs = new List<IEvent>();
 
-            List<IEvent> result;
-            if (listeners.TryGetValue(eventName, out result))
+            if (listeners.TryGetValue(eventName, out List<IEvent> result))
             {
                 outputs.AddRange(result);
             }
@@ -309,8 +304,7 @@ namespace CatLib
         /// <param name="eventName">事件名</param>
         private void DismissEventName(string eventName)
         {
-            List<IEvent> events;
-            if (!listeners.TryGetValue(eventName, out events))
+            if (!listeners.TryGetValue(eventName, out List<IEvent> events))
             {
                 return;
             }
@@ -327,8 +321,7 @@ namespace CatLib
         /// <param name="eventName">事件名</param>
         private void DismissWildcardEventName(string eventName)
         {
-            KeyValuePair<Regex, List<IEvent>> events;
-            if (!wildcardListeners.TryGetValue(eventName, out events))
+            if (!wildcardListeners.TryGetValue(eventName, out KeyValuePair<Regex, List<IEvent>> events))
             {
                 return;
             }
@@ -345,8 +338,7 @@ namespace CatLib
         /// <param name="target">事件解除目标</param>
         private void DismissTargetObject(object target)
         {
-            List<IEvent> events;
-            if (!groupMapping.TryGetValue(target, out events))
+            if (!groupMapping.TryGetValue(target, out List<IEvent> events))
             {
                 return;
             }
@@ -365,8 +357,7 @@ namespace CatLib
         {
             lock (syncRoot)
             {
-                List<IEvent> events;
-                if (target.Group != null && groupMapping.TryGetValue(target.Group, out events))
+                if (target.Group != null && groupMapping.TryGetValue(target.Group, out List<IEvent> events))
                 {
                     events.Remove(target);
                     if (events.Count <= 0)
@@ -392,8 +383,7 @@ namespace CatLib
         /// <param name="target">事件对象</param>
         private void ForgetListen(IEvent target)
         {
-            List<IEvent> events;
-            if (!listeners.TryGetValue(target.Name, out events))
+            if (!listeners.TryGetValue(target.Name, out List<IEvent> events))
             {
                 return;
             }
@@ -411,8 +401,7 @@ namespace CatLib
         /// <param name="target">事件对象</param>
         private void ForgetWildcardListen(IEvent target)
         {
-            KeyValuePair<Regex, List<IEvent>> wildcardEvents;
-            if (!wildcardListeners.TryGetValue(target.Name, out wildcardEvents))
+            if (!wildcardListeners.TryGetValue(target.Name, out KeyValuePair<Regex, List<IEvent>> wildcardEvents))
             {
                 return;
             }
@@ -433,8 +422,7 @@ namespace CatLib
         /// <returns>监听事件</returns>
         private IEvent SetupListen(string eventName, Func<string, object[], object> execution, object group)
         {
-            List<IEvent> listener;
-            if (!listeners.TryGetValue(eventName, out listener))
+            if (!listeners.TryGetValue(eventName, out List<IEvent> listener))
             {
                 listeners[eventName] = listener = new List<IEvent>();
             }
@@ -453,8 +441,7 @@ namespace CatLib
         /// <returns>监听事件</returns>
         private IEvent SetupWildcardListen(string eventName, Func<string, object[], object> execution, object group)
         {
-            KeyValuePair<Regex, List<IEvent>> listener;
-            if (!wildcardListeners.TryGetValue(eventName, out listener))
+            if (!wildcardListeners.TryGetValue(eventName, out KeyValuePair<Regex, List<IEvent>> listener))
             {
                 wildcardListeners[eventName] = listener =
                     new KeyValuePair<Regex, List<IEvent>>(new Regex(Str.AsteriskWildcard(eventName)), new List<IEvent>());

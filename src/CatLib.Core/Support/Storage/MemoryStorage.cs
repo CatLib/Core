@@ -68,12 +68,12 @@ namespace CatLib
         /// <summary>
         /// 当前存储最大内存使用量
         /// </summary>
-        public long MaxMemoryUsable { get; private set; }
+        public long MaxMemoryUsable { get; }
 
         /// <summary>
         /// 单个内存块的大小
         /// </summary>
-        public int BlockSize { get; private set; }
+        public int BlockSize { get; }
 
         /// <summary>
         /// 数据长度
@@ -141,7 +141,7 @@ namespace CatLib
             MaxMemoryUsable = maxMemoryUsable;
             BlockSize = blockBuffer;
             length = 0;
-            storage = new BlockMeta[GetPrime(capacity)];
+            storage = new BlockMeta[capacity.ToPrime()];
         }
 
         /// <summary>
@@ -364,13 +364,13 @@ namespace CatLib
                 return;
             }
 
-            var minBlockCount = (int) ((value / BlockSize) + ((value % BlockSize) == 0 ? 0 : 1));
+            var minBlockCount = (int)((value / BlockSize) + ((value % BlockSize) == 0 ? 0 : 1));
             if (storage.Length >= minBlockCount)
             {
                 return;
             }
 
-            var newStorage = new BlockMeta[GetPrime(minBlockCount)];
+            var newStorage = new BlockMeta[minBlockCount.ToPrime()];
             Array.Copy(storage, 0, newStorage, 0, storage.Length);
             storage = newStorage;
         }
@@ -401,35 +401,13 @@ namespace CatLib
         }
 
         /// <summary>
-        /// 计算规定值最近的二的次幂的容量
-        /// </summary>
-        /// <param name="min">规定值</param>
-        /// <returns>容量</returns>
-        private static int GetPrime(int min)
-        {
-            min = Math.Max(0, min);
-
-            var result = 8192;
-            for (var i = 2; i < int.MaxValue; i = i << 1)
-            {
-                if (i >= min)
-                {
-                    result = i;
-                    break;
-                }
-            }
-
-            return result;
-        }
-
-        /// <summary>
         /// 断言是否已经被释放
         /// </summary>
         private void AssertDisabled()
         {
             if (Disabled)
             {
-                throw new ObjectDisposedException(null, "[" + GetType() + "] Stream is closed.");
+                throw new ObjectDisposedException(null, $"[{GetType()}] Stream is closed.");
             }
         }
 
@@ -439,20 +417,22 @@ namespace CatLib
         /// <param name="value">内存占用</param>
         private void AssertMemoryUseable(long value)
         {
-            if (value > MaxMemoryUsable)
+            if (value <= MaxMemoryUsable)
             {
-                if (MaxMemoryUsable >= 1048576)
-                {
-                    throw new OutOfMemoryException("Memory exceeds usage limit " + (MaxMemoryUsable / 1048576) + " MB");
-                }
-
-                if (MaxMemoryUsable >= 1024)
-                {
-                    throw new OutOfMemoryException("Memory exceeds usage limit " + (MaxMemoryUsable / 1024) + " KB");
-                }
-
-                throw new OutOfMemoryException("Memory exceeds usage limit " + MaxMemoryUsable + " bit");
+                return;
             }
+
+            if (MaxMemoryUsable >= 1048576)
+            {
+                throw new OutOfMemoryException($"Memory exceeds usage limit {MaxMemoryUsable / 1048576} MB");
+            }
+
+            if (MaxMemoryUsable >= 1024)
+            {
+                throw new OutOfMemoryException($"Memory exceeds usage limit {MaxMemoryUsable / 1024} KB");
+            }
+
+            throw new OutOfMemoryException($"Memory exceeds usage limit {MaxMemoryUsable} bit");
         }
     }
 }

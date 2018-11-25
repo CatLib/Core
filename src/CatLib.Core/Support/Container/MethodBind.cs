@@ -16,22 +16,22 @@ namespace CatLib
     /// <summary>
     /// 方法绑定数据
     /// </summary>
-    internal sealed class MethodBind : Bindable<IMethodBind> , IMethodBind
+    internal sealed class MethodBind : Bindable<IMethodBind>, IMethodBind
     {
         /// <summary>
         /// 方法信息
         /// </summary>
-        public MethodInfo MethodInfo { get; private set; }
+        public MethodInfo MethodInfo { get; }
 
         /// <summary>
         /// 调用目标
         /// </summary>
-        public object Target { get; private set; }
+        public object Target { get; }
 
         /// <summary>
         /// 参数表
         /// </summary>
-        public ParameterInfo[] ParameterInfos { get; private set; }
+        public ParameterInfo[] ParameterInfos { get; }
 
         /// <summary>
         /// 方法容器
@@ -47,7 +47,7 @@ namespace CatLib
         /// <param name="target">调用目标</param>
         /// <param name="call">调用方法</param>
         public MethodBind(MethodContainer methodContainer, Container container, string service, object target, MethodInfo call)
-            :base(container, service)
+            : base(container, service)
         {
             this.methodContainer = methodContainer;
             Target = target;

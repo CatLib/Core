@@ -22,12 +22,12 @@ namespace CatLib
         /// <summary>
         /// 服务实现，执行这个委托将会获得服务实例
         /// </summary>
-        public Func<IContainer, object[], object> Concrete { get; private set; }
+        public Func<IContainer, object[], object> Concrete { get; }
 
         /// <summary>
         /// 当前绑定的服务是否是静态服务
         /// </summary>
-        public bool IsStatic { get; private set; }
+        public bool IsStatic { get; }
 
         /// <summary>
         /// 服务构造修饰器
@@ -47,7 +47,7 @@ namespace CatLib
         /// <param name="concrete">服务实现</param>
         /// <param name="isStatic">服务是否是静态的</param>
         public BindData(Container container, string service, Func<IContainer, object[], object> concrete, bool isStatic)
-            :base(container, service)
+            : base(container, service)
         {
             Concrete = concrete;
             IsStatic = isStatic;
@@ -73,7 +73,7 @@ namespace CatLib
             lock (SyncRoot)
             {
                 GuardIsDestroy();
-                Guard.NotEmptyOrNull(alias, "alias");
+                Guard.NotEmptyOrNull(alias, nameof(alias));
                 Container.Alias(alias, Service);
                 return this;
             }
@@ -89,7 +89,7 @@ namespace CatLib
             lock (SyncRoot)
             {
                 GuardIsDestroy();
-                Guard.NotEmptyOrNull(tag, "tag");
+                Guard.NotEmptyOrNull(tag, nameof(tag));
                 Container.Tag(tag, Service);
                 return this;
             }
@@ -102,7 +102,7 @@ namespace CatLib
         /// <returns>服务绑定数据</returns>
         public IBindData OnResolving(Func<IBindData, object, object> func)
         {
-            Guard.NotNull(func, "func");
+            Guard.NotNull(func, nameof(func));
             lock (SyncRoot)
             {
                 GuardIsDestroy();
@@ -122,10 +122,10 @@ namespace CatLib
         /// <returns>服务绑定数据</returns>
         public IBindData OnRelease(Action<IBindData, object> action)
         {
-            Guard.NotNull(action, "action");
+            Guard.NotNull(action, nameof(action));
             if (!IsStatic)
             {
-                throw new RuntimeException("Service [" + Service + "] is not Singleton(Static) Bind , Can not call OnRelease().");
+                throw new RuntimeException($"Service [{Service}] is not Singleton(Static) Bind , Can not call {nameof(OnRelease)}().");
             }
             lock (SyncRoot)
             {
@@ -175,6 +175,7 @@ namespace CatLib
             {
                 return;
             }
+
             foreach (var action in release)
             {
                 action.Invoke(this, obj);

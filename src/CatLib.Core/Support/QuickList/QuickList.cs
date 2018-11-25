@@ -20,7 +20,7 @@ namespace CatLib
     /// 快速列表
     /// </summary>
     /// <typeparam name="TElement">元素</typeparam>
-    [DebuggerDisplay("Count = {Count} , Length = {Length}")]
+    [DebuggerDisplay("Count = {" + nameof(Count) + "} , Length = {" + nameof(Length) + "}")]
     public sealed class QuickList<TElement> : IQuickList<TElement>
     {
         /// <summary>
@@ -146,24 +146,12 @@ namespace CatLib
             /// <summary>
             /// 获取当前元素
             /// </summary>
-            public TElement Current
-            {
-                get
-                {
-                    return current;
-                }
-            }
+            public TElement Current => current;
 
             /// <summary>
             /// 获取当前元素
             /// </summary>
-            object IEnumerator.Current
-            {
-                get
-                {
-                    return current;
-                }
-            }
+            object IEnumerator.Current => current;
 
             /// <summary>
             /// 重置迭代器
@@ -211,18 +199,7 @@ namespace CatLib
         /// <summary>
         /// 同步锁
         /// </summary>
-        private readonly object syncRoot = new object();
-
-        /// <summary>
-        /// 同步锁
-        /// </summary>
-        public object SyncRoot
-        {
-            get
-            {
-                return syncRoot;
-            }
-        }
+        public object SyncRoot { get; } = new object();
 
         /// <summary>
         /// 列表元素基数
@@ -298,7 +275,7 @@ namespace CatLib
         /// <param name="element">元素</param>
         public void Push(TElement element)
         {
-            Insert(element, tail, tail != null ? tail.List.Count - 1 : 0, true);
+            Insert(element, tail, tail?.List.Count - 1 ?? 0, true);
         }
 
         /// <summary>
@@ -515,11 +492,12 @@ namespace CatLib
                 for (var i = 0; i < elements.Length; i++)
                 {
                     elements[i] = node.List[offset];
-                    if (++offset >= fill)
+                    if (++offset < fill)
                     {
-                        offset = 0;
-                        node = node.Forward;
+                        continue;
                     }
+                    offset = 0;
+                    node = node.Forward;
                 }
                 return elements;
             }
@@ -536,15 +514,13 @@ namespace CatLib
         {
             get
             {
-                int offset;
-                var node = FindByIndex(index, out offset);
+                var node = FindByIndex(index, out int offset);
                 Guard.Requires<ArgumentOutOfRangeException>(node != null);
                 return node.List[offset];
             }
             set
             {
-                int offset;
-                var node = FindByIndex(index, out offset);
+                var node = FindByIndex(index, out int offset);
                 Guard.Requires<ArgumentOutOfRangeException>(node != null);
                 node.List.ReplaceAt(value, offset);
             }
@@ -557,8 +533,7 @@ namespace CatLib
         /// <param name="insert">要插入的元素</param>
         public void InsertAfter(TElement finder, TElement insert)
         {
-            int offset;
-            var node = FindNode(finder, out offset);
+            var node = FindNode(finder, out int offset);
             if (node == null)
             {
                 return;
@@ -573,8 +548,7 @@ namespace CatLib
         /// <param name="insert">要插入的元素</param>
         public void InsertBefore(TElement finder, TElement insert)
         {
-            int offset;
-            var node = FindNode(finder, out offset);
+            var node = FindNode(finder, out int offset);
             if (node == null)
             {
                 return;
@@ -589,7 +563,7 @@ namespace CatLib
         {
             forward = !forward;
         }
-        
+
         /// <summary>
         /// 迭代器
         /// </summary>
@@ -686,8 +660,8 @@ namespace CatLib
         /// <param name="offset">结点相对偏移量</param>
         private void Insert(TElement insert, QuickListNode node, int offset, bool after)
         {
-            bool full, fullNext, fullBackward, atTail, atHead;
-            full = fullNext = fullBackward = atTail = atHead = false;
+            bool fullNext, fullBackward, atTail, atHead;
+            var full = fullNext = fullBackward = atTail = atHead = false;
             QuickListNode newNode;
 
             if (node == null)
@@ -747,22 +721,22 @@ namespace CatLib
                 //结点没有满，且是前插式
                 node.List.InsertAt(insert, offset);
             }
-            else if (atTail && node.Forward != null && !fullNext && after)
+            else if (atTail && node.Forward != null && !fullNext)
             {
                 //如果当前结点满了，且是后插入尾部元素，并且下一个结点存在而且不是满的
                 //那么就会插入到下一个结点中的头部
                 newNode = node.Forward;
                 newNode.List.UnShift(insert);
             }
-            else if (atHead && node.Backward != null && !fullBackward && !after)
+            else if (atHead && node.Backward != null && !fullBackward)
             {
                 //如果当前结点满了，且是前插入头部元素，并且上一个结点存在而且不是满的
                 //那么就会插入到上一个结点中的尾部
                 newNode = node.Backward;
                 newNode.List.Push(insert);
             }
-            else if (((atTail && node.Forward != null && fullNext && after) ||
-                      (atHead && node.Backward != null && fullBackward && !after)))
+            else if (((atTail && node.Forward != null && fullNext) ||
+                      (atHead && node.Backward != null && fullBackward)))
             {
                 //如果当前结点是满的，且前置结点和后置结点都是满的那么
                 //就新建一个结点，插入在2个结点之间
@@ -802,8 +776,8 @@ namespace CatLib
                 return;
             }
 
-            QuickListNode backward, backwardBackward, forward, forwardForward;
-            backward = backwardBackward = forward = forwardForward = null;
+            QuickListNode backwardBackward, forward, forwardForward;
+            var backward = backwardBackward = forward = forwardForward = null;
 
             if (node.Backward != null)
             {
@@ -826,13 +800,11 @@ namespace CatLib
             if (AllowMerge(backward, backwardBackward))
             {
                 MergeNode(backward, backwardBackward, false);
-                backward = backwardBackward = null;
             }
 
             if (AllowMerge(forward, forwardForward))
             {
                 MergeNode(forward, forwardForward, true);
-                forward = forwardForward = null;
             }
 
             if (AllowMerge(node, node.Backward))
@@ -1028,11 +1000,7 @@ namespace CatLib
         /// <returns>是否可以插入</returns>
         private bool AllowInsert(QuickListNode node)
         {
-            if (node == null)
-            {
-                return false;
-            }
-            return node.List.Count < fill;
+            return node?.List.Count < fill;
         }
     }
 }

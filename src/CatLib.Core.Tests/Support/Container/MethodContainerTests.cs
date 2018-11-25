@@ -141,14 +141,17 @@ namespace CatLib.Core.Tests.Support.Container
         public void TestContainerMethodContextual()
         {
             new Application();
-            App.Instance("@input", 1000);
-            App.Instance("@input2", 2000);
+
+            App.Instance("input", 1000);
+            App.Alias("$input", "input");
+            App.Instance("input2", 2000);
+            App.Alias("$input2", "input2");
 
             var cls = new TestContainerClass();
-            App.BindMethod("Helloworld.Func1", cls).Needs("@input").Given("@input2");
+            App.BindMethod("Helloworld.Func1", cls).Needs("$input").Given("$input2");
             App.BindMethod("Helloworld.Func2", cls)
-                .Needs("@input").Given("@input2")
-                .Needs("@input2").Given("@input"); ;
+                .Needs("$input").Given("$input2")
+                .Needs("$input2").Given("$input"); ;
 
             Assert.AreEqual(2000, App.Invoke("Helloworld.Func1"));
             Assert.AreEqual((float)1000, App.Invoke("Helloworld.Func2"));

@@ -20,7 +20,7 @@ namespace CatLib
     /// 有序集
     /// 有序集使用分数进行排序(以小到大)
     /// </summary>
-    [DebuggerDisplay("Count = {Count}")]
+    [DebuggerDisplay("Count = {" + nameof(Count) + "}")]
     public sealed class SortSet<TElement, TScore> : ISortSet<TElement, TScore>
         where TScore : IComparable<TScore>
     {
@@ -142,7 +142,7 @@ namespace CatLib
                     {
                         return current.Element;
                     }
-                    throw new RuntimeException("Can not get Current element");
+                    throw new RuntimeException($"Can not get {nameof(current)} element");
                 }
             }
 
@@ -157,7 +157,7 @@ namespace CatLib
                     {
                         return current.Element;
                     }
-                    throw new RuntimeException("Can not get Current element");
+                    throw new RuntimeException($"Can not get {nameof(current)} element");
                 }
             }
 
@@ -176,11 +176,6 @@ namespace CatLib
             {
             }
         }
-
-        /// <summary>
-        /// 同步锁
-        /// </summary>
-        private readonly object syncRoot = new object();
 
         /// <summary>
         /// 是否是向前的迭代方向
@@ -235,13 +230,7 @@ namespace CatLib
         /// <summary>
         /// 同步锁
         /// </summary>
-        public object SyncRoot
-        {
-            get
-            {
-                return syncRoot;
-            }
-        }
+        public object SyncRoot { get; } = new object();
 
         /// <summary>
         /// 创建一个有序集
@@ -299,7 +288,16 @@ namespace CatLib
         /// </summary>
         public void ReverseIterator()
         {
-            forward = !forward;
+            ReverseIterator(!forward);
+        }
+
+        /// <summary>
+        /// 反转遍历顺序(并不是反转整个有序集)
+        /// </summary>
+        /// <param name="forward">反转顺序</param>
+        public void ReverseIterator(bool forward)
+        {
+            this.forward = forward;
         }
 
         /// <summary>
@@ -308,7 +306,7 @@ namespace CatLib
         /// <returns>迭代器</returns>
         public Enumerator GetEnumerator()
         {
-            return new Enumerator(this , forward);
+            return new Enumerator(this, forward);
         }
 
         /// <summary>
@@ -378,8 +376,7 @@ namespace CatLib
         /// <returns>元素</returns>
         public TElement Shift()
         {
-            TElement result;
-            if (!Remove(header.Level[0].Forward, out result))
+            if (!Remove(header.Level[0].Forward, out TElement result))
             {
                 throw new InvalidOperationException("SortSet is Null");
             }
@@ -392,8 +389,7 @@ namespace CatLib
         /// <returns>元素</returns>
         public TElement Pop()
         {
-            TElement result;
-            if (!Remove(tail, out result))
+            if (!Remove(tail, out TElement result))
             {
                 throw new InvalidOperationException("SortSet is Null");
             }
@@ -405,10 +401,7 @@ namespace CatLib
         /// </summary>
         /// <param name="rank">排名,排名以0为底</param>
         /// <returns>指定的元素</returns>
-        public TElement this[int rank]
-        {
-            get { return GetElementByRank(rank); }
-        }
+        public TElement this[int rank] => GetElementByRank(rank);
 
         /// <summary>
         /// 插入记录
@@ -422,8 +415,7 @@ namespace CatLib
             Guard.Requires<ArgumentNullException>(score != null);
 
             //已经存在的元素先移除再添加
-            TScore dictScore;
-            if (dict.TryGetValue(element, out dictScore))
+            if (dict.TryGetValue(element, out TScore dictScore))
             {
                 Remove(element, dictScore);
             }
@@ -451,8 +443,7 @@ namespace CatLib
         public TScore GetScore(TElement element)
         {
             Guard.Requires<ArgumentNullException>(element != null);
-            TScore score;
-            if (!dict.TryGetValue(element, out score))
+            if (!dict.TryGetValue(element, out TScore score))
             {
                 throw new KeyNotFoundException();
             }
@@ -524,8 +515,7 @@ namespace CatLib
         {
             Guard.Requires<ArgumentNullException>(element != null);
 
-            TScore dictScore;
-            return dict.TryGetValue(element, out dictScore) && Remove(element, dictScore);
+            return dict.TryGetValue(element, out TScore dictScore) && Remove(element, dictScore);
         }
 
         /// <summary>
@@ -620,8 +610,7 @@ namespace CatLib
         public int GetRank(TElement element)
         {
             Guard.Requires<ArgumentNullException>(element != null);
-            TScore dictScore;
-            return dict.TryGetValue(element, out dictScore) ? GetRank(element, dictScore) : -1;
+            return dict.TryGetValue(element, out TScore dictScore) ? GetRank(element, dictScore) : -1;
         }
 
         /// <summary>
@@ -739,7 +728,7 @@ namespace CatLib
 
             if (Count > 0)
             {
-                throw new ArgumentOutOfRangeException("Rank is out of range [" + rank + "]");
+                throw new ArgumentOutOfRangeException($"Rank is out of range [{rank}]");
             }
 
             throw new InvalidOperationException("SortSet is Null");
@@ -1028,9 +1017,7 @@ namespace CatLib
         /// <returns></returns>
         private int Compare(TScore left, TScore right)
         {
-            return comparer != null 
-                ? comparer.Compare(left, right) 
-                : left.CompareTo(right);
+            return comparer?.Compare(left, right) ?? left.CompareTo(right);
         }
     }
 }

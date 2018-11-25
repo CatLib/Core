@@ -10,6 +10,7 @@
  */
 
 using System;
+using System.Collections;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace CatLib.Tests
@@ -63,8 +64,32 @@ namespace CatLib.Tests
             }
         }
 
+        public class TestYieldProvider : ServiceProvider
+        {
+            public bool IsDone;
+            public override IEnumerator CoroutineInit()
+            {
+                IsDone = true;
+                yield return 1;
+                yield return 2;
+                yield return base.CoroutineInit();
+            }
+        }
+
         [TestMethod]
-        [ExpectedException(typeof(RuntimeException))]
+        public void TestYieldProviderTest()
+        {
+            var app = new Application();
+            app.Bootstrap();
+            var test = new TestYieldProvider();
+            app.Register(test);
+            app.Init();
+
+            Assert.AreEqual(true, test.IsDone);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(CodeStandardException))]
         public void RepeatInitTest()
         {
             var app = MakeApplication();
@@ -171,12 +196,12 @@ namespace CatLib.Tests
         }
 
         [TestMethod]
-        [ExpectedException(typeof(RuntimeException))]
+        [ExpectedException(typeof(CodeStandardException))]
         public void TestInitingRegisterProvider()
         {
             var application = Application.New();
             application.Register(new StopProvider());
-            application.On<IServiceProvider>(ApplicationEvents.OnIniting, (b) =>
+            application.On<IServiceProvider>(ApplicationEvents.OnProviderInit, (b) =>
             {
                 application.Register(new TestServiceProvider());
             });
@@ -185,7 +210,7 @@ namespace CatLib.Tests
         }
 
         [TestMethod]
-        [ExpectedException(typeof(RuntimeException))]
+        [ExpectedException(typeof(CodeStandardException))]
         public void TestTerminateRegisterProvider()
         {
             var application = Application.New();
@@ -263,15 +288,15 @@ namespace CatLib.Tests
         [TestMethod]
         public void TestDebugLevel()
         {
-            App.DebugLevel = DebugLevels.Dev;
-            Assert.AreEqual(DebugLevels.Dev, App.DebugLevel);
+            App.DebugLevel = DebugLevels.Development;
+            Assert.AreEqual(DebugLevels.Development, App.DebugLevel);
         }
 
         /// <summary>
         /// 重复的引导测试
         /// </summary>
         [TestMethod]
-        [ExpectedException(typeof(RuntimeException))]
+        [ExpectedException(typeof(CodeStandardException))]
         public void RepeatBootstrap()
         {
             var app = new Application();
@@ -439,6 +464,22 @@ namespace CatLib.Tests
         {
             var app = MakeApplication();
             Assert.AreEqual(true, app.IsMainThread);
+        }
+
+        public class TestRegisterProcessMakeServiceProvider : ServiceProvider
+        {
+            public override void Register()
+            {
+                App.Make<object>();
+            }
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(CodeStandardException))]
+        public void TestRegisterProcessMake()
+        {
+            var app = MakeApplication();
+            app.Register(new TestRegisterProcessMakeServiceProvider());
         }
 
         private Application MakeApplication()

@@ -24,7 +24,7 @@ namespace CatLib
         /// <summary>
         /// 注入服务的别名或者服务名
         /// </summary>
-        public string Alias { get; private set; }
+        public string Alias { get; }
 
         /// <summary>
         /// 声明注入

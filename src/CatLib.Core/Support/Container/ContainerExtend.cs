@@ -97,6 +97,16 @@ namespace CatLib
         }
 
         /// <summary>
+        /// 为服务设定一个别名
+        /// </summary>
+        /// <typeparam name="TAlias">别名</typeparam>
+        /// <typeparam name="TService">服务名</typeparam>
+        public static IContainer Alias<TAlias, TService>(this IContainer container)
+        {
+            return container.Alias(container.Type2Service(typeof(TAlias)), container.Type2Service(typeof(TService)));
+        }
+
+        /// <summary>
         /// 常规绑定一个服务
         /// </summary>
         /// <typeparam name="TService">服务名，同时也是服务实现</typeparam>
@@ -375,7 +385,7 @@ namespace CatLib
         /// <param name="call">调用方法</param>
         public static IMethodBind BindMethod(this IContainer container, string method, object target, string call = null)
         {
-            Guard.NotEmptyOrNull(method, "method");
+            Guard.NotEmptyOrNull(method, nameof(method));
             Guard.Requires<ArgumentNullException>(target != null);
 
             return container.BindMethod(method, target, target.GetType().GetMethod(call ?? Str.Method(method)));
@@ -592,7 +602,7 @@ namespace CatLib
         public static object Call(this IContainer container, object target, string method, params object[] userParams)
         {
             Guard.Requires<ArgumentNullException>(target != null);
-            Guard.NotEmptyOrNull(method, "method");
+            Guard.NotEmptyOrNull(method, nameof(method));
 
             var methodInfo = target.GetType().GetMethod(method);
             return container.Call(target, methodInfo, userParams);
@@ -692,8 +702,7 @@ namespace CatLib
         public static object Make(this IContainer container, Type type, params object[] userParams)
         {
             var service = container.Type2Service(type);
-            IBindData binder;
-            container.BindIf(service, type, false, out binder);
+            container.BindIf(service, type, false, out IBindData binder);
             return container.Make(service, userParams);
         }
 
@@ -748,7 +757,7 @@ namespace CatLib
         public static void Watch(this IContainer container, string service, object target, string method)
         {
             Guard.Requires<ArgumentNullException>(target != null);
-            Guard.NotEmptyOrNull(method, "method");
+            Guard.NotEmptyOrNull(method, nameof(method));
 
             var methodInfo = target.GetType().GetMethod(method);
             container.Watch(service, target, methodInfo);

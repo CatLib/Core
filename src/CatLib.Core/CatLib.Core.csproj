@@ -50,6 +50,7 @@
     <Compile Include="CatLib\Facades\Template\SingleManager.cs" />
     <Compile Include="CatLib\IApplication.cs" />
     <Compile Include="CatLib\IBootstrap.cs" />
+    <Compile Include="CatLib\ICoroutineInit.cs" />
     <Compile Include="CatLib\IServiceProvider.cs" />
     <Compile Include="CatLib\IServiceProviderType.cs" />
     <Compile Include="CatLib\ServiceProvider.cs" />
@@ -80,6 +81,7 @@
     <Compile Include="Support\Events\Dispatcher.cs" />
     <Compile Include="Support\Events\Event.cs" />
     <Compile Include="Support\Exception\AssertException.cs" />
+    <Compile Include="Support\Exception\CodeStandardException.cs" />
     <Compile Include="Support\Exception\RuntimeException.cs" />
     <Compile Include="Support\FilterChain\FilterChain.cs" />
     <Compile Include="Support\FilterChain\IFilterChain.cs" />
@@ -90,9 +92,12 @@
     <Compile Include="Support\RingBuffer\IRingBuffer.cs" />
     <Compile Include="Support\RingBuffer\RingBuffer.cs" />
     <Compile Include="Support\Storage\IStorage.cs" />
+    <Compile Include="Support\Stream\CombineStream.cs" />
     <Compile Include="Support\Stream\PipelineStream.cs" />
+    <Compile Include="Support\Stream\SegmentStream.cs" />
     <Compile Include="Support\Stream\StorageStream.cs" />
     <Compile Include="Support\Storage\MemoryStorage.cs" />
+    <Compile Include="Support\Stream\WrapperStream.cs" />
     <Compile Include="Support\Util\Dict.cs" />
     <Compile Include="Support\SortSet\ISortSet.cs" />
     <Compile Include="Support\SortSet\SortSet.cs" />
