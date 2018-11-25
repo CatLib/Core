@@ -54,6 +54,7 @@
     <Compile Include="Support\Storage\MemoryStorageTests.cs" />
     <Compile Include="Support\Stream\CombineStreamTests.cs" />
     <Compile Include="Support\Stream\PipelineStreamTests.cs" />
+    <Compile Include="Support\Stream\SegmentStreamTests.cs" />
     <Compile Include="Support\Stream\StorageStreamTests.cs" />
     <Compile Include="Support\Template\ManagerTests.cs" />
     <Compile Include="Support\Template\SingleManagerTests.cs" />
