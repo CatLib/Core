@@ -21,7 +21,7 @@ namespace CatLib
         /// <summary>
         /// 当前绑定的名字
         /// </summary>
-        public string Service { get; private set; }
+        public string Service { get; }
 
         /// <summary>
         /// 父级容器

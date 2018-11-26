@@ -127,7 +127,8 @@ namespace CatLib
             Guard.NotNull(closure, nameof(closure));
             if (!IsStatic)
             {
-                throw new LogicException($"Service [{Service}] is not Singleton(Static) Bind , Can not call {nameof(OnRelease)}().");
+                throw new LogicException(
+                    $"Service [{Service}] is not Singleton(Static) Bind , Can not call {nameof(OnRelease)}().");
             }
             lock (SyncRoot)
             {
