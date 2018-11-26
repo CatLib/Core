@@ -99,6 +99,7 @@
     <Compile Include="..\CatLib.Core\Support\Events\IEvent.cs" Link="Support\Events\IEvent.cs" />
     <Compile Include="..\CatLib.Core\Support\Exception\AssertException.cs" Link="Support\Exception\AssertException.cs" />
     <Compile Include="..\CatLib.Core\Support\Exception\CodeStandardException.cs" Link="Support\Exception\CodeStandardException.cs" />
+    <Compile Include="..\CatLib.Core\Support\Exception\LogicException.cs" Link="Support\Exception\LogicException.cs" />
     <Compile Include="..\CatLib.Core\Support\Exception\RuntimeException.cs" Link="Support\Exception\RuntimeException.cs" />
     <Compile Include="..\CatLib.Core\Support\FilterChain\FilterChain.cs" Link="Support\FilterChain\FilterChain.cs" />
     <Compile Include="..\CatLib.Core\Support\FilterChain\IFilterChain.cs" Link="Support\FilterChain\IFilterChain.cs" />

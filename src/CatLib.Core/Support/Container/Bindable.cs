@@ -85,7 +85,7 @@ namespace CatLib
                 }
                 if (contextual.ContainsKey(needs))
                 {
-                    throw new RuntimeException($"Needs [{needs}] is already exist.");
+                    throw new LogicException($"Needs [{needs}] is already exist.");
                 }
                 contextual.Add(needs, given);
             }
@@ -117,7 +117,7 @@ namespace CatLib
         {
             if (isDestroy)
             {
-                throw new RuntimeException("Current bind has be mark Destroy.");
+                throw new LogicException("Current bind has be mark Destroy.");
             }
         }
     }

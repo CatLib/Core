@@ -193,7 +193,7 @@ namespace CatLib
         /// </summary>
         /// <param name="tag">标记名</param>
         /// <returns>将会返回标记所对应的所有服务实例</returns>
-        /// <exception cref="RuntimeException"><paramref name="tag"/>不存在</exception>
+        /// <exception cref="LogicException"><paramref name="tag"/>不存在</exception>
         /// <exception cref="ArgumentNullException"><paramref name="tag"/>为<c>null</c>或者空字符串</exception>
         public object[] Tagged(string tag)
         {
@@ -202,7 +202,7 @@ namespace CatLib
             {
                 if (!tags.TryGetValue(tag, out List<string> services))
                 {
-                    throw new RuntimeException($"Tag [{tag}] is not exist.");
+                    throw new LogicException($"Tag [{tag}] is not exist.");
                 }
 
                 var result = new object[services.Count];
@@ -321,7 +321,7 @@ namespace CatLib
         /// <param name="alias">别名</param>
         /// <param name="service">映射到的服务名</param>
         /// <returns>当前容器对象</returns>
-        /// <exception cref="RuntimeException"><paramref name="alias"/>别名冲突或者<paramref name="service"/>的绑定与实例都不存在</exception>
+        /// <exception cref="LogicException"><paramref name="alias"/>别名冲突或者<paramref name="service"/>的绑定与实例都不存在</exception>
         /// <exception cref="ArgumentNullException"><paramref name="alias"/>,<paramref name="service"/>为<c>null</c>或者空字符串</exception>
         public IContainer Alias(string alias, string service)
         {
@@ -330,7 +330,7 @@ namespace CatLib
 
             if (alias == service)
             {
-                throw new RuntimeException($"Alias is same as service name: [{alias}].");
+                throw new LogicException($"Alias is same as service name: [{alias}].");
             }
 
             alias = FormatService(alias);
@@ -341,7 +341,7 @@ namespace CatLib
                 GuardFlushing();
                 if (aliases.ContainsKey(alias))
                 {
-                    throw new RuntimeException($"Alias [{alias}] is already exists.");
+                    throw new LogicException($"Alias [{alias}] is already exists.");
                 }
 
                 if (!binds.ContainsKey(service) && !instances.ContainsKey(service))
@@ -414,7 +414,7 @@ namespace CatLib
             Guard.NotNull(concrete, nameof(concrete));
             if (IsUnableType(concrete))
             {
-                throw new RuntimeException($"Bind type [{concrete}] can not built");
+                throw new LogicException($"Bind type [{concrete}] can not built");
             }
             return Bind(service, WrapperTypeBuilder(service, concrete), isStatic);
         }
@@ -426,7 +426,7 @@ namespace CatLib
         /// <param name="concrete">服务实现</param>
         /// <param name="isStatic">服务是否静态化</param>
         /// <returns>服务绑定数据</returns>
-        /// <exception cref="RuntimeException"><paramref name="service"/>绑定冲突</exception>
+        /// <exception cref="LogicException"><paramref name="service"/>绑定冲突</exception>
         /// <exception cref="ArgumentNullException"><paramref name="concrete"/>为<c>null</c></exception>
         public IBindData Bind(string service, Func<IContainer, object[], object> concrete, bool isStatic)
         {
@@ -441,17 +441,17 @@ namespace CatLib
 
                 if (binds.ContainsKey(service))
                 {
-                    throw new RuntimeException($"Bind [{service}] already exists.");
+                    throw new LogicException($"Bind [{service}] already exists.");
                 }
 
                 if (instances.ContainsKey(service))
                 {
-                    throw new RuntimeException($"Instances [{service}] is already exists.");
+                    throw new LogicException($"Instances [{service}] is already exists.");
                 }
 
                 if (aliases.ContainsKey(service))
                 {
-                    throw new RuntimeException($"Aliase [{service}] is already exists.");
+                    throw new LogicException($"Aliase [{service}] is already exists.");
                 }
 
                 var bindData = new BindData(this, service, concrete, isStatic);
@@ -550,7 +550,7 @@ namespace CatLib
         /// <param name="service">服务名或别名</param>
         /// <param name="userParams">用户传入的构造参数</param>
         /// <exception cref="ArgumentNullException"><paramref name="service"/>为<c>null</c>或者空字符串</exception>
-        /// <exception cref="RuntimeException">出现循环依赖</exception>
+        /// <exception cref="LogicException">出现循环依赖</exception>
         /// <returns>服务实例，如果构造失败那么返回null</returns>
         public object Make(string service, params object[] userParams)
         {
@@ -651,7 +651,7 @@ namespace CatLib
         /// <param name="service">服务名或别名</param>
         /// <param name="instance">服务实例，<c>null</c>也是合法的实例值</param>
         /// <exception cref="ArgumentNullException"><paramref name="service"/>为<c>null</c>或者空字符串</exception>
-        /// <exception cref="RuntimeException"><paramref name="service"/>的服务在绑定设置中不是静态的</exception>
+        /// <exception cref="LogicException"><paramref name="service"/>的服务在绑定设置中不是静态的</exception>
         /// <returns>被修饰器处理后的新的实例</returns>
         public object Instance(string service, object instance)
         {
@@ -669,7 +669,7 @@ namespace CatLib
                 {
                     if (!bindData.IsStatic)
                     {
-                        throw new RuntimeException($"Service [{service}] is not Singleton(Static) Bind.");
+                        throw new LogicException($"Service [{service}] is not Singleton(Static) Bind.");
                     }
                     instance = ((BindData)bindData).TriggerResolving(instance);
                 }
@@ -938,7 +938,7 @@ namespace CatLib
                             // 所以我们抛出一个异常来终止该操作。
                             if (HasBind(service.Key))
                             {
-                                throw new RuntimeException(
+                                throw new LogicException(
                                     $"Flash service [{service.Key}] name has be used for {nameof(Bind)} or {nameof(Alias)}.");
                             }
                         }
@@ -1162,7 +1162,6 @@ namespace CatLib
                 {
                     return result;
                 }
-
                 throw;
             }
         }
@@ -1332,11 +1331,11 @@ namespace CatLib
         /// </summary>
         /// <param name="service">当前服务名</param>
         /// <returns>运行时异常</returns>
-        protected virtual RuntimeException MakeCircularDependencyException(string service)
+        protected virtual LogicException MakeCircularDependencyException(string service)
         {
             var message = $"Circular dependency detected while for [{service}].";
             message += GetBuildStackDebugMessage();
-            return new RuntimeException(message);
+            return new LogicException(message);
         }
 
         /// <summary>
@@ -1368,7 +1367,7 @@ namespace CatLib
         {
             if (count > 255)
             {
-                throw new RuntimeException("Too many parameters , must be less or equal than 255");
+                throw new LogicException("Too many parameters , must be less or equal than 255");
             }
         }
 
@@ -1415,7 +1414,7 @@ namespace CatLib
         /// <param name="makeServiceBindData">服务绑定数据</param>
         /// <param name="makeServiceInstance">服务实例</param>
         /// <returns>服务实例</returns>
-        /// <exception cref="RuntimeException">属性是必须的或者注入类型和需求类型不一致</exception>
+        /// <exception cref="LogicException">属性是必须的或者注入类型和需求类型不一致</exception>
         protected virtual void AttributeInject(Bindable makeServiceBindData, object makeServiceInstance)
         {
             if (makeServiceInstance == null)
@@ -1521,7 +1520,7 @@ namespace CatLib
         /// <param name="baseParams">服务实例的参数信息</param>
         /// <param name="userParams">输入的构造参数列表</param>
         /// <returns>服务所需参数的解决结果</returns>
-        /// <exception cref="RuntimeException">生成的实例类型和需求类型不一致</exception>
+        /// <exception cref="LogicException">生成的实例类型和需求类型不一致</exception>
         protected virtual object[] GetDependencies(Bindable makeServiceBindData, ParameterInfo[] baseParams, object[] userParams)
         {
             if (baseParams.Length <= 0)
@@ -1813,7 +1812,7 @@ namespace CatLib
         /// <param name="userParams">用户传入的构造参数</param>
         /// <returns>服务实例，如果构造失败那么返回null</returns>
         /// <exception cref="ArgumentNullException"><paramref name="service"/>为<c>null</c>或者空字符串</exception>
-        /// <exception cref="RuntimeException">出现循环依赖</exception>
+        /// <exception cref="LogicException">出现循环依赖</exception>
         /// <exception cref="UnresolvableException">无法解决服务</exception>
         /// <returns>服务实例</returns>
         private object Resolve(string service, params object[] userParams)
