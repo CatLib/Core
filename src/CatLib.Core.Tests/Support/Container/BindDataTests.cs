@@ -225,21 +225,6 @@ namespace CatLib.Tests.Stl
         }
 
         /// <summary>
-        /// 是否能追加到解决事件
-        /// </summary>
-        [TestMethod]
-        public void CanAddOnResolving()
-        {
-            var container = new Container();
-            var bindData = new BindData(container, "CanAddOnResolving", (app, param) => "hello world", false);
-
-            bindData.OnResolving((bind, obj) => null);
-
-            var data = bindData.TriggerResolving(new Container());
-            Assert.AreEqual(null, data);
-        }
-
-        /// <summary>
         /// 检查无效的解决事件传入参数
         /// </summary>
         [TestMethod]

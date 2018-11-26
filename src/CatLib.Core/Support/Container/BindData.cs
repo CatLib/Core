@@ -32,7 +32,7 @@ namespace CatLib
         /// <summary>
         /// 服务构造修饰器
         /// </summary>
-        private List<Func<IBindData, object, object>> resolving;
+        private List<Action<IBindData, object>> resolving;
 
         /// <summary>
         /// 服务构造修饰器
@@ -98,19 +98,21 @@ namespace CatLib
         /// <summary>
         /// 解决服务时触发的回调
         /// </summary>
-        /// <param name="func">解决事件</param>
+        /// <param name="closure">解决事件</param>
         /// <returns>服务绑定数据</returns>
-        public IBindData OnResolving(Func<IBindData, object, object> func)
+        public IBindData OnResolving(Action<IBindData, object> closure)
         {
-            Guard.NotNull(func, nameof(func));
+            Guard.NotNull(closure, nameof(closure));
             lock (SyncRoot)
             {
                 GuardIsDestroy();
+
                 if (resolving == null)
                 {
-                    resolving = new List<Func<IBindData, object, object>>();
+                    resolving = new List<Action<IBindData, object>>();
                 }
-                resolving.Add(func);
+
+                resolving.Add(closure);
             }
             return this;
         }
@@ -118,11 +120,11 @@ namespace CatLib
         /// <summary>
         /// 当静态服务被释放时
         /// </summary>
-        /// <param name="action">处理事件</param>
+        /// <param name="closure">处理事件</param>
         /// <returns>服务绑定数据</returns>
-        public IBindData OnRelease(Action<IBindData, object> action)
+        public IBindData OnRelease(Action<IBindData, object> closure)
         {
-            Guard.NotNull(action, nameof(action));
+            Guard.NotNull(closure, nameof(closure));
             if (!IsStatic)
             {
                 throw new RuntimeException($"Service [{Service}] is not Singleton(Static) Bind , Can not call {nameof(OnRelease)}().");
@@ -130,11 +132,13 @@ namespace CatLib
             lock (SyncRoot)
             {
                 GuardIsDestroy();
+
                 if (release == null)
                 {
                     release = new List<Action<IBindData, object>>();
                 }
-                release.Add(action);
+
+                release.Add(closure);
             }
             return this;
         }
@@ -150,36 +154,21 @@ namespace CatLib
         /// <summary>
         /// 执行服务修饰器
         /// </summary>
-        /// <param name="obj">服务实例</param>
-        /// <returns>修饰后的服务实例</returns>
-        internal object TriggerResolving(object obj)
+        /// <param name="instance">服务实例</param>
+        /// <returns>服务实例</returns>
+        internal object TriggerResolving(object instance)
         {
-            if (resolving == null)
-            {
-                return obj;
-            }
-            foreach (var func in resolving)
-            {
-                obj = func.Invoke(this, obj);
-            }
-            return obj;
+            return Container.Trigger(this, instance, resolving);
         }
 
         /// <summary>
         /// 执行服务释放处理器
         /// </summary>
-        /// <param name="obj">服务实例</param>
-        internal void TriggerRelease(object obj)
+        /// <param name="instance">服务实例</param>
+        /// <returns>服务实例</returns>
+        internal object TriggerRelease(object instance)
         {
-            if (release == null)
-            {
-                return;
-            }
-
-            foreach (var action in release)
-            {
-                action.Invoke(this, obj);
-            }
+            return Container.Trigger(this, instance, release);
         }
     }
 }

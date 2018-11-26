@@ -30,7 +30,6 @@ namespace CatLib
             return bindData.OnResolving((_, instance) =>
             {
                 action(instance);
-                return instance;
             });
         }
 
@@ -46,7 +45,6 @@ namespace CatLib
             return bindData.OnResolving((_, instance) =>
             {
                 action();
-                return instance;
             });
         }
 

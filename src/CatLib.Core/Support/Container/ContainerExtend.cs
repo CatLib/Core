@@ -719,6 +719,32 @@ namespace CatLib
         }
 
         /// <summary>
+        /// 扩展容器中的服务
+        /// <para>允许在服务构建的过程中配置或者替换服务</para>
+        /// <para>如果服务已经被构建，拓展会立即生效。</para>
+        /// </summary>
+        /// <typeparam name="TService">服务名或别名</typeparam>
+        /// <param name="container">服务容器</param>
+        /// <param name="closure">闭包</param>
+        public static void Extend<TService>(this IContainer container, Func<object, IContainer, object> closure)
+        {
+            container.Extend(container.Type2Service(typeof(TService)), closure);
+        }
+
+        /// <summary>
+        /// 扩展容器中的服务
+        /// <para>允许在服务构建的过程中配置或者替换服务</para>
+        /// <para>如果服务已经被构建，拓展会立即生效。</para>
+        /// </summary>
+        /// <typeparam name="TService">服务名或别名</typeparam>
+        /// <param name="container">服务容器</param>
+        /// <param name="closure">闭包</param>
+        public static void Extend<TService>(this IContainer container, Func<object, object> closure)
+        {
+            container.Extend(container.Type2Service(typeof(TService)), (instance, _) => closure(instance));
+        }
+
+        /// <summary>
         /// 当静态服务被释放时
         /// </summary>
         /// <param name="container">服务容器</param>
@@ -742,7 +768,6 @@ namespace CatLib
             return container.OnResolving((_, instance) =>
             {
                 callback(instance);
-                return instance;
             });
         }
 

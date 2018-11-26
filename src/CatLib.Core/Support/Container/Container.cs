@@ -54,12 +54,17 @@ namespace CatLib
         /// <summary>
         /// 服务构建时的修饰器
         /// </summary>
-        private readonly List<Func<IBindData, object, object>> resolving;
+        private readonly List<Action<IBindData, object>> resolving;
 
         /// <summary>
         /// 静态服务释放时的修饰器
         /// </summary>
         private readonly List<Action<IBindData, object>> release;
+
+        /// <summary>
+        /// 全局服务扩展方法
+        /// </summary>
+        private readonly Dictionary<string, List<Func<object, IContainer, object>>> extenders;
 
         /// <summary>
         /// 类型查询回调
@@ -125,7 +130,7 @@ namespace CatLib
         /// <summary>
         /// 服务禁用字符
         /// </summary>
-        private static readonly char[] ServiceBanChars = { '@', ':' ,'$'};
+        private static readonly char[] ServiceBanChars = { '@', ':', '$' };
 
         /// <summary>
         /// 构造一个容器
@@ -140,8 +145,9 @@ namespace CatLib
             instances = new Dictionary<string, object>(prime * 4);
             instancesReverse = new Dictionary<object, string>(prime * 4);
             binds = new Dictionary<string, BindData>(prime * 4);
-            resolving = new List<Func<IBindData, object, object>>((int)(prime * 0.25));
+            resolving = new List<Action<IBindData, object>>((int)(prime * 0.25));
             release = new List<Action<IBindData, object>>((int)(prime * 0.25));
+            extenders = new Dictionary<string, List<Func<object, IContainer, object>>>((int)(prime * 0.25));
             resolved = new HashSet<string>();
             findType = new SortSet<Func<string, Type>, int>();
             findTypeCache = new Dictionary<string, Type>(prime * 4);
@@ -570,6 +576,76 @@ namespace CatLib
         }
 
         /// <summary>
+        /// 扩展容器中的服务
+        /// <para>允许在服务构建的过程中配置或者替换服务</para>
+        /// <para>如果服务已经被构建，拓展会立即生效。</para>
+        /// </summary>
+        /// <param name="service">服务名或别名</param>
+        /// <param name="closure">闭包</param>
+        public void Extend(string service, Func<object, IContainer, object> closure)
+        {
+            Guard.NotEmptyOrNull(service, nameof(service));
+            Guard.Requires<ArgumentNullException>(closure != null);
+
+            lock (syncRoot)
+            {
+                GuardFlushing();
+                service = AliasToService(service);
+
+                if (instances.TryGetValue(service, out object instance))
+                {
+                    // 如果实例已经存在那么，那么应用扩展。
+                    // 扩展将不再被添加到永久扩展列表
+                    var old = instance;
+                    instances[service] = instance = closure(instance, this);
+
+                    if (!old.Equals(instance))
+                    {
+                        instancesReverse.Remove(old);
+                        instancesReverse.Add(instance, service);
+                    }
+                    
+                    TriggerOnRebound(service, instance);
+                    return;
+                }
+
+                if (!extenders.TryGetValue(service, out List<Func<object, IContainer, object>> extender))
+                {
+                    extenders[service] = extender = new List<Func<object, IContainer, object>>();
+                }
+
+                extender.Add(closure);
+
+                if (IsResolved(service))
+                {
+                    TriggerOnRebound(service);
+                }
+            }
+        }
+
+        /// <summary>
+        /// 移除指定服务的全部扩展
+        /// </summary>
+        /// <param name="service">服务名或别名</param>
+        public void ClearExtenders(string service)
+        {
+            lock (syncRoot)
+            {
+                GuardFlushing();
+                service = AliasToService(service);
+                extenders.Remove(service);
+
+                if (!IsResolved(service))
+                {
+                    return;
+                }
+
+                Release(service);
+                TriggerOnRebound(service);
+            }
+        }
+
+        /// <summary>
         /// 静态化一个服务,实例值会经过解决修饰器
         /// </summary>
         /// <param name="service">服务名或别名</param>
@@ -692,15 +768,15 @@ namespace CatLib
         /// <summary>
         /// 当静态服务被释放时
         /// </summary>
-        /// <param name="callback">处理释放时的回调</param>
+        /// <param name="closure">处理释放时的回调</param>
         /// <returns>当前容器实例</returns>
-        public IContainer OnRelease(Action<IBindData, object> callback)
+        public IContainer OnRelease(Action<IBindData, object> closure)
         {
-            Guard.NotNull(callback, nameof(callback));
+            Guard.NotNull(closure, nameof(closure));
             lock (syncRoot)
             {
                 GuardFlushing();
-                release.Add(callback);
+                release.Add(closure);
             }
             return this;
         }
@@ -708,15 +784,15 @@ namespace CatLib
         /// <summary>
         /// 当服务被解决时，生成的服务会经过注册的回调函数
         /// </summary>
-        /// <param name="callback">回调函数</param>
+        /// <param name="closure">回调函数</param>
         /// <returns>当前容器对象</returns>
-        public IContainer OnResolving(Func<IBindData, object, object> callback)
+        public IContainer OnResolving(Action<IBindData, object> closure)
         {
-            Guard.NotNull(callback, nameof(callback));
+            Guard.NotNull(closure, nameof(closure));
             lock (syncRoot)
             {
                 GuardFlushing();
-                resolving.Add(callback);
+                resolving.Add(closure);
             }
             return this;
         }
@@ -785,7 +861,7 @@ namespace CatLib
         }
 
         /// <summary>
-        /// 清空容器的所有实例，绑定，别名，标签，解决器
+        /// 清空容器的所有实例，绑定，别名，标签，解决器，方法容器, 扩展
         /// </summary>
         public virtual void Flush()
         {
@@ -808,6 +884,7 @@ namespace CatLib
                     binds.Clear();
                     resolving.Clear();
                     release.Clear();
+                    extenders.Clear();
                     resolved.Clear();
                     findType.Clear();
                     findTypeCache.Clear();
@@ -1204,7 +1281,7 @@ namespace CatLib
         /// <returns>变量标签</returns>
         protected virtual char[] GetVariableTags()
         {
-            return new [] {'$', '@'};
+            return new[] { '$', '@' };
         }
 
         /// <summary>
@@ -1627,29 +1704,44 @@ namespace CatLib
         /// 触发全局解决修饰器
         /// </summary>
         /// <param name="bindData">服务绑定数据</param>
-        /// <param name="obj">服务实例</param>
+        /// <param name="instance">服务实例</param>
         /// <returns>被修饰器修饰后的服务实例</returns>
-        private object TriggerOnResolving(IBindData bindData, object obj)
+        private object TriggerOnResolving(IBindData bindData, object instance)
         {
-            foreach (var func in resolving)
-            {
-                obj = func(bindData, obj);
-            }
-            return obj;
+            return Trigger(bindData, instance, resolving);
         }
 
         /// <summary>
         /// 触发全局释放修饰器
         /// </summary>
         /// <param name="bindData">服务绑定数据</param>
-        /// <param name="obj">服务实例</param>
+        /// <param name="instance">服务实例</param>
         /// <returns>被修饰器修饰后的服务实例</returns>
-        private void TriggerOnRelease(IBindData bindData, object obj)
+        private object TriggerOnRelease(IBindData bindData, object instance)
         {
-            foreach (var action in release)
+            return Trigger(bindData, instance, release);
+        }
+
+        /// <summary>
+        /// 触发指定的事件列表
+        /// </summary>
+        /// <param name="bindData">服务绑定数据</param>
+        /// <param name="instance">服务实例</param>
+        /// <param name="list">事件列表</param>
+        /// <returns>服务实例</returns>
+        internal object Trigger(IBindData bindData, object instance, List<Action<IBindData, object>> list)
+        {
+            if (list == null)
             {
-                action.Invoke(bindData, obj);
+                return instance;
             }
+
+            foreach (var closure in list)
+            {
+                closure(bindData, instance);
+            }
+
+            return instance;
         }
 
         /// <summary>
@@ -1768,9 +1860,21 @@ namespace CatLib
                 try
                 {
                     var bindData = GetBindFillable(service);
-                    var result = Inject(bindData, Build(bindData, userParams));
+
+                    // 我们将要开始构建服务实例，
+                    // 对于构建的服务我们会尝试进行依赖注入。
+                    instance = Build(bindData, userParams);
+
+                    // 如果我们为指定的服务定义了扩展器，那么我们需要依次执行扩展器，
+                    // 并允许扩展器来修改或者覆盖原始的服务。
+                    instance = Extend(service, instance);
+
+                    instance = bindData.IsStatic
+                        ? Instance(bindData.Service, instance)
+                        : TriggerOnResolving(bindData, bindData.TriggerResolving(instance));
+
                     resolved.Add(bindData.Service);
-                    return result;
+                    return instance;
                 }
                 finally
                 {
@@ -1781,20 +1885,37 @@ namespace CatLib
         }
 
         /// <summary>
+        /// 为服务进行扩展
+        /// </summary>
+        /// <param name="service">服务名</param>
+        /// <param name="instance">服务实例</param>
+        /// <returns>扩展后的服务</returns>
+        private object Extend(string service, object instance)
+        {
+            if (!extenders.TryGetValue(service, out List<Func<object, IContainer, object>> list))
+            {
+                return instance;
+            }
+
+            foreach (var extender in list)
+            {
+                instance = extender(instance, this);
+            }
+
+            return instance;
+        }
+
+        /// <summary>
         /// 为对象进行依赖注入
         /// </summary>
         /// <param name="bindData">绑定数据</param>
         /// <param name="instance">对象实例</param>
         /// <returns>注入完成的对象</returns>
-        private object Inject(BindData bindData, object instance)
+        private object Inject(Bindable bindData, object instance)
         {
             GuardResolveInstance(instance, bindData.Service);
 
             AttributeInject(bindData, instance);
-
-            instance = bindData.IsStatic
-                ? Instance(bindData.Service, instance)
-                : TriggerOnResolving(bindData, bindData.TriggerResolving(instance));
 
             return instance;
         }
@@ -1807,10 +1928,12 @@ namespace CatLib
         /// <returns>服务实例</returns>
         private object Build(BindData makeServiceBindData, object[] userParams)
         {
-            return makeServiceBindData.Concrete != null
+            var instance = makeServiceBindData.Concrete != null
                 ? makeServiceBindData.Concrete(this, userParams)
                 : CreateInstance(makeServiceBindData, SpeculatedServiceType(makeServiceBindData.Service),
                     userParams);
+
+            return Inject(makeServiceBindData, instance);
         }
 
         /// <summary>

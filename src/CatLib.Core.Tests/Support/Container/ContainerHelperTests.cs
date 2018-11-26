@@ -354,6 +354,58 @@ namespace CatLib.Tests
             Assert.AreEqual("abc", container.Make<string>());
         }
 
+        public class TestOnResolvingClass
+        {
+            public string Name;
+            public TestOnResolvingClass()
+            {
+                
+            }
+        }
+
+        [TestMethod]
+        public void TestOnResolving()
+        {
+            var container = new Container();
+            container.Singleton<TestOnResolvingClass>().OnResolving((instance) =>
+            {
+                var cls = (instance) as TestOnResolvingClass;
+                Assert.AreEqual(null, cls.Name);
+                cls.Name = "123";
+            });
+
+            container.OnResolving((instance) =>
+            {
+                var cls = (instance) as TestOnResolvingClass;
+                Assert.AreEqual("123", cls.Name);
+                cls.Name = "222";
+            });
+
+            Assert.AreEqual("222", container.Make<TestOnResolvingClass>().Name);
+        }
+
+        [TestMethod]
+        public void TestExtend()
+        {
+            var container = new Container();
+            container.Extend<string>((instance) => instance + " world");
+            container.Bind<string>(() => "hello");
+            Assert.AreEqual("hello world", container.Make<string>());
+        }
+
+        [TestMethod]
+        public void TestExtendContainer()
+        {
+            var container = new Container();
+            container.Extend<string>((instance, _) =>
+            {
+                Assert.AreSame(container, _);
+                return instance + " world";
+            });
+            container.Bind<string>(() => "hello");
+            Assert.AreEqual("hello world", container.Make<string>());
+        }
+
         /// <summary>
         /// 生成容器
         /// </summary>

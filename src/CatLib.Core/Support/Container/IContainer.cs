@@ -162,7 +162,7 @@ namespace CatLib
         bool Release(string service);
 
         /// <summary>
-        /// 清空容器的所有实例，绑定，别名，标签，解决器，方法容器
+        /// 清空容器的所有实例，绑定，别名，标签，解决器，方法容器, 扩展
         /// </summary>
         void Flush();
 
@@ -215,17 +215,26 @@ namespace CatLib
         IContainer Alias(string alias, string service);
 
         /// <summary>
+        /// 扩展容器中的服务
+        /// <para>允许在服务构建的过程中配置或者替换服务</para>
+        /// <para>如果服务已经被构建，拓展会立即生效。</para>
+        /// </summary>
+        /// <param name="service">服务名或别名</param>
+        /// <param name="closure">闭包</param>
+        void Extend(string service, Func<object, IContainer, object> closure);
+
+        /// <summary>
         /// 当服务被解决时触发的事件
         /// </summary>
-        /// <param name="func">回调函数</param>
+        /// <param name="closure">回调函数</param>
         /// <returns>当前容器实例</returns>
-        IContainer OnResolving(Func<IBindData, object, object> func);
+        IContainer OnResolving(Action<IBindData, object> closure);
 
         /// <summary>
         /// 当静态服务被释放时
         /// </summary>
-        /// <param name="action">处理释放时的回调</param>
-        IContainer OnRelease(Action<IBindData, object> action);
+        /// <param name="closure">处理释放时的回调</param>
+        IContainer OnRelease(Action<IBindData, object> closure);
 
         /// <summary>
         /// 当查找类型无法找到时会尝试去调用开发者提供的查找类型函数
