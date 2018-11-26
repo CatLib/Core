@@ -2590,6 +2590,34 @@ namespace CatLib.Tests.Stl
             container.Extend<IContainer>((instance) => "123");
             container.Make<TestExtendGivenMismatchedTypeClass>();
         }
+
+        [TestMethod]
+        public void TestThisSet()
+        {
+            var container = new Container();
+            container["hello"] = "world";
+            Assert.AreEqual("world", container.Make("hello"));
+        }
+
+        [TestMethod]
+        public void TestMultThisSet()
+        {
+            var container = new Container();
+            container["hello"] = "world";
+            container["world"] = "hello";
+            Assert.AreEqual("world", container.Make("hello"));
+            Assert.AreEqual("hello", container.Make("world"));
+        }
+
+        [TestMethod]
+        public void TestExistsThisSet()
+        {
+            var container = new Container();
+            container["hello"] = "world";
+            Assert.AreEqual("world", container.Make("hello"));
+            container["hello"] = 123;
+            Assert.AreEqual(123, container.Make("hello"));
+        }
         #endregion
 
         /// <summary>

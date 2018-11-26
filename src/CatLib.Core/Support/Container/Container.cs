@@ -562,7 +562,22 @@ namespace CatLib
         /// </summary>
         /// <param name="service">服务名或者别名</param>
         /// <returns>服务实例，如果构造失败那么返回null</returns>
-        public object this[string service] => Make(service);
+        public object this[string service]
+        {
+            get => Make(service);
+            set
+            {
+                lock (syncRoot)
+                {
+                    var bind = GetBind(service);
+                    if (bind != null)
+                    {
+                        Unbind(bind);
+                    }
+                    Bind(service, (_, __) => value, false);
+                }
+            }
+        }
 
         /// <summary>
         /// 获取一个回调，当执行回调可以生成指定的服务
@@ -899,6 +914,7 @@ namespace CatLib
         {
             lock (syncRoot)
             {
+                GuardFlushing();
                 Release(bindable.Service);
                 if (aliasesReverse.TryGetValue(bindable.Service, out List<string> serviceList))
                 {

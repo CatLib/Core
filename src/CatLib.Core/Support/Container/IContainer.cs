@@ -196,7 +196,7 @@ namespace CatLib
         /// </summary>
         /// <param name="service">服务名或者别名</param>
         /// <returns>服务实例，如果构造失败那么返回null</returns>
-		object this[string service] { get; }
+		object this[string service] { get; set; }
 
         /// <summary>
         /// 获取一个回调，当执行回调可以生成指定的服务
