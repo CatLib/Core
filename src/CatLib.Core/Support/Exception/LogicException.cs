@@ -14,33 +14,33 @@ using System;
 namespace CatLib
 {
     /// <summary>
-    /// 代码规范异常，引发本异常一般由于不正确的使用框架
+    /// 代码逻辑异常
     /// </summary>
     [ExcludeFromCodeCoverage]
-    public class CodeStandardException : LogicException
+    public class LogicException : RuntimeException
     {
         /// <summary>
-        /// 代码规范异常
+        /// 代码逻辑异常
         /// </summary>
-        public CodeStandardException()
+        public LogicException()
         {
 
         }
 
         /// <summary>
-        /// 代码规范异常
+        /// 代码逻辑异常
         /// </summary>
         /// <param name="message">异常消息</param>
-        public CodeStandardException(string message) : base(message)
+        public LogicException(string message) : base(message)
         {
         }
 
         /// <summary>
-        /// 代码规范异常
+        /// 代码逻辑异常
         /// </summary>
         /// <param name="message">异常消息</param>
         /// <param name="innerException">内部异常</param>
-        public CodeStandardException(string message, Exception innerException) : base(message, innerException)
+        public LogicException(string message, Exception innerException) : base(message, innerException)
         {
         }
     }

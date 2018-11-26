@@ -177,13 +177,15 @@ namespace CatLib.Tests.Stl
         public void CheckIllegalRelease()
         {
             var container = new Container();
-            var bindData = container.Bind("CheckIllegalRelease", (app, param) => "hello world", false);
+            var bindData = container.Bind("CheckIllegalRelease", (app, param) => "hello world", true);
 
             ExceptionAssert.Throws<ArgumentNullException>(() =>
             {
                 bindData.OnRelease(null);
             });
 
+            bindData.Unbind();
+            bindData = container.Bind("CheckIllegalRelease", (app, param) => "hello world", false);
             ExceptionAssert.Throws<RuntimeException>(() =>
             {
                 bindData.OnRelease((obj) =>
@@ -225,21 +227,6 @@ namespace CatLib.Tests.Stl
         }
 
         /// <summary>
-        /// 是否能追加到解决事件
-        /// </summary>
-        [TestMethod]
-        public void CanAddOnResolving()
-        {
-            var container = new Container();
-            var bindData = new BindData(container, "CanAddOnResolving", (app, param) => "hello world", false);
-
-            bindData.OnResolving((bind, obj) => null);
-
-            var data = bindData.TriggerResolving(new Container());
-            Assert.AreEqual(null, data);
-        }
-
-        /// <summary>
         /// 检查无效的解决事件传入参数
         /// </summary>
         [TestMethod]
@@ -252,6 +239,70 @@ namespace CatLib.Tests.Stl
             {
                 bindData.OnResolving(null);
             });
+        }
+
+        [TestMethod]
+        public void TestTypeMatchOnResolving()
+        {
+            var container = new Container();
+            var count = 0;
+            container.Bind("hello", (_, __) => new ContainerHelperTests.TestTypeMatchOnResolvingClass())
+                .OnResolving<ContainerHelperTests.ITypeMatchInterface>((instance) =>
+                {
+                    count++;
+                }).OnResolving<ContainerHelperTests.ITypeMatchInterface>((bindData, instance) =>
+                {
+                    Assert.AreNotEqual(null, bindData);
+                    count++;
+                }).OnAfterResolving<ContainerHelperTests.ITypeMatchInterface>((instance) =>
+                {
+                    count++;
+                }).OnAfterResolving<ContainerHelperTests.ITypeMatchInterface>((bindData, instance) =>
+                {
+                    Assert.AreNotEqual(null, bindData);
+                    count++;
+                }).OnAfterResolving<Container>((instance) =>
+                {
+                    count++;
+                });
+
+            container.Make("hello");
+
+            Assert.AreEqual(4, count);
+        }
+
+        [TestMethod]
+        public void TestTypeMatchOnRelease()
+        {
+            var container = new Container();
+            var count = 0;
+            container.Singleton("hello", (_, __) => new ContainerHelperTests.TestTypeMatchOnResolvingClass())
+                .OnRelease<ContainerHelperTests.ITypeMatchInterface>((instance) =>
+                {
+                    count++;
+                }).OnRelease<Container>((instance) =>
+                {
+                    count++;
+                }).OnRelease<ContainerHelperTests.ITypeMatchInterface>((bindData,instance) =>
+                {
+                    Assert.AreNotEqual(null, bindData);
+                    count++;
+                }).OnRelease<Container>((bindData, instance) =>
+                {
+                    Assert.AreNotEqual(null, bindData);
+                    count++;
+                }).OnRelease<string>((bindData, instance) =>
+                {
+                    Assert.AreNotEqual(null, bindData);
+                    count++;
+                });
+            container.Singleton("world", (_, __) => "hello");
+
+            container.Make("hello");
+
+            container.Release("hello");
+
+            Assert.AreEqual(2, count);
         }
         #endregion
 

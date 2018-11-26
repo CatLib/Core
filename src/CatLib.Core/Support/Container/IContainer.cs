@@ -162,7 +162,7 @@ namespace CatLib
         bool Release(string service);
 
         /// <summary>
-        /// 清空容器的所有实例，绑定，别名，标签，解决器，方法容器
+        /// 清空容器的所有实例，绑定，别名，标签，解决器，方法容器, 扩展
         /// </summary>
         void Flush();
 
@@ -196,7 +196,7 @@ namespace CatLib
         /// </summary>
         /// <param name="service">服务名或者别名</param>
         /// <returns>服务实例，如果构造失败那么返回null</returns>
-		object this[string service] { get; }
+		object this[string service] { get; set; }
 
         /// <summary>
         /// 获取一个回调，当执行回调可以生成指定的服务
@@ -215,17 +215,33 @@ namespace CatLib
         IContainer Alias(string alias, string service);
 
         /// <summary>
+        /// 扩展容器中的服务
+        /// <para>允许在服务构建的过程中配置或者替换服务</para>
+        /// <para>如果服务已经被构建，拓展会立即生效。</para>
+        /// </summary>
+        /// <param name="service">服务名或别名</param>
+        /// <param name="closure">闭包</param>
+        void Extend(string service, Func<object, IContainer, object> closure);
+
+        /// <summary>
         /// 当服务被解决时触发的事件
         /// </summary>
-        /// <param name="func">回调函数</param>
+        /// <param name="closure">回调函数</param>
         /// <returns>当前容器实例</returns>
-        IContainer OnResolving(Func<IBindData, object, object> func);
+        IContainer OnResolving(Action<IBindData, object> closure);
+
+        /// <summary>
+        /// 解决服务时事件之后的回调
+        /// </summary>
+        /// <param name="closure">解决事件</param>
+        /// <returns>服务绑定数据</returns>
+        IContainer OnAfterResolving(Action<IBindData, object> closure);
 
         /// <summary>
         /// 当静态服务被释放时
         /// </summary>
-        /// <param name="action">处理释放时的回调</param>
-        IContainer OnRelease(Action<IBindData, object> action);
+        /// <param name="closure">处理释放时的回调</param>
+        IContainer OnRelease(Action<IBindData, object> closure);
 
         /// <summary>
         /// 当查找类型无法找到时会尝试去调用开发者提供的查找类型函数
@@ -236,22 +252,14 @@ namespace CatLib
         IContainer OnFindType(Func<string, Type> func, int priority = int.MaxValue);
 
         /// <summary>
-        /// 当一个已经被解决的服务，发生重定义时触发
+        /// 关注指定的服务，当服务触发重定义时调用指定对象的指定方法
+        /// <para>调用是以依赖注入的形式进行的</para>
+        /// <para>服务的新建（第一次解决服务）操作并不会触发重定义</para>
         /// </summary>
         /// <param name="service">服务名</param>
         /// <param name="callback">回调</param>
         /// <returns>服务容器</returns>
         IContainer OnRebound(string service, Action<object> callback);
-
-        /// <summary>
-        /// 关注指定的服务，当服务触发重定义时调用指定对象的指定方法
-        /// <para>调用是以依赖注入的形式进行的</para>
-        /// <para>服务的新建（第一次解决服务）操作并不会触发重定义</para>
-        /// </summary>
-        /// <param name="service">关注的服务名</param>
-        /// <param name="target">当服务发生重定义时调用的目标</param>
-        /// <param name="methodInfo">方法信息</param>
-        void Watch(string service, object target, MethodInfo methodInfo);
 
         /// <summary>
         /// 在回调区间内暂时性的静态化服务实例

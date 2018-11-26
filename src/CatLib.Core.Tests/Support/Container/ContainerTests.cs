@@ -1044,47 +1044,6 @@ namespace CatLib.Tests.Stl
         }
 
         /// <summary>
-        /// 解决器是否有效
-        /// </summary>
-        [TestMethod]
-        public void CanMakeWithResolve()
-        {
-            var container = MakeContainer();
-            var bind = container.Bind<MakeTestClassDependency>();
-
-            bind.OnResolving((bindData, obj) => "local resolve");
-            container.OnResolving((bindData, obj) => obj + " global resolve");
-            var isTrigger = false;
-            container.OnResolving((obj) => isTrigger = true);
-
-            var result = container.Make(container.Type2Service(typeof(MakeTestClassDependency)));
-
-            Assert.AreEqual(true, isTrigger);
-            Assert.AreEqual("local resolve global resolve", result);
-        }
-
-        /// <summary>
-        /// 给与了错误的解决器,导致不正确的返回值
-        /// </summary>
-        [TestMethod]
-        public void CheckMakeWithErrorResolve()
-        {
-            var container = MakeContainer();
-            var bind = container.Bind<MakeTestClass>();
-            container.Bind<MakeTestClassDependency2>().Alias("AliasName");
-            var bind2 = container.Bind<MakeTestClassDependency>().Alias("AliasNameRequired");
-
-            bind.OnResolving((bindData, obj) => "local resolve");
-            container.OnResolving((bindData, obj) => obj + " global resolve");
-            bind2.OnResolving((bindData, obj) => "bind2");
-
-            ExceptionAssert.Throws<RuntimeException>(() =>
-            {
-                container.Make(container.Type2Service(typeof(MakeTestClass)));
-            });
-        }
-
-        /// <summary>
         /// 参数注入标记测试类
         /// </summary>
         public class TestMakeParamInjectAttrClass
@@ -1808,7 +1767,6 @@ namespace CatLib.Tests.Stl
             container.OnResolving((bind, obj) =>
             {
                 isCall = true;
-                return obj;
             });
 
             Assert.AreEqual(false, isCall);
@@ -2334,14 +2292,15 @@ namespace CatLib.Tests.Stl
             var container = new Container();
             var oldObject = new object();
             object newObject = null;
-            container.OnResolving((bindData, obj) =>
+            container.Extend("Hello", (instance, c) =>
             {
+                Console.WriteLine("new");
                 return newObject = new object();
             });
 
-            container.Instance("Hello", oldObject);
-
-            Assert.AreSame(newObject, container["Hello"]);
+            container.Bind("Hello", (_, __) => oldObject);
+            var ins = container["Hello"];
+            Assert.AreSame(newObject, ins);
         }
 
         [TestMethod]
@@ -2526,6 +2485,187 @@ namespace CatLib.Tests.Stl
         public void TestCannotWatch()
         {
             
+        }
+
+        [TestMethod]
+        public void TestExtend()
+        {
+            var container = new Container();
+            container.Bind("hello", (_, __) => "hello");
+            container.Extend("hello", (instance, c) => instance + " world");
+
+            Assert.AreEqual("hello world", container["hello"]);
+        }
+
+        [TestMethod]
+        public void TestMultExtend()
+        {
+            var container = new Container();
+            container.Bind("hello", (_, __) => "hello");
+            container.Extend("hello", (instance, c) => instance + " world");
+            container.Extend("hello", (instance, c) => instance + " miaomiao");
+
+            Assert.AreEqual("hello world miaomiao", container["hello"]);
+        }
+
+        [TestMethod]
+        public void TestClearExtend()
+        {
+            var container = new Container();
+            container.Bind("hello", (_, __) => "hello");
+            container.Extend("hello", (instance, c) => instance + " world");
+            container.Extend("hello", (instance, c) => instance + " miaomiao");
+
+            container.Bind("world", (_, __) => "hello");
+            container.Extend("world", (instance, c) => instance + " world");
+            container.Extend("world", (instance, c) => instance + " miaomiao");
+
+            Assert.AreEqual("hello world miaomiao", container["hello"]);
+            Assert.AreEqual("hello world miaomiao", container["world"]);
+
+            container.ClearExtenders("hello");
+
+            Assert.AreEqual("hello", container["hello"]);
+            Assert.AreEqual("hello world miaomiao", container["world"]);
+        }
+
+        [TestMethod]
+        public void TestClearExtendNotUse()
+        {
+            var container = new Container();
+            container.Bind("hello", (_, __) => "hello");
+            container.Extend("hello", (instance, c) => instance + " world");
+            container.Extend("hello", (instance, c) => instance + " miaomiao");
+            container.ClearExtenders("hello");
+            Assert.AreEqual("hello", container["hello"]);
+        }
+
+        [TestMethod]
+        public void TestExtendSingle()
+        {
+            var container = new Container();
+            container.Singleton("hello", (_, __) => "hello");
+            container.Extend("hello", (instance, c) => instance + " world");
+            Assert.AreEqual("hello world", container["hello"]);
+            container.Extend("hello", (instance, c) => instance + " miaomiao");
+            Assert.AreEqual("hello world miaomiao", container["hello"]);
+
+            container.Release("hello");
+            Assert.AreEqual("hello world", container["hello"]);
+        }
+
+        [TestMethod]
+        public void TestIsResolvedExtend()
+        {
+            var container = new Container();
+            container.Singleton("hello", (_, __) => "hello");
+            container.Make("hello");
+            container.Release("hello");
+
+            var data = "";
+            container.OnRebound("hello", (instance) =>
+            {
+                data = instance.ToString();
+            });
+            container.Extend("hello", (instance, c) => instance + " world");
+
+            Assert.AreEqual("hello world", data);
+        }
+
+        public class TestExtendGivenMismatchedTypeClass
+        {
+            public TestExtendGivenMismatchedTypeClass(IContainer container)
+            {
+                
+            }
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(UnresolvableException))]
+        public void TestExtendGivenMismatchedType()
+        {
+            var container = new Container();
+            container.Singleton<IContainer>(() => container);
+            container.Singleton<TestExtendGivenMismatchedTypeClass>();
+            container.Extend<IContainer>((instance) => "123");
+            container.Make<TestExtendGivenMismatchedTypeClass>();
+        }
+
+        [TestMethod]
+        public void TestThisSet()
+        {
+            var container = new Container();
+            container["hello"] = "world";
+            Assert.AreEqual("world", container.Make("hello"));
+        }
+
+        [TestMethod]
+        public void TestMultThisSet()
+        {
+            var container = new Container();
+            container["hello"] = "world";
+            container["world"] = "hello";
+            Assert.AreEqual("world", container.Make("hello"));
+            Assert.AreEqual("hello", container.Make("world"));
+        }
+
+        [TestMethod]
+        public void TestExistsThisSet()
+        {
+            var container = new Container();
+            container["hello"] = "world";
+            Assert.AreEqual("world", container.Make("hello"));
+            container["hello"] = 123;
+            Assert.AreEqual(123, container.Make("hello"));
+        }
+
+        [TestMethod]
+        public void TestOnAfterResolving()
+        {
+            var container = new Container();
+            var val = 0;
+            container.OnAfterResolving((_) =>
+            {
+                Assert.AreEqual(10, val);
+                val = 20;
+            });
+            container.OnAfterResolving((_,__) =>
+            {
+                Assert.AreEqual(20, val);
+                val = 30;
+            });
+            container.OnResolving((_, __) =>
+            {
+                Assert.AreEqual(0, val);
+                val = 10;
+            });
+
+            container["hello"] = "hello";
+            Assert.AreEqual("hello", container["hello"]);
+            Assert.AreEqual(30, val);
+        }
+
+        [TestMethod]
+        public void TestOnAfterResolvingLocal()
+        {
+            var container = new Container();
+            var val = 0;
+            container.Bind("hello", (_, __) => "world").OnAfterResolving(() =>
+            {
+                Assert.AreEqual(10, val);
+                val = 20;
+            }).OnAfterResolving((_) =>
+            {
+                Assert.AreEqual(20, val);
+                val = 30;
+            }).OnResolving(() =>
+            {
+                Assert.AreEqual(0, val);
+                val = 10;
+            });
+
+            Assert.AreEqual("world", container["hello"]);
+            Assert.AreEqual(30, val);
         }
         #endregion
 

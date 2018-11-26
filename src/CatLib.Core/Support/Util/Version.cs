@@ -223,7 +223,7 @@ namespace CatLib
         {
             if (!VersionMatcher.IsMatch(version))
             {
-                throw new RuntimeException($"{nameof(version)} is invalid : {version}");
+                throw new LogicException($"{nameof(version)} is invalid : {version}");
             }
         }
 

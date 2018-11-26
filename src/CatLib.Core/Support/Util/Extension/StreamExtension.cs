@@ -68,7 +68,7 @@ namespace CatLib
             {
                 if (!source.CanRead)
                 {
-                    throw new RuntimeException($"Can not read stream, {nameof(source.CanRead)} == false");
+                    throw new LogicException($"Can not read stream, {nameof(source.CanRead)} == false");
                 }
 
                 encoding = encoding ?? Util.Encoding;

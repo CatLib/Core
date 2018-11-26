@@ -11,6 +11,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 
 namespace CatLib
 {
@@ -719,6 +720,32 @@ namespace CatLib
         }
 
         /// <summary>
+        /// 扩展容器中的服务
+        /// <para>允许在服务构建的过程中配置或者替换服务</para>
+        /// <para>如果服务已经被构建，拓展会立即生效。</para>
+        /// </summary>
+        /// <typeparam name="TService">服务名或别名</typeparam>
+        /// <param name="container">服务容器</param>
+        /// <param name="closure">闭包</param>
+        public static void Extend<TService>(this IContainer container, Func<object, IContainer, object> closure)
+        {
+            container.Extend(container.Type2Service(typeof(TService)), closure);
+        }
+
+        /// <summary>
+        /// 扩展容器中的服务
+        /// <para>允许在服务构建的过程中配置或者替换服务</para>
+        /// <para>如果服务已经被构建，拓展会立即生效。</para>
+        /// </summary>
+        /// <typeparam name="TService">服务名或别名</typeparam>
+        /// <param name="container">服务容器</param>
+        /// <param name="closure">闭包</param>
+        public static void Extend<TService>(this IContainer container, Func<object, object> closure)
+        {
+            container.Extend(container.Type2Service(typeof(TService)), (instance, _) => closure(instance));
+        }
+
+        /// <summary>
         /// 当静态服务被释放时
         /// </summary>
         /// <param name="container">服务容器</param>
@@ -728,6 +755,42 @@ namespace CatLib
         {
             Guard.Requires<ArgumentNullException>(callback != null);
             return container.OnRelease((_, instance) => callback(instance));
+        }
+
+        /// <summary>
+        /// 当静态服务被释放时
+        /// </summary>
+        /// <param name="container">服务容器</param>
+        /// <param name="closure">处理释放时的回调</param>
+        /// <returns>当前容器实例</returns>
+        public static IContainer OnRelease<T>(this IContainer container, Action<T> closure)  
+        {
+            Guard.Requires<ArgumentNullException>(closure != null);
+            return container.OnRelease((_, instance) =>
+            {
+                if (instance is T)
+                {
+                    closure((T)instance);
+                }
+            });
+        }
+
+        /// <summary>
+        /// 当静态服务被释放时
+        /// </summary>
+        /// <param name="container">服务容器</param>
+        /// <param name="closure">处理释放时的回调</param>
+        /// <returns>当前容器实例</returns>
+        public static IContainer OnRelease<T>(this IContainer container, Action<IBindData, T> closure)
+        {
+            Guard.Requires<ArgumentNullException>(closure != null);
+            return container.OnRelease((bindData, instance) =>
+            {
+                if (instance is T)
+                {
+                    closure(bindData, (T)instance);
+                }
+            });
         }
 
         /// <summary>
@@ -742,7 +805,125 @@ namespace CatLib
             return container.OnResolving((_, instance) =>
             {
                 callback(instance);
-                return instance;
+            });
+        }
+
+        /// <summary>
+        /// 当服务被解决时，生成的服务会经过注册的回调函数
+        /// <para>只有类型和给定的类型相匹配才会被回调</para>
+        /// </summary>
+        /// <typeparam name="T">指定的类型</typeparam>
+        /// <param name="container">服务容器</param>
+        /// <param name="closure">闭包</param>
+        /// <returns>当前容器对象</returns>
+        public static IContainer OnResolving<T>(this IContainer container, Action<T> closure)
+        {
+            Guard.Requires<ArgumentNullException>(closure != null);
+            return container.OnResolving((_, instance) =>
+            {
+                if (instance is T)
+                {
+                    closure((T)instance);
+                }
+            });
+        }
+
+        /// <summary>
+        /// 当服务被解决时，生成的服务会经过注册的回调函数
+        /// <para>只有类型和给定的类型相匹配才会被回调</para>
+        /// </summary>
+        /// <typeparam name="T">指定的类型</typeparam>
+        /// <param name="container">服务容器</param>
+        /// <param name="closure">闭包</param>
+        /// <returns>当前容器对象</returns>
+        public static IContainer OnResolving<T>(this IContainer container, Action<IBindData, T> closure)
+        {
+            Guard.Requires<ArgumentNullException>(closure != null);
+            return container.OnResolving((bindData, instance) =>
+            {
+                if (instance is T)
+                {
+                    closure(bindData, (T) instance);
+                }
+            });
+        }
+
+        /// <summary>
+        /// 当服务被解决事件之后的回调
+        /// </summary>
+        /// <param name="container">服务容器</param>
+        /// <param name="callback">回调函数</param>
+        /// <returns>当前容器对象</returns>
+        public static IContainer OnAfterResolving(this IContainer container, Action<object> callback)
+        {
+            Guard.Requires<ArgumentNullException>(callback != null);
+            return container.OnAfterResolving((_, instance) =>
+            {
+                callback(instance);
+            });
+        }
+
+        /// <summary>
+        /// 当服务被解决事件之后的回调
+        /// <para>只有类型和给定的类型相匹配才会被回调</para>
+        /// </summary>
+        /// <typeparam name="T">指定的类型</typeparam>
+        /// <param name="container">服务容器</param>
+        /// <param name="closure">闭包</param>
+        /// <returns>当前容器对象</returns>
+        public static IContainer OnAfterResolving<T>(this IContainer container, Action<T> closure)
+        {
+            Guard.Requires<ArgumentNullException>(closure != null);
+            return container.OnAfterResolving((_, instance) =>
+            {
+                if (instance is T)
+                {
+                    closure((T)instance);
+                }
+            });
+        }
+
+        /// <summary>
+        /// 当服务被解决事件之后的回调
+        /// <para>只有类型和给定的类型相匹配才会被回调</para>
+        /// </summary>
+        /// <typeparam name="T">指定的类型</typeparam>
+        /// <param name="container">服务容器</param>
+        /// <param name="closure">闭包</param>
+        /// <returns>当前容器对象</returns>
+        public static IContainer OnAfterResolving<T>(this IContainer container, Action<IBindData, T> closure)
+        {
+            Guard.Requires<ArgumentNullException>(closure != null);
+            return container.OnAfterResolving((bindData, instance) =>
+            {
+                if (instance is T)
+                {
+                    closure(bindData, (T)instance);
+                }
+            });
+        }
+
+        /// <summary>
+        /// 关注指定的服务，当服务触发重定义时调用指定对象的指定方法
+        /// <para>调用是以依赖注入的形式进行的</para>
+        /// <para>服务的新建（第一次解决服务）操作并不会触发重定义</para>
+        /// </summary>
+        /// <param name="container">服务容器</param>
+        /// <param name="service">关注的服务名</param>
+        /// <param name="target">当服务发生重定义时调用的目标</param>
+        /// <param name="methodInfo">方法信息</param>
+        public static void Watch(this IContainer container, string service, object target, MethodInfo methodInfo)
+        {
+            Guard.Requires<ArgumentNullException>(methodInfo != null);
+
+            if (!methodInfo.IsStatic)
+            {
+                Guard.Requires<ArgumentNullException>(target != null);
+            }
+
+            container.OnRebound(service, (instance) =>
+            {
+                container.Call(target, methodInfo, instance);
             });
         }
 

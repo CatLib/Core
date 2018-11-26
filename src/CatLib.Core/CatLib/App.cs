@@ -592,6 +592,30 @@ namespace CatLib
         }
 
         /// <summary>
+        /// 扩展容器中的服务
+        /// <para>允许在服务构建的过程中配置或者替换服务</para>
+        /// <para>如果服务已经被构建，拓展会立即生效。</para>
+        /// </summary>
+        /// <typeparam name="TService">服务名或别名</typeparam>
+        /// <param name="closure">闭包</param>
+        public static void Extend<TService>(Func<object, IContainer, object> closure)
+        {
+            Handler.Extend<TService>(closure);
+        }
+
+        /// <summary>
+        /// 扩展容器中的服务
+        /// <para>允许在服务构建的过程中配置或者替换服务</para>
+        /// <para>如果服务已经被构建，拓展会立即生效。</para>
+        /// </summary>
+        /// <typeparam name="TService">服务名或别名</typeparam>
+        /// <param name="closure">闭包</param>
+        public static void Extend<TService>(Func<object, object> closure)
+        {
+            Handler.Extend<TService>(closure);
+        }
+
+        /// <summary>
         /// 为服务设定一个别名
         /// </summary>
         /// <param name="alias">别名</param>
@@ -605,11 +629,11 @@ namespace CatLib
         /// <summary>
         /// 当服务被解决时触发的事件
         /// </summary>
-        /// <param name="func">回调函数</param>
+        /// <param name="closure">闭包函数</param>
         /// <returns>当前容器实例</returns>
-        public static IContainer OnResolving(Func<IBindData, object, object> func)
+        public static IContainer OnResolving(Action<IBindData, object> closure)
         {
-            return Handler.OnResolving(func);
+            return Handler.OnResolving(closure);
         }
 
         /// <summary>

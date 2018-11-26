@@ -51,7 +51,7 @@ namespace CatLib
 
             if (extendBuilder.ContainsKey(name))
             {
-                throw new RuntimeException($"Extend [{name}]({GetType()}) is already exists.");
+                throw new LogicException($"Extend [{name}]({GetType()}) is already exists.");
             }
 
             extendBuilder.Add(name, builder);
@@ -139,7 +139,7 @@ namespace CatLib
 
             if (!extendBuilder.TryGetValue(name, out Func<TInterface> result))
             {
-                throw new RuntimeException($"Can not find [{name}]({GetType()}) Extend.");
+                throw new LogicException($"Can not find [{name}]({GetType()}) Extend.");
             }
 
             return result;

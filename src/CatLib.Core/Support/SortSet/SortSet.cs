@@ -142,7 +142,7 @@ namespace CatLib
                     {
                         return current.Element;
                     }
-                    throw new RuntimeException($"Can not get {nameof(current)} element");
+                    throw new LogicException($"Can not get {nameof(current)} element");
                 }
             }
 
@@ -157,7 +157,7 @@ namespace CatLib
                     {
                         return current.Element;
                     }
-                    throw new RuntimeException($"Can not get {nameof(current)} element");
+                    throw new LogicException($"Can not get {nameof(current)} element");
                 }
             }
 

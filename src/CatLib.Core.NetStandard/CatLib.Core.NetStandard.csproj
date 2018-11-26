@@ -99,6 +99,7 @@
     <Compile Include="..\CatLib.Core\Support\Events\IEvent.cs" Link="Support\Events\IEvent.cs" />
     <Compile Include="..\CatLib.Core\Support\Exception\AssertException.cs" Link="Support\Exception\AssertException.cs" />
     <Compile Include="..\CatLib.Core\Support\Exception\CodeStandardException.cs" Link="Support\Exception\CodeStandardException.cs" />
+    <Compile Include="..\CatLib.Core\Support\Exception\LogicException.cs" Link="Support\Exception\LogicException.cs" />
     <Compile Include="..\CatLib.Core\Support\Exception\RuntimeException.cs" Link="Support\Exception\RuntimeException.cs" />
     <Compile Include="..\CatLib.Core\Support\FilterChain\FilterChain.cs" Link="Support\FilterChain\FilterChain.cs" />
     <Compile Include="..\CatLib.Core\Support\FilterChain\IFilterChain.cs" Link="Support\FilterChain\IFilterChain.cs" />
@@ -112,8 +113,11 @@
     <Compile Include="..\CatLib.Core\Support\SortSet\SortSet.cs" Link="Support\SortSet\SortSet.cs" />
     <Compile Include="..\CatLib.Core\Support\Storage\IStorage.cs" Link="Support\Storage\IStorage.cs" />
     <Compile Include="..\CatLib.Core\Support\Storage\MemoryStorage.cs" Link="Support\Storage\MemoryStorage.cs" />
+    <Compile Include="..\CatLib.Core\Support\Stream\CombineStream.cs" Link="Support\Stream\CombineStream.cs" />
     <Compile Include="..\CatLib.Core\Support\Stream\PipelineStream.cs" Link="Support\Stream\PipelineStream.cs" />
+    <Compile Include="..\CatLib.Core\Support\Stream\SegmentStream.cs" Link="Support\Stream\SegmentStream.cs" />
     <Compile Include="..\CatLib.Core\Support\Stream\StorageStream.cs" Link="Support\Stream\StorageStream.cs" />
+    <Compile Include="..\CatLib.Core\Support\Stream\WrapperStream.cs" Link="Support\Stream\WrapperStream.cs" />
     <Compile Include="..\CatLib.Core\Support\Template\IManaged.cs" Link="Support\Template\IManaged.cs" />
     <Compile Include="..\CatLib.Core\Support\Template\IManager.cs" Link="Support\Template\IManager.cs" />
     <Compile Include="..\CatLib.Core\Support\Template\ISingleManaged.cs" Link="Support\Template\ISingleManaged.cs" />

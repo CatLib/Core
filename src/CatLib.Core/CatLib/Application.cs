@@ -233,7 +233,7 @@ namespace CatLib
         /// <summary>
         /// 初始化
         /// </summary>
-        /// <exception cref="RuntimeException">没有调用<c>Bootstrap(...)</c>就尝试初始化时触发</exception>
+        /// <exception cref="CodeStandardException">没有调用<c>Bootstrap(...)</c>就尝试初始化时触发</exception>
         protected IEnumerator CoroutineInit()
         {
             if (!bootstrapped)
@@ -267,7 +267,7 @@ namespace CatLib
         /// 注册服务提供者
         /// </summary>
         /// <param name="provider">注册服务提供者</param>
-        /// <exception cref="RuntimeException">服务提供者被重复注册时触发</exception>
+        /// <exception cref="LogicException">服务提供者被重复注册时触发</exception>
         public virtual void Register(IServiceProvider provider)
         {
             StartCoroutine(CoroutineRegister(provider));
@@ -277,14 +277,14 @@ namespace CatLib
         /// 注册服务提供者
         /// </summary>
         /// <param name="provider">注册服务提供者</param>
-        /// <exception cref="RuntimeException">服务提供者被重复注册时触发</exception>
+        /// <exception cref="LogicException">服务提供者被重复注册时触发</exception>
         protected IEnumerator CoroutineRegister(IServiceProvider provider)
         {
             Guard.Requires<ArgumentNullException>(provider != null);
 
             if (IsRegisted(provider))
             {
-                throw new RuntimeException($"Provider [{provider.GetType()}] is already register.");
+                throw new LogicException($"Provider [{provider.GetType()}] is already register.");
             }
 
             if (Process == StartProcess.Initing)

@@ -80,7 +80,7 @@ namespace CatLib
             {
                 if (methodMappings.ContainsKey(method))
                 {
-                    throw new RuntimeException($"Method [{method}] is already {nameof(Bind)}");
+                    throw new LogicException($"Method [{method}] is already {nameof(Bind)}");
                 }
 
                 var methodBind = new MethodBind(this, container, method, target, methodInfo);
@@ -223,9 +223,9 @@ namespace CatLib
         /// 生成一个方法没有找到异常
         /// </summary>
         /// <param name="method"></param>
-        private RuntimeException MakeMethodNotFoundException(string method)
+        private LogicException MakeMethodNotFoundException(string method)
         {
-            return new RuntimeException($"Method [{method}] is not found.");
+            return new LogicException($"Method [{method}] is not found.");
         }
     }
 }
