@@ -598,9 +598,9 @@ namespace CatLib
         /// </summary>
         /// <typeparam name="TService">服务名或别名</typeparam>
         /// <param name="closure">闭包</param>
-        public static void Extend<TService>(Func<object, IContainer, object> closure)
+        public static void Extend<TService>(Func<TService, IContainer, object> closure)
         {
-            Handler.Extend<TService>(closure);
+            Handler.Extend(closure);
         }
 
         /// <summary>
@@ -610,9 +610,9 @@ namespace CatLib
         /// </summary>
         /// <typeparam name="TService">服务名或别名</typeparam>
         /// <param name="closure">闭包</param>
-        public static void Extend<TService>(Func<object, object> closure)
+        public static void Extend<TService>(Func<TService, object> closure)
         {
-            Handler.Extend<TService>(closure);
+            Handler.Extend(closure);
         }
 
         /// <summary>

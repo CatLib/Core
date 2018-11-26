@@ -727,9 +727,16 @@ namespace CatLib
         /// <typeparam name="TService">服务名或别名</typeparam>
         /// <param name="container">服务容器</param>
         /// <param name="closure">闭包</param>
-        public static void Extend<TService>(this IContainer container, Func<object, IContainer, object> closure)
+        public static void Extend<TService>(this IContainer container, Func<TService, IContainer, object> closure)
         {
-            container.Extend(container.Type2Service(typeof(TService)), closure);
+            container.Extend(container.Type2Service(typeof(TService)), (instance, c) =>
+            {
+                if (instance is TService)
+                {
+                    return closure((TService)instance, c);
+                }
+                return instance;
+            });
         }
 
         /// <summary>
@@ -740,9 +747,16 @@ namespace CatLib
         /// <typeparam name="TService">服务名或别名</typeparam>
         /// <param name="container">服务容器</param>
         /// <param name="closure">闭包</param>
-        public static void Extend<TService>(this IContainer container, Func<object, object> closure)
+        public static void Extend<TService>(this IContainer container, Func<TService, object> closure)
         {
-            container.Extend(container.Type2Service(typeof(TService)), (instance, _) => closure(instance));
+            container.Extend(container.Type2Service(typeof(TService)), (instance, _) =>
+            {
+                if (instance is TService)
+                {
+                    return closure((TService)instance);
+                }
+                return instance;
+            });
         }
 
         /// <summary>
