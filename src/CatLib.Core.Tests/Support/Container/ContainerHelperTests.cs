@@ -406,6 +406,91 @@ namespace CatLib.Tests
             Assert.AreEqual("hello world", container.Make<string>());
         }
 
+        public interface ITypeMatchInterface
+        {
+            
+        }
+
+        public class TestTypeMatchOnResolvingClass : ITypeMatchInterface
+        {
+            
+        }
+
+        [TestMethod]
+        public void TestTypeMatchOnResolving()
+        {
+            var container = new Container();
+            container.Bind("hello", (_, __) => new TestTypeMatchOnResolvingClass());
+            container["world"] = "hello";
+            var count = 0;
+            container.OnResolving<ITypeMatchInterface>((instance) =>
+            {
+                count++;
+            });
+
+            container.OnResolving<ITypeMatchInterface>((bindData, instance) =>
+            {
+                Assert.AreNotEqual(null, bindData);
+                count++;
+            });
+
+            container.OnAfterResolving<ITypeMatchInterface>((instance) =>
+            {
+                count++;
+            });
+
+            container.OnAfterResolving<ITypeMatchInterface>((bindData,instance) =>
+            {
+                Assert.AreNotEqual(null, bindData);
+                count++;
+            });
+
+            container.Make("hello");
+            container.Make("world");
+
+            Assert.AreEqual(4, count);
+        }
+
+        [TestMethod]
+        public void TestTypeMatchOnRelease()
+        {
+            var container = new Container();
+            container.Singleton("hello", (_, __) => new TestTypeMatchOnResolvingClass());
+            container.Singleton("world", (_, __) => "hello");
+            var count = 0;
+            var stringCount = 0;
+            container.OnRelease<ITypeMatchInterface>((instance) =>
+            {
+                count++;
+            });
+
+            container.OnRelease<ITypeMatchInterface>((bindData, instance) =>
+            {
+                Assert.AreNotEqual(null, bindData);
+                count++;
+            });
+
+            container.OnRelease<string>((instance) =>
+            {
+                stringCount++;
+            });
+
+            container.OnRelease<string>((bindData, instance) =>
+            {
+                Assert.AreNotEqual(null, bindData);
+                stringCount++;
+            });
+
+            container.Make("hello");
+            container.Make("world");
+
+            container.Release("hello");
+            container.Release("world");
+
+            Assert.AreEqual(2, count);
+            Assert.AreEqual(2, stringCount);
+        }
+
         /// <summary>
         /// 生成容器
         /// </summary>

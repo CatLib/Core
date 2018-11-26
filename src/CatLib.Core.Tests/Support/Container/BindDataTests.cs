@@ -240,6 +240,70 @@ namespace CatLib.Tests.Stl
                 bindData.OnResolving(null);
             });
         }
+
+        [TestMethod]
+        public void TestTypeMatchOnResolving()
+        {
+            var container = new Container();
+            var count = 0;
+            container.Bind("hello", (_, __) => new ContainerHelperTests.TestTypeMatchOnResolvingClass())
+                .OnResolving<ContainerHelperTests.ITypeMatchInterface>((instance) =>
+                {
+                    count++;
+                }).OnResolving<ContainerHelperTests.ITypeMatchInterface>((bindData, instance) =>
+                {
+                    Assert.AreNotEqual(null, bindData);
+                    count++;
+                }).OnAfterResolving<ContainerHelperTests.ITypeMatchInterface>((instance) =>
+                {
+                    count++;
+                }).OnAfterResolving<ContainerHelperTests.ITypeMatchInterface>((bindData, instance) =>
+                {
+                    Assert.AreNotEqual(null, bindData);
+                    count++;
+                }).OnAfterResolving<Container>((instance) =>
+                {
+                    count++;
+                });
+
+            container.Make("hello");
+
+            Assert.AreEqual(4, count);
+        }
+
+        [TestMethod]
+        public void TestTypeMatchOnRelease()
+        {
+            var container = new Container();
+            var count = 0;
+            container.Singleton("hello", (_, __) => new ContainerHelperTests.TestTypeMatchOnResolvingClass())
+                .OnRelease<ContainerHelperTests.ITypeMatchInterface>((instance) =>
+                {
+                    count++;
+                }).OnRelease<Container>((instance) =>
+                {
+                    count++;
+                }).OnRelease<ContainerHelperTests.ITypeMatchInterface>((bindData,instance) =>
+                {
+                    Assert.AreNotEqual(null, bindData);
+                    count++;
+                }).OnRelease<Container>((bindData, instance) =>
+                {
+                    Assert.AreNotEqual(null, bindData);
+                    count++;
+                }).OnRelease<string>((bindData, instance) =>
+                {
+                    Assert.AreNotEqual(null, bindData);
+                    count++;
+                });
+            container.Singleton("world", (_, __) => "hello");
+
+            container.Make("hello");
+
+            container.Release("hello");
+
+            Assert.AreEqual(2, count);
+        }
         #endregion
 
         #region Unbind
