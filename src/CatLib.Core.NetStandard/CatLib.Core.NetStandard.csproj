@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <Version>1.1.3</Version>
+    <Version>1.3.0</Version>
     <Company>CatLib</Company>
     <Authors>CatLib</Authors>
     <Description>- CatLib是渐进式的框架，可以无缝和现有框架融合。无论您的项目处于哪个阶段您都可以轻易的接入CatLib。
@@ -18,7 +18,7 @@
 - 中文文档完善，极低的学习成本。
 
 - 面向接口编程，底层组件无感知替换。</Description>
-    <Copyright>Copyright © CatLib 2017</Copyright>
+    <Copyright>Copyright © CatLib 2017-2019</Copyright>
     <AssemblyName>CatLib.Core</AssemblyName>
     <RootNamespace>CatLib.Core</RootNamespace>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
@@ -28,14 +28,11 @@
     <RepositoryUrl>https://github.com/CatLib/Core</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageTags>CatLib,Framework</PackageTags>
-    <PackageReleaseNotes>- 增加了新的模版方法：Managed 和 SingleManaged 用于扩展不对外开放的管理器。
-- App增加OnNewApplication事件
-- 已过时了一些接口并提供了相应替换方案。
-- 增加了Str.Truncate可以用于裁剪字符串
-- 增加了Arr.Difference用于排除指定的值
-- 一些内部bug的修正</PackageReleaseNotes>
+    <PackageReleaseNotes></PackageReleaseNotes>
     <PackageLicenseUrl>https://github.com/CatLib/Core/blob/master/LICENSE</PackageLicenseUrl>
     <NeutralLanguage>zh</NeutralLanguage>
+    <AssemblyVersion>1.3.0.0</AssemblyVersion>
+    <FileVersion>1.3.0.0</FileVersion>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
