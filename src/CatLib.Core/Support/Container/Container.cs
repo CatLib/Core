@@ -57,6 +57,11 @@ namespace CatLib
         private readonly List<Action<IBindData, object>> resolving;
 
         /// <summary>
+        /// 在服务构建修饰器之后的修饰器
+        /// </summary>
+        private readonly List<Action<IBindData, object>> afterResloving;
+
+        /// <summary>
         /// 静态服务释放时的修饰器
         /// </summary>
         private readonly List<Action<IBindData, object>> release;
@@ -146,6 +151,7 @@ namespace CatLib
             instancesReverse = new Dictionary<object, string>(prime * 4);
             binds = new Dictionary<string, BindData>(prime * 4);
             resolving = new List<Action<IBindData, object>>((int)(prime * 0.25));
+            afterResloving = new List<Action<IBindData, object>>((int)(prime * 0.25));
             release = new List<Action<IBindData, object>>((int)(prime * 0.25));
             extenders = new Dictionary<string, List<Func<object, IContainer, object>>>((int)(prime * 0.25));
             resolved = new HashSet<string>();
@@ -686,14 +692,13 @@ namespace CatLib
                     {
                         throw new LogicException($"Service [{service}] is not Singleton(Static) Bind.");
                     }
-                    instance = ((BindData)bindData).TriggerResolving(instance);
                 }
                 else
                 {
                     bindData = MakeEmptyBindData(service);
                 }
 
-                instance = TriggerOnResolving(bindData, instance);
+                instance = TriggerOnResolving((BindData)bindData, instance);
 
                 if (instance != null
                     && instancesReverse.TryGetValue(instance, out string realService)
@@ -787,12 +792,7 @@ namespace CatLib
         /// <returns>当前容器实例</returns>
         public IContainer OnRelease(Action<IBindData, object> closure)
         {
-            Guard.NotNull(closure, nameof(closure));
-            lock (syncRoot)
-            {
-                GuardFlushing();
-                release.Add(closure);
-            }
+            AddClosure(closure, release);
             return this;
         }
 
@@ -803,12 +803,18 @@ namespace CatLib
         /// <returns>当前容器对象</returns>
         public IContainer OnResolving(Action<IBindData, object> closure)
         {
-            Guard.NotNull(closure, nameof(closure));
-            lock (syncRoot)
-            {
-                GuardFlushing();
-                resolving.Add(closure);
-            }
+            AddClosure(closure, resolving);
+            return this;
+        }
+
+        /// <summary>
+        /// 解决服务时事件之后的回调
+        /// </summary>
+        /// <param name="closure">解决事件</param>
+        /// <returns>服务绑定数据</returns>
+        public IContainer OnAfterResolving(Action<IBindData, object> closure)
+        {
+            AddClosure(closure, afterResloving);
             return this;
         }
 
@@ -838,6 +844,7 @@ namespace CatLib
                 {
                     rebound[service] = list = new List<Action<object>>();
                 }
+
                 list.Add(callback);
             }
             return this;
@@ -1700,9 +1707,23 @@ namespace CatLib
         /// <param name="bindData">服务绑定数据</param>
         /// <param name="instance">服务实例</param>
         /// <returns>被修饰器修饰后的服务实例</returns>
-        private object TriggerOnResolving(IBindData bindData, object instance)
+        private object TriggerOnResolving(BindData bindData, object instance)
         {
-            return Trigger(bindData, instance, resolving);
+            instance = bindData.TriggerResolving(instance);
+            instance = Trigger(bindData, instance, resolving);
+            return TriggerOnAfterResolving(bindData, instance);
+        }
+
+        /// <summary>
+        /// 触发全局解决修饰器之后的修饰器回调
+        /// </summary>
+        /// <param name="bindData">服务绑定数据</param>
+        /// <param name="instance">服务实例</param>
+        /// <returns>被修饰器修饰后的服务实例</returns>
+        private object TriggerOnAfterResolving(BindData bindData, object instance)
+        {
+            instance = bindData.TriggerAfterResolving(instance);
+            return Trigger(bindData, instance, afterResloving);
         }
 
         /// <summary>
@@ -1865,7 +1886,7 @@ namespace CatLib
 
                     instance = bindData.IsStatic
                         ? Instance(bindData.Service, instance)
-                        : TriggerOnResolving(bindData, bindData.TriggerResolving(instance));
+                        : TriggerOnResolving(bindData, instance);
 
                     resolved.Add(bindData.Service);
                     return instance;
@@ -2016,6 +2037,22 @@ namespace CatLib
 
                 return null;
             };
+        }
+
+        /// <summary>
+        /// 增加一个闭包到指定的列表
+        /// </summary>
+        /// <param name="closure">闭包</param>
+        /// <param name="list">指定的列表</param>
+        private void AddClosure(Action<IBindData, object> closure, List<Action<IBindData, object>> list)
+        {
+            Guard.NotNull(closure, nameof(closure));
+
+            lock (syncRoot)
+            {
+                GuardFlushing();
+                list.Add(closure);
+            }
         }
     }
 }

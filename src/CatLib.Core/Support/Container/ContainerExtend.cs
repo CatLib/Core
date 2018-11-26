@@ -773,6 +773,21 @@ namespace CatLib
         }
 
         /// <summary>
+        /// 当服务被解决事件之后的回调
+        /// </summary>
+        /// <param name="container">服务容器</param>
+        /// <param name="callback">回调函数</param>
+        /// <returns>当前容器对象</returns>
+        public static IContainer OnAfterResolving(this IContainer container, Action<object> callback)
+        {
+            Guard.Requires<ArgumentNullException>(callback != null);
+            return container.OnAfterResolving((_, instance) =>
+            {
+                callback(instance);
+            });
+        }
+
+        /// <summary>
         /// 关注指定的服务，当服务触发重定义时调用指定对象的指定方法
         /// <para>调用是以依赖注入的形式进行的</para>
         /// <para>服务的新建（第一次解决服务）操作并不会触发重定义</para>

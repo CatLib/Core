@@ -35,6 +35,11 @@ namespace CatLib
         private List<Action<IBindData, object>> resolving;
 
         /// <summary>
+        /// 在服务构建修饰器之后的修饰器
+        /// </summary>
+        private List<Action<IBindData, object>> afterResolving;
+
+        /// <summary>
         /// 服务构造修饰器
         /// </summary>
         private List<Action<IBindData, object>> release;
@@ -102,18 +107,18 @@ namespace CatLib
         /// <returns>服务绑定数据</returns>
         public IBindData OnResolving(Action<IBindData, object> closure)
         {
-            Guard.NotNull(closure, nameof(closure));
-            lock (SyncRoot)
-            {
-                GuardIsDestroy();
+            AddClosure(closure, ref resolving);
+            return this;
+        }
 
-                if (resolving == null)
-                {
-                    resolving = new List<Action<IBindData, object>>();
-                }
-
-                resolving.Add(closure);
-            }
+        /// <summary>
+        /// 解决服务时事件之后的回调
+        /// </summary>
+        /// <param name="closure">解决事件</param>
+        /// <returns>服务绑定数据</returns>
+        public IBindData OnAfterResolving(Action<IBindData, object> closure)
+        {
+            AddClosure(closure, ref afterResolving);
             return this;
         }
 
@@ -124,23 +129,13 @@ namespace CatLib
         /// <returns>服务绑定数据</returns>
         public IBindData OnRelease(Action<IBindData, object> closure)
         {
-            Guard.NotNull(closure, nameof(closure));
             if (!IsStatic)
             {
                 throw new LogicException(
                     $"Service [{Service}] is not Singleton(Static) Bind , Can not call {nameof(OnRelease)}().");
             }
-            lock (SyncRoot)
-            {
-                GuardIsDestroy();
 
-                if (release == null)
-                {
-                    release = new List<Action<IBindData, object>>();
-                }
-
-                release.Add(closure);
-            }
+            AddClosure(closure, ref release);
             return this;
         }
 
@@ -163,6 +158,16 @@ namespace CatLib
         }
 
         /// <summary>
+        /// 执行服务修饰器之后的回调
+        /// </summary>
+        /// <param name="instance">服务实例</param>
+        /// <returns>服务实例</returns>
+        internal object TriggerAfterResolving(object instance)
+        {
+            return Container.Trigger(this, instance, afterResolving);
+        }
+
+        /// <summary>
         /// 执行服务释放处理器
         /// </summary>
         /// <param name="instance">服务实例</param>
@@ -170,6 +175,28 @@ namespace CatLib
         internal object TriggerRelease(object instance)
         {
             return Container.Trigger(this, instance, release);
+        }
+
+        /// <summary>
+        /// 增加一个事件
+        /// </summary>
+        /// <param name="closure">闭包</param>
+        /// <param name="list">事件列表</param>
+        private void AddClosure(Action<IBindData, object> closure, ref List<Action<IBindData, object>> list)
+        {
+            Guard.NotNull(closure, nameof(closure));
+
+            lock (SyncRoot)
+            {
+                GuardIsDestroy();
+
+                if (list == null)
+                {
+                    list = new List<Action<IBindData, object>>();
+                }
+
+                list.Add(closure);
+            }
         }
     }
 }

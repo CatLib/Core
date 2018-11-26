@@ -2618,6 +2618,55 @@ namespace CatLib.Tests.Stl
             container["hello"] = 123;
             Assert.AreEqual(123, container.Make("hello"));
         }
+
+        [TestMethod]
+        public void TestOnAfterResolving()
+        {
+            var container = new Container();
+            var val = 0;
+            container.OnAfterResolving((_) =>
+            {
+                Assert.AreEqual(10, val);
+                val = 20;
+            });
+            container.OnAfterResolving((_,__) =>
+            {
+                Assert.AreEqual(20, val);
+                val = 30;
+            });
+            container.OnResolving((_, __) =>
+            {
+                Assert.AreEqual(0, val);
+                val = 10;
+            });
+
+            container["hello"] = "hello";
+            Assert.AreEqual("hello", container["hello"]);
+            Assert.AreEqual(30, val);
+        }
+
+        [TestMethod]
+        public void TestOnAfterResolvingLocal()
+        {
+            var container = new Container();
+            var val = 0;
+            container.Bind("hello", (_, __) => "world").OnAfterResolving(() =>
+            {
+                Assert.AreEqual(10, val);
+                val = 20;
+            }).OnAfterResolving((_) =>
+            {
+                Assert.AreEqual(20, val);
+                val = 30;
+            }).OnResolving(() =>
+            {
+                Assert.AreEqual(0, val);
+                val = 10;
+            });
+
+            Assert.AreEqual("world", container["hello"]);
+            Assert.AreEqual(30, val);
+        }
         #endregion
 
         /// <summary>

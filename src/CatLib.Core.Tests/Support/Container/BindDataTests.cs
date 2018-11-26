@@ -177,13 +177,15 @@ namespace CatLib.Tests.Stl
         public void CheckIllegalRelease()
         {
             var container = new Container();
-            var bindData = container.Bind("CheckIllegalRelease", (app, param) => "hello world", false);
+            var bindData = container.Bind("CheckIllegalRelease", (app, param) => "hello world", true);
 
             ExceptionAssert.Throws<ArgumentNullException>(() =>
             {
                 bindData.OnRelease(null);
             });
 
+            bindData.Unbind();
+            bindData = container.Bind("CheckIllegalRelease", (app, param) => "hello world", false);
             ExceptionAssert.Throws<RuntimeException>(() =>
             {
                 bindData.OnRelease((obj) =>

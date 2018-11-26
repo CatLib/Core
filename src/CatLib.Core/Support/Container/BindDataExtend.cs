@@ -49,6 +49,36 @@ namespace CatLib
         }
 
         /// <summary>
+        /// 解决服务事件之后的回调
+        /// </summary>
+        /// <param name="bindData">绑定数据</param>
+        /// <param name="action">解决事件</param>
+        /// <returns>服务绑定数据</returns>
+        public static IBindData OnAfterResolving(this IBindData bindData, Action<object> action)
+        {
+            Guard.Requires<ArgumentNullException>(action != null);
+            return bindData.OnAfterResolving((_, instance) =>
+            {
+                action(instance);
+            });
+        }
+
+        /// <summary>
+        /// 解决服务事件之后的回调
+        /// </summary>
+        /// <param name="bindData">绑定数据</param>
+        /// <param name="action">解决事件</param>
+        /// <returns>服务绑定数据</returns>
+        public static IBindData OnAfterResolving(this IBindData bindData, Action action)
+        {
+            Guard.Requires<ArgumentNullException>(action != null);
+            return bindData.OnAfterResolving((_, instance) =>
+            {
+                action();
+            });
+        }
+
+        /// <summary>
         /// 当静态服务被释放时
         /// </summary>
         /// <param name="bindData">绑定数据</param>

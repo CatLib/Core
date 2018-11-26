@@ -57,6 +57,13 @@ namespace CatLib
         IBindData OnResolving(Action<IBindData, object> closure);
 
         /// <summary>
+        /// 解决服务时事件之后的回调
+        /// </summary>
+        /// <param name="closure">解决事件</param>
+        /// <returns>服务绑定数据</returns>
+        IBindData OnAfterResolving(Action<IBindData, object> closure);
+
+        /// <summary>
         /// 当服务被释放时
         /// </summary>
         /// <param name="closure">处理事件</param>
