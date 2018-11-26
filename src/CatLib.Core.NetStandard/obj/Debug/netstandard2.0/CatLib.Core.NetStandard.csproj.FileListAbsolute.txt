@@ -1,0 +1,9 @@
+D:\Private\CatLib.Core\src\CatLib.Core.NetStandard\bin\Debug\netstandard2.0\CatLib.Core.deps.json
+D:\Private\CatLib.Core\src\CatLib.Core.NetStandard\bin\Debug\netstandard2.0\CatLib.Core.dll
+D:\Private\CatLib.Core\src\CatLib.Core.NetStandard\bin\Debug\netstandard2.0\CatLib.Core.pdb
+D:\Private\CatLib.Core\src\CatLib.Core.NetStandard\obj\Debug\netstandard2.0\CatLib.Core.NetStandard.csprojResolveAssemblyReference.cache
+D:\Private\CatLib.Core\src\CatLib.Core.NetStandard\obj\Debug\netstandard2.0\CatLib.Core.NetStandard.csproj.CoreCompileInputs.cache
+D:\Private\CatLib.Core\src\CatLib.Core.NetStandard\obj\Debug\netstandard2.0\CatLib.Core.NetStandard.AssemblyInfoInputs.cache
+D:\Private\CatLib.Core\src\CatLib.Core.NetStandard\obj\Debug\netstandard2.0\CatLib.Core.NetStandard.AssemblyInfo.cs
+D:\Private\CatLib.Core\src\CatLib.Core.NetStandard\obj\Debug\netstandard2.0\CatLib.Core.dll
+D:\Private\CatLib.Core\src\CatLib.Core.NetStandard\obj\Debug\netstandard2.0\CatLib.Core.pdb
