@@ -625,7 +625,7 @@ namespace CatLib
                         instancesReverse.Remove(old);
                         instancesReverse.Add(instance, service);
                     }
-                    
+
                     TriggerOnRebound(service, instance);
                     return;
                 }
