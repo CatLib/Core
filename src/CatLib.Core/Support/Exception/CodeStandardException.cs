@@ -17,7 +17,7 @@ namespace CatLib
     /// 代码规范异常，引发本异常一般由于不正确的使用框架
     /// </summary>
     [ExcludeFromCodeCoverage]
-    public class CodeStandardException : RuntimeException
+    public class CodeStandardException : LogicException
     {
         /// <summary>
         /// 代码规范异常
