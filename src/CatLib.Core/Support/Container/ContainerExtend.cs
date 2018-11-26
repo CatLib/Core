@@ -11,6 +11,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 
 namespace CatLib
 {
@@ -768,6 +769,30 @@ namespace CatLib
             return container.OnResolving((_, instance) =>
             {
                 callback(instance);
+            });
+        }
+
+        /// <summary>
+        /// 关注指定的服务，当服务触发重定义时调用指定对象的指定方法
+        /// <para>调用是以依赖注入的形式进行的</para>
+        /// <para>服务的新建（第一次解决服务）操作并不会触发重定义</para>
+        /// </summary>
+        /// <param name="container">服务容器</param>
+        /// <param name="service">关注的服务名</param>
+        /// <param name="target">当服务发生重定义时调用的目标</param>
+        /// <param name="methodInfo">方法信息</param>
+        public static void Watch(this IContainer container, string service, object target, MethodInfo methodInfo)
+        {
+            Guard.Requires<ArgumentNullException>(methodInfo != null);
+
+            if (!methodInfo.IsStatic)
+            {
+                Guard.Requires<ArgumentNullException>(target != null);
+            }
+
+            container.OnRebound(service, (instance) =>
+            {
+                container.Call(target, methodInfo, instance);
             });
         }
 

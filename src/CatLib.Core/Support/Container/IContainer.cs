@@ -245,22 +245,14 @@ namespace CatLib
         IContainer OnFindType(Func<string, Type> func, int priority = int.MaxValue);
 
         /// <summary>
-        /// 当一个已经被解决的服务，发生重定义时触发
+        /// 关注指定的服务，当服务触发重定义时调用指定对象的指定方法
+        /// <para>调用是以依赖注入的形式进行的</para>
+        /// <para>服务的新建（第一次解决服务）操作并不会触发重定义</para>
         /// </summary>
         /// <param name="service">服务名</param>
         /// <param name="callback">回调</param>
         /// <returns>服务容器</returns>
         IContainer OnRebound(string service, Action<object> callback);
-
-        /// <summary>
-        /// 关注指定的服务，当服务触发重定义时调用指定对象的指定方法
-        /// <para>调用是以依赖注入的形式进行的</para>
-        /// <para>服务的新建（第一次解决服务）操作并不会触发重定义</para>
-        /// </summary>
-        /// <param name="service">关注的服务名</param>
-        /// <param name="target">当服务发生重定义时调用的目标</param>
-        /// <param name="methodInfo">方法信息</param>
-        void Watch(string service, object target, MethodInfo methodInfo);
 
         /// <summary>
         /// 在回调区间内暂时性的静态化服务实例
