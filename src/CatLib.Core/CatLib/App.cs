@@ -596,6 +596,28 @@ namespace CatLib
         /// <para>允许在服务构建的过程中配置或者替换服务</para>
         /// <para>如果服务已经被构建，拓展会立即生效。</para>
         /// </summary>
+        /// <param name="closure">闭包</param>
+        public static void Extend(Func<object, IContainer, object> closure)
+        {
+            Handler.Extend(closure);
+        }
+
+        /// <summary>
+        /// 扩展容器中的服务
+        /// <para>允许在服务构建的过程中配置或者替换服务</para>
+        /// <para>如果服务已经被构建，拓展会立即生效。</para>
+        /// </summary>
+        /// <param name="closure">闭包</param>
+        public static void Extend(Func<object, object> closure)
+        {
+            Handler.Extend(closure);
+        }
+
+        /// <summary>
+        /// 扩展容器中的服务
+        /// <para>允许在服务构建的过程中配置或者替换服务</para>
+        /// <para>如果服务已经被构建，拓展会立即生效。</para>
+        /// </summary>
         /// <typeparam name="TService">服务名或别名</typeparam>
         /// <param name="closure">闭包</param>
         public static void Extend<TService>(Func<TService, IContainer, object> closure)
@@ -1242,6 +1264,26 @@ namespace CatLib
         }
 
         /// <summary>
+        /// 当静态服务被释放时
+        /// </summary>
+        /// <param name="closure">处理释放时的回调</param>
+        /// <returns>当前容器实例</returns>
+        public static IContainer OnRelease<TWhere>(Action<TWhere> closure)
+        {
+            return Handler.OnRelease(closure);
+        }
+
+        /// <summary>
+        /// 当静态服务被释放时
+        /// </summary>
+        /// <param name="closure">处理释放时的回调</param>
+        /// <returns>当前容器实例</returns>
+        public static IContainer OnRelease<TWhere>(Action<IBindData, TWhere> closure)
+        {
+            return Handler.OnRelease(closure);
+        }
+
+        /// <summary>
         /// 当服务被解决时，生成的服务会经过注册的回调函数
         /// </summary>
         /// <param name="callback">回调函数</param>
@@ -1249,6 +1291,68 @@ namespace CatLib
         public static IContainer OnResolving(Action<object> callback)
         {
             return Handler.OnResolving(callback);
+        }
+
+        /// <summary>
+        /// 当服务被解决时，生成的服务会经过注册的回调函数
+        /// </summary>
+        /// <param name="closure">回调函数</param>
+        /// <returns>当前容器对象</returns>
+        public static IContainer OnResolving<TWhere>(Action<TWhere> closure)
+        {
+            return Handler.OnResolving(closure);
+        }
+
+        /// <summary>
+        /// 当服务被解决时，生成的服务会经过注册的回调函数
+        /// </summary>
+        /// <param name="closure">回调函数</param>
+        /// <returns>当前容器对象</returns>
+        public static IContainer OnResolving<TWhere>(Action<IBindData, TWhere> closure)
+        {
+            return Handler.OnResolving(closure);
+        }
+
+        /// <summary>
+        /// 当服务被解决事件之后的回调
+        /// </summary>
+        /// <param name="closure">闭包</param>
+        /// <returns>当前容器</returns>
+        public static IContainer OnAfterResolving(Action<IBindData, object> closure)
+        {
+            return Handler.OnAfterResolving(closure);
+        }
+
+        /// <summary>
+        /// 当服务被解决事件之后的回调
+        /// </summary>
+        /// <param name="closure">闭包</param>
+        /// <returns>当前容器</returns>
+        public static IContainer OnAfterResolving(Action<object> closure)
+        {
+            return Handler.OnAfterResolving(closure);
+        }
+
+        /// <summary>
+        /// 当服务被解决事件之后的回调
+        /// </summary>
+        /// <typeparam name="TWhere">筛选条件</typeparam>
+        /// <param name="closure">闭包</param>
+        /// <returns>当前容器</returns>
+        public static IContainer OnAfterResolving<TWhere>(Action<TWhere> closure)
+        {
+            return Handler.OnAfterResolving(closure);
+        }
+
+        /// <summary>
+        /// 当服务被解决事件之后的回调
+        /// </summary>
+        /// <typeparam name="TWhere">筛选条件</typeparam>
+        /// <param name="closure">闭包</param>
+        /// <returns>当前容器</returns>
+        public static IContainer OnAfterResolving<TWhere>(Action<IBindData, TWhere> closure)
+        {
+            return Handler.OnAfterResolving(closure);
         }
 
         /// <summary>
