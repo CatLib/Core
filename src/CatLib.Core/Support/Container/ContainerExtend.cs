@@ -777,7 +777,7 @@ namespace CatLib
         /// <param name="container">服务容器</param>
         /// <param name="closure">处理释放时的回调</param>
         /// <returns>当前容器实例</returns>
-        public static IContainer OnRelease<T>(this IContainer container, Action<T> closure)  
+        public static IContainer OnRelease<T>(this IContainer container, Action<T> closure)
         {
             Guard.Requires<ArgumentNullException>(closure != null);
             return container.OnRelease((_, instance) =>
@@ -857,7 +857,7 @@ namespace CatLib
             {
                 if (instance is T)
                 {
-                    closure(bindData, (T) instance);
+                    closure(bindData, (T)instance);
                 }
             });
         }
