@@ -24,7 +24,7 @@ namespace CatLib
         /// <summary>
         /// 版本号
         /// </summary>
-        private readonly Version version = new Version("1.3.0");
+        private static readonly Version version = new Version("1.3.0");
 
         /// <summary>
         /// 框架启动流程
@@ -444,7 +444,7 @@ namespace CatLib
         /// CatLib版本(遵循semver)
         /// </summary>
         [ExcludeFromCodeCoverage]
-        public string Version => version.ToString();
+        public static string Version => version.ToString();
 
         /// <summary>
         /// 比较CatLib版本(遵循semver)
@@ -457,7 +457,7 @@ namespace CatLib
         /// <param name="revised">修订版本号</param>
         /// <returns>比较结果</returns>
         [ExcludeFromCodeCoverage]
-        public int Compare(int major, int minor, int revised)
+        public static int Compare(int major, int minor, int revised)
         {
             return Compare($"{major}.{minor}.{revised}");
         }
@@ -468,12 +468,12 @@ namespace CatLib
         /// <para>输入版本等于当前版本则返回<code>0</code></para>
         /// <para>输入版本小于当前版本则返回<code>1</code></para>
         /// </summary>
-        /// <param name="version">版本号</param>
+        /// <param name="comparison">版本号</param>
         /// <returns>比较结果</returns>
         [ExcludeFromCodeCoverage]
-        public int Compare(string version)
+        public static int Compare(string comparison)
         {
-            return this.version.Compare(version);
+            return version.Compare(comparison);
         }
 
         /// <summary>

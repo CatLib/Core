@@ -100,7 +100,7 @@ namespace CatLib
         /// <summary>
         /// CatLib版本(遵循semver)
         /// </summary>
-        public static string Version => Handler.Version;
+        public static string Version => Application.Version;
 
         /// <summary>
         /// 比较CatLib版本(遵循semver)
@@ -114,7 +114,7 @@ namespace CatLib
         /// <returns>比较结果</returns>
         public static int Compare(int major, int minor, int revised)
         {
-            return Handler.Compare(major, minor, revised);
+            return Application.Compare(major, minor, revised);
         }
 
         /// <summary>
@@ -127,7 +127,7 @@ namespace CatLib
         /// <returns>比较结果</returns>
         public static int Compare(string version)
         {
-            return Handler.Compare(version);
+            return Application.Compare(version);
         }
 
         /// <summary>
