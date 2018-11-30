@@ -35,11 +35,9 @@ Install-Package CatLib.Core -Version 1.3.0
 
 下载[最新版本](https://github.com/CatLib/Core/releases)。
 
-## 学习CatLib
+## 文档
 
-我们已经准备了各个组件的教程，您只需要进入 [中文文档](http://catlib.io) / [English Document](http://en.catlib.io) 就可以看到她们。
-
-您也可以通过 [CatLib问答系统](http://ask.catlib.io) 来提出您的问题。
+您只需要进入 [中文文档](https://catlib.io) 就可以看到她们。
 
 ## 架构图
 ![](http://catlib.io/images/architecture-diagram.svg)
