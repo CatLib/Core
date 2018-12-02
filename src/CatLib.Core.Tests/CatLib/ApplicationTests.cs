@@ -252,8 +252,7 @@ namespace CatLib.Tests
         [TestMethod]
         public void GetVersionTest()
         {
-            var app = MakeApplication();
-            Assert.AreNotEqual(string.Empty, app.Version);
+            Assert.AreNotEqual(string.Empty, Application.Version);
         }
 
         [TestMethod]

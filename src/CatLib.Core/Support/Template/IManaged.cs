@@ -20,9 +20,14 @@ namespace CatLib
     public interface IManaged<TInterface>
     {
         /// <summary>
-        /// 当扩展被实现时
+        /// 当扩展被构建时
         /// </summary>
         event Action<TInterface> OnResolving;
+
+        /// <summary>
+        /// 当扩展被构建时之后
+        /// </summary>
+        event Action<TInterface> OnAfterResolving;
 
         /// <summary>
         /// 自定义一个扩展构建器

@@ -9,6 +9,7 @@
  * Document: http://catlib.io/
  */
 
+using System.ComponentModel;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace CatLib.Tests.Stl
@@ -85,6 +86,34 @@ namespace CatLib.Tests.Stl
             {
                 return new TestManagerClass();
             });
+        }
+
+        [TestMethod]
+        public void TestOnAfterExtend()
+        {
+            var cls = new TestManagerClass();
+
+            TestManagerClass tmp = null;
+            cls.Extend(() =>
+            {
+                return tmp = new TestManagerClass();
+            });
+
+            var isResolving = false;
+            var isAfterResolving = false;
+            cls.OnAfterResolving += (instance) =>
+            {
+                Assert.AreEqual(true, isResolving);
+                isAfterResolving = true;
+            };
+            cls.OnResolving += (instance) =>
+            {
+                isResolving = true;
+            };
+
+            var result = cls[null];
+            Assert.AreEqual(true, isAfterResolving);
+            Assert.AreSame(tmp, result);
         }
     }
 }

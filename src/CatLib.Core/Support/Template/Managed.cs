@@ -26,9 +26,14 @@ namespace CatLib
         private readonly Dictionary<string, Func<TInterface>> extendBuilder;
 
         /// <summary>
-        /// 当扩展被实现时
+        /// 当扩展被构建时
         /// </summary>
         public event Action<TInterface> OnResolving;
+
+        /// <summary>
+        /// 当扩展被构建时之后
+        /// </summary>
+        public event Action<TInterface> OnAfterResolving;
 
         /// <summary>
         /// 构建一个新的管理器模板
@@ -103,6 +108,7 @@ namespace CatLib
             var extend = GetExtend(name)();
 
             OnResolving?.Invoke(extend);
+            OnAfterResolving?.Invoke(extend);
 
             return extend;
         }
