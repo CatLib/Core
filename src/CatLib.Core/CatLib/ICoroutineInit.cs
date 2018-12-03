@@ -9,24 +9,18 @@
  * Document: http://catlib.io/
  */
 
-using System;
+using System.Collections;
 
 namespace CatLib
 {
     /// <summary>
-    /// 线程静态暂存对象
+    /// 协同初始化
     /// </summary>
-    public static class ThreadStatic
+    public interface ICoroutineInit
     {
         /// <summary>
-        /// 默认的缓冲区
+        /// 服务提供者初始化
         /// </summary>
-        [ThreadStatic]
-        private static readonly byte[] buffer = new byte[4096];
-
-        /// <summary>
-        /// 默认缓冲区
-        /// </summary>
-        public static byte[] Buffer => buffer;
+        IEnumerator CoroutineInit();
     }
 }

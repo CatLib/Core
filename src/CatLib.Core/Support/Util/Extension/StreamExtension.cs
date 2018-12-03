@@ -63,12 +63,18 @@ namespace CatLib
         /// <returns>字符串</returns>
         public static string ToText(this Stream source, Encoding encoding = null, bool closed = true)
         {
+            Guard.Requires<ArgumentNullException>(source != null);
             try
             {
-                encoding = encoding ?? Util.Encoding;
-                if (source is MemoryStream)
+                if (!source.CanRead)
                 {
-                    var memoryStream = (MemoryStream) source;
+                    throw new LogicException($"Can not read stream, {nameof(source.CanRead)} == false");
+                }
+
+                encoding = encoding ?? Util.Encoding;
+                var memoryStream = source as MemoryStream;
+                if (memoryStream != null)
+                {
                     byte[] buffer;
                     try
                     {
@@ -79,7 +85,7 @@ namespace CatLib
                         buffer = memoryStream.ToArray();
                     }
 
-                    return encoding.GetString(buffer, 0, (int) memoryStream.Length);
+                    return encoding.GetString(buffer, 0, (int)memoryStream.Length);
                 }
 
                 var length = 0;

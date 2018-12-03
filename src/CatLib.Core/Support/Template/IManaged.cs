@@ -20,9 +20,14 @@ namespace CatLib
     public interface IManaged<TInterface>
     {
         /// <summary>
-        /// 当扩展被实现时
+        /// 当扩展被构建时
         /// </summary>
         event Action<TInterface> OnResolving;
+
+        /// <summary>
+        /// 当扩展被构建时之后
+        /// </summary>
+        event Action<TInterface> OnAfterResolving;
 
         /// <summary>
         /// 自定义一个扩展构建器
@@ -35,7 +40,7 @@ namespace CatLib
         /// 释放指定扩展的构建器
         /// </summary>
         /// <param name="name">扩展名</param>
-        [Obsolete("Please use RemoveExtend();")]
+        [Obsolete("Please use " + nameof(RemoveExtend) + "();")]
         void ReleaseExtend(string name = null);
 
         /// <summary>

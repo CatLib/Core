@@ -60,7 +60,7 @@ namespace CatLib
         /// <returns>服务绑定数据</returns>
         public TReturn Given(string service)
         {
-            Guard.NotEmptyOrNull(service, "service");
+            Guard.NotEmptyOrNull(service, nameof(service));
             bindable.AddContextual(needs, service);
             return bindable as TReturn;
         }

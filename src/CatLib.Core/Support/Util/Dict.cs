@@ -53,7 +53,7 @@ namespace CatLib
         /// <param name="source">规定字典</param>
         /// <param name="predicate">回调函数</param>
         /// <return>被移除的元素</return>
-        public static KeyValuePair<TKey,TValue>[] Remove<TKey, TValue>(IDictionary<TKey, TValue> source
+        public static KeyValuePair<TKey, TValue>[] Remove<TKey, TValue>(IDictionary<TKey, TValue> source
             , Func<TKey, TValue, bool> predicate)
         {
             Guard.Requires<ArgumentNullException>(source != null);
@@ -100,7 +100,7 @@ namespace CatLib
                 }
             }
 
-            if(elements == null)
+            if (elements == null)
             {
                 return;
             }
@@ -268,8 +268,7 @@ namespace CatLib
         {
             while (true)
             {
-                object result;
-                if (!dict.TryGetValue(Arr.Pop(ref keys), out result) || keys.Length <= 0)
+                if (!dict.TryGetValue(Arr.Pop(ref keys), out object result) || keys.Length <= 0)
                 {
                     return result;
                 }
@@ -298,9 +297,8 @@ namespace CatLib
                     return;
                 }
 
-                object result;
                 var key = Arr.Pop(ref keys);
-                if (!dict.TryGetValue(key, out result) || !(result is IDictionary<string, object>))
+                if (!dict.TryGetValue(key, out object result) || !(result is IDictionary<string, object>))
                 {
                     dict[key] = result = new Dictionary<string, object>();
                 }
@@ -336,9 +334,8 @@ namespace CatLib
                     return true;
                 }
 
-                object result;
                 var key = Arr.Pop(ref keys);
-                if (!dict.TryGetValue(key, out result) || !(result is IDictionary<string, object>))
+                if (!dict.TryGetValue(key, out object result) || !(result is IDictionary<string, object>))
                 {
                     return false;
                 }

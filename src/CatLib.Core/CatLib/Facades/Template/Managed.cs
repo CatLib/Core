@@ -27,12 +27,21 @@ namespace CatLib.Facades.Template
         where TInterface : IManaged<TExtend>
     {
         /// <summary>
-        /// 当扩展被实现时
+        /// 当扩展被构建时
         /// </summary>
         public static event Action<TExtend> OnResolving
         {
-            add { Instance.OnResolving += value; }
-            remove { Instance.OnResolving -= value; }
+            add => Instance.OnResolving += value;
+            remove => Instance.OnResolving -= value;
+        }
+
+        /// <summary>
+        /// 当扩展被构建时之后
+        /// </summary>
+        public static event Action<TExtend> OnAfterResolving
+        {
+            add => Instance.OnAfterResolving += value;
+            remove => Instance.OnAfterResolving -= value;
         }
 
         /// <summary>

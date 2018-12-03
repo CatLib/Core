@@ -9,13 +9,15 @@
  * Document: http://catlib.io/
  */
 
+using System.Collections;
+
 namespace CatLib
 {
     /// <summary>
     /// 基础服务提供者
     /// </summary>
     [ExcludeFromCodeCoverage]
-    public abstract class ServiceProvider : IServiceProvider
+    public abstract class ServiceProvider : IServiceProvider, ICoroutineInit
     {
         /// <summary>
         /// 服务提供者初始化
@@ -25,8 +27,19 @@ namespace CatLib
         }
 
         /// <summary>
+        /// 协同初始化
+        /// </summary>
+        /// <returns>迭代器</returns>
+        public virtual IEnumerator CoroutineInit()
+        {
+            yield break;
+        }
+
+        /// <summary>
         /// 当注册服务提供者
         /// </summary>
-        public abstract void Register();
+        public virtual void Register()
+        {
+        }
     }
 }

@@ -10,6 +10,7 @@
  */
 
 using System;
+using System.Collections.Generic;
 
 namespace CatLib
 {
@@ -256,7 +257,7 @@ namespace CatLib
             Guard.Requires<ArgumentOutOfRangeException>(start >= 0);
             Guard.Requires<ArgumentOutOfRangeException>(length > 0);
             var count = start + length;
-            var requested = new T[source == null ? count : source.Length + count];
+            var requested = new T[source?.Length + count ?? count];
 
             if (start > 0 && source != null)
             {
@@ -337,6 +338,30 @@ namespace CatLib
         }
 
         /// <summary>
+        /// 将规定迭代器中的每个值传给回调函数,如果回调函数返回 true，则把规定迭代器中的当前值加入结果数组中
+        /// </summary>
+        /// <typeparam name="T">数组类型</typeparam>
+        /// <param name="source">规定迭代器</param>
+        /// <param name="predicate">回调函数</param>
+        /// <returns>需求数组</returns>
+        public static T[] Filter<T>(IEnumerable<T> source, Predicate<T> predicate)
+        {
+            Guard.Requires<ArgumentNullException>(source != null);
+            Guard.Requires<ArgumentNullException>(predicate != null);
+
+            var results = new List<T>();
+            foreach (var result in source)
+            {
+                if (predicate.Invoke(result))
+                {
+                    results.Add(result);
+                }
+            }
+
+            return results.ToArray();
+        }
+
+        /// <summary>
         /// 将数组值传入用户自定义函数，自定义函数返回的值作为新的数组值
         /// </summary>
         /// <typeparam name="T">数组类型</typeparam>
@@ -357,6 +382,27 @@ namespace CatLib
             }
 
             return requested;
+        }
+
+        /// <summary>
+        /// 将迭代器的值传入用户自定义函数，自定义函数返回的值作为新的数组值
+        /// </summary>
+        /// <typeparam name="T">数组类型</typeparam>
+        /// <param name="source">规定迭代器</param>
+        /// <param name="callback">自定义函数</param>
+        /// <returns>处理后的数组</returns>
+        public static T[] Map<T>(IEnumerable<T> source, Func<T, T> callback)
+        {
+            Guard.Requires<ArgumentNullException>(source != null);
+            Guard.Requires<ArgumentNullException>(callback != null);
+
+            var requested = new List<T>();
+            foreach (var value in source)
+            {
+                requested.Add(callback.Invoke(value));
+            }
+
+            return requested.ToArray();
         }
 
         /// <summary>
@@ -413,7 +459,7 @@ namespace CatLib
             {
                 requested = callback.Invoke(requested, segments);
             }
-            return requested == null ? null : requested.ToString();
+            return requested?.ToString();
         }
 
         /// <summary>

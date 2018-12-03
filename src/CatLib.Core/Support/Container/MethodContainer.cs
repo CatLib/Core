@@ -68,7 +68,7 @@ namespace CatLib
         /// <returns></returns>
         public IMethodBind Bind(string method, object target, MethodInfo methodInfo)
         {
-            Guard.NotEmptyOrNull(method, "method");
+            Guard.NotEmptyOrNull(method, nameof(method));
             Guard.Requires<ArgumentNullException>(methodInfo != null);
 
             if (!methodInfo.IsStatic)
@@ -80,7 +80,7 @@ namespace CatLib
             {
                 if (methodMappings.ContainsKey(method))
                 {
-                    throw new RuntimeException("Method [" + method + "] is already bind");
+                    throw new LogicException($"Method [{method}] is already {nameof(Bind)}");
                 }
 
                 var methodBind = new MethodBind(this, container, method, target, methodInfo);
@@ -91,8 +91,7 @@ namespace CatLib
                     return methodBind;
                 }
 
-                List<string> targetMappings;
-                if (!targetToMethodsMappings.TryGetValue(target, out targetMappings))
+                if (!targetToMethodsMappings.TryGetValue(target, out List<string> targetMappings))
                 {
                     targetToMethodsMappings[target] = targetMappings = new List<string>();
                 }
@@ -110,12 +109,11 @@ namespace CatLib
         /// <returns>方法调用结果</returns>
         public object Invoke(string method, params object[] userParams)
         {
-            Guard.NotEmptyOrNull(method, "method");
+            Guard.NotEmptyOrNull(method, nameof(method));
 
             lock (syncRoot)
             {
-                MethodBind methodBind;
-                if (!methodMappings.TryGetValue(method, out methodBind))
+                if (!methodMappings.TryGetValue(method, out MethodBind methodBind))
                 {
                     throw MakeMethodNotFoundException(method);
                 }
@@ -178,8 +176,7 @@ namespace CatLib
                     return;
                 }
 
-                List<string> methods;
-                if (!targetToMethodsMappings.TryGetValue(methodBind.Target, out methods))
+                if (!targetToMethodsMappings.TryGetValue(methodBind.Target, out List<string> methods))
                 {
                     return;
                 }
@@ -199,8 +196,7 @@ namespace CatLib
         /// <param name="target">对象信息</param>
         private void UnbindWithObject(object target)
         {
-            List<string> methods;
-            if (!targetToMethodsMappings.TryGetValue(target, out methods))
+            if (!targetToMethodsMappings.TryGetValue(target, out List<string> methods))
             {
                 return;
             }
@@ -227,9 +223,9 @@ namespace CatLib
         /// 生成一个方法没有找到异常
         /// </summary>
         /// <param name="method"></param>
-        private RuntimeException MakeMethodNotFoundException(string method)
+        private LogicException MakeMethodNotFoundException(string method)
         {
-            return new RuntimeException("Method [" + method + "] is not found.");
+            return new LogicException($"Method [{method}] is not found.");
         }
     }
 }

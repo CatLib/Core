@@ -22,17 +22,22 @@ namespace CatLib
         /// <summary>
         /// 服务实现，执行这个委托将会获得服务实例
         /// </summary>
-        public Func<IContainer, object[], object> Concrete { get; private set; }
+        public Func<IContainer, object[], object> Concrete { get; }
 
         /// <summary>
         /// 当前绑定的服务是否是静态服务
         /// </summary>
-        public bool IsStatic { get; private set; }
+        public bool IsStatic { get; }
 
         /// <summary>
         /// 服务构造修饰器
         /// </summary>
-        private List<Func<IBindData, object, object>> resolving;
+        private List<Action<IBindData, object>> resolving;
+
+        /// <summary>
+        /// 在服务构建修饰器之后的修饰器
+        /// </summary>
+        private List<Action<IBindData, object>> afterResolving;
 
         /// <summary>
         /// 服务构造修饰器
@@ -47,7 +52,7 @@ namespace CatLib
         /// <param name="concrete">服务实现</param>
         /// <param name="isStatic">服务是否是静态的</param>
         public BindData(Container container, string service, Func<IContainer, object[], object> concrete, bool isStatic)
-            :base(container, service)
+            : base(container, service)
         {
             Concrete = concrete;
             IsStatic = isStatic;
@@ -73,7 +78,7 @@ namespace CatLib
             lock (SyncRoot)
             {
                 GuardIsDestroy();
-                Guard.NotEmptyOrNull(alias, "alias");
+                Guard.NotEmptyOrNull(alias, nameof(alias));
                 Container.Alias(alias, Service);
                 return this;
             }
@@ -89,7 +94,7 @@ namespace CatLib
             lock (SyncRoot)
             {
                 GuardIsDestroy();
-                Guard.NotEmptyOrNull(tag, "tag");
+                Guard.NotEmptyOrNull(tag, nameof(tag));
                 Container.Tag(tag, Service);
                 return this;
             }
@@ -98,44 +103,39 @@ namespace CatLib
         /// <summary>
         /// 解决服务时触发的回调
         /// </summary>
-        /// <param name="func">解决事件</param>
+        /// <param name="closure">解决事件</param>
         /// <returns>服务绑定数据</returns>
-        public IBindData OnResolving(Func<IBindData, object, object> func)
+        public IBindData OnResolving(Action<IBindData, object> closure)
         {
-            Guard.NotNull(func, "func");
-            lock (SyncRoot)
-            {
-                GuardIsDestroy();
-                if (resolving == null)
-                {
-                    resolving = new List<Func<IBindData, object, object>>();
-                }
-                resolving.Add(func);
-            }
+            AddClosure(closure, ref resolving);
+            return this;
+        }
+
+        /// <summary>
+        /// 解决服务时事件之后的回调
+        /// </summary>
+        /// <param name="closure">解决事件</param>
+        /// <returns>服务绑定数据</returns>
+        public IBindData OnAfterResolving(Action<IBindData, object> closure)
+        {
+            AddClosure(closure, ref afterResolving);
             return this;
         }
 
         /// <summary>
         /// 当静态服务被释放时
         /// </summary>
-        /// <param name="action">处理事件</param>
+        /// <param name="closure">处理事件</param>
         /// <returns>服务绑定数据</returns>
-        public IBindData OnRelease(Action<IBindData, object> action)
+        public IBindData OnRelease(Action<IBindData, object> closure)
         {
-            Guard.NotNull(action, "action");
             if (!IsStatic)
             {
-                throw new RuntimeException("Service [" + Service + "] is not Singleton(Static) Bind , Can not call OnRelease().");
+                throw new LogicException(
+                    $"Service [{Service}] is not Singleton(Static) Bind , Can not call {nameof(OnRelease)}().");
             }
-            lock (SyncRoot)
-            {
-                GuardIsDestroy();
-                if (release == null)
-                {
-                    release = new List<Action<IBindData, object>>();
-                }
-                release.Add(action);
-            }
+
+            AddClosure(closure, ref release);
             return this;
         }
 
@@ -150,34 +150,52 @@ namespace CatLib
         /// <summary>
         /// 执行服务修饰器
         /// </summary>
-        /// <param name="obj">服务实例</param>
-        /// <returns>修饰后的服务实例</returns>
-        internal object TriggerResolving(object obj)
+        /// <param name="instance">服务实例</param>
+        /// <returns>服务实例</returns>
+        internal object TriggerResolving(object instance)
         {
-            if (resolving == null)
-            {
-                return obj;
-            }
-            foreach (var func in resolving)
-            {
-                obj = func.Invoke(this, obj);
-            }
-            return obj;
+            return Container.Trigger(this, instance, resolving);
+        }
+
+        /// <summary>
+        /// 执行服务修饰器之后的回调
+        /// </summary>
+        /// <param name="instance">服务实例</param>
+        /// <returns>服务实例</returns>
+        internal object TriggerAfterResolving(object instance)
+        {
+            return Container.Trigger(this, instance, afterResolving);
         }
 
         /// <summary>
         /// 执行服务释放处理器
         /// </summary>
-        /// <param name="obj">服务实例</param>
-        internal void TriggerRelease(object obj)
+        /// <param name="instance">服务实例</param>
+        /// <returns>服务实例</returns>
+        internal object TriggerRelease(object instance)
         {
-            if (release == null)
+            return Container.Trigger(this, instance, release);
+        }
+
+        /// <summary>
+        /// 增加一个事件
+        /// </summary>
+        /// <param name="closure">闭包</param>
+        /// <param name="list">事件列表</param>
+        private void AddClosure(Action<IBindData, object> closure, ref List<Action<IBindData, object>> list)
+        {
+            Guard.NotNull(closure, nameof(closure));
+
+            lock (SyncRoot)
             {
-                return;
-            }
-            foreach (var action in release)
-            {
-                action.Invoke(this, obj);
+                GuardIsDestroy();
+
+                if (list == null)
+                {
+                    list = new List<Action<IBindData, object>>();
+                }
+
+                list.Add(closure);
             }
         }
     }

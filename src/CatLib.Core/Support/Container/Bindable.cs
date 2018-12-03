@@ -21,7 +21,7 @@ namespace CatLib
         /// <summary>
         /// 当前绑定的名字
         /// </summary>
-        public string Service { get; private set; }
+        public string Service { get; }
 
         /// <summary>
         /// 父级容器
@@ -85,7 +85,7 @@ namespace CatLib
                 }
                 if (contextual.ContainsKey(needs))
                 {
-                    throw new RuntimeException("Needs [" + needs + "] is already exist.");
+                    throw new LogicException($"Needs [{needs}] is already exist.");
                 }
                 contextual.Add(needs, given);
             }
@@ -102,8 +102,7 @@ namespace CatLib
             {
                 return needs;
             }
-            string contextualNeeds;
-            return contextual.TryGetValue(needs, out contextualNeeds) ? contextualNeeds : needs;
+            return contextual.TryGetValue(needs, out string contextualNeeds) ? contextualNeeds : needs;
         }
 
         /// <summary>
@@ -118,7 +117,7 @@ namespace CatLib
         {
             if (isDestroy)
             {
-                throw new RuntimeException("Current bind has be mark Destroy.");
+                throw new LogicException("Current bind has be mark Destroy.");
             }
         }
     }
@@ -150,7 +149,7 @@ namespace CatLib
         /// <returns>绑定关系临时数据</returns>
         public IGivenData<TReturn> Needs(string service)
         {
-            Guard.NotEmptyOrNull(service, "service");
+            Guard.NotEmptyOrNull(service, nameof(service));
             lock (SyncRoot)
             {
                 GuardIsDestroy();

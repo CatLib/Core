@@ -14,33 +14,33 @@ using System;
 namespace CatLib
 {
     /// <summary>
-    /// 未能解决异常
+    /// 代码逻辑异常
     /// </summary>
     [ExcludeFromCodeCoverage]
-    public class UnresolvableException : RuntimeException
+    public class LogicException : RuntimeException
     {
         /// <summary>
-        /// 未能解决异常
+        /// 代码逻辑异常
         /// </summary>
-        public UnresolvableException()
+        public LogicException()
         {
 
         }
 
         /// <summary>
-        /// 未能解决异常
+        /// 代码逻辑异常
         /// </summary>
         /// <param name="message">异常消息</param>
-        public UnresolvableException(string message) : base(message)
+        public LogicException(string message) : base(message)
         {
         }
 
         /// <summary>
-        /// 未能解决异常
+        /// 代码逻辑异常
         /// </summary>
         /// <param name="message">异常消息</param>
         /// <param name="innerException">内部异常</param>
-        public UnresolvableException(string message, Exception innerException) : base(message, innerException)
+        public LogicException(string message, Exception innerException) : base(message, innerException)
         {
         }
     }

@@ -19,7 +19,7 @@ namespace CatLib
     /// 管道通讯流
     /// <para>一读一写线程安全</para>
     /// </summary>
-    public class PipelineStream : Stream
+    public class PipelineStream : WrapperStream
     {
         /// <summary>
         /// 可以被读取的长度
@@ -59,19 +59,12 @@ namespace CatLib
         /// <summary>
         /// 是否可以被读取
         /// </summary>
-        public override bool CanRead
-        {
-            get { return count > 0 && !disabled; }
-        }
+        public override bool CanRead => count > 0 && !disabled;
 
         /// <summary>
         /// 是否可以被写入
         /// </summary>
-        public override bool CanWrite
-        {
-            get { return count < capacity && !closed; }
-        }
-
+        public override bool CanWrite => count < capacity && !closed;
         /// <summary>
         /// 当前流的位置
         /// </summary>
@@ -82,8 +75,8 @@ namespace CatLib
         /// </summary>
         public override long Position
         {
-            get { return position; }
-            set { throw new NotSupportedException(); }
+            get => position;
+            set => throw new NotSupportedException();
         }
 
         /// <summary>
@@ -94,26 +87,17 @@ namespace CatLib
         /// <summary>
         /// 流的长度
         /// </summary>
-        public override long Length
-        {
-            get { return length; }
-        }
+        public override long Length => length;
 
         /// <summary>
         /// 是否能够设定偏移量
         /// </summary>
-        public override bool CanSeek
-        {
-            get { return false; }
-        }
+        public override bool CanSeek => false;
 
         /// <summary>
         /// 是否已经关闭了流
         /// </summary>
-        public bool Closed
-        {
-            get { return closed; }
-        }
+        public bool Closed => closed;
 
         /// <summary>
         /// 管道通讯流
@@ -204,10 +188,7 @@ namespace CatLib
                         this.count -= read;
                         position += read;
 
-                        if (OnRead != null)
-                        {
-                            OnRead(this);
-                        }
+                        OnRead?.Invoke(this);
 
                         return read;
                     }
@@ -280,7 +261,7 @@ namespace CatLib
         {
             if (closed)
             {
-                throw new ObjectDisposedException("PipelineStream", "Stream is Closed Cannot write");
+                throw new ObjectDisposedException(nameof(PipelineStream), $"Stream is {nameof(closed)} Cannot write");
             }
         }
 
@@ -291,7 +272,7 @@ namespace CatLib
         {
             if (disabled)
             {
-                throw new ObjectDisposedException("PipelineStream", "Stream is dispose");
+                throw new ObjectDisposedException(nameof(PipelineStream), $"Stream is {disabled}");
             }
         }
 

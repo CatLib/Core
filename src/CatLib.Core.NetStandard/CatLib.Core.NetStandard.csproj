@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <Version>1.1.3</Version>
+    <Version>1.3.0</Version>
     <Company>CatLib</Company>
     <Authors>CatLib</Authors>
     <Description>- CatLib是渐进式的框架，可以无缝和现有框架融合。无论您的项目处于哪个阶段您都可以轻易的接入CatLib。
@@ -18,7 +18,7 @@
 - 中文文档完善，极低的学习成本。
 
 - 面向接口编程，底层组件无感知替换。</Description>
-    <Copyright>Copyright © CatLib 2017</Copyright>
+    <Copyright>Copyright © CatLib 2017-2019</Copyright>
     <AssemblyName>CatLib.Core</AssemblyName>
     <RootNamespace>CatLib.Core</RootNamespace>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
@@ -28,14 +28,11 @@
     <RepositoryUrl>https://github.com/CatLib/Core</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageTags>CatLib,Framework</PackageTags>
-    <PackageReleaseNotes>- 增加了新的模版方法：Managed 和 SingleManaged 用于扩展不对外开放的管理器。
-- App增加OnNewApplication事件
-- 已过时了一些接口并提供了相应替换方案。
-- 增加了Str.Truncate可以用于裁剪字符串
-- 增加了Arr.Difference用于排除指定的值
-- 一些内部bug的修正</PackageReleaseNotes>
+    <PackageReleaseNotes></PackageReleaseNotes>
     <PackageLicenseUrl>https://github.com/CatLib/Core/blob/master/LICENSE</PackageLicenseUrl>
     <NeutralLanguage>zh</NeutralLanguage>
+    <AssemblyVersion>1.3.0.0</AssemblyVersion>
+    <FileVersion>1.3.0.0</FileVersion>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
@@ -69,6 +66,7 @@
     <Compile Include="..\CatLib.Core\CatLib\Facades\Template\SingleManager.cs" Link="CatLib\Facades\Template\SingleManager.cs" />
     <Compile Include="..\CatLib.Core\CatLib\IApplication.cs" Link="CatLib\IApplication.cs" />
     <Compile Include="..\CatLib.Core\CatLib\IBootstrap.cs" Link="CatLib\IBootstrap.cs" />
+    <Compile Include="..\CatLib.Core\CatLib\ICoroutineInit.cs" Link="CatLib\ICoroutineInit.cs" />
     <Compile Include="..\CatLib.Core\CatLib\IServiceProvider.cs" Link="CatLib\IServiceProvider.cs" />
     <Compile Include="..\CatLib.Core\CatLib\IServiceProviderType.cs" Link="CatLib\IServiceProviderType.cs" />
     <Compile Include="..\CatLib.Core\CatLib\ServiceProvider.cs" Link="CatLib\ServiceProvider.cs" />
@@ -97,6 +95,8 @@
     <Compile Include="..\CatLib.Core\Support\Events\IDispatcher.cs" Link="Support\Events\IDispatcher.cs" />
     <Compile Include="..\CatLib.Core\Support\Events\IEvent.cs" Link="Support\Events\IEvent.cs" />
     <Compile Include="..\CatLib.Core\Support\Exception\AssertException.cs" Link="Support\Exception\AssertException.cs" />
+    <Compile Include="..\CatLib.Core\Support\Exception\CodeStandardException.cs" Link="Support\Exception\CodeStandardException.cs" />
+    <Compile Include="..\CatLib.Core\Support\Exception\LogicException.cs" Link="Support\Exception\LogicException.cs" />
     <Compile Include="..\CatLib.Core\Support\Exception\RuntimeException.cs" Link="Support\Exception\RuntimeException.cs" />
     <Compile Include="..\CatLib.Core\Support\FilterChain\FilterChain.cs" Link="Support\FilterChain\FilterChain.cs" />
     <Compile Include="..\CatLib.Core\Support\FilterChain\IFilterChain.cs" Link="Support\FilterChain\IFilterChain.cs" />
@@ -110,8 +110,11 @@
     <Compile Include="..\CatLib.Core\Support\SortSet\SortSet.cs" Link="Support\SortSet\SortSet.cs" />
     <Compile Include="..\CatLib.Core\Support\Storage\IStorage.cs" Link="Support\Storage\IStorage.cs" />
     <Compile Include="..\CatLib.Core\Support\Storage\MemoryStorage.cs" Link="Support\Storage\MemoryStorage.cs" />
+    <Compile Include="..\CatLib.Core\Support\Stream\CombineStream.cs" Link="Support\Stream\CombineStream.cs" />
     <Compile Include="..\CatLib.Core\Support\Stream\PipelineStream.cs" Link="Support\Stream\PipelineStream.cs" />
+    <Compile Include="..\CatLib.Core\Support\Stream\SegmentStream.cs" Link="Support\Stream\SegmentStream.cs" />
     <Compile Include="..\CatLib.Core\Support\Stream\StorageStream.cs" Link="Support\Stream\StorageStream.cs" />
+    <Compile Include="..\CatLib.Core\Support\Stream\WrapperStream.cs" Link="Support\Stream\WrapperStream.cs" />
     <Compile Include="..\CatLib.Core\Support\Template\IManaged.cs" Link="Support\Template\IManaged.cs" />
     <Compile Include="..\CatLib.Core\Support\Template\IManager.cs" Link="Support\Template\IManager.cs" />
     <Compile Include="..\CatLib.Core\Support\Template\ISingleManaged.cs" Link="Support\Template\ISingleManaged.cs" />

@@ -66,14 +66,8 @@ namespace CatLib
         /// <returns>参数值</returns>
         public object this[string key]
         {
-            get
-            {
-                return table[key];
-            }
-            set
-            {
-                table[key] = value;
-            }
+            get => table[key];
+            set => table[key] = value;
         }
 
         /// <summary>

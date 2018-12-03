@@ -10,6 +10,7 @@
  */
 
 using System;
+using IEnumerator = System.Collections.IEnumerator;
 using System.Collections.Generic;
 using System.Threading;
 
@@ -23,7 +24,7 @@ namespace CatLib
         /// <summary>
         /// 版本号
         /// </summary>
-        private readonly Version version = new Version("1.2.12");
+        private static readonly Version version = new Version("1.3.0");
 
         /// <summary>
         /// 框架启动流程
@@ -107,21 +108,14 @@ namespace CatLib
         private bool inited;
 
         /// <summary>
-        /// 启动流程
+        /// 是否正在注册中
         /// </summary>
-        private StartProcess process;
+        private bool registering;
 
         /// <summary>
         /// 启动流程
         /// </summary>
-        public StartProcess Process
-        {
-            get
-            {
-                return process;
-            }
-            private set { process = value; }
-        }
+        public StartProcess Process { get; private set; }
 
         /// <summary>
         /// 增量Id
@@ -136,13 +130,7 @@ namespace CatLib
         /// <summary>
         /// 是否是主线程
         /// </summary>
-        public bool IsMainThread
-        {
-            get
-            {
-                return mainThreadId == Thread.CurrentThread.ManagedThreadId;
-            }
-        }
+        public bool IsMainThread => mainThreadId == Thread.CurrentThread.ManagedThreadId;
 
         /// <summary>
         /// 事件系统
@@ -152,13 +140,7 @@ namespace CatLib
         /// <summary>
         /// 事件系统
         /// </summary>
-        public IDispatcher Dispatcher
-        {
-            get
-            {
-                return dispatcher ?? (dispatcher = this.Make<IDispatcher>());
-            }
-        }
+        public IDispatcher Dispatcher => dispatcher ?? (dispatcher = this.Make<IDispatcher>());
 
         /// <summary>
         /// 构建一个CatLib实例
@@ -209,7 +191,7 @@ namespace CatLib
 
             if (bootstrapped || Process != StartProcess.Construct)
             {
-                throw new RuntimeException("Cannot repeatedly trigger the Bootstrap()");
+                throw new CodeStandardException($"Cannot repeatedly trigger the {nameof(Bootstrap)}()");
             }
 
             Process = StartProcess.Bootstrap;
@@ -220,7 +202,10 @@ namespace CatLib
 
             foreach (var bootstrap in bootstraps)
             {
-                sorting.Add(bootstrap, GetPriority(bootstrap.GetType(), "Bootstrap"));
+                if (bootstrap != null)
+                {
+                    sorting.Add(bootstrap, GetPriority(bootstrap.GetType(), nameof(IBootstrap.Bootstrap)));
+                }
             }
 
             foreach (var bootstrap in sorting)
@@ -240,17 +225,25 @@ namespace CatLib
         /// <summary>
         /// 初始化
         /// </summary>
-        /// <exception cref="RuntimeException">没有调用<c>Bootstrap(...)</c>就尝试初始化时触发</exception>
         public virtual void Init()
+        {
+            StartCoroutine(CoroutineInit());
+        }
+
+        /// <summary>
+        /// 初始化
+        /// </summary>
+        /// <exception cref="CodeStandardException">没有调用<c>Bootstrap(...)</c>就尝试初始化时触发</exception>
+        protected IEnumerator CoroutineInit()
         {
             if (!bootstrapped)
             {
-                throw new RuntimeException("You must call Bootstrap() first.");
+                throw new CodeStandardException($"You must call {nameof(Bootstrap)}() first.");
             }
 
             if (inited || Process != StartProcess.Bootstraped)
             {
-                throw new RuntimeException("Cannot repeatedly trigger the Init()");
+                throw new CodeStandardException($"Cannot repeatedly trigger the {nameof(Init)}()");
             }
 
             Process = StartProcess.Init;
@@ -259,8 +252,7 @@ namespace CatLib
 
             foreach (var provider in serviceProviders)
             {
-                Trigger(ApplicationEvents.OnIniting, provider);
-                provider.Init();
+                yield return InitProvider(provider);
             }
 
             inited = true;
@@ -275,41 +267,75 @@ namespace CatLib
         /// 注册服务提供者
         /// </summary>
         /// <param name="provider">注册服务提供者</param>
-        /// <exception cref="RuntimeException">服务提供者被重复注册时触发</exception>
+        /// <exception cref="LogicException">服务提供者被重复注册时触发</exception>
         public virtual void Register(IServiceProvider provider)
+        {
+            StartCoroutine(CoroutineRegister(provider));
+        }
+
+        /// <summary>
+        /// 注册服务提供者
+        /// </summary>
+        /// <param name="provider">注册服务提供者</param>
+        /// <exception cref="LogicException">服务提供者被重复注册时触发</exception>
+        protected IEnumerator CoroutineRegister(IServiceProvider provider)
         {
             Guard.Requires<ArgumentNullException>(provider != null);
 
             if (IsRegisted(provider))
             {
-                throw new RuntimeException("Provider [" + provider.GetType() + "] is already register.");
+                throw new LogicException($"Provider [{provider.GetType()}] is already register.");
             }
 
-            if(Process == StartProcess.Initing)
+            if (Process == StartProcess.Initing)
             {
-                throw new RuntimeException("Unable to add service provider during StartProcess.Initing");
+                throw new CodeStandardException($"Unable to add service provider during {nameof(StartProcess.Initing)}");
             }
 
-            if(Process > StartProcess.Running)
+            if (Process > StartProcess.Running)
             {
-                throw new RuntimeException("Unable to Terminate in-process registration service provider");
+                throw new CodeStandardException($"Unable to {nameof(Terminate)} in-process registration service provider");
             }
 
             var allow = TriggerHalt(ApplicationEvents.OnRegisterProvider, provider) == null;
             if (!allow)
             {
-                return;
+                yield break;
             }
 
-            provider.Register();
-            serviceProviders.Add(provider, GetPriority(provider.GetType(), "Init"));
+            try
+            {
+                registering = true;
+                provider.Register();
+            }
+            finally
+            {
+                registering = false;
+            }
+            serviceProviders.Add(provider, GetPriority(provider.GetType(), nameof(IServiceProvider.Init)));
             serviceProviderTypes.Add(GetProviderBaseType(provider));
 
             if (inited)
             {
-                Trigger(ApplicationEvents.OnIniting, provider);
-                provider.Init();
+                yield return InitProvider(provider);
             }
+        }
+
+        /// <summary>
+        /// 初始化服务提供者
+        /// </summary>
+        /// <param name="provider">服务提供者</param>
+        private IEnumerator InitProvider(IServiceProvider provider)
+        {
+            Trigger(ApplicationEvents.OnProviderInit, provider);
+
+            provider.Init();
+            if (provider is ICoroutineInit coroutine)
+            {
+                yield return coroutine.CoroutineInit();
+            }
+
+            Trigger(ApplicationEvents.OnProviderInited, provider);
         }
 
         /// <summary>
@@ -348,14 +374,8 @@ namespace CatLib
         /// </summary>
         public DebugLevels DebugLevel
         {
-            get
-            {
-                return (DebugLevels)Make(Type2Service(typeof(DebugLevels)));
-            }
-            set
-            {
-                Instance(Type2Service(typeof(DebugLevels)), value);
-            }
+            get => (DebugLevels)Make(Type2Service(typeof(DebugLevels)));
+            set => Instance(Type2Service(typeof(DebugLevels)), value);
         }
 
         /// <summary>
@@ -424,13 +444,7 @@ namespace CatLib
         /// CatLib版本(遵循semver)
         /// </summary>
         [ExcludeFromCodeCoverage]
-        public string Version
-        {
-            get
-            {
-                return version.ToString();
-            }
-        }
+        public static string Version => version.ToString();
 
         /// <summary>
         /// 比较CatLib版本(遵循semver)
@@ -443,9 +457,9 @@ namespace CatLib
         /// <param name="revised">修订版本号</param>
         /// <returns>比较结果</returns>
         [ExcludeFromCodeCoverage]
-        public int Compare(int major, int minor, int revised)
+        public static int Compare(int major, int minor, int revised)
         {
-            return Compare(string.Format("{0}.{1}.{2}", major, minor, revised));
+            return Compare($"{major}.{minor}.{revised}");
         }
 
         /// <summary>
@@ -454,18 +468,32 @@ namespace CatLib
         /// <para>输入版本等于当前版本则返回<code>0</code></para>
         /// <para>输入版本小于当前版本则返回<code>1</code></para>
         /// </summary>
-        /// <param name="version">版本号</param>
+        /// <param name="comparison">版本号</param>
         /// <returns>比较结果</returns>
         [ExcludeFromCodeCoverage]
-        public int Compare(string version)
+        public static int Compare(string comparison)
         {
-            return this.version.Compare(version);
+            return version.Compare(comparison);
+        }
+
+        /// <summary>
+        /// 验证构建状态
+        /// </summary>
+        /// <param name="method">函数名</param>
+        protected override void GuardConstruct(string method)
+        {
+            if (registering)
+            {
+                throw new CodeStandardException(
+                    $"It is not allowed to make services or dependency injection in the registration process, method:{method}");
+            }
+            base.GuardConstruct(method);
         }
 
         /// <summary>
         /// 注册核心别名
         /// </summary>
-        protected virtual void RegisterCoreAlias()
+        private void RegisterCoreAlias()
         {
             var application = Type2Service(typeof(Application));
             Instance(application, this);
@@ -483,10 +511,13 @@ namespace CatLib
         /// <summary>
         /// 注册核心服务
         /// </summary>
-        protected virtual void RegisterCoreService()
+        private void RegisterCoreService()
         {
             var bindable = new BindData(this, null, null, false);
-            this.Singleton<GlobalDispatcher>((_, __) => new GlobalDispatcher((paramInfos, userParams) => GetDependencies(bindable, paramInfos, userParams))).Alias<IDispatcher>();
+            this.Singleton<GlobalDispatcher>(
+                    (_, __) => new GlobalDispatcher(
+                        (paramInfos, userParams) => GetDependencies(bindable, paramInfos, userParams)))
+                .Alias<IDispatcher>();
         }
 
         /// <summary>
@@ -498,6 +529,30 @@ namespace CatLib
         {
             var providerType = provider as IServiceProviderType;
             return providerType == null ? provider.GetType() : providerType.BaseType;
+        }
+
+        /// <summary>
+        /// 启动迭代器
+        /// </summary>
+        /// <param name="coroutine">迭代程序</param>
+        private void StartCoroutine(IEnumerator coroutine)
+        {
+            var stack = new Stack<IEnumerator>();
+            stack.Push(coroutine);
+            do
+            {
+                coroutine = stack.Pop();
+                while (coroutine.MoveNext())
+                {
+                    if (!(coroutine.Current is IEnumerator nextCoroutine))
+                    {
+                        continue;
+                    }
+
+                    stack.Push(coroutine);
+                    coroutine = nextCoroutine;
+                }
+            } while (stack.Count > 0);
         }
     }
 }

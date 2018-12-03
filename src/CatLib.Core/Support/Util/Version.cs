@@ -27,18 +27,9 @@ namespace CatLib
         /// <summary>
         /// 版本匹配正则式
         /// </summary>
-        private static Regex VersionMatcher
-        {
-            get
-            {
-                if (versionMatcher == null)
-                {
-                    versionMatcher = new Regex(
-                        @"^(?<major>((?![0])\d+?|[0]))\.(?<minor>((?![0])\d+?|[0]))\.(?<revised>((?![0])\d+?|[0]))(?:-(?!\.)(?<pre_release>([a-zA-Z]\w*?|(?![0])\d+?|[0])(\.([a-zA-Z]\w*?|(?![0])\d+?|[0]))*?))?(?:\+(?!\.)(?<build_metadata>([a-zA-Z]\w*?|(?![0])\d+?|[0])(\.([a-zA-Z]\w*?|(?![0])\d+?|[0]))*?))?$");
-                }
-                return versionMatcher;
-            }
-        }
+        private static Regex VersionMatcher => versionMatcher ?? (versionMatcher = new Regex(
+                                                   @"^(?<major>((?![0])\d+?|[0]))\.(?<minor>((?![0])\d+?|[0]))\.(?<revised>((?![0])\d+?|[0]))(?:-(?!\.)(?<pre_release>([a-zA-Z]\w*?|(?![0])\d+?|[0])(\.([a-zA-Z]\w*?|(?![0])\d+?|[0]))*?))?(?:\+(?!\.)(?<build_metadata>([a-zA-Z]\w*?|(?![0])\d+?|[0])(\.([a-zA-Z]\w*?|(?![0])\d+?|[0]))*?))?$")
+                                               );
 
         /// <summary>
         /// 原始版本信息
@@ -208,10 +199,8 @@ namespace CatLib
         /// <param name="right">右值</param>
         private int CompareBlock(string left, string right)
         {
-            int leftInt;
-            var leftIsInt = int.TryParse(left, out leftInt);
-            int rightInt;
-            var rightIsInt = int.TryParse(right, out rightInt);
+            var leftIsInt = int.TryParse(left, out int leftInt);
+            var rightIsInt = int.TryParse(right, out int rightInt);
 
             if (rightIsInt && leftIsInt)
             {
@@ -234,7 +223,7 @@ namespace CatLib
         {
             if (!VersionMatcher.IsMatch(version))
             {
-                throw new RuntimeException("version is invalid");
+                throw new LogicException($"{nameof(version)} is invalid : {version}");
             }
         }
 

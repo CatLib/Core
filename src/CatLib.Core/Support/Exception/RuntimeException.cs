@@ -21,9 +21,9 @@ namespace CatLib
         /// <summary>
         /// 运行时异常
         /// </summary>
-        public RuntimeException() : base()
+        public RuntimeException()
         {
-            
+
         }
 
         /// <summary>

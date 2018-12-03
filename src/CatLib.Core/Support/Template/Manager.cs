@@ -31,12 +31,6 @@ namespace CatLib
         /// </summary>
         /// <param name="name">扩展名</param>
         /// <returns>扩展实现</returns>
-        public TInterface this[string name]
-        {
-            get
-            {
-                return Get(name);
-            }
-        }
+        public TInterface this[string name] => Get(name);
     }
 }

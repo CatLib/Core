@@ -52,15 +52,22 @@ namespace CatLib
         /// <summary>
         /// 解决服务时触发的回调
         /// </summary>
-        /// <param name="func">解决事件</param>
+        /// <param name="closure">解决事件</param>
         /// <returns>服务绑定数据</returns>
-        IBindData OnResolving(Func<IBindData, object, object> func);
+        IBindData OnResolving(Action<IBindData, object> closure);
+
+        /// <summary>
+        /// 解决服务时事件之后的回调
+        /// </summary>
+        /// <param name="closure">解决事件</param>
+        /// <returns>服务绑定数据</returns>
+        IBindData OnAfterResolving(Action<IBindData, object> closure);
 
         /// <summary>
         /// 当服务被释放时
         /// </summary>
-        /// <param name="action">处理事件</param>
+        /// <param name="closure">处理事件</param>
         /// <returns>服务绑定数据</returns>
-        IBindData OnRelease(Action<IBindData, object> action);
+        IBindData OnRelease(Action<IBindData, object> closure);
     }
 }

@@ -45,8 +45,7 @@ namespace CatLib
         {
             StandardName(ref name);
 
-            TInterface extend;
-            if (!instances.TryGetValue(name, out extend))
+            if (!instances.TryGetValue(name, out TInterface extend))
             {
                 return;
             }
@@ -84,16 +83,9 @@ namespace CatLib
         /// <param name="extend">扩展实现</param>
         private void InternalRelease(TInterface extend)
         {
-            if (OnRelease != null)
-            {
-                OnRelease(extend);
-            }
-
+            OnRelease?.Invoke(extend);
             var dispose = extend as IDisposable;
-            if (dispose != null)
-            {
-                dispose.Dispose();
-            }
+            dispose?.Dispose();
         }
 
         /// <summary>
@@ -105,8 +97,7 @@ namespace CatLib
         {
             StandardName(ref name);
 
-            TInterface extend;
-            if (instances.TryGetValue(name, out extend))
+            if (instances.TryGetValue(name, out TInterface extend))
             {
                 return extend;
             }
