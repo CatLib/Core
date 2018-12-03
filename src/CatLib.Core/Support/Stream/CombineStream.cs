@@ -90,7 +90,20 @@ namespace CatLib
         /// <summary>
         /// 是否是可读的
         /// </summary>
-        public override bool CanRead => true;
+        public override bool CanRead
+        {
+            get
+            {
+                foreach (var stream in streams)
+                {
+                    if (!stream.CanRead)
+                    {
+                        return false;
+                    }
+                }
+                return true;
+            }   
+        }
 
         /// <summary>
         /// 是否是可写的
