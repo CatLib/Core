@@ -9,6 +9,7 @@
  * Document: http://catlib.io/
  */
 
+using System;
 using System.Collections.Generic;
 
 namespace CatLib
@@ -33,6 +34,12 @@ namespace CatLib
         /// 当前服务需求某个服务时可以指定给与什么服务
         /// </summary>
         private Dictionary<string, string> contextual;
+
+        /// <summary>
+        /// 服务上下文闭包
+        /// 当前服务需求某个服务时给定的闭包
+        /// </summary>
+        private Dictionary<string, Func<object>> contextualClosure;
 
         /// <summary>
         /// 同步锁
@@ -83,11 +90,35 @@ namespace CatLib
                 {
                     contextual = new Dictionary<string, string>();
                 }
-                if (contextual.ContainsKey(needs))
+                if (contextual.ContainsKey(needs)
+                    || (contextualClosure != null && contextualClosure.ContainsKey(needs)))
                 {
                     throw new LogicException($"Needs [{needs}] is already exist.");
                 }
                 contextual.Add(needs, given);
+            }
+        }
+
+        /// <summary>
+        /// 为服务增加上下文
+        /// </summary>
+        /// <param name="needs">需求什么服务</param>
+        /// <param name="given">给与什么服务</param>
+        internal void AddContextual(string needs, Func<object> given)
+        {
+            lock (SyncRoot)
+            {
+                GuardIsDestroy();
+                if (contextualClosure == null)
+                {
+                    contextualClosure = new Dictionary<string, Func<object>>();
+                }
+                if (contextualClosure.ContainsKey(needs)
+                    || (contextual != null && contextual.ContainsKey(needs)))
+                {
+                    throw new LogicException($"Needs [{needs}] is already exist.");
+                }
+                contextualClosure.Add(needs, given);
             }
         }
 
@@ -103,6 +134,20 @@ namespace CatLib
                 return needs;
             }
             return contextual.TryGetValue(needs, out string contextualNeeds) ? contextualNeeds : needs;
+        }
+
+        /// <summary>
+        /// 获取上下文关系闭包实现
+        /// </summary>
+        /// <param name="needs">需求的服务</param>
+        /// <returns>给与的闭包</returns>
+        internal Func<object> GetContextualClosure(string needs)
+        {
+            if (contextualClosure == null)
+            {
+                return null;
+            }
+            return contextualClosure.TryGetValue(needs, out Func<object> closure) ? closure : null;
         }
 
         /// <summary>
