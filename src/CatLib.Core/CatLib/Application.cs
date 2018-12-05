@@ -90,7 +90,8 @@ namespace CatLib
         /// <summary>
         /// 服务提供者
         /// </summary>
-        private readonly SortSet<IServiceProvider, int> serviceProviders = new SortSet<IServiceProvider, int>();
+        private readonly List<KeyValuePair<IServiceProvider, int>> serviceProviders =
+            new List<KeyValuePair<IServiceProvider, int>>();
 
         /// <summary>
         /// 注册服务提供者
@@ -198,18 +199,31 @@ namespace CatLib
             Trigger(ApplicationEvents.OnBootstrap, this);
             Process = StartProcess.Bootstrapping;
 
-            var sorting = new SortSet<IBootstrap, int>();
+            var sorting = new List<KeyValuePair<IBootstrap, int>>();
+            var existed = new HashSet<IBootstrap>();
 
             foreach (var bootstrap in bootstraps)
             {
-                if (bootstrap != null)
+                if (bootstrap == null)
                 {
-                    sorting.Add(bootstrap, GetPriority(bootstrap.GetType(), nameof(IBootstrap.Bootstrap)));
+                    continue;
                 }
+
+                if (existed.Contains(bootstrap))
+                {
+                    throw new LogicException($"The bootstrap already exists : {bootstrap}");
+                }
+
+                existed.Add(bootstrap);
+                sorting.Add(new KeyValuePair<IBootstrap, int>(bootstrap,
+                    GetPriority(bootstrap.GetType(), nameof(IBootstrap.Bootstrap))));
             }
 
-            foreach (var bootstrap in sorting)
+            sorting.Sort((left, right) => left.Value.CompareTo(right.Value));
+
+            foreach (var kv in sorting)
             {
+                var bootstrap = kv.Key;
                 var allow = TriggerHalt(ApplicationEvents.Bootstrapping, bootstrap) == null;
                 if (bootstrap != null && allow)
                 {
@@ -250,9 +264,11 @@ namespace CatLib
             Trigger(ApplicationEvents.OnInit, this);
             Process = StartProcess.Initing;
 
+            serviceProviders.Sort((left, right) => left.Value.CompareTo(right.Value));
+
             foreach (var provider in serviceProviders)
             {
-                yield return InitProvider(provider);
+                yield return InitProvider(provider.Key);
             }
 
             inited = true;
@@ -312,7 +328,10 @@ namespace CatLib
             {
                 registering = false;
             }
-            serviceProviders.Add(provider, GetPriority(provider.GetType(), nameof(IServiceProvider.Init)));
+
+            serviceProviders.Add(
+                new KeyValuePair<IServiceProvider, int>(provider,
+                    GetPriority(provider.GetType(), nameof(IServiceProvider.Init))));
             serviceProviderTypes.Add(GetProviderBaseType(provider));
 
             if (inited)

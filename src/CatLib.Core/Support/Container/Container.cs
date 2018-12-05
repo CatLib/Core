@@ -908,7 +908,7 @@ namespace CatLib
         /// </summary>
         /// <param name="type">类型</param>
         /// <returns>服务名</returns>
-        public virtual string Type2Service(Type type)
+        public string Type2Service(Type type)
         {
             return type.ToString();
         }
@@ -1150,6 +1150,12 @@ namespace CatLib
         /// <returns>解决结果</returns>
         protected virtual object ResolveAttrPrimitive(Bindable makeServiceBindData, string service, PropertyInfo baseParam)
         {
+            var contextualClosure = makeServiceBindData.GetContextualClosure(service);
+            if (contextualClosure != null)
+            {
+                return contextualClosure();
+            }
+
             service = makeServiceBindData.GetContextual(service);
             if (CanMake(service))
             {
@@ -1174,8 +1180,15 @@ namespace CatLib
         /// <returns>解决结果</returns>
         protected virtual object ResloveAttrClass(Bindable makeServiceBindData, string service, PropertyInfo baseParam)
         {
+            var contextualClosure = makeServiceBindData.GetContextualClosure(service);
+            if (contextualClosure != null)
+            {
+                return contextualClosure();
+            }
+
             try
             {
+                // 我们不进行CanMake检查以避免一次hash
                 return Make(makeServiceBindData.GetContextual(service));
             }
             catch (Exception)
@@ -1198,6 +1211,12 @@ namespace CatLib
         /// <returns>解决结果</returns>
         protected virtual object ResolvePrimitive(Bindable makeServiceBindData, string service, ParameterInfo baseParam)
         {
+            var contextualClosure = makeServiceBindData.GetContextualClosure(service);
+            if (contextualClosure != null)
+            {
+                return contextualClosure();
+            }
+
             service = makeServiceBindData.GetContextual(service);
             if (CanMake(service))
             {
@@ -1227,6 +1246,12 @@ namespace CatLib
         /// <returns>解决结果</returns>
         protected virtual object ResloveClass(Bindable makeServiceBindData, string service, ParameterInfo baseParam)
         {
+            var contextualClosure = makeServiceBindData.GetContextualClosure(service);
+            if (contextualClosure != null)
+            {
+                return contextualClosure();
+            }
+
             try
             {
                 return Make(makeServiceBindData.GetContextual(service));
