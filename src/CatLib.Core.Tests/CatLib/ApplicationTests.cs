@@ -481,6 +481,111 @@ namespace CatLib.Tests
             app.Register(new TestRegisterProcessMakeServiceProvider());
         }
 
+        public class TestExistedBoostrap : IBootstrap
+        {
+            public void Bootstrap()
+            {
+                
+            }
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(LogicException))]
+        public void TestExistBoostrap()
+        {
+            var app = new Application();
+            var boostrap = new TestExistedBoostrap();
+            app.Bootstrap(boostrap, boostrap);
+        }
+
+        private static int assertValue = 0;
+
+        public class OrderAssertClass : IBootstrap, IServiceProvider
+        {
+            private readonly int assert;
+            public OrderAssertClass(int assert)
+            {
+                this.assert = assert;
+            }
+
+            public void Bootstrap()
+            {
+                Assert.AreEqual(assert, assertValue++);
+            }
+
+            /// <summary>
+            /// 服务提供者初始化
+            /// </summary>
+            public void Init()
+            {
+                Bootstrap();
+            }
+
+            /// <summary>
+            /// 当注册服务提供者
+            /// </summary>
+            public void Register()
+            {
+                
+            }
+        }
+
+        public class OrderAssertClassSub : OrderAssertClass
+        {
+            public OrderAssertClassSub(int assert)
+                :base(assert)
+            {
+
+            }
+        }
+
+        [Priority(0)]
+        public class OrderFirstClass : IBootstrap, IServiceProvider
+        {
+            public void Bootstrap()
+            {
+                Assert.AreEqual(0, assertValue);
+            }
+
+            /// <summary>
+            /// 服务提供者初始化
+            /// </summary>
+            public void Init()
+            {
+                Bootstrap();
+            }
+
+            /// <summary>
+            /// 当注册服务提供者
+            /// </summary>
+            public void Register()
+            {
+
+            }
+        }
+
+        [TestMethod]
+        public void TestBoostrapOrder()
+        {
+            assertValue = 0;
+            var app = new Application();
+            app.Bootstrap(new OrderAssertClass(0), new OrderFirstClass(), new OrderAssertClass(1));
+            Assert.AreEqual(2, assertValue);
+        }
+
+        [TestMethod]
+        public void TestProviderOrder()
+        {
+            assertValue = 0;
+            var app = new Application();
+            app.Bootstrap();
+            app.Register(new OrderAssertClass(0));
+            app.Register(new OrderFirstClass());
+            app.Register(new OrderAssertClassSub(1));
+            app.Init();
+            Assert.AreEqual(2, assertValue);
+        }
+
         private Application MakeApplication()
         {
             var app = new Application();

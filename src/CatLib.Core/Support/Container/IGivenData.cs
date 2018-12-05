@@ -9,6 +9,8 @@
  * Document: http://catlib.io/
  */
 
+using System;
+
 namespace CatLib
 {
     /// <summary>
@@ -29,5 +31,12 @@ namespace CatLib
         /// <typeparam name="T">给与的服务名或别名</typeparam>
         /// <returns>服务绑定数据</returns>
         TReturn Given<T>();
+
+        /// <summary>
+        /// 给与什么服务
+        /// </summary>
+        /// <param name="closure">给定的服务</param>
+        /// <returns>服务绑定数据</returns>
+        TReturn Given(Func<object> closure);
     }
 }

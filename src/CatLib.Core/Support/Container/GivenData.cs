@@ -9,6 +9,8 @@
  * Document: http://catlib.io/
  */
 
+using System;
+
 namespace CatLib
 {
     /// <summary>
@@ -73,6 +75,18 @@ namespace CatLib
         public TReturn Given<T>()
         {
             return Given(container.Type2Service(typeof(T)));
+        }
+
+        /// <summary>
+        /// 给与什么服务
+        /// </summary>
+        /// <param name="closure">给与的服务生成闭包</param>
+        /// <returns>服务绑定数据</returns>
+        public TReturn Given(Func<object> closure)
+        {
+            Guard.Requires<ArgumentNullException>(closure != null);
+            bindable.AddContextual(needs, closure);
+            return bindable as TReturn;
         }
     }
 }
