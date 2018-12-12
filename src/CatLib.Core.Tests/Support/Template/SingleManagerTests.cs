@@ -6,7 +6,7 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  * 
- * Document: http://catlib.io/
+ * Document: https://catlib.io/
  */
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
