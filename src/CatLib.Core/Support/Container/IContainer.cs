@@ -199,14 +199,6 @@ namespace CatLib
 		object this[string service] { get; set; }
 
         /// <summary>
-        /// 获取一个回调，当执行回调可以生成指定的服务
-        /// </summary>
-        /// <param name="service">服务名或别名</param>
-        /// <param name="userParams">用户传入的参数</param>
-        /// <returns>回调方案</returns>
-        Func<object> Factory(string service, params object[] userParams);
-
-        /// <summary>
         /// 为服务设定一个别名
         /// </summary>
         /// <param name="alias">别名</param>

@@ -1020,5 +1020,17 @@ namespace CatLib
         {
             return container.Type2Service(typeof(TService));
         }
+
+        /// <summary>
+        /// 获取一个回调，当执行回调可以生成指定的服务
+        /// </summary>
+        /// <param name="container">服务容器</param>
+        /// <param name="service">服务名或别名</param>
+        /// <param name="userParams">用户传入的参数</param>
+        /// <returns>回调方案</returns>
+        public static Func<object> Factory(this IContainer container, string service, params object[] userParams)
+        {
+            return () => container.Make(service, userParams);
+        }
     }
 }

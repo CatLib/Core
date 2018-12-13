@@ -586,17 +586,6 @@ namespace CatLib
         }
 
         /// <summary>
-        /// 获取一个回调，当执行回调可以生成指定的服务
-        /// </summary>
-        /// <param name="service">服务名或别名</param>
-        /// <param name="userParams">用户传入的参数</param>
-        /// <returns>回调方案</returns>
-        public Func<object> Factory(string service, params object[] userParams)
-        {
-            return () => Make(service, userParams);
-        }
-
-        /// <summary>
         /// 扩展容器中的服务
         /// <para>允许在服务构建的过程中配置或者替换服务</para>
         /// <para>如果服务已经被构建，拓展会立即生效。</para>
