@@ -144,6 +144,11 @@ namespace CatLib
         public IDispatcher Dispatcher => dispatcher ?? (dispatcher = this.Make<IDispatcher>());
 
         /// <summary>
+        /// 调试等级
+        /// </summary>
+        private DebugLevels debugLevel;
+
+        /// <summary>
         /// 构建一个CatLib实例
         /// </summary>
         public Application()
@@ -409,8 +414,12 @@ namespace CatLib
         /// </summary>
         public DebugLevels DebugLevel
         {
-            get => (DebugLevels)Make(Type2Service(typeof(DebugLevels)));
-            set => Instance(Type2Service(typeof(DebugLevels)), value);
+            get => debugLevel;
+            set
+            {
+                debugLevel = value;
+                Instance(Type2Service(typeof(DebugLevels)), debugLevel);
+            }
         }
 
         /// <summary>
