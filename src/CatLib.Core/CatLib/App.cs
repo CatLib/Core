@@ -798,11 +798,11 @@ namespace CatLib
         /// 常规绑定一个服务
         /// </summary>
         /// <typeparam name="TService">服务名</typeparam>
-        /// <typeparam name="TAlias">服务别名</typeparam>
+        /// <typeparam name="TConcrete">服务实现</typeparam>
         /// <returns>服务绑定数据</returns>
-        public static IBindData Bind<TService, TAlias>()
+        public static IBindData Bind<TService, TConcrete>()
         {
-            return Handler.Bind<TService, TAlias>();
+            return Handler.Bind<TService, TConcrete>();
         }
 
         /// <summary>
@@ -842,12 +842,12 @@ namespace CatLib
         /// 如果服务不存在那么则绑定服务
         /// </summary>
         /// <typeparam name="TService">服务名</typeparam>
-        /// <typeparam name="TAlias">服务别名</typeparam>
+        /// <typeparam name="TConcrete">服务实现</typeparam>
         /// <param name="bindData">如果绑定失败则返回历史绑定对象</param>
         /// <returns>是否完成绑定</returns>
-        public static bool BindIf<TService, TAlias>(out IBindData bindData)
+        public static bool BindIf<TService, TConcrete>(out IBindData bindData)
         {
-            return Handler.BindIf<TService, TAlias>(out bindData);
+            return Handler.BindIf<TService, TConcrete>(out bindData);
         }
 
         /// <summary>
@@ -901,11 +901,11 @@ namespace CatLib
         /// 以单例的形式绑定一个服务
         /// </summary>
         /// <typeparam name="TService">服务名</typeparam>
-        /// <typeparam name="TAlias">服务别名</typeparam>
+        /// <typeparam name="TConcrete">服务实现</typeparam>
         /// <returns>服务绑定数据</returns>
-        public static IBindData Singleton<TService, TAlias>()
+        public static IBindData Singleton<TService, TConcrete>()
         {
-            return Handler.Singleton<TService, TAlias>();
+            return Handler.Singleton<TService, TConcrete>();
         }
 
         /// <summary>
@@ -955,12 +955,12 @@ namespace CatLib
         /// 如果服务不存在那么则绑定服务
         /// </summary>
         /// <typeparam name="TService">服务名</typeparam>
-        /// <typeparam name="TAlias">服务别名</typeparam>
+        /// <typeparam name="TConcrete">服务实现</typeparam>
         /// <param name="bindData">如果绑定失败则返回历史绑定对象</param>
         /// <returns>是否完成绑定</returns>
-        public static bool SingletonIf<TService, TAlias>(out IBindData bindData)
+        public static bool SingletonIf<TService, TConcrete>(out IBindData bindData)
         {
-            return Handler.SingletonIf<TService, TAlias>(out bindData);
+            return Handler.SingletonIf<TService, TConcrete>(out bindData);
         }
 
         /// <summary>

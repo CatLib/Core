@@ -122,13 +122,12 @@ namespace CatLib
         /// 常规绑定一个服务
         /// </summary>
         /// <typeparam name="TService">服务名</typeparam>
-        /// <typeparam name="TAlias">服务别名</typeparam>
+        /// <typeparam name="TConcrete">服务实现</typeparam>
         /// <param name="container">服务容器</param>
         /// <returns>服务绑定数据</returns>
-        public static IBindData Bind<TService, TAlias>(this IContainer container)
+        public static IBindData Bind<TService, TConcrete>(this IContainer container)
         {
-            return container.Bind(container.Type2Service(typeof(TService)), typeof(TService), false)
-                .Alias(container.Type2Service(typeof(TAlias)));
+            return container.Bind(container.Type2Service(typeof(TService)), typeof(TConcrete), false);
         }
 
         /// <summary>
@@ -173,18 +172,13 @@ namespace CatLib
         /// 如果服务不存在那么则绑定服务
         /// </summary>
         /// <typeparam name="TService">服务名</typeparam>
-        /// <typeparam name="TAlias">服务别名</typeparam>
+        /// <typeparam name="TConcrete">服务实现</typeparam>
         /// <param name="container">服务容器</param>
         /// <param name="bindData">如果绑定失败则返回历史绑定对象</param>
         /// <returns>是否完成绑定</returns>
-        public static bool BindIf<TService, TAlias>(this IContainer container, out IBindData bindData)
+        public static bool BindIf<TService, TConcrete>(this IContainer container, out IBindData bindData)
         {
-            if (container.BindIf(container.Type2Service(typeof(TService)), typeof(TService), false, out bindData))
-            {
-                bindData.Alias(container.Type2Service(typeof(TAlias)));
-                return true;
-            }
-            return false;
+            return container.BindIf(container.Type2Service(typeof(TService)), typeof(TConcrete), false, out bindData);
         }
 
         /// <summary>
@@ -258,13 +252,12 @@ namespace CatLib
         /// 以单例的形式绑定一个服务
         /// </summary>
         /// <typeparam name="TService">服务名</typeparam>
-        /// <typeparam name="TAlias">服务别名</typeparam>
+        /// <typeparam name="TConcrete">服务实现</typeparam>
         /// <param name="container">服务容器</param>
         /// <returns>服务绑定数据</returns>
-        public static IBindData Singleton<TService, TAlias>(this IContainer container)
+        public static IBindData Singleton<TService, TConcrete>(this IContainer container)
         {
-            return container.Bind(container.Type2Service(typeof(TService)), typeof(TService), true)
-                .Alias(container.Type2Service(typeof(TAlias)));
+            return container.Bind(container.Type2Service(typeof(TService)), typeof(TConcrete), true);
         }
 
         /// <summary>
@@ -309,18 +302,13 @@ namespace CatLib
         /// 如果服务不存在那么则绑定服务
         /// </summary>
         /// <typeparam name="TService">服务名</typeparam>
-        /// <typeparam name="TAlias">服务别名</typeparam>
+        /// <typeparam name="TConcrete">服务实现</typeparam>
         /// <param name="container">服务容器</param>
         /// <param name="bindData">如果绑定失败则返回历史绑定对象</param>
         /// <returns>是否完成绑定</returns>
-        public static bool SingletonIf<TService, TAlias>(this IContainer container, out IBindData bindData)
+        public static bool SingletonIf<TService, TConcrete>(this IContainer container, out IBindData bindData)
         {
-            if (container.BindIf(container.Type2Service(typeof(TService)), typeof(TService), true, out bindData))
-            {
-                bindData.Alias(container.Type2Service(typeof(TAlias)));
-                return true;
-            }
-            return false;
+            return container.BindIf(container.Type2Service(typeof(TService)), typeof(TConcrete), true, out bindData);
         }
 
         /// <summary>
