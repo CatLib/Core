@@ -723,15 +723,35 @@ namespace CatLib
         /// <summary>
         /// 释放静态化实例
         /// </summary>
-        /// <param name="service">服务名或别名</param>
-        public bool Release(string service)
+        /// <param name="mixed">服务名或别名或单例化的对象</param>
+        /// <returns>是否完成了释放</returns>
+        public bool Release(object mixed)
         {
-            Guard.NotEmptyOrNull(service, nameof(service));
+            if (mixed == null)
+            {
+                return false;
+            }
+
             lock (syncRoot)
             {
-                service = AliasToService(service);
+                string service;
+                object instance = null;
+                if (!(mixed is string))
+                {
+                    service = GetServiceWithInstanceObject(mixed);
+                }
+                else
+                {
+                    service = AliasToService(mixed.ToString());
+                    if (!instances.TryGetValue(service, out instance))
+                    {
+                        // 防止将字符串作为服务名的情况
+                        service = GetServiceWithInstanceObject(mixed);
+                    }
+                }
 
-                if (!instances.TryGetValue(service, out object instance))
+                if (instance == null && 
+                    (string.IsNullOrEmpty(service) || !instances.TryGetValue(service, out instance)))
                 {
                     return false;
                 }
@@ -1658,6 +1678,18 @@ namespace CatLib
 
             Guard.Requires<AssertException>(exception != null);
             throw exception;
+        }
+
+        /// <summary>
+        /// 通过对象反向获取服务名
+        /// </summary>
+        /// <param name="instance">对象</param>
+        /// <returns>服务名</returns>
+        protected string GetServiceWithInstanceObject(object instance)
+        {
+            return instancesReverse.TryGetValue(instance, out string origin)
+                ? origin
+                : string.Empty;
         }
 
         /// <summary>

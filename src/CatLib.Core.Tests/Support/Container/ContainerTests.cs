@@ -2210,6 +2210,27 @@ namespace CatLib.Tests.Stl
             container.Unbind("Not Exists");
         }
 
+        public interface ITaggedRelease
+        {
+            
+        }
+
+        public class TaggedRelease : ITaggedRelease
+        {
+            
+        }
+
+        [TestMethod]
+        public void TestTaggedRelease()
+        {
+            var container = new Container();
+            container.Singleton<ITaggedRelease, TaggedRelease>()
+                .Tag("tag");
+            var services = container.Tagged("tag");
+
+            Assert.AreEqual(true, container.Release(ref services));
+        }
+
         /// <summary>
         /// 测试基础容器调用
         /// </summary>

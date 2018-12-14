@@ -156,10 +156,10 @@ namespace CatLib
         object Instance(string service, object instance);
 
         /// <summary>
-        /// 释放某个静态化实例
+        /// 释放某个单例化的对象
         /// </summary>
-        /// <param name="service">服务名或别名</param>
-        bool Release(string service);
+        /// <param name="mixed">服务名或别名或单例对象</param>
+        bool Release(object mixed);
 
         /// <summary>
         /// 清空容器的所有实例，绑定，别名，标签，解决器，方法容器, 扩展

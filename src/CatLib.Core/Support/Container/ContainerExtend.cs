@@ -515,7 +515,7 @@ namespace CatLib
                     continue;
                 }
 
-                if (!container.Release(container.Type2Service(instances[index].GetType())))
+                if (!container.Release(instances[index]))
                 {
                     instances[errorIndex++] = instances[index];
                 }
