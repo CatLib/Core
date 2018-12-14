@@ -153,13 +153,13 @@ namespace CatLib
         /// </summary>
         public Application()
         {
-            App.Handler = this;
             mainThreadId = Thread.CurrentThread.ManagedThreadId;
             RegisterCoreAlias();
             RegisterCoreService();
             OnFindType(finder => { return Type.GetType(finder); });
             DebugLevel = DebugLevels.Production;
             Process = StartProcess.Construct;
+            App.Handler = this;
         }
 
         /// <summary>

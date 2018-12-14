@@ -21,7 +21,14 @@ namespace CatLib.Core.Tests
         public void TestCloseAutoInstance()
         {
             App.AutoInstance = false;
-            var handler = App.Handler;
+            try
+            {
+                var handler = App.Handler;
+            }
+            finally
+            {
+                App.AutoInstance = true;
+            }
         }
     }
 }

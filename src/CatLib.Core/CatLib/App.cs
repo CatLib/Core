@@ -25,7 +25,23 @@ namespace CatLib
         /// <summary>
         /// 当新建Application时
         /// </summary>
-        public static event Action<IApplication> OnNewApplication;
+        private static event Action<IApplication> onNewApplication;
+
+        /// <summary>
+        /// 当新建Application时
+        /// </summary>
+        public static event Action<IApplication> OnNewApplication
+        {
+            add
+            {
+                onNewApplication += value;
+                if (instance != null)
+                {
+                    onNewApplication?.Invoke(instance);
+                }
+            }
+            remove => onNewApplication -= value;
+        }
 
         /// <summary>
         /// CatLib实例
@@ -53,7 +69,7 @@ namespace CatLib
             set
             {
                 instance = value;
-                OnNewApplication?.Invoke(instance);
+                onNewApplication?.Invoke(instance);
             }
         }
 
