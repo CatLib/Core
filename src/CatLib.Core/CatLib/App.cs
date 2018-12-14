@@ -33,11 +33,23 @@ namespace CatLib
         private static IApplication instance;
 
         /// <summary>
+        /// 自动生成Application
+        /// </summary>
+        public static bool AutoInstance { get; set; } = true;
+
+        /// <summary>
         /// CatLib实例
         /// </summary>
         public static IApplication Handler
         {
-            get => instance ?? New();
+            get
+            {
+                if (instance == null && !AutoInstance)
+                {
+                    throw new LogicException("The Application does not instance");
+                }
+                return instance ?? New();
+            }
             set
             {
                 instance = value;
