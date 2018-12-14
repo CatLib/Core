@@ -20,6 +20,7 @@ namespace CatLib.Core.Tests
         [ExpectedException(typeof(LogicException))]
         public void TestCloseAutoInstance()
         {
+            App.Handler?.Terminate();
             App.AutoInstance = false;
             try
             {
