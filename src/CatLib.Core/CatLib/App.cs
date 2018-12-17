@@ -422,6 +422,16 @@ namespace CatLib
         }
 
         /// <summary>
+        /// 服务是否已经被解决过
+        /// </summary>
+        /// <param name="service">服务名</param>
+        /// <returns>是否已经被解决过</returns>
+        public static bool IsResolved(string service)
+        {
+            return Handler.IsResolved(service);
+        }
+
+        /// <summary>
         /// 是否可以生成服务
         /// </summary>
         /// <param name="service">服务名或者别名</param>
