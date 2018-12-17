@@ -53,7 +53,6 @@ namespace CatLib
                 binder = null;
                 inited = false;
                 released = false;
-                service = App.Type2Service(typeof(TService));
             };
         }
 
