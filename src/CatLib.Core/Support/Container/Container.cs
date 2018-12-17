@@ -846,7 +846,7 @@ namespace CatLib
                 if (!IsResolved(service) && !CanMake(service))
                 {
                     throw new CodeStandardException(
-                        $"Must be monitored if the service can be make, Please {nameof(Bind)} or {nameof(Instance)} first.");
+                        $"If you want use Rebound(Watch) , please {nameof(Bind)} or {nameof(Instance)} service first.");
                 }
 
                 if (!rebound.TryGetValue(service, out List<Action<object>> list))

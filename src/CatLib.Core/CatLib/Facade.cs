@@ -86,19 +86,16 @@ namespace CatLib
         {
             released = false;
 
-            if (!inited)
+            if (!inited && (App.IsResolved(service) || App.CanMake(service)))
             {
                 App.Watch<TService>(ServiceRebound);
                 inited = true;
             }
-            else
+            else if (binder != null && !binder.IsStatic)
             {
                 // 如果已经初始化了说明binder已经被初始化过。
                 // 那么提前判断可以优化性能而不用经过一个hash查找。
-                if (binder != null && !binder.IsStatic)
-                {
-                    return Build(userParams);
-                }
+                return Build(userParams);
             }
 
             var newBinder = App.GetBind(service);

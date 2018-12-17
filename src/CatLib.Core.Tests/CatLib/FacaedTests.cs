@@ -345,5 +345,12 @@ namespace CatLib.Tests
             Assert.AreEqual(300, Facade<int>.Instance);
             Assert.AreEqual(4, makeCount);
         }
+
+        [TestMethod]
+        [ExpectedException(typeof(UnresolvableException))]
+        public void TestEmptyFacade()
+        {
+            var ins = Facade<IBindData>.Instance;
+        }
     }
 }
