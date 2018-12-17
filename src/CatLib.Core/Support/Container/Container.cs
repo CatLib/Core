@@ -1503,7 +1503,7 @@ namespace CatLib
                 if (!CanInject(property.PropertyType, instance))
                 {
                     throw new UnresolvableException(
-                        $"[{makeServiceBindData.Service}] Attr inject type must be [{property.PropertyType}] , But instance is [{instance.GetType()}] , Make service is [{needService}].");
+                        $"[{makeServiceBindData.Service}]({makeServiceInstance.GetType()}) Attr inject type must be [{property.PropertyType}] , But instance is [{instance.GetType()}] , Make service is [{needService}].");
                 }
 
                 property.SetValue(makeServiceInstance, instance, null);
