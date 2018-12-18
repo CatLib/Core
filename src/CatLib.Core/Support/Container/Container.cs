@@ -1496,7 +1496,7 @@ namespace CatLib
                 if (!CanInject(property.PropertyType, instance))
                 {
                     throw new UnresolvableException(
-                        $"[{makeServiceBindData.Service}]({makeServiceInstance.GetType()}) Attr inject type must be [{property.PropertyType}] , But instance is [{instance.GetType()}] , Make service is [{needService}].");
+                        $"[{makeServiceBindData.Service}]({makeServiceInstance.GetType()}) Attr inject type must be [{property.PropertyType}] , But instance is [{instance?.GetType()}] , Make service is [{needService}].");
                 }
 
                 property.SetValue(makeServiceInstance, instance, null);
@@ -1619,7 +1619,7 @@ namespace CatLib
                 if (!CanInject(baseParam.ParameterType, param))
                 {
                     var error =
-                        $"[{makeServiceBindData.Service}] Params inject type must be [{baseParam.ParameterType}] , But instance is [{param.GetType()}]";
+                        $"[{makeServiceBindData.Service}] Params inject type must be [{baseParam.ParameterType}] , But instance is [{param?.GetType()}]";
                     if (needService == null)
                     {
                         error += " Inject params from user incoming parameters.";

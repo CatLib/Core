@@ -10,6 +10,7 @@
  */
 
 using System;
+using System.CodeDom;
 using System.Collections.Generic;
 using System.Reflection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -2714,6 +2715,75 @@ namespace CatLib.Tests.Stl
             container.Bind<int>(() => 200);
 
             Assert.AreEqual(200, container.Make<TestNeedGivenWithParamNameClass>().MyParam);
+        }
+
+        [TestMethod]
+        public void TestNullRelease()
+        {
+            var container = new Container();
+            Assert.AreEqual(false, container.Release(null));
+        }
+
+        public class TestGivenInvalidTypeClass
+        {
+            public TestGivenInvalidTypeClass(Container container)
+            {
+                Assert.Fail();
+            }
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(UnresolvableException))]
+        public void TestGivenInvalidType()
+        {
+            var container = new Container();
+            container.Bind<TestGivenInvalidTypeClass>()
+                .Needs("$container").Given(() => 123);
+            container.Make<TestGivenInvalidTypeClass>();
+        }
+
+        public class TestGivenInvalidTypeAttrClass
+        {
+            [Inject]
+            public Container container { get; set; }
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(UnresolvableException))]
+        public void TestGivenInvalidTypeAttr()
+        {
+            var container = new Container();
+            container.Bind<TestGivenInvalidTypeAttrClass>()
+                .Needs("$container").Given(() => 123);
+            container.Make<TestGivenInvalidTypeAttrClass>();
+        }
+
+        public class NotSupportNullInject : Container
+        {
+            protected override bool CanInject(Type type, object instance)
+            {
+                return instance != null;
+            }
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(UnresolvableException))]
+        public void TestGivenInvalidTypeAttrNotSupportNullInject()
+        {
+            var container = new NotSupportNullInject();
+            container.Bind<TestGivenInvalidTypeAttrClass>()
+                .Needs("$container").Given(() => null);
+            container.Make<TestGivenInvalidTypeAttrClass>();
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(UnresolvableException))]
+        public void TestGivenInvalidTypeNotSupportNullInject()
+        {
+            var container = new NotSupportNullInject();
+            container.Bind<TestGivenInvalidTypeClass>()
+                .Needs("$container").Given(() => null);
+            container.Make<TestGivenInvalidTypeClass>();
         }
         #endregion
 
