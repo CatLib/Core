@@ -131,9 +131,9 @@ namespace CatLib
         {
             if (contextual == null)
             {
-                return needs;
+                return null;
             }
-            return contextual.TryGetValue(needs, out string contextualNeeds) ? contextualNeeds : needs;
+            return contextual.TryGetValue(needs, out string contextualNeeds) ? contextualNeeds : null;
         }
 
         /// <summary>

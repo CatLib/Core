@@ -71,7 +71,7 @@ namespace CatLib.Tests.Stl
 
             Assert.AreEqual("abc", bindData.GetContextual("need1"));
             Assert.AreEqual(container.Type2Service(typeof(BindDataTest)), bindData.GetContextual("need2"));
-            Assert.AreEqual("empty", bindData.GetContextual("empty"));
+            Assert.AreEqual(null, bindData.GetContextual("empty"));
         }
         #endregion
 

@@ -700,10 +700,13 @@ namespace CatLib.Tests.Stl
         public void TestContainerCallWithNullParams()
         {
             var container = MakeContainer();
-            container.Instance("num", 777);
-            container.Alias("$num", "num");
-            var result = container.Call(this, "TestContainerCall", null);
+            var result = container.Call(this, "TestContainerCallEmpty", null);
             Assert.AreEqual(777, result);
+        }
+
+        public int TestContainerCallEmpty()
+        {
+            return 777;
         }
 
         [TestMethod]
@@ -849,7 +852,7 @@ namespace CatLib.Tests.Stl
         public void MakeNoClassAttrInject()
         {
             var container = MakeContainer();
-            container.Bind<NoClassAttrInject>();
+            container.Bind<NoClassAttrInject>().Needs("$Time").Given("Time");
             container.Bind("Time", (c, p) => 100, false).Alias("$Time");
 
             var result = container.Make<NoClassAttrInject>();
@@ -905,9 +908,9 @@ namespace CatLib.Tests.Stl
         public void MakeNotClassConstructor()
         {
             var container = MakeContainer();
-            container.Bind<MakeTestNoParamClass>();
+            container.Bind<MakeTestNoParamClass>().Needs("$i").Given("i");
             container.Bind<MakeTestClassDependency>();
-            container.Singleton("i", (_,__) => 77).Alias("$i");
+            container.Singleton("i", (_,__) => 77);
             var result = container.Make<MakeTestNoParamClass>();
             Assert.AreEqual(77, result.I);
             Assert.AreNotEqual(null, result.Dependency);
@@ -1187,8 +1190,7 @@ namespace CatLib.Tests.Stl
         public void TestInjectNull()
         {
             var container = new SupportNullContainer() as IContainer;
-            container.Bind<TestInjectNullClass>();
-
+            container.Bind<TestInjectNullClass>().Needs("$cls").Given(() => null);
             container.Make<TestInjectNullClass>();
         }
 
@@ -1847,9 +1849,7 @@ namespace CatLib.Tests.Stl
         public void TestFormatException()
         {
             var container = new Container();
-            container.Instance("num", 10);
-            container.Alias("$num", "num");
-            Assert.AreEqual(10, container.Call(this, "TestContainerCall", new ContainerTest()));
+            Assert.AreEqual(10, container.Call(this, "TestContainerCall", new ContainerTest(),10));
         }
 
         internal class TestNoConstructorAccessClass
@@ -2020,14 +2020,14 @@ namespace CatLib.Tests.Stl
         public void TestResloveAttrClassSpeculationServiceFunc()
         {
             var container = new Container();
-            container.Bind<TestResloveAttrClassSpeculationService>();
+            container.Bind<TestResloveAttrClassSpeculationService>()
+                .Needs("$ex").Given("ex")
+                .Needs("$rex").Given("rex");
             container.Instance("ex", new UnresolvableException());
-            container.Alias("$ex", "ex");
             container.Instance("rex", new UnresolvableException());
-            container.Alias("$rex", "rex");
             var cls = container.Make<TestResloveAttrClassSpeculationService>();
 
-            Assert.AreSame(container.Make("$ex"), cls.ex);
+            Assert.AreSame(container.Make("ex"), cls.ex);
         }
 
         [TestMethod]

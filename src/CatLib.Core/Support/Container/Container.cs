@@ -1154,14 +1154,28 @@ namespace CatLib
         /// 根据上下文获取相关的构建闭包
         /// </summary>
         /// <param name="makeServiceBindData">请求注入操作的服务绑定数据</param>
-        /// <param name="service">服务名</param>
+        /// <param name="service">构建的服务名</param>
         /// <param name="paramName">目标参数的名字</param>
         /// <returns>构建闭包</returns>
         protected virtual Func<object> GetContextualClosure(Bindable makeServiceBindData, string service,
             string paramName)
         {
             return makeServiceBindData.GetContextualClosure(service) ??
-                   makeServiceBindData.GetContextualClosure($"${paramName}");
+                   makeServiceBindData.GetContextualClosure($"{GetVariableTag()}{paramName}");
+        }
+
+        /// <summary>
+        /// 根据上下文获取相关的需求服务
+        /// </summary>
+        /// <param name="makeServiceBindData">请求注入操作的服务绑定数据</param>
+        /// <param name="service">构建的服务名</param>
+        /// <param name="paramName">目标参数的名字</param>
+        /// <returns>需求的服务名</returns>
+        protected virtual string GetContextual(Bindable makeServiceBindData, string service, string paramName)
+        {
+            return makeServiceBindData.GetContextual(service) ??
+                   makeServiceBindData.GetContextual($"{GetVariableTag()}{paramName}") ??
+                   service;
         }
 
         /// <summary>
@@ -1169,16 +1183,59 @@ namespace CatLib
         /// </summary>
         /// <param name="closure">上下文闭包</param>
         /// <param name="needType">参数需求的类型</param>
-        /// <returns>构建的实例</returns>
-        protected virtual object MakeFromContextualClosure(Func<object> closure, Type needType)
+        /// <param name="ouput">构建的实例</param>
+        /// <returns>是否成功构建</returns>
+        protected virtual bool MakeFromContextualClosure(Func<object> closure, Type needType, out object ouput)
         {
-            var instance = closure();
-            if (ChangeType(ref instance, needType))
+            ouput = null;
+            if (closure == null)
             {
-                return instance;
+                return false;
             }
 
-            throw new LogicException("Parameter type cannot be converted to : " + needType);
+            ouput = closure();
+            return ChangeType(ref ouput, needType);
+        }
+
+        /// <summary>
+        /// 从上下文关系的服务名获取服务实现
+        /// </summary>
+        /// <param name="service">上下文关系的服务名</param>
+        /// <param name="needType">参数需求类型</param>
+        /// <param name="output">构建的实例</param>
+        /// <returns>是否成功构建</returns>
+        protected virtual bool MakeFromContextualService(string service, Type needType, out object output)
+        {
+            output = null;
+            if (!CanMake(service))
+            {
+                return false;
+            }
+
+            output = Make(service);
+            return ChangeType(ref output, needType);
+        }
+
+        /// <summary>
+        /// 根据上下文来解决指定需求的服务
+        /// </summary>
+        /// <param name="makeServiceBindData">请求注入操作的服务绑定数据</param>
+        /// <param name="service">构建的服务名字</param>
+        /// <param name="paramName">目标参数的名字</param>
+        /// <param name="paramType">目标参数的类型</param>
+        /// <param name="output">构建的实例</param>
+        /// <returns>是否成功通过上下文解决</returns>
+        protected virtual bool ResloveFromContextual(Bindable makeServiceBindData, string service, string paramName,
+            Type paramType, out object output)
+        {
+            if (MakeFromContextualClosure(GetContextualClosure(makeServiceBindData, service, paramName),
+                paramType, out output))
+            {
+                return true;
+            }
+
+            return MakeFromContextualService(GetContextual(makeServiceBindData, service, paramName),
+                paramType, out output);
         }
 
         /// <summary>
@@ -1190,25 +1247,7 @@ namespace CatLib
         /// <returns>解决结果</returns>
         protected virtual object ResolveAttrPrimitive(Bindable makeServiceBindData, string service, PropertyInfo baseParam)
         {
-            var contextualClosure = GetContextualClosure(makeServiceBindData, service, baseParam.Name);
-            if (contextualClosure != null)
-            {
-                return MakeFromContextualClosure(contextualClosure, baseParam.PropertyType);
-            }
-
-            service = makeServiceBindData.GetContextual(service);
-            if (CanMake(service))
-            {
-                return Make(service);
-            }
-
-            var result = SpeculationServiceByParamName(makeServiceBindData, baseParam.Name, baseParam.PropertyType);
-            if (result != null)
-            {
-                return result;
-            }
-
-            throw MakeUnresolvablePrimitiveException(baseParam.Name, baseParam.DeclaringType);
+            return ResloveAttrClass(makeServiceBindData, service, baseParam);
         }
 
         /// <summary>
@@ -1220,26 +1259,13 @@ namespace CatLib
         /// <returns>解决结果</returns>
         protected virtual object ResloveAttrClass(Bindable makeServiceBindData, string service, PropertyInfo baseParam)
         {
-            var contextualClosure = GetContextualClosure(makeServiceBindData, service, baseParam.Name);
-            if (contextualClosure != null)
+            if (ResloveFromContextual(makeServiceBindData, service, baseParam.Name, baseParam.PropertyType,
+                out object instance))
             {
-                return MakeFromContextualClosure(contextualClosure, baseParam.PropertyType);
+                return instance;
             }
 
-            try
-            {
-                // 我们不进行CanMake检查以避免一次hash
-                return Make(makeServiceBindData.GetContextual(service));
-            }
-            catch (Exception)
-            {
-                var result = SpeculationServiceByParamName(makeServiceBindData, baseParam.Name, baseParam.PropertyType);
-                if (result != null)
-                {
-                    return result;
-                }
-                throw;
-            }
+            throw MakeUnresolvablePrimitiveException(baseParam.Name, baseParam.DeclaringType);
         }
 
         /// <summary>
@@ -1251,30 +1277,7 @@ namespace CatLib
         /// <returns>解决结果</returns>
         protected virtual object ResolvePrimitive(Bindable makeServiceBindData, string service, ParameterInfo baseParam)
         {
-            var contextualClosure = GetContextualClosure(makeServiceBindData, service, baseParam.Name);
-            if (contextualClosure != null)
-            {
-                return MakeFromContextualClosure(contextualClosure, baseParam.ParameterType);
-            }
-
-            service = makeServiceBindData.GetContextual(service);
-            if (CanMake(service))
-            {
-                return Make(service);
-            }
-
-            var result = SpeculationServiceByParamName(makeServiceBindData, baseParam.Name, baseParam.ParameterType);
-            if (result != null)
-            {
-                return result;
-            }
-
-            if (baseParam.IsOptional)
-            {
-                return baseParam.DefaultValue;
-            }
-
-            throw MakeUnresolvablePrimitiveException(baseParam.Name, baseParam.Member.DeclaringType);
+            return ResloveClass(makeServiceBindData, service, baseParam);
         }
 
         /// <summary>
@@ -1286,68 +1289,27 @@ namespace CatLib
         /// <returns>解决结果</returns>
         protected virtual object ResloveClass(Bindable makeServiceBindData, string service, ParameterInfo baseParam)
         {
-            var contextualClosure = GetContextualClosure(makeServiceBindData, service, baseParam.Name);
-            if (contextualClosure != null)
+            if (ResloveFromContextual(makeServiceBindData, service, baseParam.Name, baseParam.ParameterType,
+                out object instance))
             {
-                return MakeFromContextualClosure(contextualClosure, baseParam.ParameterType);
+                return instance;
             }
 
-            try
+            if (baseParam.IsOptional)
             {
-                return Make(makeServiceBindData.GetContextual(service));
-            }
-            catch (UnresolvableException)
-            {
-                var result = SpeculationServiceByParamName(makeServiceBindData, baseParam.Name, baseParam.ParameterType);
-                if (result != null)
-                {
-                    return result;
-                }
-
-                if (baseParam.IsOptional)
-                {
-                    return baseParam.DefaultValue;
-                }
-
-                throw;
-            }
-        }
-
-        /// <summary>
-        /// 根据参数名字来推测服务
-        /// </summary>
-        /// <param name="makeServiceBindData">请求注入操作的服务绑定数据</param>
-        /// <param name="paramName">参数名</param>
-        /// <param name="paramType">参数类型</param>
-        /// <returns>推测的服务</returns>
-        protected virtual object SpeculationServiceByParamName(Bindable makeServiceBindData, string paramName, Type paramType)
-        {
-            foreach (var tag in GetVariableTags())
-            {
-                var service = makeServiceBindData.GetContextual($"{tag}{paramName}");
-
-                if (!CanMake(service))
-                {
-                    continue;
-                }
-
-                var instance = Make(service);
-                if (ChangeType(ref instance, paramType))
-                {
-                    return instance;
-                }
+                return baseParam.DefaultValue;
             }
 
-            return null;
+            throw MakeUnresolvablePrimitiveException(baseParam.Name, baseParam.Member.DeclaringType);
         }
 
         /// <summary>
         /// 获取变量标签
         /// </summary>
         /// <returns>变量标签</returns>
-        protected virtual char[] GetVariableTags()
+        protected virtual char GetVariableTag()
         {
-            return new[] { '$', '@' };
+            return '$';
         }
 
         /// <summary>
