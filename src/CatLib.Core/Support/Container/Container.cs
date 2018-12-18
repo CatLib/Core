@@ -1997,7 +1997,7 @@ namespace CatLib
         /// <param name="makeServiceType">服务类型</param>
         /// <param name="userParams">用户传入的构造参数</param>
         /// <returns>服务实例</returns>
-        private object CreateInstance(Bindable makeServiceBindData, Type makeServiceType, object[] userParams)
+        protected virtual object CreateInstance(Bindable makeServiceBindData, Type makeServiceType, object[] userParams)
         {
             if (IsUnableType(makeServiceType))
             {
@@ -2008,17 +2008,28 @@ namespace CatLib
 
             try
             {
-                // 如果参数不存在那么在反射时不写入参数可以获得更好的性能
-                if (userParams == null || userParams.Length <= 0)
-                {
-                    return Activator.CreateInstance(makeServiceType);
-                }
-                return Activator.CreateInstance(makeServiceType, userParams);
+                return CreateInstance(makeServiceType, userParams);
             }
             catch (Exception ex)
             {
                 throw MakeBuildFaildException(makeServiceBindData.Service, makeServiceType, ex);
             }
+        }
+
+        /// <summary>
+        /// 通过指定的类型构建服务实现
+        /// </summary>
+        /// <param name="makeServiceType">指定的服务类型</param>
+        /// <param name="userParams">用户自定义参数</param>
+        /// <returns>构建的服务实现</returns>
+        protected virtual object CreateInstance(Type makeServiceType, object[] userParams)
+        {
+            // 如果参数不存在那么在反射时不写入参数可以获得更好的性能
+            if (userParams == null || userParams.Length <= 0)
+            {
+                return Activator.CreateInstance(makeServiceType);
+            }
+            return Activator.CreateInstance(makeServiceType, userParams);
         }
 
         /// <summary>
