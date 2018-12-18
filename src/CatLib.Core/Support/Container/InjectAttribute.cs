@@ -17,24 +17,9 @@ namespace CatLib
     /// 注入标记
     /// </summary>
     [AttributeUsage(AttributeTargets.Interface |
-                    AttributeTargets.Parameter |
                     AttributeTargets.Property)]
     public class InjectAttribute : Attribute
     {
-        /// <summary>
-        /// 注入服务的别名或者服务名
-        /// </summary>
-        public string Alias { get; }
-
-        /// <summary>
-        /// 声明注入
-        /// </summary>
-        /// <param name="alias">依赖服务的别名或者服务名</param>
-        public InjectAttribute(string alias)
-        {
-            Alias = alias;
-        }
-
         /// <summary>
         /// 声明注入
         /// </summary>

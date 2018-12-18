@@ -789,10 +789,10 @@ namespace CatLib.Tests.Stl
             [Inject]
             public MakeTestClassDependency DependencyRequired { get; set; }
 
-            [Inject("AliasName")]
+            [Inject]
             public MakeTestClassDependency2 DependencyAlias { get; set; }
 
-            [Inject("AliasNameRequired")]
+            [Inject]
             public MakeTestClassDependency DependencyAliasRequired { get; set; }
 
             public MakeTestClass(MakeTestClassDependency dependency)
@@ -950,7 +950,7 @@ namespace CatLib.Tests.Stl
         public void CheckIllegalMakeTypeIsNotSame()
         {
             var container = MakeContainer();
-            container.Singleton<MakeTestClass>();
+            container.Singleton<MakeTestClass>().Needs("$DependencyAlias").Given("AliasName");
             container.Singleton<MakeTestClassDependency2>().Alias("AliasNameRequired");
             container.Singleton<MakeTestClassDependency>().Alias("AliasName");
 
@@ -1053,8 +1053,7 @@ namespace CatLib.Tests.Stl
         public class TestMakeParamInjectAttrClass
         {
             private IMsg msg;
-            public TestMakeParamInjectAttrClass(
-                [Inject("AliasName")]IMsg msg)
+            public TestMakeParamInjectAttrClass(IMsg msg)
             {
                 this.msg = msg;
             }
@@ -1078,7 +1077,7 @@ namespace CatLib.Tests.Stl
 
             bind.Needs<IMsg>().Given<MakeTestClassDependency>();
             var cls = container.Make<TestMakeParamInjectAttrClass>();
-            Assert.AreEqual("world", cls.GetMsg());
+            Assert.AreEqual("hello", cls.GetMsg());
 
             bind.Needs("AliasName").Given<MakeTestClassDependency>();
             cls = container.Make<TestMakeParamInjectAttrClass>();
@@ -1496,7 +1495,7 @@ namespace CatLib.Tests.Stl
 
         class ComplexClassAlias
         {
-            [Inject("IComplexInterface.alias")]
+            [Inject]
             public IComplexInterface Msg { get; set; }
         }
 
@@ -1507,7 +1506,7 @@ namespace CatLib.Tests.Stl
         public void ComplexContextualRelationshipTest3()
         {
             var container = MakeContainer();
-            container.Bind<ComplexClassAlias>();
+            container.Bind<ComplexClassAlias>().Needs("$Msg").Given("IComplexInterface.alias");
             container.Bind<ComplexInjectClass1>().Alias<IComplexInterface>();
             container.Bind<ComplexInjectClass2>().Alias("IComplexInterface.alias");
 

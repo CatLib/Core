@@ -1123,10 +1123,7 @@ namespace CatLib
         /// <returns>需求的服务名</returns>
         protected virtual string GetPropertyNeedsService(PropertyInfo property)
         {
-            var injectAttr = (InjectAttribute)property.GetCustomAttributes(injectTarget, false)[0];
-            return string.IsNullOrEmpty(injectAttr.Alias)
-                ? Type2Service(property.PropertyType)
-                : injectAttr.Alias;
+            return Type2Service(property.PropertyType);
         }
 
         /// <summary>
@@ -1136,18 +1133,7 @@ namespace CatLib
         /// <returns>需求的服务名</returns>
         protected virtual string GetParamNeedsService(ParameterInfo baseParam)
         {
-            var needService = Type2Service(baseParam.ParameterType);
-            if (!baseParam.IsDefined(injectTarget, false))
-            {
-                return needService;
-            }
-
-            var injectAttr = (InjectAttribute)baseParam.GetCustomAttributes(injectTarget, false)[0];
-            if (!string.IsNullOrEmpty(injectAttr.Alias))
-            {
-                needService = injectAttr.Alias;
-            }
-            return needService;
+            return Type2Service(baseParam.ParameterType);
         }
 
         /// <summary>
