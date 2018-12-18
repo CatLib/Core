@@ -42,12 +42,6 @@ namespace CatLib
         public static readonly string OnInit = "CatLib.ApplicationEvents.OnInit";
 
         /// <summary>
-        /// 当初始化进行时
-        /// </summary>
-        [System.Obsolete("Please use " + nameof(OnProviderInit))]
-        public static readonly string OnIniting = "CatLib.ApplicationEvents.OnProviderInit";
-
-        /// <summary>
         /// 当服务提供者初始化进行前
         /// </summary>
         public static readonly string OnProviderInit = "CatLib.ApplicationEvents.OnProviderInit";

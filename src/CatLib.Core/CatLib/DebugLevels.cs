@@ -9,8 +9,6 @@
  * Document: https://catlib.io/
  */
 
-using System;
-
 namespace CatLib
 {
     /// <summary>
@@ -21,24 +19,12 @@ namespace CatLib
         /// <summary>
         /// 生产环境
         /// </summary>
-        [Obsolete("Please use " + nameof(Production))]
-        Prod,
-
-        /// <summary>
-        /// 生产环境
-        /// </summary>
         Production,
 
         /// <summary>
         /// 仿真环境
         /// </summary>
         Staging,
-
-        /// <summary>
-        /// 开发者模式
-        /// </summary>
-        [Obsolete("Please use " + nameof(Development))]
-        Dev,
 
         /// <summary>
         /// 开发者模式
