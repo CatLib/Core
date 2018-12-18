@@ -1157,7 +1157,7 @@ namespace CatLib
         /// <param name="service">构建的服务名</param>
         /// <param name="paramName">目标参数的名字</param>
         /// <returns>需求的服务名</returns>
-        protected virtual string GetContextual(Bindable makeServiceBindData, string service, string paramName)
+        protected virtual string GetContextualService(Bindable makeServiceBindData, string service, string paramName)
         {
             return makeServiceBindData.GetContextual(service) ??
                    makeServiceBindData.GetContextual($"{GetVariableTag()}{paramName}") ??
@@ -1220,7 +1220,7 @@ namespace CatLib
                 return true;
             }
 
-            return MakeFromContextualService(GetContextual(makeServiceBindData, service, paramName),
+            return MakeFromContextualService(GetContextualService(makeServiceBindData, service, paramName),
                 paramType, out output);
         }
 
