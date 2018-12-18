@@ -20,9 +20,5 @@ namespace CatLib
                     AttributeTargets.Property)]
     public class InjectAttribute : Attribute
     {
-        /// <summary>
-        /// 声明注入
-        /// </summary>
-        public InjectAttribute() { }
     }
 }
