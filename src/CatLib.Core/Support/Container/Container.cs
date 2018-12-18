@@ -1151,6 +1151,37 @@ namespace CatLib
         }
 
         /// <summary>
+        /// 根据上下文获取相关的构建闭包
+        /// </summary>
+        /// <param name="makeServiceBindData">请求注入操作的服务绑定数据</param>
+        /// <param name="service">服务名</param>
+        /// <param name="paramName">目标参数的名字</param>
+        /// <returns>构建闭包</returns>
+        protected virtual Func<object> GetContextualClosure(Bindable makeServiceBindData, string service,
+            string paramName)
+        {
+            return makeServiceBindData.GetContextualClosure(service) ??
+                   makeServiceBindData.GetContextualClosure($"${paramName}");
+        }
+
+        /// <summary>
+        /// 从上下文闭包中进行构建获得实例
+        /// </summary>
+        /// <param name="closure">上下文闭包</param>
+        /// <param name="needType">参数需求的类型</param>
+        /// <returns>构建的实例</returns>
+        protected virtual object MakeFromContextualClosure(Func<object> closure, Type needType)
+        {
+            var instance = closure();
+            if (ChangeType(ref instance, needType))
+            {
+                return instance;
+            }
+
+            throw new LogicException("Parameter type cannot be converted to : " + needType);
+        }
+
+        /// <summary>
         /// 解决基本类型
         /// </summary>
         /// <param name="makeServiceBindData">请求注入操作的服务绑定数据</param>
@@ -1159,10 +1190,10 @@ namespace CatLib
         /// <returns>解决结果</returns>
         protected virtual object ResolveAttrPrimitive(Bindable makeServiceBindData, string service, PropertyInfo baseParam)
         {
-            var contextualClosure = makeServiceBindData.GetContextualClosure(service);
+            var contextualClosure = GetContextualClosure(makeServiceBindData, service, baseParam.Name);
             if (contextualClosure != null)
             {
-                return contextualClosure();
+                return MakeFromContextualClosure(contextualClosure, baseParam.PropertyType);
             }
 
             service = makeServiceBindData.GetContextual(service);
@@ -1189,10 +1220,10 @@ namespace CatLib
         /// <returns>解决结果</returns>
         protected virtual object ResloveAttrClass(Bindable makeServiceBindData, string service, PropertyInfo baseParam)
         {
-            var contextualClosure = makeServiceBindData.GetContextualClosure(service);
+            var contextualClosure = GetContextualClosure(makeServiceBindData, service, baseParam.Name);
             if (contextualClosure != null)
             {
-                return contextualClosure();
+                return MakeFromContextualClosure(contextualClosure, baseParam.PropertyType);
             }
 
             try
@@ -1220,10 +1251,10 @@ namespace CatLib
         /// <returns>解决结果</returns>
         protected virtual object ResolvePrimitive(Bindable makeServiceBindData, string service, ParameterInfo baseParam)
         {
-            var contextualClosure = makeServiceBindData.GetContextualClosure(service);
+            var contextualClosure = GetContextualClosure(makeServiceBindData, service, baseParam.Name);
             if (contextualClosure != null)
             {
-                return contextualClosure();
+                return MakeFromContextualClosure(contextualClosure, baseParam.ParameterType);
             }
 
             service = makeServiceBindData.GetContextual(service);
@@ -1255,10 +1286,10 @@ namespace CatLib
         /// <returns>解决结果</returns>
         protected virtual object ResloveClass(Bindable makeServiceBindData, string service, ParameterInfo baseParam)
         {
-            var contextualClosure = makeServiceBindData.GetContextualClosure(service);
+            var contextualClosure = GetContextualClosure(makeServiceBindData, service, baseParam.Name);
             if (contextualClosure != null)
             {
-                return contextualClosure();
+                return MakeFromContextualClosure(contextualClosure, baseParam.ParameterType);
             }
 
             try

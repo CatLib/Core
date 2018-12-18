@@ -2688,6 +2688,33 @@ namespace CatLib.Tests.Stl
             Assert.AreEqual("world", container["hello"]);
             Assert.AreEqual(30, val);
         }
+
+        public class TestNeedGivenWithParamNameClass
+        {
+            public int MyParam { get; set; }
+
+            public TestNeedGivenWithParamNameClass(int myParam)
+            {
+                MyParam = myParam;
+            }
+        }
+
+        [TestMethod]
+        public void TestNeedGivenWithParamName()
+        {
+            var container = new Container();
+            container.Bind<TestNeedGivenWithParamNameClass>()
+                .Needs("$myParam").Given(() => 100);
+
+            Assert.AreEqual(100, container.Make<TestNeedGivenWithParamNameClass>().MyParam);
+
+            container = new Container();
+            container.Bind<TestNeedGivenWithParamNameClass>()
+                .Needs("$myParam").Given<int>();
+            container.Bind<int>(() => 200);
+
+            Assert.AreEqual(200, container.Make<TestNeedGivenWithParamNameClass>().MyParam);
+        }
         #endregion
 
         /// <summary>
