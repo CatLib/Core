@@ -67,6 +67,11 @@ namespace CatLib
                 onNewApplication?.Invoke(instance);
             }
         }
+
+        /// <summary>
+        /// 是否拥有全局CatLib实例
+        /// </summary>
+        public static bool HasHandler => instance != null;
         #endregion
 
         #region Application API

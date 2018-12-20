@@ -186,7 +186,10 @@ namespace CatLib
             Trigger(ApplicationEvents.OnTerminate, this);
             Process = StartProcess.Terminating;
             Flush();
-            App.Handler = null;
+            if (App.HasHandler && App.Handler == this)
+            {
+                App.Handler = null;
+            }
             Process = StartProcess.Terminated;
             Trigger(ApplicationEvents.OnTerminated, this);
         }
