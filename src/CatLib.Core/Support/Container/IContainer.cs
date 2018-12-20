@@ -1,12 +1,12 @@
 ﻿/*
  * This file is part of the CatLib package.
  *
- * (c) Yu Bin <support@catlib.io>
+ * (c) CatLib <support@catlib.io>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  *
- * Document: http://catlib.io/
+ * Document: https://catlib.io/
  */
 
 using System;
@@ -156,10 +156,10 @@ namespace CatLib
         object Instance(string service, object instance);
 
         /// <summary>
-        /// 释放某个静态化实例
+        /// 释放某个单例化的对象
         /// </summary>
-        /// <param name="service">服务名或别名</param>
-        bool Release(string service);
+        /// <param name="mixed">服务名或别名或单例对象</param>
+        bool Release(object mixed);
 
         /// <summary>
         /// 清空容器的所有实例，绑定，别名，标签，解决器，方法容器, 扩展
@@ -197,14 +197,6 @@ namespace CatLib
         /// <param name="service">服务名或者别名</param>
         /// <returns>服务实例，如果构造失败那么返回null</returns>
 		object this[string service] { get; set; }
-
-        /// <summary>
-        /// 获取一个回调，当执行回调可以生成指定的服务
-        /// </summary>
-        /// <param name="service">服务名或别名</param>
-        /// <param name="userParams">用户传入的参数</param>
-        /// <returns>回调方案</returns>
-        Func<object> Factory(string service, params object[] userParams);
 
         /// <summary>
         /// 为服务设定一个别名

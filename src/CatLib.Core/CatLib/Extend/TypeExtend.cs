@@ -9,19 +9,23 @@
  * Document: https://catlib.io/
  */
 
+using System;
+
 namespace CatLib
 {
     /// <summary>
-    /// 参数名注入表
+    /// Type类型扩展函数
     /// </summary>
-    public interface IParams
+    public static class TypeExtend
     {
         /// <summary>
-        /// 获取一个参数
+        /// 将类型转为服务名
         /// </summary>
-        /// <param name="key">参数名</param>
-        /// <param name="value">参数值</param>
-        /// <returns>是否成功获取</returns>
-        bool TryGetValue(string key, out object value);
+        /// <param name="type">类型</param>
+        /// <returns>服务名</returns>
+        public static string ToService(this Type type)
+        {
+            return App.Type2Service(type);
+        }
     }
 }

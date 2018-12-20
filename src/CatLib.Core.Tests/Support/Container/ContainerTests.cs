@@ -1,12 +1,12 @@
 ﻿/*
  * This file is part of the CatLib package.
  *
- * (c) Yu Bin <support@catlib.io>
+ * (c) CatLib <support@catlib.io>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  *
- * Document: http://catlib.io/
+ * Document: https://catlib.io/
  */
 
 using System;
@@ -700,10 +700,13 @@ namespace CatLib.Tests.Stl
         public void TestContainerCallWithNullParams()
         {
             var container = MakeContainer();
-            container.Instance("num", 777);
-            container.Alias("$num", "num");
-            var result = container.Call(this, "TestContainerCall", null);
+            var result = container.Call(this, "TestContainerCallEmpty", null);
             Assert.AreEqual(777, result);
+        }
+
+        public int TestContainerCallEmpty()
+        {
+            return 777;
         }
 
         [TestMethod]
@@ -785,10 +788,10 @@ namespace CatLib.Tests.Stl
             [Inject]
             public MakeTestClassDependency DependencyRequired { get; set; }
 
-            [Inject("AliasName")]
+            [Inject]
             public MakeTestClassDependency2 DependencyAlias { get; set; }
 
-            [Inject("AliasNameRequired")]
+            [Inject]
             public MakeTestClassDependency DependencyAliasRequired { get; set; }
 
             public MakeTestClass(MakeTestClassDependency dependency)
@@ -849,7 +852,7 @@ namespace CatLib.Tests.Stl
         public void MakeNoClassAttrInject()
         {
             var container = MakeContainer();
-            container.Bind<NoClassAttrInject>();
+            container.Bind<NoClassAttrInject>().Needs("$Time").Given("Time");
             container.Bind("Time", (c, p) => 100, false).Alias("$Time");
 
             var result = container.Make<NoClassAttrInject>();
@@ -905,9 +908,9 @@ namespace CatLib.Tests.Stl
         public void MakeNotClassConstructor()
         {
             var container = MakeContainer();
-            container.Bind<MakeTestNoParamClass>();
+            container.Bind<MakeTestNoParamClass>().Needs("$i").Given("i");
             container.Bind<MakeTestClassDependency>();
-            container.Singleton("i", (_,__) => 77).Alias("$i");
+            container.Singleton("i", (_,__) => 77);
             var result = container.Make<MakeTestNoParamClass>();
             Assert.AreEqual(77, result.I);
             Assert.AreNotEqual(null, result.Dependency);
@@ -946,7 +949,7 @@ namespace CatLib.Tests.Stl
         public void CheckIllegalMakeTypeIsNotSame()
         {
             var container = MakeContainer();
-            container.Singleton<MakeTestClass>();
+            container.Singleton<MakeTestClass>().Needs("$DependencyAlias").Given("AliasName");
             container.Singleton<MakeTestClassDependency2>().Alias("AliasNameRequired");
             container.Singleton<MakeTestClassDependency>().Alias("AliasName");
 
@@ -1049,8 +1052,7 @@ namespace CatLib.Tests.Stl
         public class TestMakeParamInjectAttrClass
         {
             private IMsg msg;
-            public TestMakeParamInjectAttrClass(
-                [Inject("AliasName")]IMsg msg)
+            public TestMakeParamInjectAttrClass(IMsg msg)
             {
                 this.msg = msg;
             }
@@ -1074,7 +1076,7 @@ namespace CatLib.Tests.Stl
 
             bind.Needs<IMsg>().Given<MakeTestClassDependency>();
             var cls = container.Make<TestMakeParamInjectAttrClass>();
-            Assert.AreEqual("world", cls.GetMsg());
+            Assert.AreEqual("hello", cls.GetMsg());
 
             bind.Needs("AliasName").Given<MakeTestClassDependency>();
             cls = container.Make<TestMakeParamInjectAttrClass>();
@@ -1187,8 +1189,7 @@ namespace CatLib.Tests.Stl
         public void TestInjectNull()
         {
             var container = new SupportNullContainer() as IContainer;
-            container.Bind<TestInjectNullClass>();
-
+            container.Bind<TestInjectNullClass>().Needs("$cls").Given(() => null);
             container.Make<TestInjectNullClass>();
         }
 
@@ -1261,8 +1262,8 @@ namespace CatLib.Tests.Stl
                 container.Make<TestMakeParamInjectAttrRequiredClass>();
             });
 
-            container.Bind<MakeTestClassDependency, IMsg>();
-            var result = container.Make<TestMakeParamInjectAttrRequiredClass>();
+            container.Bind<IMsg, MakeTestClassDependency>();
+            var result = container.Make<IMsg>();
             Assert.AreEqual("hello", result.GetMsg());
         }
 
@@ -1493,7 +1494,7 @@ namespace CatLib.Tests.Stl
 
         class ComplexClassAlias
         {
-            [Inject("IComplexInterface.alias")]
+            [Inject]
             public IComplexInterface Msg { get; set; }
         }
 
@@ -1504,7 +1505,7 @@ namespace CatLib.Tests.Stl
         public void ComplexContextualRelationshipTest3()
         {
             var container = MakeContainer();
-            container.Bind<ComplexClassAlias>();
+            container.Bind<ComplexClassAlias>().Needs("$Msg").Given("IComplexInterface.alias");
             container.Bind<ComplexInjectClass1>().Alias<IComplexInterface>();
             container.Bind<ComplexInjectClass2>().Alias("IComplexInterface.alias");
 
@@ -1847,9 +1848,7 @@ namespace CatLib.Tests.Stl
         public void TestFormatException()
         {
             var container = new Container();
-            container.Instance("num", 10);
-            container.Alias("$num", "num");
-            Assert.AreEqual(10, container.Call(this, "TestContainerCall", new ContainerTest()));
+            Assert.AreEqual(10, container.Call(this, "TestContainerCall", new ContainerTest(),10));
         }
 
         internal class TestNoConstructorAccessClass
@@ -2020,14 +2019,14 @@ namespace CatLib.Tests.Stl
         public void TestResloveAttrClassSpeculationServiceFunc()
         {
             var container = new Container();
-            container.Bind<TestResloveAttrClassSpeculationService>();
+            container.Bind<TestResloveAttrClassSpeculationService>()
+                .Needs("$ex").Given("ex")
+                .Needs("$rex").Given("rex");
             container.Instance("ex", new UnresolvableException());
-            container.Alias("$ex", "ex");
             container.Instance("rex", new UnresolvableException());
-            container.Alias("$rex", "rex");
             var cls = container.Make<TestResloveAttrClassSpeculationService>();
 
-            Assert.AreSame(container.Make("$ex"), cls.ex);
+            Assert.AreSame(container.Make("ex"), cls.ex);
         }
 
         [TestMethod]
@@ -2208,6 +2207,27 @@ namespace CatLib.Tests.Stl
         {
             var container = new Container();
             container.Unbind("Not Exists");
+        }
+
+        public interface ITaggedRelease
+        {
+            
+        }
+
+        public class TaggedRelease : ITaggedRelease
+        {
+            
+        }
+
+        [TestMethod]
+        public void TestTaggedRelease()
+        {
+            var container = new Container();
+            container.Singleton<ITaggedRelease, TaggedRelease>()
+                .Tag("tag");
+            var services = container.Tagged("tag");
+
+            Assert.AreEqual(true, container.Release(ref services));
         }
 
         /// <summary>
@@ -2666,6 +2686,102 @@ namespace CatLib.Tests.Stl
 
             Assert.AreEqual("world", container["hello"]);
             Assert.AreEqual(30, val);
+        }
+
+        public class TestNeedGivenWithParamNameClass
+        {
+            public int MyParam { get; set; }
+
+            public TestNeedGivenWithParamNameClass(int myParam)
+            {
+                MyParam = myParam;
+            }
+        }
+
+        [TestMethod]
+        public void TestNeedGivenWithParamName()
+        {
+            var container = new Container();
+            container.Bind<TestNeedGivenWithParamNameClass>()
+                .Needs("$myParam").Given(() => 100);
+
+            Assert.AreEqual(100, container.Make<TestNeedGivenWithParamNameClass>().MyParam);
+
+            container = new Container();
+            container.Bind<TestNeedGivenWithParamNameClass>()
+                .Needs("$myParam").Given<int>();
+            container.Bind<int>(() => 200);
+
+            Assert.AreEqual(200, container.Make<TestNeedGivenWithParamNameClass>().MyParam);
+        }
+
+        [TestMethod]
+        public void TestNullRelease()
+        {
+            var container = new Container();
+            Assert.AreEqual(false, container.Release(null));
+        }
+
+        public class TestGivenInvalidTypeClass
+        {
+            public TestGivenInvalidTypeClass(Container container)
+            {
+                Assert.Fail();
+            }
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(UnresolvableException))]
+        public void TestGivenInvalidType()
+        {
+            var container = new Container();
+            container.Bind<TestGivenInvalidTypeClass>()
+                .Needs("$container").Given(() => 123);
+            container.Make<TestGivenInvalidTypeClass>();
+        }
+
+        public class TestGivenInvalidTypeAttrClass
+        {
+            [Inject]
+            public Container container { get; set; }
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(UnresolvableException))]
+        public void TestGivenInvalidTypeAttr()
+        {
+            var container = new Container();
+            container.Bind<TestGivenInvalidTypeAttrClass>()
+                .Needs("$container").Given(() => 123);
+            container.Make<TestGivenInvalidTypeAttrClass>();
+        }
+
+        public class NotSupportNullInject : Container
+        {
+            protected override bool CanInject(Type type, object instance)
+            {
+                return instance != null;
+            }
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(UnresolvableException))]
+        public void TestGivenInvalidTypeAttrNotSupportNullInject()
+        {
+            var container = new NotSupportNullInject();
+            container.Bind<TestGivenInvalidTypeAttrClass>()
+                .Needs("$container").Given(() => null);
+            container.Make<TestGivenInvalidTypeAttrClass>();
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(UnresolvableException))]
+        public void TestGivenInvalidTypeNotSupportNullInject()
+        {
+            var container = new NotSupportNullInject();
+            container.Bind<TestGivenInvalidTypeClass>()
+                .Needs("$container").Given(() => null);
+            container.Make<TestGivenInvalidTypeClass>();
         }
         #endregion
 

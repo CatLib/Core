@@ -63,6 +63,7 @@
     <Compile Include="Support\Container\MethodBind.cs" />
     <Compile Include="Support\Container\MethodContainer.cs" />
     <Compile Include="Support\Container\Params.cs" />
+    <Compile Include="CatLib\Extend\TypeExtend.cs" />
     <Compile Include="Support\Container\UnresolvableException.cs" />
     <Compile Include="CatLib\Events\DispatcherExtend.cs" />
     <Compile Include="Support\Events\IDispatcher.cs" />

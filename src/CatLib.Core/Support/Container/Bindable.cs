@@ -1,12 +1,12 @@
 ﻿/*
  * This file is part of the CatLib package.
  *
- * (c) Yu Bin <support@catlib.io>
+ * (c) CatLib <support@catlib.io>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  *
- * Document: http://catlib.io/
+ * Document: https://catlib.io/
  */
 
 using System;
@@ -131,9 +131,9 @@ namespace CatLib
         {
             if (contextual == null)
             {
-                return needs;
+                return null;
             }
-            return contextual.TryGetValue(needs, out string contextualNeeds) ? contextualNeeds : needs;
+            return contextual.TryGetValue(needs, out string contextualNeeds) ? contextualNeeds : null;
         }
 
         /// <summary>

@@ -1,12 +1,12 @@
 ﻿/*
  * This file is part of the CatLib package.
  *
- * (c) Yu Bin <support@catlib.io>
+ * (c) CatLib <support@catlib.io>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  *
- * Document: http://catlib.io/
+ * Document: https://catlib.io/
  */
 
 namespace CatLib
@@ -40,12 +40,6 @@ namespace CatLib
         /// 当初始化开始之前
         /// </summary>
         public static readonly string OnInit = "CatLib.ApplicationEvents.OnInit";
-
-        /// <summary>
-        /// 当初始化进行时
-        /// </summary>
-        [System.Obsolete("Please use " + nameof(OnProviderInit))]
-        public static readonly string OnIniting = "CatLib.ApplicationEvents.OnProviderInit";
 
         /// <summary>
         /// 当服务提供者初始化进行前

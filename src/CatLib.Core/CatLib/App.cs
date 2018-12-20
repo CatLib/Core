@@ -1,12 +1,12 @@
 ﻿/*
  * This file is part of the CatLib package.
  *
- * (c) Yu Bin <support@catlib.io>
+ * (c) CatLib <support@catlib.io>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  *
- * Document: http://catlib.io/
+ * Document: https://catlib.io/
  */
 
 using System;
@@ -25,7 +25,23 @@ namespace CatLib
         /// <summary>
         /// 当新建Application时
         /// </summary>
-        public static event Action<IApplication> OnNewApplication;
+        private static event Action<IApplication> onNewApplication;
+
+        /// <summary>
+        /// 当新建Application时
+        /// </summary>
+        public static event Action<IApplication> OnNewApplication
+        {
+            add
+            {
+                onNewApplication += value;
+                if (instance != null)
+                {
+                    onNewApplication?.Invoke(instance);
+                }
+            }
+            remove => onNewApplication -= value;
+        }
 
         /// <summary>
         /// CatLib实例
@@ -37,21 +53,19 @@ namespace CatLib
         /// </summary>
         public static IApplication Handler
         {
-            get => instance ?? New();
+            get
+            {
+                if (instance == null)
+                {
+                    throw new LogicException("The Application does not created, please call new Application() first.");
+                }
+                return instance;
+            }
             set
             {
                 instance = value;
-                OnNewApplication?.Invoke(instance);
+                onNewApplication?.Invoke(instance);
             }
-        }
-
-        /// <summary>
-        /// 创建CatLib实例
-        /// </summary>
-        /// <returns>CatLib实例</returns>
-        protected static IApplication New()
-        {
-            return Application.New();
         }
         #endregion
 
@@ -391,6 +405,16 @@ namespace CatLib
         public static bool IsResolved<TService>()
         {
             return Handler.IsResolved<TService>();
+        }
+
+        /// <summary>
+        /// 服务是否已经被解决过
+        /// </summary>
+        /// <param name="service">服务名</param>
+        /// <returns>是否已经被解决过</returns>
+        public static bool IsResolved(string service)
+        {
+            return Handler.IsResolved(service);
         }
 
         /// <summary>
@@ -798,11 +822,11 @@ namespace CatLib
         /// 常规绑定一个服务
         /// </summary>
         /// <typeparam name="TService">服务名</typeparam>
-        /// <typeparam name="TAlias">服务别名</typeparam>
+        /// <typeparam name="TConcrete">服务实现</typeparam>
         /// <returns>服务绑定数据</returns>
-        public static IBindData Bind<TService, TAlias>()
+        public static IBindData Bind<TService, TConcrete>()
         {
-            return Handler.Bind<TService, TAlias>();
+            return Handler.Bind<TService, TConcrete>();
         }
 
         /// <summary>
@@ -842,12 +866,12 @@ namespace CatLib
         /// 如果服务不存在那么则绑定服务
         /// </summary>
         /// <typeparam name="TService">服务名</typeparam>
-        /// <typeparam name="TAlias">服务别名</typeparam>
+        /// <typeparam name="TConcrete">服务实现</typeparam>
         /// <param name="bindData">如果绑定失败则返回历史绑定对象</param>
         /// <returns>是否完成绑定</returns>
-        public static bool BindIf<TService, TAlias>(out IBindData bindData)
+        public static bool BindIf<TService, TConcrete>(out IBindData bindData)
         {
-            return Handler.BindIf<TService, TAlias>(out bindData);
+            return Handler.BindIf<TService, TConcrete>(out bindData);
         }
 
         /// <summary>
@@ -901,11 +925,11 @@ namespace CatLib
         /// 以单例的形式绑定一个服务
         /// </summary>
         /// <typeparam name="TService">服务名</typeparam>
-        /// <typeparam name="TAlias">服务别名</typeparam>
+        /// <typeparam name="TConcrete">服务实现</typeparam>
         /// <returns>服务绑定数据</returns>
-        public static IBindData Singleton<TService, TAlias>()
+        public static IBindData Singleton<TService, TConcrete>()
         {
-            return Handler.Singleton<TService, TAlias>();
+            return Handler.Singleton<TService, TConcrete>();
         }
 
         /// <summary>
@@ -955,12 +979,12 @@ namespace CatLib
         /// 如果服务不存在那么则绑定服务
         /// </summary>
         /// <typeparam name="TService">服务名</typeparam>
-        /// <typeparam name="TAlias">服务别名</typeparam>
+        /// <typeparam name="TConcrete">服务实现</typeparam>
         /// <param name="bindData">如果绑定失败则返回历史绑定对象</param>
         /// <returns>是否完成绑定</returns>
-        public static bool SingletonIf<TService, TAlias>(out IBindData bindData)
+        public static bool SingletonIf<TService, TConcrete>(out IBindData bindData)
         {
-            return Handler.SingletonIf<TService, TAlias>(out bindData);
+            return Handler.SingletonIf<TService, TConcrete>(out bindData);
         }
 
         /// <summary>

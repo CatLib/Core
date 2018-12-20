@@ -1,12 +1,12 @@
 ﻿/*
  * This file is part of the CatLib package.
  *
- * (c) Yu Bin <support@catlib.io>
+ * (c) CatLib <support@catlib.io>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  *
- * Document: http://catlib.io/
+ * Document: https://catlib.io/
  */
 
 using System;
@@ -62,7 +62,12 @@ namespace CatLib.Tests
             Assert.AreSame(obj, container.Make("BindSingleton"));
         }
 
-        public class ContainerHelperTestClass
+        public interface IContainerHelperTestClass
+        {
+            
+        }
+
+        public class ContainerHelperTestClass : IContainerHelperTestClass
         {
 
         }
@@ -79,11 +84,9 @@ namespace CatLib.Tests
         public void BindSingletonTServiceTConcrete()
         {
             var container = MakeContainer();
-            container.Singleton<TestClassService, ContainerHelperTestClass>();
-            var obj = container.Make(container.Type2Service(typeof(ContainerHelperTestClass)));
-            var obj2 = container.Make(container.Type2Service(typeof(TestClassService)));
-
-            Assert.AreSame(obj, obj2);
+            container.Singleton<IContainerHelperTestClass, ContainerHelperTestClass>();
+            var obj = container.Make(container.Type2Service(typeof(IContainerHelperTestClass)));
+            Assert.AreNotEqual(null, obj);
         }
 
         /// <summary>
@@ -146,10 +149,10 @@ namespace CatLib.Tests
             Assert.AreEqual(true, App.BindIf<int>(() => 100, out bindData));
             Assert.AreEqual(100, App.Make<int>());
             Assert.AreEqual(100, App.Make<int>()); // double get check
-            Assert.AreEqual(true, App.BindIf<double, float>(out bindData));
-            Assert.AreEqual(false, App.BindIf<double, float>(out bindData));
+            Assert.AreEqual(true, App.BindIf<float, float>(out bindData));
+            Assert.AreEqual(false, App.BindIf<float, float>(out bindData));
 
-            Assert.AreEqual(typeof(double), App.Make<double>(App.Type2Service(typeof(float))).GetType());
+            Assert.AreEqual(typeof(float), App.Make<float>(App.Type2Service(typeof(float))).GetType());
         }
 
         [TestMethod]
@@ -172,10 +175,10 @@ namespace CatLib.Tests
             Assert.AreEqual(true, App.SingletonIf<long>((c, p) => 100, out bindData));
             Assert.AreEqual(true, App.SingletonIf<int>(() => 100, out bindData));
             Assert.AreEqual(100, App.Make<int>());
-            Assert.AreEqual(true, App.SingletonIf<double, float>(out bindData));
-            Assert.AreEqual(false, App.SingletonIf<double, float>(out bindData));
+            Assert.AreEqual(true, App.SingletonIf<float, float>(out bindData));
+            Assert.AreEqual(false, App.SingletonIf<float, float>(out bindData));
 
-            Assert.AreEqual(typeof(double), App.Make<double>(App.Type2Service(typeof(float))).GetType());
+            Assert.AreEqual(typeof(float), App.Make<float>(App.Type2Service(typeof(float))).GetType());
         }
 
         [TestMethod]

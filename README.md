@@ -14,10 +14,6 @@
 
 > We are currently preparing to convert the comments in the code to the English version. We look forward to your joining.
 
-> CatLib Framework 请访问：[CatLib/Framework](https://github.com/CatLib/Framework)
-
-> CatLib For Unity 请访问：[CatLib/CatLib](https://github.com/CatLib/CatLib)
-
 ## 关于CatLib
 
 `CatLib Core` 是 `CatLib` 的最小可用框架。仅提供最基础的功能，是其他框架开发者作为基础的理想选择。

@@ -1,12 +1,12 @@
 ﻿/*
  * This file is part of the CatLib package.
  *
- * (c) Yu Bin <support@catlib.io>
+ * (c) CatLib <support@catlib.io>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  *
- * Document: http://catlib.io/
+ * Document: https://catlib.io/
  */
 
 using System;
@@ -90,8 +90,8 @@ namespace CatLib
         /// <summary>
         /// 服务提供者
         /// </summary>
-        private readonly List<KeyValuePair<IServiceProvider, int>> serviceProviders =
-            new List<KeyValuePair<IServiceProvider, int>>();
+        private readonly SortedList<int, List<IServiceProvider>> serviceProviders 
+            = new SortedList<int, List<IServiceProvider>>();
 
         /// <summary>
         /// 注册服务提供者
@@ -144,26 +144,37 @@ namespace CatLib
         public IDispatcher Dispatcher => dispatcher ?? (dispatcher = this.Make<IDispatcher>());
 
         /// <summary>
+        /// 调试等级
+        /// </summary>
+        private DebugLevels debugLevel;
+
+        /// <summary>
         /// 构建一个CatLib实例
         /// </summary>
-        public Application()
+        /// <param name="global">是否将当前实例应用到全局</param>
+        public Application(bool global = true)
         {
-            App.Handler = this;
             mainThreadId = Thread.CurrentThread.ManagedThreadId;
             RegisterCoreAlias();
             RegisterCoreService();
             OnFindType(finder => { return Type.GetType(finder); });
             DebugLevel = DebugLevels.Production;
             Process = StartProcess.Construct;
+
+            if (global)
+            {
+                App.Handler = this;
+            }
         }
 
         /// <summary>
         /// 构建一个新的Application实例
         /// </summary>
+        /// <param name="global">是否将当前实例应用到全局</param>
         /// <returns>Application实例</returns>
-        public static Application New()
+        public static Application New(bool global = true)
         {
-            return new Application();
+            return new Application(global);
         }
 
         /// <summary>
@@ -199,7 +210,7 @@ namespace CatLib
             Trigger(ApplicationEvents.OnBootstrap, this);
             Process = StartProcess.Bootstrapping;
 
-            var sorting = new List<KeyValuePair<IBootstrap, int>>();
+            var sorting = new SortedList<int, List<IBootstrap>>();
             var existed = new HashSet<IBootstrap>();
 
             foreach (var bootstrap in bootstraps)
@@ -215,19 +226,18 @@ namespace CatLib
                 }
 
                 existed.Add(bootstrap);
-                sorting.Add(new KeyValuePair<IBootstrap, int>(bootstrap,
-                    GetPriority(bootstrap.GetType(), nameof(IBootstrap.Bootstrap))));
+                AddSortedList(sorting, bootstrap, nameof(IBootstrap.Bootstrap));
             }
 
-            sorting.Sort((left, right) => left.Value.CompareTo(right.Value));
-
-            foreach (var kv in sorting)
+            foreach (var sorted in sorting)
             {
-                var bootstrap = kv.Key;
-                var allow = TriggerHalt(ApplicationEvents.Bootstrapping, bootstrap) == null;
-                if (bootstrap != null && allow)
+                foreach (var bootstrap in sorted.Value)
                 {
-                    bootstrap.Bootstrap();
+                    var allow = TriggerHalt(ApplicationEvents.Bootstrapping, bootstrap) == null;
+                    if (bootstrap != null && allow)
+                    {
+                        bootstrap.Bootstrap();
+                    }
                 }
             }
 
@@ -264,11 +274,12 @@ namespace CatLib
             Trigger(ApplicationEvents.OnInit, this);
             Process = StartProcess.Initing;
 
-            serviceProviders.Sort((left, right) => left.Value.CompareTo(right.Value));
-
-            foreach (var provider in serviceProviders)
+            foreach (var sorted in serviceProviders)
             {
-                yield return InitProvider(provider.Key);
+                foreach (var provider in sorted.Value)
+                {
+                    yield return InitProvider(provider);
+                }
             }
 
             inited = true;
@@ -329,15 +340,31 @@ namespace CatLib
                 registering = false;
             }
 
-            serviceProviders.Add(
-                new KeyValuePair<IServiceProvider, int>(provider,
-                    GetPriority(provider.GetType(), nameof(IServiceProvider.Init))));
+            AddSortedList(serviceProviders, provider, nameof(IServiceProvider.Init));
             serviceProviderTypes.Add(GetProviderBaseType(provider));
 
             if (inited)
             {
                 yield return InitProvider(provider);
             }
+        }
+
+        /// <summary>
+        /// 增加到排序列表
+        /// </summary>
+        /// <param name="list">列表</param>
+        /// <param name="insert">需要插入的记录</param>
+        /// <param name="priorityMethod">优先级函数</param>
+        private void AddSortedList<T>(SortedList<int, List<T>> list, T insert, string priorityMethod)
+        {
+            var priority = GetPriority(insert.GetType(), priorityMethod );
+
+            if (!list.TryGetValue(priority, out List<T> providers))
+            {
+                list.Add(priority, providers = new List<T>());
+            }
+
+            providers.Add(insert);
         }
 
         /// <summary>
@@ -393,8 +420,12 @@ namespace CatLib
         /// </summary>
         public DebugLevels DebugLevel
         {
-            get => (DebugLevels)Make(Type2Service(typeof(DebugLevels)));
-            set => Instance(Type2Service(typeof(DebugLevels)), value);
+            get => debugLevel;
+            set
+            {
+                debugLevel = value;
+                Instance(Type2Service(typeof(DebugLevels)), debugLevel);
+            }
         }
 
         /// <summary>

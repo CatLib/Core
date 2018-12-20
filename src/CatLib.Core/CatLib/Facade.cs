@@ -1,12 +1,12 @@
 ﻿/*
  * This file is part of the CatLib package.
  *
- * (c) Yu Bin <support@catlib.io>
+ * (c) CatLib <support@catlib.io>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  *
- * Document: http://catlib.io/
+ * Document: https://catlib.io/
  */
 
 namespace CatLib
@@ -53,7 +53,6 @@ namespace CatLib
                 binder = null;
                 inited = false;
                 released = false;
-                service = App.Type2Service(typeof(TService));
             };
         }
 
@@ -86,19 +85,16 @@ namespace CatLib
         {
             released = false;
 
-            if (!inited)
+            if (!inited && (App.IsResolved(service) || App.CanMake(service)))
             {
                 App.Watch<TService>(ServiceRebound);
                 inited = true;
             }
-            else
+            else if (binder != null && !binder.IsStatic)
             {
                 // 如果已经初始化了说明binder已经被初始化过。
                 // 那么提前判断可以优化性能而不用经过一个hash查找。
-                if (binder != null && !binder.IsStatic)
-                {
-                    return Build(userParams);
-                }
+                return Build(userParams);
             }
 
             var newBinder = App.GetBind(service);
