@@ -151,7 +151,8 @@ namespace CatLib
         /// <summary>
         /// 构建一个CatLib实例
         /// </summary>
-        public Application()
+        /// <param name="global">是否将当前实例应用到全局</param>
+        public Application(bool global = true)
         {
             mainThreadId = Thread.CurrentThread.ManagedThreadId;
             RegisterCoreAlias();
@@ -159,16 +160,21 @@ namespace CatLib
             OnFindType(finder => { return Type.GetType(finder); });
             DebugLevel = DebugLevels.Production;
             Process = StartProcess.Construct;
-            App.Handler = this;
+
+            if (global)
+            {
+                App.Handler = this;
+            }
         }
 
         /// <summary>
         /// 构建一个新的Application实例
         /// </summary>
+        /// <param name="global">是否将当前实例应用到全局</param>
         /// <returns>Application实例</returns>
-        public static Application New()
+        public static Application New(bool global = true)
         {
-            return new Application();
+            return new Application(global);
         }
 
         /// <summary>
