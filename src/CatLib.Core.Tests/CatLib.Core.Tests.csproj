@@ -35,7 +35,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CatLib\ApplicationTests.cs" />
-    <Compile Include="CatLib\AppTests.cs" />
     <Compile Include="CatLib\FacaedTests.cs" />
     <Compile Include="CatLib\GlobalDispatcherTests.cs" />
     <Compile Include="CatLib\TypeExtendTests.cs" />

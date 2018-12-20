@@ -49,37 +49,23 @@ namespace CatLib
         private static IApplication instance;
 
         /// <summary>
-        /// 自动生成Application
-        /// </summary>
-        public static bool AutoInstance { get; set; } = true;
-
-        /// <summary>
         /// CatLib实例
         /// </summary>
         public static IApplication Handler
         {
             get
             {
-                if (instance == null && !AutoInstance)
+                if (instance == null)
                 {
-                    throw new LogicException("The Application does not instance");
+                    throw new LogicException("The Application does not created, please call new Application() first.");
                 }
-                return instance ?? New();
+                return instance;
             }
             set
             {
                 instance = value;
                 onNewApplication?.Invoke(instance);
             }
-        }
-
-        /// <summary>
-        /// 创建CatLib实例
-        /// </summary>
-        /// <returns>CatLib实例</returns>
-        protected static IApplication New()
-        {
-            return Application.New();
         }
         #endregion
 

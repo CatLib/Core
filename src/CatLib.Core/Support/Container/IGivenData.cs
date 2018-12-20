@@ -16,6 +16,7 @@ namespace CatLib
     /// <summary>
     /// 绑定关系临时数据,用于支持链式调用
     /// </summary>
+    /// <typeparam name="TReturn">返回类型</typeparam>
     public interface IGivenData<TReturn>
     {
         /// <summary>

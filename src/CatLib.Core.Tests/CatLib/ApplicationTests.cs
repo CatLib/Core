@@ -242,7 +242,16 @@ namespace CatLib.Tests
                 Assert.AreEqual(1, num++);
             });
             App.Terminate();
-            Assert.AreNotEqual(oldApp, App.Handler);
+            var isCall = false;
+            try
+            {
+                Assert.AreNotEqual(oldApp, App.Handler);
+            }
+            catch (LogicException)
+            {
+                isCall = true;
+            }
+            Assert.AreEqual(true, isCall);
             Assert.AreEqual(2, num);
         }
 

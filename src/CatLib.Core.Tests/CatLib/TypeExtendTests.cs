@@ -19,6 +19,7 @@ namespace CatLib.Core.Tests
         [TestMethod]
         public void TestGetService()
         {
+            var app = new Application();
             Assert.AreEqual(App.Type2Service<TypeExtendTests>(), typeof(TypeExtendTests).ToService());
         }
     }
