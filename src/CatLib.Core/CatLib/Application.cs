@@ -157,7 +157,12 @@ namespace CatLib
             mainThreadId = Thread.CurrentThread.ManagedThreadId;
             RegisterCoreAlias();
             RegisterCoreService();
+
+            // 我们使用闭包来保存当前上下文状态
+            // 不要修改为：OnFindType(Type.GetType)这会导致
+            // 作用程序集不是预期作用域。
             OnFindType(finder => { return Type.GetType(finder); });
+
             DebugLevel = DebugLevels.Production;
             Process = StartProcess.Construct;
 

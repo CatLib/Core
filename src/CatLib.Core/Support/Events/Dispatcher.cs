@@ -165,8 +165,7 @@ namespace CatLib
 
             lock (syncRoot)
             {
-                var baseEvent = target as IEvent;
-                if (baseEvent != null)
+                if (target is IEvent baseEvent)
                 {
                     Forget(baseEvent);
                     return;

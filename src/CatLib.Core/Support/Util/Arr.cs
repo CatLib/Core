@@ -583,14 +583,15 @@ namespace CatLib
                 return -1;
             }
 
-            for (int i = 0, n; i < source.Length; i++)
+            for (var i = 0; i < source.Length; i++)
             {
                 if (!source[i].Equals(match[0]))
                 {
                     continue;
                 }
                 var isFinded = true;
-                for (n = 0; n < match.Length; n++)
+
+                for (var n = 0; n < match.Length; n++)
                 {
                     if ((i + n) < source.Length &&
                           source[i + n].Equals(match[n]))
@@ -600,6 +601,7 @@ namespace CatLib
                     isFinded = false;
                     break;
                 }
+
                 if (isFinded)
                 {
                     return i;
@@ -624,9 +626,9 @@ namespace CatLib
                 return -1;
             }
 
-            for (int i = 0, n; i < source.Length; i++)
+            for (var i = 0; i < source.Length; i++)
             {
-                for (n = 0; n < match.Length; n++)
+                for (var n = 0; n < match.Length; n++)
                 {
                     if (source[i].Equals(match[n]))
                     {

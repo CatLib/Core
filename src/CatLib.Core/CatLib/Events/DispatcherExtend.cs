@@ -278,8 +278,7 @@ namespace CatLib
         internal static IGlobalDispatcher ToGlobalDispatcher(this IDispatcher dispatcher)
         {
             var originalDispatcher = dispatcher as IOriginalDispatcher;
-            var globalDispatcher = originalDispatcher?.Dispatcher as IGlobalDispatcher;
-            if (globalDispatcher != null)
+            if (originalDispatcher?.Dispatcher is IGlobalDispatcher globalDispatcher)
             {
                 return globalDispatcher;
             }
