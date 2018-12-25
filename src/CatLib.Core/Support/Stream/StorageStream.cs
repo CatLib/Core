@@ -104,6 +104,11 @@ namespace CatLib
             position = 0;
             disabled = false;
 
+            if (storage.Locker == null)
+            {
+                return;
+            }
+
             if (writable)
             {
                 if (!storage.Locker.TryEnterWriteLock(timeout))
@@ -247,6 +252,11 @@ namespace CatLib
                 }
 
                 disabled = true;
+
+                if (storage.Locker == null)
+                {
+                    return;
+                }
 
                 if (writable)
                 {
