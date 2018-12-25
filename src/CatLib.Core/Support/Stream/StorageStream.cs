@@ -253,7 +253,7 @@ namespace CatLib
 
                 disabled = true;
 
-                if (storage.Locker == null)
+                if (storage.Disabled || storage.Locker == null)
                 {
                     return;
                 }
