@@ -9,11 +9,14 @@
  * Document: https://catlib.io/
  */
 
+using System;
+
 namespace CatLib
 {
     /// <summary>
     /// 自定义枚举
     /// </summary>
+    [Obsolete("Custom Enum will be removed in version 2.0")]
     public abstract class Enum
     {
         /// <summary>
