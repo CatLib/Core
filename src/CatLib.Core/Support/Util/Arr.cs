@@ -365,15 +365,16 @@ namespace CatLib
         /// 将数组值传入用户自定义函数，自定义函数返回的值作为新的数组值
         /// </summary>
         /// <typeparam name="T">数组类型</typeparam>
+        /// <typeparam name="TReturn">返回值类型</typeparam>
         /// <param name="source">规定数组</param>
         /// <param name="callback">自定义函数</param>
         /// <returns>处理后的数组</returns>
-        public static T[] Map<T>(T[] source, Func<T, T> callback)
+        public static TReturn[] Map<T, TReturn>(T[] source, Func<T, TReturn> callback)
         {
             Guard.Requires<ArgumentNullException>(source != null);
             Guard.Requires<ArgumentNullException>(callback != null);
 
-            var requested = new T[source.Length];
+            var requested = new TReturn[source.Length];
             Array.Copy(source, requested, source.Length);
 
             for (var i = 0; i < source.Length; i++)
