@@ -717,7 +717,7 @@ namespace CatLib
         /// <param name="closure">闭包</param>
         public static void Extend<TService>(this IContainer container, Func<TService, IContainer, object> closure)
         {
-            container.Extend(container.Type2Service(typeof(TService)), (instance, c) =>
+            container.Extend(null, (instance, c) =>
             {
                 if (instance is TService)
                 {
@@ -737,7 +737,7 @@ namespace CatLib
         /// <param name="closure">闭包</param>
         public static void Extend<TService>(this IContainer container, Func<TService, object> closure)
         {
-            container.Extend(container.Type2Service(typeof(TService)), (instance, _) =>
+            container.Extend(null, (instance, _) =>
             {
                 if (instance is TService)
                 {

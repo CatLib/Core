@@ -211,7 +211,7 @@ namespace CatLib
         /// <para>允许在服务构建的过程中配置或者替换服务</para>
         /// <para>如果服务已经被构建，拓展会立即生效。</para>
         /// </summary>
-        /// <param name="service">服务名或别名</param>
+        /// <param name="service">服务名或别名,如果为null则意味着全局有效</param>
         /// <param name="closure">闭包</param>
         void Extend(string service, Func<object, IContainer, object> closure);
 

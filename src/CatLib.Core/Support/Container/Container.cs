@@ -592,19 +592,19 @@ namespace CatLib
         /// <para>允许在服务构建的过程中配置或者替换服务</para>
         /// <para>如果服务已经被构建，拓展会立即生效。</para>
         /// </summary>
-        /// <param name="service">服务名或别名</param>
+        /// <param name="service">服务名或别名,如果为null则意味着全局有效</param>
         /// <param name="closure">闭包</param>
         public void Extend(string service, Func<object, IContainer, object> closure)
         {
-            Guard.NotEmptyOrNull(service, nameof(service));
             Guard.Requires<ArgumentNullException>(closure != null);
 
             lock (syncRoot)
             {
                 GuardFlushing();
-                service = AliasToService(service);
 
-                if (instances.TryGetValue(service, out object instance))
+                service = string.IsNullOrEmpty(service) ? string.Empty : AliasToService(service);
+
+                if (service != string.Empty && instances.TryGetValue(service, out object instance))
                 {
                     // 如果实例已经存在那么，那么应用扩展。
                     // 扩展将不再被添加到永久扩展列表
@@ -628,7 +628,7 @@ namespace CatLib
 
                 extender.Add(closure);
 
-                if (IsResolved(service))
+                if (service != string.Empty && IsResolved(service))
                 {
                     TriggerOnRebound(service);
                 }
@@ -1934,7 +1934,15 @@ namespace CatLib
         /// <returns>扩展后的服务</returns>
         private object Extend(string service, object instance)
         {
-            if (!extenders.TryGetValue(service, out List<Func<object, IContainer, object>> list))
+            if (extenders.TryGetValue(service, out List<Func<object, IContainer, object>> list))
+            {
+                foreach (var extender in list)
+                {
+                    instance = extender(instance, this);
+                }
+            }
+
+            if (!extenders.TryGetValue(string.Empty, out list))
             {
                 return instance;
             }
