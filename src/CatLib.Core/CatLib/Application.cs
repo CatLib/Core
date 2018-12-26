@@ -432,7 +432,7 @@ namespace CatLib
             set
             {
                 debugLevel = value;
-                Instance(typeof(DebugLevels).ToString(), debugLevel);
+                Instance(Type2Service(typeof(DebugLevels)), debugLevel);
             }
         }
 
@@ -553,7 +553,7 @@ namespace CatLib
         /// </summary>
         private void RegisterCoreAlias()
         {
-            var application = typeof(Application).ToString();
+            var application = Type2Service(typeof(Application));
             Instance(application, this);
             foreach (var type in new[]
             {
@@ -562,7 +562,7 @@ namespace CatLib
                 typeof(IContainer)
             })
             {
-                Alias(type.ToString(), application);
+                Alias(Type2Service(type), application);
             }
         }
 
