@@ -409,6 +409,30 @@ namespace CatLib.Tests
             Assert.AreEqual("hello world", container.Make<string>());
         }
 
+        [TestMethod]
+        public void TestExtendContainerWithService()
+        {
+            var container = new Container();
+            container.Extend("abc", (instance, _) =>
+            {
+                Assert.AreSame(container, _);
+                return instance + " world";
+            });
+
+            container.Bind("abc", (b, p) => "hello", false);
+            Assert.AreEqual("hello world", container.Make("abc"));
+        }
+
+        [TestMethod]
+        public void TestExtendContainerWithService2()
+        {
+            var container = new Container();
+            container.Extend("abc", (instance) => instance + " world");
+
+            container.Bind("abc", (b, p) => "hello", false);
+            Assert.AreEqual("hello world", container.Make("abc"));
+        }
+
         public interface ITypeMatchInterface
         {
             

@@ -625,10 +625,11 @@ namespace CatLib
         /// <para>允许在服务构建的过程中配置或者替换服务</para>
         /// <para>如果服务已经被构建，拓展会立即生效。</para>
         /// </summary>
+        /// <param name="service">服务名</param>
         /// <param name="closure">闭包</param>
-        public static void Extend(Func<object, IContainer, object> closure)
+        public static void Extend(string service, Func<object, object> closure)
         {
-            Handler.Extend(closure);
+            Handler.Extend(service, closure);
         }
 
         /// <summary>
@@ -636,32 +637,31 @@ namespace CatLib
         /// <para>允许在服务构建的过程中配置或者替换服务</para>
         /// <para>如果服务已经被构建，拓展会立即生效。</para>
         /// </summary>
+        /// <param name="service">服务名</param>
         /// <param name="closure">闭包</param>
-        public static void Extend(Func<object, object> closure)
+        public static void Extend(string service, Func<object, IContainer, object> closure)
+        {
+            Handler.Extend(service, closure);
+        }
+
+        /// <summary>
+        /// 扩展容器中的服务
+        /// <para>如果构建的实例符合指定的类型或者接口，那么触发扩展闭包</para>
+        /// </summary>
+        /// <typeparam name="TConcrete">实现的类型或接口</typeparam>
+        /// <param name="closure">闭包</param>
+        public static void Extend<TConcrete>(Func<TConcrete, IContainer, object> closure)
         {
             Handler.Extend(closure);
         }
 
         /// <summary>
         /// 扩展容器中的服务
-        /// <para>允许在服务构建的过程中配置或者替换服务</para>
-        /// <para>如果服务已经被构建，拓展会立即生效。</para>
+        /// <para>如果构建的实例符合指定的类型或者接口，那么触发扩展闭包</para>
         /// </summary>
-        /// <typeparam name="TService">服务名或别名</typeparam>
+        /// <typeparam name="TConcrete">实现的类型或接口</typeparam>
         /// <param name="closure">闭包</param>
-        public static void Extend<TService>(Func<TService, IContainer, object> closure)
-        {
-            Handler.Extend(closure);
-        }
-
-        /// <summary>
-        /// 扩展容器中的服务
-        /// <para>允许在服务构建的过程中配置或者替换服务</para>
-        /// <para>如果服务已经被构建，拓展会立即生效。</para>
-        /// </summary>
-        /// <typeparam name="TService">服务名或别名</typeparam>
-        /// <param name="closure">闭包</param>
-        public static void Extend<TService>(Func<TService, object> closure)
+        public static void Extend<TConcrete>(Func<TConcrete, object> closure)
         {
             Handler.Extend(closure);
         }
