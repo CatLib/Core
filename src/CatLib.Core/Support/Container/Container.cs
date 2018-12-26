@@ -401,7 +401,7 @@ namespace CatLib
             if (!IsUnableType(concrete))
             {
                 service = FormatService(service);
-                return BindIf(service, WrapperTypeBuilder(service, concrete), isStatic, out bindData);
+                return BindIf(service, WrapperTypeBuilder(GetBindFillable(service), concrete), isStatic, out bindData);
             }
 
             bindData = null;
@@ -424,7 +424,7 @@ namespace CatLib
                 throw new LogicException($"Bind type [{concrete}] can not built");
             }
             service = FormatService(service);
-            return Bind(service, WrapperTypeBuilder(service, concrete), isStatic);
+            return Bind(service, WrapperTypeBuilder(GetBindFillable(service), concrete), isStatic);
         }
 
         /// <summary>
@@ -1034,12 +1034,12 @@ namespace CatLib
         /// <summary>
         /// 包装一个类型，可以被用来生成服务
         /// </summary>
-        /// <param name="service">服务名</param>
+        /// <param name="bindable">绑定数据</param>
         /// <param name="concrete">类型</param>
         /// <returns>根据类型生成的服务</returns>
-        protected virtual Func<IContainer, object[], object> WrapperTypeBuilder(string service, Type concrete)
+        protected virtual Func<IContainer, object[], object> WrapperTypeBuilder(Bindable bindable, Type concrete)
         {
-            return (container, userParams) => ((Container) container).CreateInstance(GetBindFillable(service), concrete,
+            return (container, userParams) => ((Container) container).CreateInstance(bindable, concrete,
                 userParams);
         }
 
