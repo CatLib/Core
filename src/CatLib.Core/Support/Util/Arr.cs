@@ -371,8 +371,12 @@ namespace CatLib
         /// <returns>处理后的数组</returns>
         public static TReturn[] Map<T, TReturn>(T[] source, Func<T, TReturn> callback)
         {
-            Guard.Requires<ArgumentNullException>(source != null);
             Guard.Requires<ArgumentNullException>(callback != null);
+
+            if (source == null)
+            {
+                return new TReturn[0];
+            }
 
             var requested = new TReturn[source.Length];
             Array.Copy(source, requested, source.Length);
@@ -395,8 +399,12 @@ namespace CatLib
         /// <returns>处理后的数组</returns>
         public static TReturn[] Map<T, TReturn>(IEnumerable<T> source, Func<T, TReturn> callback)
         {
-            Guard.Requires<ArgumentNullException>(source != null);
             Guard.Requires<ArgumentNullException>(callback != null);
+
+            if (source == null)
+            {
+                return new TReturn[0];
+            }
 
             var requested = new List<TReturn>();
             foreach (var value in source)
