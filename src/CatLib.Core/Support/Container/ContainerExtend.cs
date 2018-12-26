@@ -50,7 +50,7 @@ namespace CatLib
         /// <returns>是否已经静态化</returns>
         public static bool HasInstance<TService>(this IContainer container)
         {
-            return container.HasInstance(container.Type2Service<TService>());
+            return container.HasInstance(container.Type2Service(typeof(TService)));
         }
 
         /// <summary>
@@ -61,7 +61,7 @@ namespace CatLib
         /// <returns>是否已经被解决过</returns>
         public static bool IsResolved<TService>(this IContainer container)
         {
-            return container.IsResolved(container.Type2Service<TService>());
+            return container.IsResolved(container.Type2Service(typeof(TService)));
         }
 
         /// <summary>
@@ -957,7 +957,7 @@ namespace CatLib
         public static void Watch<TService>(this IContainer container, object target, string method)
         {
             Guard.Requires<ArgumentNullException>(method != null);
-            container.Watch(container.Type2Service<TService>(), target, method);
+            container.Watch(container.Type2Service(typeof(TService)), target, method);
         }
 
         /// <summary>
@@ -970,7 +970,7 @@ namespace CatLib
         public static void Watch<TService>(this IContainer container, Action method)
         {
             Guard.Requires<ArgumentNullException>(method != null);
-            container.Watch(container.Type2Service<TService>(), method.Target, method.Method);
+            container.Watch(container.Type2Service(typeof(TService)), method.Target, method.Method);
         }
 
         /// <summary>
@@ -983,7 +983,7 @@ namespace CatLib
         public static void Watch<TService>(this IContainer container, Action<TService> method)
         {
             Guard.Requires<ArgumentNullException>(method != null);
-            container.Watch(container.Type2Service<TService>(), method.Target, method.Method);
+            container.Watch(container.Type2Service(typeof(TService)), method.Target, method.Method);
         }
 
         /// <summary>

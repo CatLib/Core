@@ -810,7 +810,7 @@ namespace CatLib
         /// <typeparam name="TService">服务名</typeparam>
         public static IContainer Alias<TAlias, TService>()
         {
-            return Handler.Alias(Handler.Type2Service(typeof(TAlias)), Handler.Type2Service(typeof(TService)));
+            return Handler.Alias<TAlias, TService>();
         }
 
         /// <summary>
