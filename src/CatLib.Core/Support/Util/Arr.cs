@@ -379,8 +379,6 @@ namespace CatLib
             }
 
             var requested = new TReturn[source.Length];
-            Array.Copy(source, requested, source.Length);
-
             for (var i = 0; i < source.Length; i++)
             {
                 requested[i] = callback.Invoke(source[i]);
