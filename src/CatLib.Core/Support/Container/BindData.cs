@@ -17,7 +17,7 @@ namespace CatLib
     /// <summary>
     /// 服务绑定数据
     /// </summary>    
-    internal sealed class BindData : Bindable<IBindData>, IBindData
+    public sealed class BindData : Bindable<IBindData>, IBindData
     {
         /// <summary>
         /// 服务实现，执行这个委托将会获得服务实例

@@ -170,7 +170,7 @@ namespace CatLib
     /// <summary>
     /// 可绑定对象
     /// </summary>
-    internal abstract class Bindable<TReturn> : Bindable, IBindable<TReturn> where TReturn : class, IBindable<TReturn>
+    public abstract class Bindable<TReturn> : Bindable, IBindable<TReturn> where TReturn : class, IBindable<TReturn>
     {
         /// <summary>
         /// 给与数据
