@@ -709,19 +709,18 @@ namespace CatLib
 
         /// <summary>
         /// 扩展容器中的服务
-        /// <para>允许在服务构建的过程中配置或者替换服务</para>
-        /// <para>如果服务已经被构建，拓展会立即生效。</para>
+        /// <para>如果构建的实例符合指定的类型或者接口，那么触发扩展闭包</para>
         /// </summary>
-        /// <typeparam name="TService">服务名或别名</typeparam>
+        /// <typeparam name="TConcrete">实现的类型或接口</typeparam>
         /// <param name="container">服务容器</param>
         /// <param name="closure">闭包</param>
-        public static void Extend<TService>(this IContainer container, Func<TService, IContainer, object> closure)
+        public static void Extend<TConcrete>(this IContainer container, Func<TConcrete, IContainer, object> closure)
         {
             container.Extend(null, (instance, c) =>
             {
-                if (instance is TService)
+                if (instance is TConcrete)
                 {
-                    return closure((TService)instance, c);
+                    return closure((TConcrete)instance, c);
                 }
                 return instance;
             });
@@ -729,19 +728,18 @@ namespace CatLib
 
         /// <summary>
         /// 扩展容器中的服务
-        /// <para>允许在服务构建的过程中配置或者替换服务</para>
-        /// <para>如果服务已经被构建，拓展会立即生效。</para>
+        /// <para>如果构建的实例符合指定的类型或者接口，那么触发扩展闭包</para>
         /// </summary>
-        /// <typeparam name="TService">服务名或别名</typeparam>
+        /// <typeparam name="TConcrete">实现的类型或接口</typeparam>
         /// <param name="container">服务容器</param>
         /// <param name="closure">闭包</param>
-        public static void Extend<TService>(this IContainer container, Func<TService, object> closure)
+        public static void Extend<TConcrete>(this IContainer container, Func<TConcrete, object> closure)
         {
             container.Extend(null, (instance, _) =>
             {
-                if (instance is TService)
+                if (instance is TConcrete)
                 {
-                    return closure((TService)instance);
+                    return closure((TConcrete)instance);
                 }
                 return instance;
             });
