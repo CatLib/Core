@@ -432,7 +432,7 @@ namespace CatLib
             set
             {
                 debugLevel = value;
-                Instance(Type2Service(typeof(DebugLevels)), debugLevel);
+                Instance(typeof(DebugLevels).ToString(), debugLevel);
             }
         }
 
@@ -553,7 +553,7 @@ namespace CatLib
         /// </summary>
         private void RegisterCoreAlias()
         {
-            var application = Type2Service(typeof(Application));
+            var application = typeof(Application).ToString();
             Instance(application, this);
             foreach (var type in new[]
             {
@@ -562,7 +562,7 @@ namespace CatLib
                 typeof(IContainer)
             })
             {
-                Alias(Type2Service(type), application);
+                Alias(type.ToString(), application);
             }
         }
 
@@ -572,10 +572,9 @@ namespace CatLib
         private void RegisterCoreService()
         {
             var bindable = new BindData(this, null, null, false);
-            this.Singleton<GlobalDispatcher>(
-                    (_, __) => new GlobalDispatcher(
-                        (paramInfos, userParams) => GetDependencies(bindable, paramInfos, userParams)))
-                .Alias<IDispatcher>();
+            this.Singleton<IDispatcher>(
+                (_, __) => new GlobalDispatcher(
+                    (paramInfos, userParams) => GetDependencies(bindable, paramInfos, userParams)));
         }
 
         /// <summary>

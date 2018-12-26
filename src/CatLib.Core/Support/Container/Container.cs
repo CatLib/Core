@@ -919,7 +919,7 @@ namespace CatLib
         /// </summary>
         /// <param name="type">类型</param>
         /// <returns>服务名</returns>
-        public string Type2Service(Type type)
+        public virtual string Type2Service(Type type)
         {
             return type.ToString();
         }
