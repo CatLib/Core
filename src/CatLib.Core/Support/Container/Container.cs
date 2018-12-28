@@ -1288,7 +1288,8 @@ namespace CatLib
                 return baseParam.DefaultValue;
             }
 
-            throw MakeUnresolvablePrimitiveException(baseParam.Name, baseParam.Member.DeclaringType);
+            throw MakeUnresolvablePrimitiveException(baseParam.Name,
+                baseParam.Member != null ? baseParam.Member.DeclaringType : null);
         }
 
         /// <summary>
@@ -1361,7 +1362,7 @@ namespace CatLib
         protected virtual UnresolvableException MakeUnresolvablePrimitiveException(string name, Type declaringClass)
         {
             return new UnresolvableException(
-                $"Unresolvable primitive dependency , resolving [{name}] in class [{declaringClass}]");
+                $"Unresolvable primitive dependency , resolving [{name ?? "Unknow"}] in class [{declaringClass?.ToString() ?? "Unknow"}]");
         }
 
         /// <summary>
