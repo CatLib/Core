@@ -49,8 +49,8 @@ namespace CatLib
         /// <summary>
         /// 当需求某个服务
         /// </summary>
-        /// <typeparam name="T">服务类型</typeparam>
+        /// <typeparam name="TService">服务类型</typeparam>
         /// <returns>绑定关系临时数据</returns>
-        IGivenData<TReturn> Needs<T>();
+        IGivenData<TReturn> Needs<TService>();
     }
 }
