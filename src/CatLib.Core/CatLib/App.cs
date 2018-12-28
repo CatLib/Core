@@ -37,7 +37,7 @@ namespace CatLib
                 onNewApplication += value;
                 if (instance != null)
                 {
-                    onNewApplication?.Invoke(instance);
+                    value?.Invoke(instance);
                 }
             }
             remove => onNewApplication -= value;
