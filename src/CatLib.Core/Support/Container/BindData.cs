@@ -65,7 +65,7 @@ namespace CatLib
         /// <returns>服务绑定数据</returns>
         public IBindData Alias<T>()
         {
-            return Alias(Container.Type2Service(typeof(T)));
+            return Alias(InternalContainer.Type2Service(typeof(T)));
         }
 
         /// <summary>
@@ -79,7 +79,7 @@ namespace CatLib
             {
                 GuardIsDestroy();
                 Guard.NotEmptyOrNull(alias, nameof(alias));
-                Container.Alias(alias, Service);
+                InternalContainer.Alias(alias, Service);
                 return this;
             }
         }
@@ -95,7 +95,7 @@ namespace CatLib
             {
                 GuardIsDestroy();
                 Guard.NotEmptyOrNull(tag, nameof(tag));
-                Container.Tag(tag, Service);
+                InternalContainer.Tag(tag, Service);
                 return this;
             }
         }
@@ -144,7 +144,7 @@ namespace CatLib
         /// </summary>
         protected override void ReleaseBind()
         {
-            Container.Unbind(this);
+            InternalContainer.Unbind(this);
         }
 
         /// <summary>
@@ -154,7 +154,7 @@ namespace CatLib
         /// <returns>服务实例</returns>
         internal object TriggerResolving(object instance)
         {
-            return Container.Trigger(this, instance, resolving);
+            return InternalContainer.Trigger(this, instance, resolving);
         }
 
         /// <summary>
@@ -164,7 +164,7 @@ namespace CatLib
         /// <returns>服务实例</returns>
         internal object TriggerAfterResolving(object instance)
         {
-            return Container.Trigger(this, instance, afterResolving);
+            return InternalContainer.Trigger(this, instance, afterResolving);
         }
 
         /// <summary>
@@ -174,7 +174,7 @@ namespace CatLib
         /// <returns>服务实例</returns>
         internal object TriggerRelease(object instance)
         {
-            return Container.Trigger(this, instance, release);
+            return InternalContainer.Trigger(this, instance, release);
         }
 
         /// <summary>

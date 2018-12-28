@@ -22,6 +22,11 @@ namespace CatLib
         string Service { get; }
 
         /// <summary>
+        /// 所属服务容器
+        /// </summary>
+        IContainer Container { get; }
+
+        /// <summary>
         /// 移除绑定
         /// <para>如果进行的是服务绑定 , 那么在解除绑定时如果是静态化物体将会触发释放</para>
         /// </summary>

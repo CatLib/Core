@@ -25,9 +25,14 @@ namespace CatLib
         public string Service { get; }
 
         /// <summary>
+        /// 所属服务容器
+        /// </summary>
+        public IContainer Container => InternalContainer;
+
+        /// <summary>
         /// 父级容器
         /// </summary>
-        protected readonly Container Container;
+        protected readonly Container InternalContainer;
 
         /// <summary>
         /// 服务关系上下文
@@ -58,7 +63,7 @@ namespace CatLib
         /// <param name="service">服务名</param>
         protected Bindable(Container container, string service)
         {
-            Container = container;
+            InternalContainer = container;
             Service = service;
             isDestroy = false;
         }
@@ -200,7 +205,7 @@ namespace CatLib
                 GuardIsDestroy();
                 if (given == null)
                 {
-                    given = new GivenData<TReturn>(Container, this);
+                    given = new GivenData<TReturn>(InternalContainer, this);
                 }
                 given.Needs(service);
             }
@@ -214,7 +219,7 @@ namespace CatLib
         /// <returns>绑定关系临时数据</returns>
         public IGivenData<TReturn> Needs<T>()
         {
-            return Needs(Container.Type2Service(typeof(T)));
+            return Needs(InternalContainer.Type2Service(typeof(T)));
         }
     }
 }
