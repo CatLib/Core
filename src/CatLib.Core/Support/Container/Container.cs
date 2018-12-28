@@ -1288,6 +1288,7 @@ namespace CatLib
                 return baseParam.DefaultValue;
             }
 
+            // baseParam.Member 可能会为空，在一些底层开发会覆写ParameterInfo时可能会发生
             throw MakeUnresolvablePrimitiveException(baseParam.Name,
                 baseParam.Member != null ? baseParam.Member.DeclaringType : null);
         }
