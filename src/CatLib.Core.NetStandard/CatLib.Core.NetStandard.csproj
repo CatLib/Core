@@ -74,9 +74,9 @@
     <Compile Include="..\CatLib.Core\Support\Attribute\PriorityAttribute.cs" Link="Support\Attribute\PriorityAttribute.cs" />
     <Compile Include="..\CatLib.Core\Support\Container\Bindable.cs" Link="Support\Container\Bindable.cs" />
     <Compile Include="..\CatLib.Core\Support\Container\BindData.cs" Link="Support\Container\BindData.cs" />
-    <Compile Include="..\CatLib.Core\Support\Container\BindDataExtend.cs" Link="Support\Container\BindDataExtend.cs" />
     <Compile Include="..\CatLib.Core\Support\Container\Container.cs" Link="Support\Container\Container.cs" />
-    <Compile Include="..\CatLib.Core\Support\Container\ContainerExtend.cs" Link="Support\Container\ContainerExtend.cs" />
+    <Compile Include="..\CatLib.Core\Support\Container\ExtendBindData.cs" Link="Support\Container\ExtendBindData.cs" />
+    <Compile Include="..\CatLib.Core\Support\Container\ExtendContainer.cs" Link="Support\Container\ExtendContainer.cs" />
     <Compile Include="..\CatLib.Core\Support\Container\GivenData.cs" Link="Support\Container\GivenData.cs" />
     <Compile Include="..\CatLib.Core\Support\Container\IBindable.cs" Link="Support\Container\IBindable.cs" />
     <Compile Include="..\CatLib.Core\Support\Container\IBindData.cs" Link="Support\Container\IBindData.cs" />

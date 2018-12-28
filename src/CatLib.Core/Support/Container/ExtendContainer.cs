@@ -18,7 +18,7 @@ namespace CatLib
     ///<summary>
     /// 容器拓展
     /// </summary>
-    public static class ContainerExtend
+    public static class ExtendContainer
     {
         /// <summary>
         /// 获取服务的绑定数据,如果绑定不存在则返回null

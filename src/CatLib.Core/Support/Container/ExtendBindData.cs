@@ -16,7 +16,7 @@ namespace CatLib
     ///<summary>
     /// 绑定数据拓展
     /// </summary>
-    public static class BindDataExtend
+    public static class ExtendBindData
     {
         /// <summary>
         /// 为服务设定一个别名
