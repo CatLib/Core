@@ -37,6 +37,7 @@ namespace CatLib
     /// 被绑定对象
     /// </summary>
     public interface IBindable<TReturn> : IBindable
+        where TReturn : IBindable
     {
         /// <summary>
         /// 当需求某个服务                                                                                                                                                                                                                                                                                                                                                                                  

@@ -18,6 +18,7 @@ namespace CatLib
     /// </summary>
     /// <typeparam name="TReturn">返回类型</typeparam>
     public interface IGivenData<TReturn>
+        where TReturn : IBindable
     {
         /// <summary>
         /// 给与什么服务
