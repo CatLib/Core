@@ -31,13 +31,6 @@ namespace CatLib
         /// <summary>
         /// 为服务设定一个别名
         /// </summary>
-        /// <typeparam name="T">别名</typeparam>
-        /// <returns>服务绑定数据</returns>
-        IBindData Alias<T>();
-
-        /// <summary>
-        /// 为服务设定一个别名
-        /// </summary>
         /// <param name="alias">别名</param>
         /// <returns>服务绑定数据</returns>
         IBindData Alias(string alias);

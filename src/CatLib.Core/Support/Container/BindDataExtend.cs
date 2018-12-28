@@ -19,6 +19,17 @@ namespace CatLib
     public static class BindDataExtend
     {
         /// <summary>
+        /// 为服务设定一个别名
+        /// </summary>
+        /// <typeparam name="TAlias">别名</typeparam>
+        /// <param name="bindData">绑定数据</param>
+        /// <returns>服务绑定数据</returns>
+        public static IBindData Alias<TAlias>(this IBindData bindData)
+        {
+            return bindData.Alias(bindData.Container.Type2Service(typeof(TAlias)));
+        }
+
+        /// <summary>
         /// 解决服务时触发的回调
         /// </summary>
         /// <param name="bindData">绑定数据</param>
