@@ -1253,7 +1253,7 @@ namespace CatLib
                 return instance;
             }
 
-            throw MakeUnresolvablePrimitiveException(baseParam.Name, baseParam.DeclaringType);
+            throw MakeUnresolvableException(baseParam.Name, baseParam.DeclaringType);
         }
 
         /// <summary>
@@ -1289,7 +1289,7 @@ namespace CatLib
             }
 
             // baseParam.Member 可能会为空，在一些底层开发会覆写ParameterInfo时可能会发生
-            throw MakeUnresolvablePrimitiveException(baseParam.Name,
+            throw MakeUnresolvableException(baseParam.Name,
                 baseParam.Member != null ? baseParam.Member.DeclaringType : null);
         }
 
@@ -1360,10 +1360,10 @@ namespace CatLib
         /// <param name="name">变量名</param>
         /// <param name="declaringClass">变量所属类</param>
         /// <returns>运行时异常</returns>
-        protected virtual UnresolvableException MakeUnresolvablePrimitiveException(string name, Type declaringClass)
+        protected virtual UnresolvableException MakeUnresolvableException(string name, Type declaringClass)
         {
             return new UnresolvableException(
-                $"Unresolvable primitive dependency , resolving [{name ?? "Unknow"}] in class [{declaringClass?.ToString() ?? "Unknow"}]");
+                $"Unresolvable dependency , resolving [{name ?? "Unknow"}] in class [{declaringClass?.ToString() ?? "Unknow"}]");
         }
 
         /// <summary>
