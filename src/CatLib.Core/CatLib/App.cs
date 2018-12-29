@@ -790,6 +790,28 @@ namespace CatLib
 
         /// <summary>
         /// 扩展容器中的服务
+        /// <para>允许在服务构建的过程中配置或者替换服务</para>
+        /// <para>如果服务已经被构建，拓展会立即生效。</para>
+        /// </summary>
+        /// <param name="closure">闭包</param>
+        public static void Extend<TService, TConcrete>(Func<TConcrete, object> closure)
+        {
+            Handler.Extend<TService, TConcrete>(closure);
+        }
+        
+        /// <summary>
+        /// 扩展容器中的服务
+        /// <para>允许在服务构建的过程中配置或者替换服务</para>
+        /// <para>如果服务已经被构建，拓展会立即生效。</para>
+        /// </summary>
+        /// <param name="closure">闭包</param>
+        public static void Extend<TService, TConcrete>(Func<TConcrete, IContainer, object> closure)
+        {
+            Handler.Extend<TService, TConcrete>(closure);
+        }
+
+        /// <summary>
+        /// 扩展容器中的全部服务
         /// <para>如果构建的实例符合指定的类型或者接口，那么触发扩展闭包</para>
         /// </summary>
         /// <typeparam name="TConcrete">实现的类型或接口</typeparam>
@@ -800,7 +822,7 @@ namespace CatLib
         }
 
         /// <summary>
-        /// 扩展容器中的服务
+        /// 扩展容器中的全部服务
         /// <para>如果构建的实例符合指定的类型或者接口，那么触发扩展闭包</para>
         /// </summary>
         /// <typeparam name="TConcrete">实现的类型或接口</typeparam>
