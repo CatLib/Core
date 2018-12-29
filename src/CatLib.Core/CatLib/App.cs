@@ -391,25 +391,11 @@ namespace CatLib
         /// <summary>
         /// 是否已经实例静态化
         /// </summary>
-        /// <typeparam name="TService">服务名</typeparam>
+        /// <param name="service">服务名或别名</param>
         /// <returns>是否已经静态化</returns>
-        public static bool HasInstance<TService>()
+        public static bool HasInstance(string service)
         {
-#if CATLIB_PERFORMANCE
-            return Facade<TService>.HasInstance || Handler.HasInstance<TService>();
-#else
-            return Handler.HasInstance<TService>();
-#endif
-        }
-
-        /// <summary>
-        /// 服务是否已经被解决过
-        /// </summary>
-        /// <typeparam name="TService">服务名</typeparam>
-        /// <returns>是否已经被解决过</returns>
-        public static bool IsResolved<TService>()
-        {
-            return Handler.IsResolved<TService>();
+            return Handler.HasInstance(service);
         }
 
         /// <summary>
@@ -621,15 +607,14 @@ namespace CatLib
         }
 
         /// <summary>
-        /// 扩展容器中的服务
-        /// <para>允许在服务构建的过程中配置或者替换服务</para>
-        /// <para>如果服务已经被构建，拓展会立即生效。</para>
+        /// 为服务设定一个别名
         /// </summary>
-        /// <param name="service">服务名</param>
-        /// <param name="closure">闭包</param>
-        public static void Extend(string service, Func<object, object> closure)
+        /// <param name="alias">别名</param>
+        /// <param name="service">映射到的服务名</param>
+        /// <returns>当前容器对象</returns>
+        public static IContainer Alias(string alias, string service)
         {
-            Handler.Extend(service, closure);
+            return Handler.Alias(alias, service);
         }
 
         /// <summary>
@@ -642,39 +627,6 @@ namespace CatLib
         public static void Extend(string service, Func<object, IContainer, object> closure)
         {
             Handler.Extend(service, closure);
-        }
-
-        /// <summary>
-        /// 扩展容器中的服务
-        /// <para>如果构建的实例符合指定的类型或者接口，那么触发扩展闭包</para>
-        /// </summary>
-        /// <typeparam name="TConcrete">实现的类型或接口</typeparam>
-        /// <param name="closure">闭包</param>
-        public static void Extend<TConcrete>(Func<TConcrete, IContainer, object> closure)
-        {
-            Handler.Extend(closure);
-        }
-
-        /// <summary>
-        /// 扩展容器中的服务
-        /// <para>如果构建的实例符合指定的类型或者接口，那么触发扩展闭包</para>
-        /// </summary>
-        /// <typeparam name="TConcrete">实现的类型或接口</typeparam>
-        /// <param name="closure">闭包</param>
-        public static void Extend<TConcrete>(Func<TConcrete, object> closure)
-        {
-            Handler.Extend(closure);
-        }
-
-        /// <summary>
-        /// 为服务设定一个别名
-        /// </summary>
-        /// <param name="alias">别名</param>
-        /// <param name="service">映射到的服务名</param>
-        /// <returns>当前容器对象</returns>
-        public static IContainer Alias(string alias, string service)
-        {
-            return Handler.Alias(alias, service);
         }
 
         /// <summary>
@@ -719,19 +671,6 @@ namespace CatLib
         }
 
         /// <summary>
-        /// 关注指定的服务，当服务触发重定义时调用指定对象的指定方法
-        /// <para>调用是以依赖注入的形式进行的</para>
-        /// <para>服务的新建（第一次解决服务）操作并不会触发重定义</para>
-        /// </summary>
-        /// <param name="service">关注的服务名</param>
-        /// <param name="target">当服务发生重定义时调用的目标</param>
-        /// <param name="methodInfo">方法信息</param>
-        public static void Watch(string service, object target, MethodInfo methodInfo)
-        {
-            Handler.Watch(service, target, methodInfo);
-        }
-
-        /// <summary>
         /// 在回调区间内暂时性的静态化服务实例
         /// </summary>
         /// <param name="callback">回调区间</param>
@@ -761,6 +700,30 @@ namespace CatLib
         public static IBindData GetBind<TService>()
         {
             return Handler.GetBind<TService>();
+        }
+
+        /// <summary>
+        /// 是否已经实例静态化
+        /// </summary>
+        /// <typeparam name="TService">服务名</typeparam>
+        /// <returns>是否已经静态化</returns>
+        public static bool HasInstance<TService>()
+        {
+#if CATLIB_PERFORMANCE
+            return Facade<TService>.HasInstance || Handler.HasInstance<TService>();
+#else
+            return Handler.HasInstance<TService>();
+#endif
+        }
+
+        /// <summary>
+        /// 服务是否已经被解决过
+        /// </summary>
+        /// <typeparam name="TService">服务名</typeparam>
+        /// <returns>是否已经被解决过</returns>
+        public static bool IsResolved<TService>()
+        {
+            return Handler.IsResolved<TService>();
         }
 
         /// <summary>
@@ -811,6 +774,40 @@ namespace CatLib
         public static IContainer Alias<TAlias, TService>()
         {
             return Handler.Alias<TAlias, TService>();
+        }
+
+        /// <summary>
+        /// 扩展容器中的服务
+        /// <para>允许在服务构建的过程中配置或者替换服务</para>
+        /// <para>如果服务已经被构建，拓展会立即生效。</para>
+        /// </summary>
+        /// <param name="service">服务名</param>
+        /// <param name="closure">闭包</param>
+        public static void Extend(string service, Func<object, object> closure)
+        {
+            Handler.Extend(service, closure);
+        }
+
+        /// <summary>
+        /// 扩展容器中的服务
+        /// <para>如果构建的实例符合指定的类型或者接口，那么触发扩展闭包</para>
+        /// </summary>
+        /// <typeparam name="TConcrete">实现的类型或接口</typeparam>
+        /// <param name="closure">闭包</param>
+        public static void Extend<TConcrete>(Func<TConcrete, IContainer, object> closure)
+        {
+            Handler.Extend(closure);
+        }
+
+        /// <summary>
+        /// 扩展容器中的服务
+        /// <para>如果构建的实例符合指定的类型或者接口，那么触发扩展闭包</para>
+        /// </summary>
+        /// <typeparam name="TConcrete">实现的类型或接口</typeparam>
+        /// <param name="closure">闭包</param>
+        public static void Extend<TConcrete>(Func<TConcrete, object> closure)
+        {
+            Handler.Extend(closure);
         }
 
         /// <summary>
@@ -1382,6 +1379,19 @@ namespace CatLib
         public static IContainer OnAfterResolving<TWhere>(Action<IBindData, TWhere> closure)
         {
             return Handler.OnAfterResolving(closure);
+        }
+
+        /// <summary>
+        /// 关注指定的服务，当服务触发重定义时调用指定对象的指定方法
+        /// <para>调用是以依赖注入的形式进行的</para>
+        /// <para>服务的新建（第一次解决服务）操作并不会触发重定义</para>
+        /// </summary>
+        /// <param name="service">关注的服务名</param>
+        /// <param name="target">当服务发生重定义时调用的目标</param>
+        /// <param name="methodInfo">方法信息</param>
+        public static void Watch(string service, object target, MethodInfo methodInfo)
+        {
+            Handler.Watch(service, target, methodInfo);
         }
 
         /// <summary>
