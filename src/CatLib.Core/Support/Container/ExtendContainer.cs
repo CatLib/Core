@@ -150,8 +150,22 @@ namespace CatLib
         /// <param name="container">服务容器</param>
         /// <param name="concrete">服务实现</param>
         /// <returns>服务绑定数据</returns>
+        public static IBindData Bind<TService>(this IContainer container, Func<object[], object> concrete)
+        {
+            Guard.Requires<ArgumentNullException>(concrete != null);
+            return container.Bind(container.Type2Service(typeof(TService)), (c, p) => concrete.Invoke(p), false);
+        }
+
+        /// <summary>
+        /// 常规绑定一个服务
+        /// </summary>
+        /// <typeparam name="TService">服务名</typeparam>
+        /// <param name="container">服务容器</param>
+        /// <param name="concrete">服务实现</param>
+        /// <returns>服务绑定数据</returns>
         public static IBindData Bind<TService>(this IContainer container, Func<object> concrete)
         {
+            Guard.Requires<ArgumentNullException>(concrete != null);
             return container.Bind(container.Type2Service(typeof(TService)), (c, p) => concrete.Invoke(), false);
         }
 
@@ -165,6 +179,7 @@ namespace CatLib
         public static IBindData Bind(this IContainer container, string service,
             Func<IContainer, object[], object> concrete)
         {
+            Guard.Requires<ArgumentNullException>(concrete != null);
             return container.Bind(service, concrete, false);
         }
 
@@ -203,6 +218,7 @@ namespace CatLib
         /// <returns>是否完成绑定</returns>
         public static bool BindIf<TService>(this IContainer container, Func<IContainer, object[], object> concrete, out IBindData bindData)
         {
+            Guard.Requires<ArgumentNullException>(concrete != null);
             return container.BindIf(container.Type2Service(typeof(TService)), concrete, false, out bindData);
         }
 
@@ -281,7 +297,21 @@ namespace CatLib
         public static IBindData Singleton<TService>(this IContainer container,
             Func<IContainer, object[], object> concrete)
         {
+            Guard.Requires<ArgumentNullException>(concrete != null);
             return container.Bind(container.Type2Service(typeof(TService)), concrete, true);
+        }
+
+        /// <summary>
+        /// 以单例的形式绑定一个服务
+        /// </summary>
+        /// <typeparam name="TService">服务名</typeparam>
+        /// <param name="container">服务容器</param>
+        /// <param name="concrete">服务实现</param>
+        /// <returns>服务绑定数据</returns>
+        public static IBindData Singleton<TService>(this IContainer container, Func<object[], object> concrete)
+        {
+            Guard.Requires<ArgumentNullException>(concrete != null);
+            return container.Bind(container.Type2Service(typeof(TService)), (c, p) => concrete.Invoke(p), true);
         }
 
         /// <summary>

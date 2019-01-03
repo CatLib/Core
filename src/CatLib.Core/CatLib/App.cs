@@ -870,6 +870,17 @@ namespace CatLib
         /// <typeparam name="TService">服务名</typeparam>
         /// <param name="concrete">服务实现</param>
         /// <returns>服务绑定数据</returns>
+        public static IBindData Bind<TService>(Func<object[], object> concrete)
+        {
+            return Handler.Bind<TService>(concrete);
+        }
+
+        /// <summary>
+        /// 常规绑定一个服务
+        /// </summary>
+        /// <typeparam name="TService">服务名</typeparam>
+        /// <param name="concrete">服务实现</param>
+        /// <returns>服务绑定数据</returns>
         public static IBindData Bind<TService>(Func<object> concrete)
         {
             return Handler.Bind<TService>(concrete);
@@ -973,6 +984,17 @@ namespace CatLib
         /// <param name="concrete">服务实现</param>
         /// <returns>服务绑定数据</returns>
         public static IBindData Singleton<TService>(Func<IContainer, object[], object> concrete)
+        {
+            return Handler.Singleton<TService>(concrete);
+        }
+
+        /// <summary>
+        /// 以单例的形式绑定一个服务
+        /// </summary>
+        /// <typeparam name="TService">服务名</typeparam>
+        /// <param name="concrete">服务实现</param>
+        /// <returns>服务绑定数据</returns>
+        public static IBindData Singleton<TService>(Func<object[], object> concrete)
         {
             return Handler.Singleton<TService>(concrete);
         }
