@@ -1348,6 +1348,17 @@ namespace CatLib
         }
 
         /// <summary>
+        /// 获取一个回调，当执行回调可以生成指定的服务
+        /// </summary>
+        /// <param name="service">服务名</param>
+        /// <param name="userParams">用户提供的参数</param>
+        /// <returns>回调方案</returns>
+        public static Func<object> Factory(string service, params object[] userParams)
+        {
+            return Handler.Factory(service, userParams);
+        }
+
+        /// <summary>
         /// 当静态服务被释放时
         /// </summary>
         /// <param name="callback">处理释放时的回调</param>
