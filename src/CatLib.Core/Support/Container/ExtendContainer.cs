@@ -230,6 +230,21 @@ namespace CatLib
         /// <param name="concrete">服务实现</param>
         /// <param name="bindData">如果绑定失败则返回历史绑定对象</param>
         /// <returns>是否完成绑定</returns>
+        public static bool BindIf<TService>(this IContainer container, Func<object[], object> concrete, out IBindData bindData)
+        {
+            Guard.Requires<ArgumentNullException>(concrete != null);
+            return container.BindIf(container.Type2Service(typeof(TService)), (c, @params) => concrete(@params), false,
+                out bindData);
+        }
+
+        /// <summary>
+        /// 如果服务不存在那么则绑定服务
+        /// </summary>
+        /// <typeparam name="TService">服务名</typeparam>
+        /// <param name="container">服务容器</param>
+        /// <param name="concrete">服务实现</param>
+        /// <param name="bindData">如果绑定失败则返回历史绑定对象</param>
+        /// <returns>是否完成绑定</returns>
         public static bool BindIf<TService>(this IContainer container, Func<object> concrete, out IBindData bindData)
         {
             Guard.Requires<ArgumentNullException>(concrete != null);
@@ -378,6 +393,21 @@ namespace CatLib
         {
             Guard.Requires<ArgumentNullException>(concrete != null);
             return container.BindIf(container.Type2Service(typeof(TService)), (c, p) => concrete.Invoke(), true,
+                out bindData);
+        }
+
+        /// <summary>
+        /// 如果服务不存在那么则绑定服务
+        /// </summary>
+        /// <typeparam name="TService">服务名</typeparam>
+        /// <param name="container">服务容器</param>
+        /// <param name="concrete">服务实现</param>
+        /// <param name="bindData">如果绑定失败则返回历史绑定对象</param>
+        /// <returns>是否完成绑定</returns>
+        public static bool SingletonIf<TService>(this IContainer container, Func<object[], object> concrete, out IBindData bindData)
+        {
+            Guard.Requires<ArgumentNullException>(concrete != null);
+            return container.BindIf(container.Type2Service(typeof(TService)), (c, @params) => concrete(@params), true,
                 out bindData);
         }
 

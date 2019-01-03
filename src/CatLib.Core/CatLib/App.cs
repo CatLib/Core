@@ -939,6 +939,18 @@ namespace CatLib
         /// <param name="concrete">服务实现</param>
         /// <param name="bindData">如果绑定失败则返回历史绑定对象</param>
         /// <returns>是否完成绑定</returns>
+        public static bool BindIf<TService>(Func<object[], object> concrete, out IBindData bindData)
+        {
+            return Handler.BindIf<TService>(concrete, out bindData);
+        }
+
+        /// <summary>
+        /// 如果服务不存在那么则绑定服务
+        /// </summary>
+        /// <typeparam name="TService">服务名</typeparam>
+        /// <param name="concrete">服务实现</param>
+        /// <param name="bindData">如果绑定失败则返回历史绑定对象</param>
+        /// <returns>是否完成绑定</returns>
         public static bool BindIf<TService>(Func<object> concrete, out IBindData bindData)
         {
             return Handler.BindIf<TService>(concrete, out bindData);
@@ -1052,6 +1064,18 @@ namespace CatLib
         /// <param name="bindData">如果绑定失败则返回历史绑定对象</param>
         /// <returns>是否完成绑定</returns>
         public static bool SingletonIf<TService>(Func<IContainer, object[], object> concrete, out IBindData bindData)
+        {
+            return Handler.SingletonIf<TService>(concrete, out bindData);
+        }
+
+        /// <summary>
+        /// 如果服务不存在那么则绑定服务
+        /// </summary>
+        /// <typeparam name="TService">服务名</typeparam>
+        /// <param name="concrete">服务实现</param>
+        /// <param name="bindData">如果绑定失败则返回历史绑定对象</param>
+        /// <returns>是否完成绑定</returns>
+        public static bool SingletonIf<TService>(Func<object[], object> concrete, out IBindData bindData)
         {
             return Handler.SingletonIf<TService>(concrete, out bindData);
         }

@@ -561,6 +561,30 @@ namespace CatLib.Tests
             Assert.AreSame(obj, container.Make("created", false));
         }
 
+        [TestMethod]
+        public void TestBindIfFunc2()
+        {
+            var container = new Container();
+            var obj = new object();
+            Assert.AreEqual(true, container.BindIf<IAwait>((p) => (bool)p[0] ? obj : new object(), out IBindData bindData));
+            Assert.AreEqual(false, container.BindIf<IAwait>((p) => null, out bindData));
+            bindData.Alias("created");
+            Assert.AreSame(obj, container.Make("created", true));
+            Assert.AreNotSame(obj, container.Make("created", false));
+        }
+
+        [TestMethod]
+        public void TestSingletonIfFunc2()
+        {
+            var container = new Container();
+            var obj = new object();
+            Assert.AreEqual(true, container.SingletonIf<IAwait>((p) => (bool)p[0] ? obj : new object(), out IBindData bindData));
+            Assert.AreEqual(false, container.SingletonIf<IAwait>((p) => null, out bindData));
+            bindData.Alias("created");
+            Assert.AreSame(obj, container.Make("created", true));
+            Assert.AreSame(obj, container.Make("created", false));
+        }
+
         /// <summary>
         /// 生成容器
         /// </summary>
