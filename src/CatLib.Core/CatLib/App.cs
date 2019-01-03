@@ -1344,7 +1344,7 @@ namespace CatLib
         /// <returns>回调方案</returns>
         public static Func<TService> Factory<TService>(params object[] userParams)
         {
-            return () => Make<TService>(userParams);
+            return Handler.Factory<TService>(userParams);
         }
 
         /// <summary>
