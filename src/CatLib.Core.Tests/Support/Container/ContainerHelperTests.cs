@@ -262,21 +262,6 @@ namespace CatLib.Tests
         }
 
         [TestMethod]
-        public void TestWatch()
-        {
-            var container = new Container();
-            container.Instance<IContainer>(container);
-
-            var cls = new TestWatchCLass();
-            container.Instance<IWatchTest>(100);
-            container.Watch<IWatchTest>(cls, "OnChange");
-            container.Instance<IWatchTest>(200);
-
-            Assert.AreEqual(200, cls.value);
-            Assert.AreSame(container, cls.container);
-        }
-
-        [TestMethod]
         public void TestWatchLambda()
         {
             var container = new Container();

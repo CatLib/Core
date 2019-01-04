@@ -1452,43 +1452,6 @@ namespace CatLib
 
         /// <summary>
         /// 关注指定的服务，当服务触发重定义时调用指定对象的指定方法
-        /// <para>调用是以依赖注入的形式进行的</para>
-        /// <para>服务的新建（第一次解决服务）操作并不会触发重定义</para>
-        /// </summary>
-        /// <param name="service">关注的服务名</param>
-        /// <param name="target">当服务发生重定义时调用的目标</param>
-        /// <param name="methodInfo">方法信息</param>
-        public static void Watch(string service, object target, MethodInfo methodInfo)
-        {
-            Handler.Watch(service, target, methodInfo);
-        }
-
-        /// <summary>
-        /// 关注指定的服务，当服务触发重定义时调用指定对象的指定方法
-        /// <param>调用是以依赖注入的形式进行的</param>
-        /// </summary>
-        /// <param name="service">关注的服务名</param>
-        /// <param name="target">当服务发生重定义时调用的目标</param>
-        /// <param name="method">方法名</param>
-        public static void Watch(string service, object target, string method)
-        {
-            Handler.Watch(service, target, method);
-        }
-
-        /// <summary>
-        /// 关注指定的服务，当服务触发重定义时调用指定对象的指定方法
-        /// <param>调用是以依赖注入的形式进行的</param>
-        /// </summary>
-        /// <typeparam name="TService">服务名</typeparam>
-        /// <param name="target">当服务发生重定义时调用的目标</param>
-        /// <param name="method">方法名</param>
-        public static void Watch<TService>(object target, string method)
-        {
-            Handler.Watch<TService>(target, method);
-        }
-
-        /// <summary>
-        /// 关注指定的服务，当服务触发重定义时调用指定对象的指定方法
         /// <param>调用是以依赖注入的形式进行的</param>
         /// </summary>
         /// <typeparam name="TService">服务名</typeparam>

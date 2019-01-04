@@ -2292,21 +2292,6 @@ namespace CatLib.Tests.Stl
         }
 
         [TestMethod]
-        public void TestWatch()
-        {
-            var container = new Container();
-
-            container.Instance<IContainer>(container);
-            var cls = new TestWatchCLass();           
-            container.Instance("WatchService", 100);
-            container.Watch("WatchService", cls, "OnChange");
-            container.Instance("WatchService", 200);
-
-            Assert.AreEqual(200, cls.value);
-            Assert.AreSame(container, cls.container);
-        }
-
-        [TestMethod]
         public void TestInstanceAndDecorator()
         {
             var container = new Container();
@@ -2321,27 +2306,6 @@ namespace CatLib.Tests.Stl
             container.Bind("Hello", (_, __) => oldObject);
             var ins = container["Hello"];
             Assert.AreSame(newObject, ins);
-        }
-
-        [TestMethod]
-        public void TestOccupiedKeyInstance()
-        {
-            var container = new Container();
-            container.Instance<IBindData>(null);
-            var cls = new TestWatchCLass();
-            container.Instance("WatchService", 100);
-            container.Watch("WatchService", cls, "OnChange");
-            var isThrow = false;
-            try
-            {
-                container.Instance("WatchService", 200);
-            }
-            catch (RuntimeException)
-            {
-                isThrow = true;
-            }
-
-            Assert.AreEqual(true, isThrow);
         }
 
         [TestMethod]

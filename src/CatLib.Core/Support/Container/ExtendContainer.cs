@@ -789,7 +789,7 @@ namespace CatLib
         /// <param name="closure">闭包</param>
         public static void Extend<TService, TConcrete>(this IContainer container, Func<TConcrete, object> closure)
         {
-            container.Extend(container.Type2Service(typeof(TService)), (instance, c) => closure((TConcrete) instance));
+            container.Extend(container.Type2Service(typeof(TService)), (instance, c) => closure((TConcrete)instance));
         }
 
         /// <summary>
@@ -802,7 +802,7 @@ namespace CatLib
         public static void Extend<TService, TConcrete>(this IContainer container, Func<TConcrete, IContainer, object> closure)
         {
             container.Extend(container.Type2Service(typeof(TService)),
-                (instance, c) => closure((TConcrete) instance, c));
+                (instance, c) => closure((TConcrete)instance, c));
         }
 
         /// <summary>
@@ -1003,61 +1003,6 @@ namespace CatLib
 
         /// <summary>
         /// 关注指定的服务，当服务触发重定义时调用指定对象的指定方法
-        /// <para>调用是以依赖注入的形式进行的</para>
-        /// <para>服务的新建（第一次解决服务）操作并不会触发重定义</para>
-        /// </summary>
-        /// <param name="container">服务容器</param>
-        /// <param name="service">关注的服务名</param>
-        /// <param name="target">当服务发生重定义时调用的目标</param>
-        /// <param name="methodInfo">方法信息</param>
-        public static void Watch(this IContainer container, string service, object target, MethodInfo methodInfo)
-        {
-            Guard.Requires<ArgumentNullException>(methodInfo != null);
-
-            if (!methodInfo.IsStatic)
-            {
-                Guard.Requires<ArgumentNullException>(target != null);
-            }
-
-            container.OnRebound(service, (instance) =>
-            {
-                container.Call(target, methodInfo, instance);
-            });
-        }
-
-        /// <summary>
-        /// 关注指定的服务，当服务触发重定义时调用指定对象的指定方法
-        /// <param>调用是以依赖注入的形式进行的</param>
-        /// </summary>
-        /// <param name="container">服务容器</param>
-        /// <param name="service">关注的服务名</param>
-        /// <param name="target">当服务发生重定义时调用的目标</param>
-        /// <param name="method">方法名</param>
-        public static void Watch(this IContainer container, string service, object target, string method)
-        {
-            Guard.Requires<ArgumentNullException>(target != null);
-            Guard.NotEmptyOrNull(method, nameof(method));
-
-            var methodInfo = target.GetType().GetMethod(method);
-            container.Watch(service, target, methodInfo);
-        }
-
-        /// <summary>
-        /// 关注指定的服务，当服务触发重定义时调用指定对象的指定方法
-        /// <param>调用是以依赖注入的形式进行的</param>
-        /// </summary>
-        /// <typeparam name="TService">服务名</typeparam>
-        /// <param name="container">服务容器</param>
-        /// <param name="target">当服务发生重定义时调用的目标</param>
-        /// <param name="method">方法名</param>
-        public static void Watch<TService>(this IContainer container, object target, string method)
-        {
-            Guard.Requires<ArgumentNullException>(method != null);
-            container.Watch(container.Type2Service(typeof(TService)), target, method);
-        }
-
-        /// <summary>
-        /// 关注指定的服务，当服务触发重定义时调用指定对象的指定方法
         /// <param>调用是以依赖注入的形式进行的</param>
         /// </summary>
         /// <typeparam name="TService">服务名</typeparam>
@@ -1066,7 +1011,7 @@ namespace CatLib
         public static void Watch<TService>(this IContainer container, Action method)
         {
             Guard.Requires<ArgumentNullException>(method != null);
-            container.Watch(container.Type2Service(typeof(TService)), method.Target, method.Method);
+            container.OnRebound(container.Type2Service(typeof(TService)), (instance) => method());
         }
 
         /// <summary>
@@ -1079,7 +1024,7 @@ namespace CatLib
         public static void Watch<TService>(this IContainer container, Action<TService> method)
         {
             Guard.Requires<ArgumentNullException>(method != null);
-            container.Watch(container.Type2Service(typeof(TService)), method.Target, method.Method);
+            container.OnRebound(container.Type2Service(typeof(TService)), (instance) => method((TService)instance));
         }
 
         /// <summary>
