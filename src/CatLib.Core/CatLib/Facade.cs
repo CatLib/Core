@@ -87,7 +87,7 @@ namespace CatLib
 
             if (!inited && (App.IsResolved(service) || App.CanMake(service)))
             {
-                App.Watch<TService>(ServiceRebound);
+                App.OnRebound(service, (o) => ServiceRebound((TService) o));
                 inited = true;
             }
             else if (binder != null && !binder.IsStatic)
