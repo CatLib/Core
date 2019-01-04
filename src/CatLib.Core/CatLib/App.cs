@@ -650,6 +650,16 @@ namespace CatLib
         }
 
         /// <summary>
+        /// 当服务被解决事件之后的回调
+        /// </summary>
+        /// <param name="closure">闭包</param>
+        /// <returns>当前容器</returns>
+        public static IContainer OnAfterResolving(Action<IBindData, object> closure)
+        {
+            return Handler.OnAfterResolving(closure);
+        }
+
+        /// <summary>
         /// 当查找类型无法找到时会尝试去调用开发者提供的查找类型函数
         /// </summary>
         /// <param name="func">查找类型的回调</param>
@@ -1406,16 +1416,6 @@ namespace CatLib
         public static IContainer OnResolving<TWhere>(Action<IBindData, TWhere> closure)
         {
             return Handler.OnResolving(closure);
-        }
-
-        /// <summary>
-        /// 当服务被解决事件之后的回调
-        /// </summary>
-        /// <param name="closure">闭包</param>
-        /// <returns>当前容器</returns>
-        public static IContainer OnAfterResolving(Action<IBindData, object> closure)
-        {
-            return Handler.OnAfterResolving(closure);
         }
 
         /// <summary>
