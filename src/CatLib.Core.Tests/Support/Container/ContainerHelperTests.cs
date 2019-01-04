@@ -262,21 +262,6 @@ namespace CatLib.Tests
         }
 
         [TestMethod]
-        public void TestWatch()
-        {
-            var container = new Container();
-            container.Instance<IContainer>(container);
-
-            var cls = new TestWatchCLass();
-            container.Instance<IWatchTest>(100);
-            container.Watch<IWatchTest>(cls, "OnChange");
-            container.Instance<IWatchTest>(200);
-
-            Assert.AreEqual(200, cls.value);
-            Assert.AreSame(container, cls.container);
-        }
-
-        [TestMethod]
         public void TestWatchLambda()
         {
             var container = new Container();
@@ -409,6 +394,53 @@ namespace CatLib.Tests
             Assert.AreEqual("hello world", container.Make<string>());
         }
 
+        [TestMethod]
+        public void TestExtendContainerWithService()
+        {
+            var container = new Container();
+            container.Extend("abc", (instance, _) =>
+            {
+                Assert.AreSame(container, _);
+                return instance + " world";
+            });
+
+            container.Bind("abc", (b, p) => "hello", false);
+            Assert.AreEqual("hello world", container.Make("abc"));
+        }
+
+        [TestMethod]
+        public void TestExtendContainerWithService2()
+        {
+            var container = new Container();
+            container.Extend("abc", (instance) => instance + " world");
+
+            container.Bind("abc", (b, p) => "hello", false);
+            Assert.AreEqual("hello world", container.Make("abc"));
+        }
+
+        [TestMethod]
+        public void TestExtendWithServiceName()
+        {
+            var container = new Container();
+            container.Extend<ITypeMatchInterface, TestTypeMatchOnResolvingClass>((instance) => null);
+            container.Bind<ITypeMatchInterface, TestTypeMatchOnResolvingClass>();
+
+            Assert.AreEqual(null, container.Make<ITypeMatchInterface>());
+        }
+
+        [TestMethod]
+        public void TestExtendWithServiceName2()
+        {
+            var container = new Container();
+            container.Extend<ITypeMatchInterface, TestTypeMatchOnResolvingClass>((instance, c) =>
+            {
+                Assert.AreEqual(container, c);
+                return null;
+            });
+            container.Bind<ITypeMatchInterface, TestTypeMatchOnResolvingClass>();
+            Assert.AreEqual(null, container.Make<ITypeMatchInterface>());
+        }
+
         public interface ITypeMatchInterface
         {
             
@@ -492,6 +524,50 @@ namespace CatLib.Tests
 
             Assert.AreEqual(2, count);
             Assert.AreEqual(2, stringCount);
+        }
+
+        [TestMethod]
+        public void TestBindFunc2()
+        {
+            var container = new Container();
+            var obj = new object();
+            container.Bind<IAwait>((p) => (bool) p[0] ? obj : new object()).Alias("created");
+            Assert.AreSame(obj, container.Make("created", true));
+            Assert.AreNotSame(obj, container.Make("created", false));
+        }
+
+        [TestMethod]
+        public void TestSingletonFunc2()
+        {
+            var container = new Container();
+            var obj = new object();
+            container.Singleton<IAwait>((p) => (bool)p[0] ? obj : new object()).Alias("created");
+            Assert.AreSame(obj, container.Make("created", true));
+            Assert.AreSame(obj, container.Make("created", false));
+        }
+
+        [TestMethod]
+        public void TestBindIfFunc2()
+        {
+            var container = new Container();
+            var obj = new object();
+            Assert.AreEqual(true, container.BindIf<IAwait>((p) => (bool)p[0] ? obj : new object(), out IBindData bindData));
+            Assert.AreEqual(false, container.BindIf<IAwait>((p) => null, out bindData));
+            bindData.Alias("created");
+            Assert.AreSame(obj, container.Make("created", true));
+            Assert.AreNotSame(obj, container.Make("created", false));
+        }
+
+        [TestMethod]
+        public void TestSingletonIfFunc2()
+        {
+            var container = new Container();
+            var obj = new object();
+            Assert.AreEqual(true, container.SingletonIf<IAwait>((p) => (bool)p[0] ? obj : new object(), out IBindData bindData));
+            Assert.AreEqual(false, container.SingletonIf<IAwait>((p) => null, out bindData));
+            bindData.Alias("created");
+            Assert.AreSame(obj, container.Make("created", true));
+            Assert.AreSame(obj, container.Make("created", false));
         }
 
         /// <summary>

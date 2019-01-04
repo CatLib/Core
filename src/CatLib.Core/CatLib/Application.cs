@@ -157,7 +157,12 @@ namespace CatLib
             mainThreadId = Thread.CurrentThread.ManagedThreadId;
             RegisterCoreAlias();
             RegisterCoreService();
+
+            // 我们使用闭包来保存当前上下文状态
+            // 不要修改为：OnFindType(Type.GetType)这会导致
+            // 作用程序集不是预期作用域。
             OnFindType(finder => { return Type.GetType(finder); });
+
             DebugLevel = DebugLevels.Production;
             Process = StartProcess.Construct;
 
@@ -186,7 +191,10 @@ namespace CatLib
             Trigger(ApplicationEvents.OnTerminate, this);
             Process = StartProcess.Terminating;
             Flush();
-            App.Handler = null;
+            if (App.HasHandler && App.Handler == this)
+            {
+                App.Handler = null;
+            }
             Process = StartProcess.Terminated;
             Trigger(ApplicationEvents.OnTerminated, this);
         }
@@ -355,9 +363,9 @@ namespace CatLib
         /// <param name="list">列表</param>
         /// <param name="insert">需要插入的记录</param>
         /// <param name="priorityMethod">优先级函数</param>
-        private void AddSortedList<T>(SortedList<int, List<T>> list, T insert, string priorityMethod)
+        protected void AddSortedList<T>(IDictionary<int, List<T>> list, T insert, string priorityMethod)
         {
-            var priority = GetPriority(insert.GetType(), priorityMethod );
+            var priority = GetPriority(insert.GetType(), priorityMethod);
 
             if (!list.TryGetValue(priority, out List<T> providers))
             {
@@ -371,7 +379,7 @@ namespace CatLib
         /// 初始化服务提供者
         /// </summary>
         /// <param name="provider">服务提供者</param>
-        private IEnumerator InitProvider(IServiceProvider provider)
+        protected virtual IEnumerator InitProvider(IServiceProvider provider)
         {
             Trigger(ApplicationEvents.OnProviderInit, provider);
 
@@ -541,6 +549,30 @@ namespace CatLib
         }
 
         /// <summary>
+        /// 启动迭代器
+        /// </summary>
+        /// <param name="coroutine">迭代程序</param>
+        protected void StartCoroutine(IEnumerator coroutine)
+        {
+            var stack = new Stack<IEnumerator>();
+            stack.Push(coroutine);
+            do
+            {
+                coroutine = stack.Pop();
+                while (coroutine.MoveNext())
+                {
+                    if (!(coroutine.Current is IEnumerator nextCoroutine))
+                    {
+                        continue;
+                    }
+
+                    stack.Push(coroutine);
+                    coroutine = nextCoroutine;
+                }
+            } while (stack.Count > 0);
+        }
+
+        /// <summary>
         /// 注册核心别名
         /// </summary>
         private void RegisterCoreAlias()
@@ -564,10 +596,9 @@ namespace CatLib
         private void RegisterCoreService()
         {
             var bindable = new BindData(this, null, null, false);
-            this.Singleton<GlobalDispatcher>(
-                    (_, __) => new GlobalDispatcher(
-                        (paramInfos, userParams) => GetDependencies(bindable, paramInfos, userParams)))
-                .Alias<IDispatcher>();
+            this.Singleton<IDispatcher>(
+                (_, __) => new GlobalDispatcher(
+                    (paramInfos, userParams) => GetDependencies(bindable, paramInfos, userParams)));
         }
 
         /// <summary>
@@ -579,30 +610,6 @@ namespace CatLib
         {
             var providerType = provider as IServiceProviderType;
             return providerType == null ? provider.GetType() : providerType.BaseType;
-        }
-
-        /// <summary>
-        /// 启动迭代器
-        /// </summary>
-        /// <param name="coroutine">迭代程序</param>
-        private void StartCoroutine(IEnumerator coroutine)
-        {
-            var stack = new Stack<IEnumerator>();
-            stack.Push(coroutine);
-            do
-            {
-                coroutine = stack.Pop();
-                while (coroutine.MoveNext())
-                {
-                    if (!(coroutine.Current is IEnumerator nextCoroutine))
-                    {
-                        continue;
-                    }
-
-                    stack.Push(coroutine);
-                    coroutine = nextCoroutine;
-                }
-            } while (stack.Count > 0);
         }
     }
 }

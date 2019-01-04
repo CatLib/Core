@@ -350,6 +350,11 @@ namespace CatLib
                     throw new LogicException($"Alias [{alias}] is already exists.");
                 }
 
+                if (binds.ContainsKey(alias))
+                {
+                    throw new LogicException($"Alias [{alias}] has been used for service name.");
+                }
+
                 if (!binds.ContainsKey(service) && !instances.ContainsKey(service))
                 {
                     throw new CodeStandardException(
@@ -400,6 +405,7 @@ namespace CatLib
         {
             if (!IsUnableType(concrete))
             {
+                service = FormatService(service);
                 return BindIf(service, WrapperTypeBuilder(service, concrete), isStatic, out bindData);
             }
 
@@ -422,6 +428,7 @@ namespace CatLib
             {
                 throw new LogicException($"Bind type [{concrete}] can not built");
             }
+            service = FormatService(service);
             return Bind(service, WrapperTypeBuilder(service, concrete), isStatic);
         }
 
@@ -590,19 +597,19 @@ namespace CatLib
         /// <para>允许在服务构建的过程中配置或者替换服务</para>
         /// <para>如果服务已经被构建，拓展会立即生效。</para>
         /// </summary>
-        /// <param name="service">服务名或别名</param>
+        /// <param name="service">服务名或别名,如果为null则意味着全局有效</param>
         /// <param name="closure">闭包</param>
         public void Extend(string service, Func<object, IContainer, object> closure)
         {
-            Guard.NotEmptyOrNull(service, nameof(service));
             Guard.Requires<ArgumentNullException>(closure != null);
 
             lock (syncRoot)
             {
                 GuardFlushing();
-                service = AliasToService(service);
 
-                if (instances.TryGetValue(service, out object instance))
+                service = string.IsNullOrEmpty(service) ? string.Empty : AliasToService(service);
+
+                if (service != string.Empty && instances.TryGetValue(service, out object instance))
                 {
                     // 如果实例已经存在那么，那么应用扩展。
                     // 扩展将不再被添加到永久扩展列表
@@ -626,7 +633,7 @@ namespace CatLib
 
                 extender.Add(closure);
 
-                if (IsResolved(service))
+                if (service != string.Empty && IsResolved(service))
                 {
                     TriggerOnRebound(service);
                 }
@@ -1037,8 +1044,8 @@ namespace CatLib
         /// <returns>根据类型生成的服务</returns>
         protected virtual Func<IContainer, object[], object> WrapperTypeBuilder(string service, Type concrete)
         {
-            service = FormatService(service);
-            return (container, userParams) => ((Container)container).CreateInstance(GetBindFillable(service), concrete, userParams);
+            return (container, userParams) => ((Container) container).CreateInstance(GetBindFillable(service), concrete,
+                userParams);
         }
 
         /// <summary>
@@ -1251,7 +1258,7 @@ namespace CatLib
                 return instance;
             }
 
-            throw MakeUnresolvablePrimitiveException(baseParam.Name, baseParam.DeclaringType);
+            throw MakeUnresolvableException(baseParam.Name, baseParam.DeclaringType);
         }
 
         /// <summary>
@@ -1286,7 +1293,9 @@ namespace CatLib
                 return baseParam.DefaultValue;
             }
 
-            throw MakeUnresolvablePrimitiveException(baseParam.Name, baseParam.Member.DeclaringType);
+            // baseParam.Member 可能会为空，在一些底层开发会覆写ParameterInfo时可能会发生
+            throw MakeUnresolvableException(baseParam.Name,
+                baseParam.Member != null ? baseParam.Member.DeclaringType : null);
         }
 
         /// <summary>
@@ -1356,10 +1365,10 @@ namespace CatLib
         /// <param name="name">变量名</param>
         /// <param name="declaringClass">变量所属类</param>
         /// <returns>运行时异常</returns>
-        protected virtual UnresolvableException MakeUnresolvablePrimitiveException(string name, Type declaringClass)
+        protected virtual UnresolvableException MakeUnresolvableException(string name, Type declaringClass)
         {
             return new UnresolvableException(
-                $"Unresolvable primitive dependency , resolving [{name}] in class [{declaringClass}]");
+                $"Unresolvable dependency , resolving [{name ?? "Unknow"}] in class [{declaringClass?.ToString() ?? "Unknow"}]");
         }
 
         /// <summary>
@@ -1862,7 +1871,7 @@ namespace CatLib
         /// </summary>
         /// <param name="service">服务名</param>
         /// <returns>空绑定数据</returns>
-        private BindData MakeEmptyBindData(string service)
+        protected virtual BindData MakeEmptyBindData(string service)
         {
             return new BindData(this, service, null, false);
         }
@@ -1932,7 +1941,15 @@ namespace CatLib
         /// <returns>扩展后的服务</returns>
         private object Extend(string service, object instance)
         {
-            if (!extenders.TryGetValue(service, out List<Func<object, IContainer, object>> list))
+            if (extenders.TryGetValue(service, out List<Func<object, IContainer, object>> list))
+            {
+                foreach (var extender in list)
+                {
+                    instance = extender(instance, this);
+                }
+            }
+
+            if (!extenders.TryGetValue(string.Empty, out list))
             {
                 return instance;
             }
@@ -2023,7 +2040,7 @@ namespace CatLib
         /// </summary>
         /// <param name="service">服务名</param>
         /// <returns>服务绑定数据</returns>
-        private BindData GetBindFillable(string service)
+        protected BindData GetBindFillable(string service)
         {
             return service != null && binds.TryGetValue(service, out BindData bindData)
                 ? bindData

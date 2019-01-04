@@ -18,6 +18,7 @@ namespace CatLib
     /// </summary>
     /// <typeparam name="TReturn">返回类型</typeparam>
     public interface IGivenData<TReturn>
+        where TReturn : IBindable
     {
         /// <summary>
         /// 给与什么服务
@@ -29,9 +30,9 @@ namespace CatLib
         /// <summary>
         /// 给与什么服务
         /// </summary>
-        /// <typeparam name="T">给与的服务名或别名</typeparam>
+        /// <typeparam name="TService">给与的服务名或别名</typeparam>
         /// <returns>服务绑定数据</returns>
-        TReturn Given<T>();
+        TReturn Given<TService>();
 
         /// <summary>
         /// 给与什么服务

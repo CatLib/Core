@@ -436,6 +436,16 @@ namespace CatLib.Tests.Support.Util
         }
 
         [TestMethod]
+        public void TestMapIntToString()
+        {
+            var data = new[] { 1, 2, 3 };
+            var result = Arr.Map(data, (i) => i.ToString());
+            Assert.AreEqual("1", result[0]);
+            Assert.AreEqual("2", result[1]);
+            Assert.AreEqual("3", result[2]);
+        }
+
+        [TestMethod]
         public void TestPop()
         {
             var elements = new[] { 1, 2, 3 };

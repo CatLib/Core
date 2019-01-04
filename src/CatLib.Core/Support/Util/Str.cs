@@ -443,10 +443,9 @@ namespace CatLib
                 return result + mission;
             }
 
-            var separatorRegex = separator as Regex;
             var separatorStr = separator.ToString();
             var index = -1;
-            if (separatorRegex != null)
+            if (separator is Regex separatorRegex)
             {
                 if (separatorRegex.IsMatch(result))
                 {

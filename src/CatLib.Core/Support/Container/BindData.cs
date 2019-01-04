@@ -17,7 +17,7 @@ namespace CatLib
     /// <summary>
     /// 服务绑定数据
     /// </summary>    
-    internal sealed class BindData : Bindable<IBindData>, IBindData
+    public sealed class BindData : Bindable<IBindData>, IBindData
     {
         /// <summary>
         /// 服务实现，执行这个委托将会获得服务实例
@@ -61,16 +61,6 @@ namespace CatLib
         /// <summary>
         /// 为服务设定一个别名
         /// </summary>
-        /// <typeparam name="T">别名</typeparam>
-        /// <returns>服务绑定数据</returns>
-        public IBindData Alias<T>()
-        {
-            return Alias(Container.Type2Service(typeof(T)));
-        }
-
-        /// <summary>
-        /// 为服务设定一个别名
-        /// </summary>
         /// <param name="alias">别名</param>
         /// <returns>服务绑定数据</returns>
         public IBindData Alias(string alias)
@@ -79,7 +69,7 @@ namespace CatLib
             {
                 GuardIsDestroy();
                 Guard.NotEmptyOrNull(alias, nameof(alias));
-                Container.Alias(alias, Service);
+                InternalContainer.Alias(alias, Service);
                 return this;
             }
         }
@@ -95,7 +85,7 @@ namespace CatLib
             {
                 GuardIsDestroy();
                 Guard.NotEmptyOrNull(tag, nameof(tag));
-                Container.Tag(tag, Service);
+                InternalContainer.Tag(tag, Service);
                 return this;
             }
         }
@@ -144,7 +134,7 @@ namespace CatLib
         /// </summary>
         protected override void ReleaseBind()
         {
-            Container.Unbind(this);
+            InternalContainer.Unbind(this);
         }
 
         /// <summary>
@@ -154,7 +144,7 @@ namespace CatLib
         /// <returns>服务实例</returns>
         internal object TriggerResolving(object instance)
         {
-            return Container.Trigger(this, instance, resolving);
+            return InternalContainer.Trigger(this, instance, resolving);
         }
 
         /// <summary>
@@ -164,7 +154,7 @@ namespace CatLib
         /// <returns>服务实例</returns>
         internal object TriggerAfterResolving(object instance)
         {
-            return Container.Trigger(this, instance, afterResolving);
+            return InternalContainer.Trigger(this, instance, afterResolving);
         }
 
         /// <summary>
@@ -174,7 +164,7 @@ namespace CatLib
         /// <returns>服务实例</returns>
         internal object TriggerRelease(object instance)
         {
-            return Container.Trigger(this, instance, release);
+            return InternalContainer.Trigger(this, instance, release);
         }
 
         /// <summary>

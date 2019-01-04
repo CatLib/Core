@@ -365,17 +365,20 @@ namespace CatLib
         /// 将数组值传入用户自定义函数，自定义函数返回的值作为新的数组值
         /// </summary>
         /// <typeparam name="T">数组类型</typeparam>
+        /// <typeparam name="TReturn">返回值类型</typeparam>
         /// <param name="source">规定数组</param>
         /// <param name="callback">自定义函数</param>
         /// <returns>处理后的数组</returns>
-        public static T[] Map<T>(T[] source, Func<T, T> callback)
+        public static TReturn[] Map<T, TReturn>(T[] source, Func<T, TReturn> callback)
         {
-            Guard.Requires<ArgumentNullException>(source != null);
             Guard.Requires<ArgumentNullException>(callback != null);
 
-            var requested = new T[source.Length];
-            Array.Copy(source, requested, source.Length);
+            if (source == null)
+            {
+                return new TReturn[0];
+            }
 
+            var requested = new TReturn[source.Length];
             for (var i = 0; i < source.Length; i++)
             {
                 requested[i] = callback.Invoke(source[i]);
@@ -388,15 +391,20 @@ namespace CatLib
         /// 将迭代器的值传入用户自定义函数，自定义函数返回的值作为新的数组值
         /// </summary>
         /// <typeparam name="T">数组类型</typeparam>
+        /// <typeparam name="TReturn">返回值类型</typeparam>
         /// <param name="source">规定迭代器</param>
         /// <param name="callback">自定义函数</param>
         /// <returns>处理后的数组</returns>
-        public static T[] Map<T>(IEnumerable<T> source, Func<T, T> callback)
+        public static TReturn[] Map<T, TReturn>(IEnumerable<T> source, Func<T, TReturn> callback)
         {
-            Guard.Requires<ArgumentNullException>(source != null);
             Guard.Requires<ArgumentNullException>(callback != null);
 
-            var requested = new List<T>();
+            if (source == null)
+            {
+                return new TReturn[0];
+            }
+
+            var requested = new List<TReturn>();
             foreach (var value in source)
             {
                 requested.Add(callback.Invoke(value));
@@ -583,14 +591,15 @@ namespace CatLib
                 return -1;
             }
 
-            for (int i = 0, n; i < source.Length; i++)
+            for (var i = 0; i < source.Length; i++)
             {
                 if (!source[i].Equals(match[0]))
                 {
                     continue;
                 }
                 var isFinded = true;
-                for (n = 0; n < match.Length; n++)
+
+                for (var n = 0; n < match.Length; n++)
                 {
                     if ((i + n) < source.Length &&
                           source[i + n].Equals(match[n]))
@@ -600,6 +609,7 @@ namespace CatLib
                     isFinded = false;
                     break;
                 }
+
                 if (isFinded)
                 {
                     return i;
@@ -624,9 +634,9 @@ namespace CatLib
                 return -1;
             }
 
-            for (int i = 0, n; i < source.Length; i++)
+            for (var i = 0; i < source.Length; i++)
             {
-                for (n = 0; n < match.Length; n++)
+                for (var n = 0; n < match.Length; n++)
                 {
                     if (source[i].Equals(match[n]))
                     {
