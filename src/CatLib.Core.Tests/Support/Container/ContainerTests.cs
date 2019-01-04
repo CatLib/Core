@@ -2783,6 +2783,16 @@ namespace CatLib.Tests.Stl
                 .Needs("$container").Given(() => null);
             container.Make<TestGivenInvalidTypeClass>();
         }
+
+        [TestMethod]
+        [ExpectedException(typeof(LogicException))]
+        public void TestSetAliasIsService()
+        {
+            var container = new Container();
+            container.Bind("abc", (c, p) => 1, false);
+            container.Bind("ccc", (c, p) => 1, false);
+            container.Alias("abc", "ccc");
+        }
         #endregion
 
         /// <summary>

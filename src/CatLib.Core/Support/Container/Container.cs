@@ -350,6 +350,11 @@ namespace CatLib
                     throw new LogicException($"Alias [{alias}] is already exists.");
                 }
 
+                if (binds.ContainsKey(alias))
+                {
+                    throw new LogicException($"Alias [{alias}] has been used for service name.");
+                }
+
                 if (!binds.ContainsKey(service) && !instances.ContainsKey(service))
                 {
                     throw new CodeStandardException(
