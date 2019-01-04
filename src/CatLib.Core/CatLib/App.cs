@@ -1,12 +1,12 @@
 ﻿/*
  * This file is part of the CatLib package.
  *
- * (c) Yu Bin <support@catlib.io>
+ * (c) CatLib <support@catlib.io>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  *
- * Document: http://catlib.io/
+ * Document: https://catlib.io/
  */
 
 using System;
@@ -25,7 +25,23 @@ namespace CatLib
         /// <summary>
         /// 当新建Application时
         /// </summary>
-        public static event Action<IApplication> OnNewApplication;
+        private static event Action<IApplication> onNewApplication;
+
+        /// <summary>
+        /// 当新建Application时
+        /// </summary>
+        public static event Action<IApplication> OnNewApplication
+        {
+            add
+            {
+                onNewApplication += value;
+                if (instance != null)
+                {
+                    value?.Invoke(instance);
+                }
+            }
+            remove => onNewApplication -= value;
+        }
 
         /// <summary>
         /// CatLib实例
@@ -37,22 +53,25 @@ namespace CatLib
         /// </summary>
         public static IApplication Handler
         {
-            get => instance ?? New();
+            get
+            {
+                if (instance == null)
+                {
+                    throw new LogicException("The Application does not created, please call new Application() first.");
+                }
+                return instance;
+            }
             set
             {
                 instance = value;
-                OnNewApplication?.Invoke(instance);
+                onNewApplication?.Invoke(instance);
             }
         }
 
         /// <summary>
-        /// 创建CatLib实例
+        /// 是否拥有全局CatLib实例
         /// </summary>
-        /// <returns>CatLib实例</returns>
-        protected static IApplication New()
-        {
-            return Application.New();
-        }
+        public static bool HasHandler => instance != null;
         #endregion
 
         #region Application API
@@ -372,25 +391,21 @@ namespace CatLib
         /// <summary>
         /// 是否已经实例静态化
         /// </summary>
-        /// <typeparam name="TService">服务名</typeparam>
+        /// <param name="service">服务名或别名</param>
         /// <returns>是否已经静态化</returns>
-        public static bool HasInstance<TService>()
+        public static bool HasInstance(string service)
         {
-#if CATLIB_PERFORMANCE
-            return Facade<TService>.HasInstance || Handler.HasInstance<TService>();
-#else
-            return Handler.HasInstance<TService>();
-#endif
+            return Handler.HasInstance(service);
         }
 
         /// <summary>
         /// 服务是否已经被解决过
         /// </summary>
-        /// <typeparam name="TService">服务名</typeparam>
+        /// <param name="service">服务名</param>
         /// <returns>是否已经被解决过</returns>
-        public static bool IsResolved<TService>()
+        public static bool IsResolved(string service)
         {
-            return Handler.IsResolved<TService>();
+            return Handler.IsResolved(service);
         }
 
         /// <summary>
@@ -585,56 +600,11 @@ namespace CatLib
         /// 获取一个回调，当执行回调可以生成指定的服务
         /// </summary>
         /// <param name="service">服务名或别名</param>
+        /// <param name="userParams">用户提供的参数</param>
         /// <returns>回调方案</returns>
-        public static Func<object> Factory(string service)
+        public static Func<object> Factory(string service, params object[] userParams)
         {
-            return Handler.Factory(service);
-        }
-
-        /// <summary>
-        /// 扩展容器中的服务
-        /// <para>允许在服务构建的过程中配置或者替换服务</para>
-        /// <para>如果服务已经被构建，拓展会立即生效。</para>
-        /// </summary>
-        /// <param name="closure">闭包</param>
-        public static void Extend(Func<object, IContainer, object> closure)
-        {
-            Handler.Extend(closure);
-        }
-
-        /// <summary>
-        /// 扩展容器中的服务
-        /// <para>允许在服务构建的过程中配置或者替换服务</para>
-        /// <para>如果服务已经被构建，拓展会立即生效。</para>
-        /// </summary>
-        /// <param name="closure">闭包</param>
-        public static void Extend(Func<object, object> closure)
-        {
-            Handler.Extend(closure);
-        }
-
-        /// <summary>
-        /// 扩展容器中的服务
-        /// <para>允许在服务构建的过程中配置或者替换服务</para>
-        /// <para>如果服务已经被构建，拓展会立即生效。</para>
-        /// </summary>
-        /// <typeparam name="TService">服务名或别名</typeparam>
-        /// <param name="closure">闭包</param>
-        public static void Extend<TService>(Func<TService, IContainer, object> closure)
-        {
-            Handler.Extend(closure);
-        }
-
-        /// <summary>
-        /// 扩展容器中的服务
-        /// <para>允许在服务构建的过程中配置或者替换服务</para>
-        /// <para>如果服务已经被构建，拓展会立即生效。</para>
-        /// </summary>
-        /// <typeparam name="TService">服务名或别名</typeparam>
-        /// <param name="closure">闭包</param>
-        public static void Extend<TService>(Func<TService, object> closure)
-        {
-            Handler.Extend(closure);
+            return Handler.Factory(service, userParams);
         }
 
         /// <summary>
@@ -646,6 +616,18 @@ namespace CatLib
         public static IContainer Alias(string alias, string service)
         {
             return Handler.Alias(alias, service);
+        }
+
+        /// <summary>
+        /// 扩展容器中的服务
+        /// <para>允许在服务构建的过程中配置或者替换服务</para>
+        /// <para>如果服务已经被构建，拓展会立即生效。</para>
+        /// </summary>
+        /// <param name="service">服务名</param>
+        /// <param name="closure">闭包</param>
+        public static void Extend(string service, Func<object, IContainer, object> closure)
+        {
+            Handler.Extend(service, closure);
         }
 
         /// <summary>
@@ -668,6 +650,16 @@ namespace CatLib
         }
 
         /// <summary>
+        /// 当服务被解决事件之后的回调
+        /// </summary>
+        /// <param name="closure">闭包</param>
+        /// <returns>当前容器</returns>
+        public static IContainer OnAfterResolving(Action<IBindData, object> closure)
+        {
+            return Handler.OnAfterResolving(closure);
+        }
+
+        /// <summary>
         /// 当查找类型无法找到时会尝试去调用开发者提供的查找类型函数
         /// </summary>
         /// <param name="func">查找类型的回调</param>
@@ -687,19 +679,6 @@ namespace CatLib
         public static IContainer OnRebound(string service, Action<object> callback)
         {
             return Handler.OnRebound(service, callback);
-        }
-
-        /// <summary>
-        /// 关注指定的服务，当服务触发重定义时调用指定对象的指定方法
-        /// <para>调用是以依赖注入的形式进行的</para>
-        /// <para>服务的新建（第一次解决服务）操作并不会触发重定义</para>
-        /// </summary>
-        /// <param name="service">关注的服务名</param>
-        /// <param name="target">当服务发生重定义时调用的目标</param>
-        /// <param name="methodInfo">方法信息</param>
-        public static void Watch(string service, object target, MethodInfo methodInfo)
-        {
-            Handler.Watch(service, target, methodInfo);
         }
 
         /// <summary>
@@ -732,6 +711,30 @@ namespace CatLib
         public static IBindData GetBind<TService>()
         {
             return Handler.GetBind<TService>();
+        }
+
+        /// <summary>
+        /// 是否已经实例静态化
+        /// </summary>
+        /// <typeparam name="TService">服务名</typeparam>
+        /// <returns>是否已经静态化</returns>
+        public static bool HasInstance<TService>()
+        {
+#if CATLIB_PERFORMANCE
+            return Facade<TService>.HasInstance || Handler.HasInstance<TService>();
+#else
+            return Handler.HasInstance<TService>();
+#endif
+        }
+
+        /// <summary>
+        /// 服务是否已经被解决过
+        /// </summary>
+        /// <typeparam name="TService">服务名</typeparam>
+        /// <returns>是否已经被解决过</returns>
+        public static bool IsResolved<TService>()
+        {
+            return Handler.IsResolved<TService>();
         }
 
         /// <summary>
@@ -781,7 +784,63 @@ namespace CatLib
         /// <typeparam name="TService">服务名</typeparam>
         public static IContainer Alias<TAlias, TService>()
         {
-            return Handler.Alias(Handler.Type2Service(typeof(TAlias)), Handler.Type2Service(typeof(TService)));
+            return Handler.Alias<TAlias, TService>();
+        }
+
+        /// <summary>
+        /// 扩展容器中的服务
+        /// <para>允许在服务构建的过程中配置或者替换服务</para>
+        /// <para>如果服务已经被构建，拓展会立即生效。</para>
+        /// </summary>
+        /// <param name="service">服务名</param>
+        /// <param name="closure">闭包</param>
+        public static void Extend(string service, Func<object, object> closure)
+        {
+            Handler.Extend(service, closure);
+        }
+
+        /// <summary>
+        /// 扩展容器中的服务
+        /// <para>允许在服务构建的过程中配置或者替换服务</para>
+        /// <para>如果服务已经被构建，拓展会立即生效。</para>
+        /// </summary>
+        /// <param name="closure">闭包</param>
+        public static void Extend<TService, TConcrete>(Func<TConcrete, object> closure)
+        {
+            Handler.Extend<TService, TConcrete>(closure);
+        }
+        
+        /// <summary>
+        /// 扩展容器中的服务
+        /// <para>允许在服务构建的过程中配置或者替换服务</para>
+        /// <para>如果服务已经被构建，拓展会立即生效。</para>
+        /// </summary>
+        /// <param name="closure">闭包</param>
+        public static void Extend<TService, TConcrete>(Func<TConcrete, IContainer, object> closure)
+        {
+            Handler.Extend<TService, TConcrete>(closure);
+        }
+
+        /// <summary>
+        /// 扩展容器中的全部服务
+        /// <para>如果构建的实例符合指定的类型或者接口，那么触发扩展闭包</para>
+        /// </summary>
+        /// <typeparam name="TConcrete">实现的类型或接口</typeparam>
+        /// <param name="closure">闭包</param>
+        public static void Extend<TConcrete>(Func<TConcrete, IContainer, object> closure)
+        {
+            Handler.Extend(closure);
+        }
+
+        /// <summary>
+        /// 扩展容器中的全部服务
+        /// <para>如果构建的实例符合指定的类型或者接口，那么触发扩展闭包</para>
+        /// </summary>
+        /// <typeparam name="TConcrete">实现的类型或接口</typeparam>
+        /// <param name="closure">闭包</param>
+        public static void Extend<TConcrete>(Func<TConcrete, object> closure)
+        {
+            Handler.Extend(closure);
         }
 
         /// <summary>
@@ -798,11 +857,11 @@ namespace CatLib
         /// 常规绑定一个服务
         /// </summary>
         /// <typeparam name="TService">服务名</typeparam>
-        /// <typeparam name="TAlias">服务别名</typeparam>
+        /// <typeparam name="TConcrete">服务实现</typeparam>
         /// <returns>服务绑定数据</returns>
-        public static IBindData Bind<TService, TAlias>()
+        public static IBindData Bind<TService, TConcrete>()
         {
-            return Handler.Bind<TService, TAlias>();
+            return Handler.Bind<TService, TConcrete>();
         }
 
         /// <summary>
@@ -812,6 +871,17 @@ namespace CatLib
         /// <param name="concrete">服务实现</param>
         /// <returns>服务绑定数据</returns>
         public static IBindData Bind<TService>(Func<IContainer, object[], object> concrete)
+        {
+            return Handler.Bind<TService>(concrete);
+        }
+
+        /// <summary>
+        /// 常规绑定一个服务
+        /// </summary>
+        /// <typeparam name="TService">服务名</typeparam>
+        /// <param name="concrete">服务实现</param>
+        /// <returns>服务绑定数据</returns>
+        public static IBindData Bind<TService>(Func<object[], object> concrete)
         {
             return Handler.Bind<TService>(concrete);
         }
@@ -842,12 +912,12 @@ namespace CatLib
         /// 如果服务不存在那么则绑定服务
         /// </summary>
         /// <typeparam name="TService">服务名</typeparam>
-        /// <typeparam name="TAlias">服务别名</typeparam>
+        /// <typeparam name="TConcrete">服务实现</typeparam>
         /// <param name="bindData">如果绑定失败则返回历史绑定对象</param>
         /// <returns>是否完成绑定</returns>
-        public static bool BindIf<TService, TAlias>(out IBindData bindData)
+        public static bool BindIf<TService, TConcrete>(out IBindData bindData)
         {
-            return Handler.BindIf<TService, TAlias>(out bindData);
+            return Handler.BindIf<TService, TConcrete>(out bindData);
         }
 
         /// <summary>
@@ -880,6 +950,18 @@ namespace CatLib
         /// <param name="concrete">服务实现</param>
         /// <param name="bindData">如果绑定失败则返回历史绑定对象</param>
         /// <returns>是否完成绑定</returns>
+        public static bool BindIf<TService>(Func<object[], object> concrete, out IBindData bindData)
+        {
+            return Handler.BindIf<TService>(concrete, out bindData);
+        }
+
+        /// <summary>
+        /// 如果服务不存在那么则绑定服务
+        /// </summary>
+        /// <typeparam name="TService">服务名</typeparam>
+        /// <param name="concrete">服务实现</param>
+        /// <param name="bindData">如果绑定失败则返回历史绑定对象</param>
+        /// <returns>是否完成绑定</returns>
         public static bool BindIf<TService>(Func<object> concrete, out IBindData bindData)
         {
             return Handler.BindIf<TService>(concrete, out bindData);
@@ -901,11 +983,11 @@ namespace CatLib
         /// 以单例的形式绑定一个服务
         /// </summary>
         /// <typeparam name="TService">服务名</typeparam>
-        /// <typeparam name="TAlias">服务别名</typeparam>
+        /// <typeparam name="TConcrete">服务实现</typeparam>
         /// <returns>服务绑定数据</returns>
-        public static IBindData Singleton<TService, TAlias>()
+        public static IBindData Singleton<TService, TConcrete>()
         {
-            return Handler.Singleton<TService, TAlias>();
+            return Handler.Singleton<TService, TConcrete>();
         }
 
         /// <summary>
@@ -925,6 +1007,17 @@ namespace CatLib
         /// <param name="concrete">服务实现</param>
         /// <returns>服务绑定数据</returns>
         public static IBindData Singleton<TService>(Func<IContainer, object[], object> concrete)
+        {
+            return Handler.Singleton<TService>(concrete);
+        }
+
+        /// <summary>
+        /// 以单例的形式绑定一个服务
+        /// </summary>
+        /// <typeparam name="TService">服务名</typeparam>
+        /// <param name="concrete">服务实现</param>
+        /// <returns>服务绑定数据</returns>
+        public static IBindData Singleton<TService>(Func<object[], object> concrete)
         {
             return Handler.Singleton<TService>(concrete);
         }
@@ -955,12 +1048,12 @@ namespace CatLib
         /// 如果服务不存在那么则绑定服务
         /// </summary>
         /// <typeparam name="TService">服务名</typeparam>
-        /// <typeparam name="TAlias">服务别名</typeparam>
+        /// <typeparam name="TConcrete">服务实现</typeparam>
         /// <param name="bindData">如果绑定失败则返回历史绑定对象</param>
         /// <returns>是否完成绑定</returns>
-        public static bool SingletonIf<TService, TAlias>(out IBindData bindData)
+        public static bool SingletonIf<TService, TConcrete>(out IBindData bindData)
         {
-            return Handler.SingletonIf<TService, TAlias>(out bindData);
+            return Handler.SingletonIf<TService, TConcrete>(out bindData);
         }
 
         /// <summary>
@@ -982,6 +1075,18 @@ namespace CatLib
         /// <param name="bindData">如果绑定失败则返回历史绑定对象</param>
         /// <returns>是否完成绑定</returns>
         public static bool SingletonIf<TService>(Func<IContainer, object[], object> concrete, out IBindData bindData)
+        {
+            return Handler.SingletonIf<TService>(concrete, out bindData);
+        }
+
+        /// <summary>
+        /// 如果服务不存在那么则绑定服务
+        /// </summary>
+        /// <typeparam name="TService">服务名</typeparam>
+        /// <param name="concrete">服务实现</param>
+        /// <param name="bindData">如果绑定失败则返回历史绑定对象</param>
+        /// <returns>是否完成绑定</returns>
+        public static bool SingletonIf<TService>(Func<object[], object> concrete, out IBindData bindData)
         {
             return Handler.SingletonIf<TService>(concrete, out bindData);
         }
@@ -1250,7 +1355,7 @@ namespace CatLib
         /// <returns>回调方案</returns>
         public static Func<TService> Factory<TService>(params object[] userParams)
         {
-            return () => Make<TService>(userParams);
+            return Handler.Factory<TService>(userParams);
         }
 
         /// <summary>
@@ -1318,16 +1423,6 @@ namespace CatLib
         /// </summary>
         /// <param name="closure">闭包</param>
         /// <returns>当前容器</returns>
-        public static IContainer OnAfterResolving(Action<IBindData, object> closure)
-        {
-            return Handler.OnAfterResolving(closure);
-        }
-
-        /// <summary>
-        /// 当服务被解决事件之后的回调
-        /// </summary>
-        /// <param name="closure">闭包</param>
-        /// <returns>当前容器</returns>
         public static IContainer OnAfterResolving(Action<object> closure)
         {
             return Handler.OnAfterResolving(closure);
@@ -1353,30 +1448,6 @@ namespace CatLib
         public static IContainer OnAfterResolving<TWhere>(Action<IBindData, TWhere> closure)
         {
             return Handler.OnAfterResolving(closure);
-        }
-
-        /// <summary>
-        /// 关注指定的服务，当服务触发重定义时调用指定对象的指定方法
-        /// <param>调用是以依赖注入的形式进行的</param>
-        /// </summary>
-        /// <param name="service">关注的服务名</param>
-        /// <param name="target">当服务发生重定义时调用的目标</param>
-        /// <param name="method">方法名</param>
-        public static void Watch(string service, object target, string method)
-        {
-            Handler.Watch(service, target, method);
-        }
-
-        /// <summary>
-        /// 关注指定的服务，当服务触发重定义时调用指定对象的指定方法
-        /// <param>调用是以依赖注入的形式进行的</param>
-        /// </summary>
-        /// <typeparam name="TService">服务名</typeparam>
-        /// <param name="target">当服务发生重定义时调用的目标</param>
-        /// <param name="method">方法名</param>
-        public static void Watch<TService>(object target, string method)
-        {
-            Handler.Watch<TService>(target, method);
         }
 
         /// <summary>

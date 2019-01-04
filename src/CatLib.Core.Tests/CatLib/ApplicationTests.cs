@@ -1,12 +1,12 @@
 ﻿/*
  * This file is part of the CatLib package.
  *
- * (c) Yu Bin <support@catlib.io>
+ * (c) CatLib <support@catlib.io>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  *
- * Document: http://catlib.io/
+ * Document: https://catlib.io/
  */
 
 using System;
@@ -242,7 +242,16 @@ namespace CatLib.Tests
                 Assert.AreEqual(1, num++);
             });
             App.Terminate();
-            Assert.AreNotEqual(oldApp, App.Handler);
+            var isCall = false;
+            try
+            {
+                Assert.AreNotEqual(oldApp, App.Handler);
+            }
+            catch (LogicException)
+            {
+                isCall = true;
+            }
+            Assert.AreEqual(true, isCall);
             Assert.AreEqual(2, num);
         }
 

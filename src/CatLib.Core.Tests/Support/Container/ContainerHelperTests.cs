@@ -1,12 +1,12 @@
 ﻿/*
  * This file is part of the CatLib package.
  *
- * (c) Yu Bin <support@catlib.io>
+ * (c) CatLib <support@catlib.io>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  *
- * Document: http://catlib.io/
+ * Document: https://catlib.io/
  */
 
 using System;
@@ -62,7 +62,12 @@ namespace CatLib.Tests
             Assert.AreSame(obj, container.Make("BindSingleton"));
         }
 
-        public class ContainerHelperTestClass
+        public interface IContainerHelperTestClass
+        {
+            
+        }
+
+        public class ContainerHelperTestClass : IContainerHelperTestClass
         {
 
         }
@@ -79,11 +84,9 @@ namespace CatLib.Tests
         public void BindSingletonTServiceTConcrete()
         {
             var container = MakeContainer();
-            container.Singleton<TestClassService, ContainerHelperTestClass>();
-            var obj = container.Make(container.Type2Service(typeof(ContainerHelperTestClass)));
-            var obj2 = container.Make(container.Type2Service(typeof(TestClassService)));
-
-            Assert.AreSame(obj, obj2);
+            container.Singleton<IContainerHelperTestClass, ContainerHelperTestClass>();
+            var obj = container.Make(container.Type2Service(typeof(IContainerHelperTestClass)));
+            Assert.AreNotEqual(null, obj);
         }
 
         /// <summary>
@@ -146,10 +149,10 @@ namespace CatLib.Tests
             Assert.AreEqual(true, App.BindIf<int>(() => 100, out bindData));
             Assert.AreEqual(100, App.Make<int>());
             Assert.AreEqual(100, App.Make<int>()); // double get check
-            Assert.AreEqual(true, App.BindIf<double, float>(out bindData));
-            Assert.AreEqual(false, App.BindIf<double, float>(out bindData));
+            Assert.AreEqual(true, App.BindIf<float, float>(out bindData));
+            Assert.AreEqual(false, App.BindIf<float, float>(out bindData));
 
-            Assert.AreEqual(typeof(double), App.Make<double>(App.Type2Service(typeof(float))).GetType());
+            Assert.AreEqual(typeof(float), App.Make<float>(App.Type2Service(typeof(float))).GetType());
         }
 
         [TestMethod]
@@ -172,10 +175,10 @@ namespace CatLib.Tests
             Assert.AreEqual(true, App.SingletonIf<long>((c, p) => 100, out bindData));
             Assert.AreEqual(true, App.SingletonIf<int>(() => 100, out bindData));
             Assert.AreEqual(100, App.Make<int>());
-            Assert.AreEqual(true, App.SingletonIf<double, float>(out bindData));
-            Assert.AreEqual(false, App.SingletonIf<double, float>(out bindData));
+            Assert.AreEqual(true, App.SingletonIf<float, float>(out bindData));
+            Assert.AreEqual(false, App.SingletonIf<float, float>(out bindData));
 
-            Assert.AreEqual(typeof(double), App.Make<double>(App.Type2Service(typeof(float))).GetType());
+            Assert.AreEqual(typeof(float), App.Make<float>(App.Type2Service(typeof(float))).GetType());
         }
 
         [TestMethod]
@@ -256,21 +259,6 @@ namespace CatLib.Tests
             {
                 return val;
             }
-        }
-
-        [TestMethod]
-        public void TestWatch()
-        {
-            var container = new Container();
-            container.Instance<IContainer>(container);
-
-            var cls = new TestWatchCLass();
-            container.Instance<IWatchTest>(100);
-            container.Watch<IWatchTest>(cls, "OnChange");
-            container.Instance<IWatchTest>(200);
-
-            Assert.AreEqual(200, cls.value);
-            Assert.AreSame(container, cls.container);
         }
 
         [TestMethod]
@@ -406,6 +394,53 @@ namespace CatLib.Tests
             Assert.AreEqual("hello world", container.Make<string>());
         }
 
+        [TestMethod]
+        public void TestExtendContainerWithService()
+        {
+            var container = new Container();
+            container.Extend("abc", (instance, _) =>
+            {
+                Assert.AreSame(container, _);
+                return instance + " world";
+            });
+
+            container.Bind("abc", (b, p) => "hello", false);
+            Assert.AreEqual("hello world", container.Make("abc"));
+        }
+
+        [TestMethod]
+        public void TestExtendContainerWithService2()
+        {
+            var container = new Container();
+            container.Extend("abc", (instance) => instance + " world");
+
+            container.Bind("abc", (b, p) => "hello", false);
+            Assert.AreEqual("hello world", container.Make("abc"));
+        }
+
+        [TestMethod]
+        public void TestExtendWithServiceName()
+        {
+            var container = new Container();
+            container.Extend<ITypeMatchInterface, TestTypeMatchOnResolvingClass>((instance) => null);
+            container.Bind<ITypeMatchInterface, TestTypeMatchOnResolvingClass>();
+
+            Assert.AreEqual(null, container.Make<ITypeMatchInterface>());
+        }
+
+        [TestMethod]
+        public void TestExtendWithServiceName2()
+        {
+            var container = new Container();
+            container.Extend<ITypeMatchInterface, TestTypeMatchOnResolvingClass>((instance, c) =>
+            {
+                Assert.AreEqual(container, c);
+                return null;
+            });
+            container.Bind<ITypeMatchInterface, TestTypeMatchOnResolvingClass>();
+            Assert.AreEqual(null, container.Make<ITypeMatchInterface>());
+        }
+
         public interface ITypeMatchInterface
         {
             
@@ -489,6 +524,50 @@ namespace CatLib.Tests
 
             Assert.AreEqual(2, count);
             Assert.AreEqual(2, stringCount);
+        }
+
+        [TestMethod]
+        public void TestBindFunc2()
+        {
+            var container = new Container();
+            var obj = new object();
+            container.Bind<IAwait>((p) => (bool) p[0] ? obj : new object()).Alias("created");
+            Assert.AreSame(obj, container.Make("created", true));
+            Assert.AreNotSame(obj, container.Make("created", false));
+        }
+
+        [TestMethod]
+        public void TestSingletonFunc2()
+        {
+            var container = new Container();
+            var obj = new object();
+            container.Singleton<IAwait>((p) => (bool)p[0] ? obj : new object()).Alias("created");
+            Assert.AreSame(obj, container.Make("created", true));
+            Assert.AreSame(obj, container.Make("created", false));
+        }
+
+        [TestMethod]
+        public void TestBindIfFunc2()
+        {
+            var container = new Container();
+            var obj = new object();
+            Assert.AreEqual(true, container.BindIf<IAwait>((p) => (bool)p[0] ? obj : new object(), out IBindData bindData));
+            Assert.AreEqual(false, container.BindIf<IAwait>((p) => null, out bindData));
+            bindData.Alias("created");
+            Assert.AreSame(obj, container.Make("created", true));
+            Assert.AreNotSame(obj, container.Make("created", false));
+        }
+
+        [TestMethod]
+        public void TestSingletonIfFunc2()
+        {
+            var container = new Container();
+            var obj = new object();
+            Assert.AreEqual(true, container.SingletonIf<IAwait>((p) => (bool)p[0] ? obj : new object(), out IBindData bindData));
+            Assert.AreEqual(false, container.SingletonIf<IAwait>((p) => null, out bindData));
+            bindData.Alias("created");
+            Assert.AreSame(obj, container.Make("created", true));
+            Assert.AreSame(obj, container.Make("created", false));
         }
 
         /// <summary>

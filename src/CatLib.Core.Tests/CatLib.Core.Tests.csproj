@@ -37,6 +37,7 @@
     <Compile Include="CatLib\ApplicationTests.cs" />
     <Compile Include="CatLib\FacaedTests.cs" />
     <Compile Include="CatLib\GlobalDispatcherTests.cs" />
+    <Compile Include="CatLib\TypeExtendTests.cs" />
     <Compile Include="Support\Container\ContainerPerformanceTests.cs" />
     <Compile Include="Support\Container\MethodContainerTests.cs" />
     <Compile Include="Support\Dispatcher\DispatcherTests.cs" />

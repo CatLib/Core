@@ -1,12 +1,12 @@
 ﻿/*
  * This file is part of the CatLib package.
  *
- * (c) Yu Bin <support@catlib.io>
+ * (c) CatLib <support@catlib.io>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  *
- * Document: http://catlib.io/
+ * Document: https://catlib.io/
  */
 
 using System;
@@ -433,6 +433,16 @@ namespace CatLib.Tests.Support.Util
             Assert.AreEqual(1, data[0]);
             Assert.AreEqual(2, data[1]);
             Assert.AreEqual(3, data[2]);
+        }
+
+        [TestMethod]
+        public void TestMapIntToString()
+        {
+            var data = new[] { 1, 2, 3 };
+            var result = Arr.Map(data, (i) => i.ToString());
+            Assert.AreEqual("1", result[0]);
+            Assert.AreEqual("2", result[1]);
+            Assert.AreEqual("3", result[2]);
         }
 
         [TestMethod]

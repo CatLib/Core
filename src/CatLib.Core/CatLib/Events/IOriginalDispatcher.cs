@@ -1,12 +1,12 @@
 ﻿/*
  * This file is part of the CatLib package.
  *
- * (c) Yu Bin <support@catlib.io>
+ * (c) CatLib <support@catlib.io>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this sender code.
  *
- * Document: http://catlib.io/
+ * Document: https://catlib.io/
  */
 
 namespace CatLib

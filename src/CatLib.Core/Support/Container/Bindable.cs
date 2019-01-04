@@ -1,12 +1,12 @@
 ﻿/*
  * This file is part of the CatLib package.
  *
- * (c) Yu Bin <support@catlib.io>
+ * (c) CatLib <support@catlib.io>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  *
- * Document: http://catlib.io/
+ * Document: https://catlib.io/
  */
 
 using System;
@@ -25,9 +25,14 @@ namespace CatLib
         public string Service { get; }
 
         /// <summary>
+        /// 所属服务容器
+        /// </summary>
+        public IContainer Container => InternalContainer;
+
+        /// <summary>
         /// 父级容器
         /// </summary>
-        protected readonly Container Container;
+        protected readonly Container InternalContainer;
 
         /// <summary>
         /// 服务关系上下文
@@ -58,7 +63,7 @@ namespace CatLib
         /// <param name="service">服务名</param>
         protected Bindable(Container container, string service)
         {
-            Container = container;
+            InternalContainer = container;
             Service = service;
             isDestroy = false;
         }
@@ -131,9 +136,9 @@ namespace CatLib
         {
             if (contextual == null)
             {
-                return needs;
+                return null;
             }
-            return contextual.TryGetValue(needs, out string contextualNeeds) ? contextualNeeds : needs;
+            return contextual.TryGetValue(needs, out string contextualNeeds) ? contextualNeeds : null;
         }
 
         /// <summary>
@@ -170,7 +175,7 @@ namespace CatLib
     /// <summary>
     /// 可绑定对象
     /// </summary>
-    internal abstract class Bindable<TReturn> : Bindable, IBindable<TReturn> where TReturn : class, IBindable<TReturn>
+    public abstract class Bindable<TReturn> : Bindable, IBindable<TReturn> where TReturn : class, IBindable<TReturn>
     {
         /// <summary>
         /// 给与数据
@@ -200,7 +205,7 @@ namespace CatLib
                 GuardIsDestroy();
                 if (given == null)
                 {
-                    given = new GivenData<TReturn>(Container, this);
+                    given = new GivenData<TReturn>(InternalContainer, this);
                 }
                 given.Needs(service);
             }
@@ -210,11 +215,11 @@ namespace CatLib
         /// <summary>
         /// 当需求某个服务
         /// </summary>
-        /// <typeparam name="T">服务类型</typeparam>
+        /// <typeparam name="TService">服务类型</typeparam>
         /// <returns>绑定关系临时数据</returns>
-        public IGivenData<TReturn> Needs<T>()
+        public IGivenData<TReturn> Needs<TService>()
         {
-            return Needs(Container.Type2Service(typeof(T)));
+            return Needs(InternalContainer.Type2Service(typeof(TService)));
         }
     }
 }

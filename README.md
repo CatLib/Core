@@ -7,12 +7,12 @@
 <a href="https://codecov.io/gh/CatLib/Core">
   <img src="https://codecov.io/gh/CatLib/Core/branch/master/graph/badge.svg" alt="Codecov" />
 </a>
+<a href="https://github.com/CatLib/Core/releases">
+  <img src="https://img.shields.io/nuget/dt/CatLib.Core.svg" alt="Downloads" />
+</a>
+</p>
 
 > We are currently preparing to convert the comments in the code to the English version. We look forward to your joining.
-
-> CatLib Framework 请访问：[CatLib/Framework](https://github.com/CatLib/Framework)
-
-> CatLib For Unity 请访问：[CatLib/CatLib](https://github.com/CatLib/CatLib)
 
 ## 关于CatLib
 

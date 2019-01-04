@@ -1,19 +1,22 @@
 ﻿/*
  * This file is part of the CatLib package.
  *
- * (c) Yu Bin <support@catlib.io>
+ * (c) CatLib <support@catlib.io>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  *
- * Document: http://catlib.io/
+ * Document: https://catlib.io/
  */
+
+using System;
 
 namespace CatLib
 {
     /// <summary>
     /// 自定义枚举
     /// </summary>
+    [Obsolete("Custom Enum will be removed in version 2.0")]
     public abstract class Enum
     {
         /// <summary>

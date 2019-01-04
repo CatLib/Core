@@ -1,12 +1,12 @@
 ﻿/*
  * This file is part of the CatLib package.
  *
- * (c) Yu Bin <support@catlib.io>
+ * (c) CatLib <support@catlib.io>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  *
- * Document: http://catlib.io/
+ * Document: https://catlib.io/
  */
 
 using System;
@@ -16,8 +16,34 @@ namespace CatLib
     ///<summary>
     /// 绑定数据拓展
     /// </summary>
-    public static class BindDataExtend
+    public static class ExtendBindData
     {
+        /// <summary>
+        /// 为服务设定一个别名
+        /// </summary>
+        /// <typeparam name="TAlias">别名</typeparam>
+        /// <param name="bindData">绑定数据</param>
+        /// <returns>服务绑定数据</returns>
+        public static IBindData Alias<TAlias>(this IBindData bindData)
+        {
+            return bindData.Alias(bindData.Container.Type2Service(typeof(TAlias)));
+        }
+
+        /// <summary>
+        /// 解决服务时触发的回调
+        /// </summary>
+        /// <param name="bindData">绑定数据</param>
+        /// <param name="action">解决事件</param>
+        /// <returns>服务绑定数据</returns>
+        public static IBindData OnResolving(this IBindData bindData, Action action)
+        {
+            Guard.Requires<ArgumentNullException>(action != null);
+            return bindData.OnResolving((_, instance) =>
+            {
+                action();
+            });
+        }
+
         /// <summary>
         /// 解决服务时触发的回调
         /// </summary>
@@ -72,15 +98,15 @@ namespace CatLib
         }
 
         /// <summary>
-        /// 解决服务时触发的回调
+        /// 解决服务事件之后的回调
         /// </summary>
         /// <param name="bindData">绑定数据</param>
         /// <param name="action">解决事件</param>
         /// <returns>服务绑定数据</returns>
-        public static IBindData OnResolving(this IBindData bindData, Action action)
+        public static IBindData OnAfterResolving(this IBindData bindData, Action action)
         {
             Guard.Requires<ArgumentNullException>(action != null);
-            return bindData.OnResolving((_, instance) =>
+            return bindData.OnAfterResolving((_, instance) =>
             {
                 action();
             });
@@ -138,15 +164,15 @@ namespace CatLib
         }
 
         /// <summary>
-        /// 解决服务事件之后的回调
+        /// 当静态服务被释放时
         /// </summary>
         /// <param name="bindData">绑定数据</param>
-        /// <param name="action">解决事件</param>
+        /// <param name="action">处理事件</param>
         /// <returns>服务绑定数据</returns>
-        public static IBindData OnAfterResolving(this IBindData bindData, Action action)
+        public static IBindData OnRelease(this IBindData bindData, Action action)
         {
             Guard.Requires<ArgumentNullException>(action != null);
-            return bindData.OnAfterResolving((_, instance) =>
+            return bindData.OnRelease((_, __) =>
             {
                 action();
             });
@@ -200,21 +226,6 @@ namespace CatLib
                 {
                     closure(bind, (T)instance);
                 }
-            });
-        }
-
-        /// <summary>
-        /// 当静态服务被释放时
-        /// </summary>
-        /// <param name="bindData">绑定数据</param>
-        /// <param name="action">处理事件</param>
-        /// <returns>服务绑定数据</returns>
-        public static IBindData OnRelease(this IBindData bindData, Action action)
-        {
-            Guard.Requires<ArgumentNullException>(action != null);
-            return bindData.OnRelease((_, __) =>
-            {
-                action();
             });
         }
     }

@@ -11,15 +11,16 @@
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace CatLib.Core.Tests.Support.Util
+namespace CatLib.Core.Tests
 {
     [TestClass]
-    public class StringExtensionTests
+    public class TypeExtendTests
     {
         [TestMethod]
-        public void TestToStream()
+        public void TestGetService()
         {
-            Assert.AreNotEqual(null, "hello world".ToStream());
-        } 
+            var app = new Application();
+            Assert.AreEqual(App.Type2Service<TypeExtendTests>(), typeof(TypeExtendTests).ToService());
+        }
     }
 }

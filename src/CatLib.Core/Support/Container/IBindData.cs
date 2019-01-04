@@ -1,12 +1,12 @@
 ﻿/*
  * This file is part of the CatLib package.
  *
- * (c) Yu Bin <support@catlib.io>
+ * (c) CatLib <support@catlib.io>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  *
- * Document: http://catlib.io/
+ * Document: https://catlib.io/
  */
 
 using System;
@@ -27,13 +27,6 @@ namespace CatLib
         /// 是否是静态服务
         /// </summary>
         bool IsStatic { get; }
-
-        /// <summary>
-        /// 为服务设定一个别名
-        /// </summary>
-        /// <typeparam name="T">别名</typeparam>
-        /// <returns>服务绑定数据</returns>
-        IBindData Alias<T>();
 
         /// <summary>
         /// 为服务设定一个别名

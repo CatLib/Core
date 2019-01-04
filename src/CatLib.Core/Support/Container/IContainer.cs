@@ -1,12 +1,12 @@
 ﻿/*
  * This file is part of the CatLib package.
  *
- * (c) Yu Bin <support@catlib.io>
+ * (c) CatLib <support@catlib.io>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  *
- * Document: http://catlib.io/
+ * Document: https://catlib.io/
  */
 
 using System;
@@ -156,10 +156,10 @@ namespace CatLib
         object Instance(string service, object instance);
 
         /// <summary>
-        /// 释放某个静态化实例
+        /// 释放某个单例化的对象
         /// </summary>
-        /// <param name="service">服务名或别名</param>
-        bool Release(string service);
+        /// <param name="mixed">服务名或别名或单例对象</param>
+        bool Release(object mixed);
 
         /// <summary>
         /// 清空容器的所有实例，绑定，别名，标签，解决器，方法容器, 扩展
@@ -199,14 +199,6 @@ namespace CatLib
 		object this[string service] { get; set; }
 
         /// <summary>
-        /// 获取一个回调，当执行回调可以生成指定的服务
-        /// </summary>
-        /// <param name="service">服务名或别名</param>
-        /// <param name="userParams">用户传入的参数</param>
-        /// <returns>回调方案</returns>
-        Func<object> Factory(string service, params object[] userParams);
-
-        /// <summary>
         /// 为服务设定一个别名
         /// </summary>
         /// <param name="alias">别名</param>
@@ -219,7 +211,7 @@ namespace CatLib
         /// <para>允许在服务构建的过程中配置或者替换服务</para>
         /// <para>如果服务已经被构建，拓展会立即生效。</para>
         /// </summary>
-        /// <param name="service">服务名或别名</param>
+        /// <param name="service">服务名或别名,如果为null则意味着全局有效</param>
         /// <param name="closure">闭包</param>
         void Extend(string service, Func<object, IContainer, object> closure);
 
