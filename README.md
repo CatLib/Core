@@ -39,9 +39,6 @@ Install-Package CatLib.Core -Version 1.3.0
 
 您只需要进入 [中文文档](https://catlib.io) 就可以看到她们。
 
-## 架构图
-![](https://catlib.io/v1/imgs/architecture-diagram.svg)
-
 ## 项目开发计划
 
 CatLib一直都在建立新的组件来降低开发者的工作量，进入 [CatLib 开发计划](https://www.teambition.com/project/589ce998907a7b661c86de9c/tasks/scrum/589ce9aadf254b9870a7ac90) 来了解未来的开发序列。
