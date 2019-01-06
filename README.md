@@ -40,7 +40,7 @@ Install-Package CatLib.Core -Version 1.3.0
 您只需要进入 [中文文档](https://catlib.io) 就可以看到她们。
 
 ## 架构图
-![](https://catlib.io/images/architecture-diagram.svg)
+![](https://catlib.io/v1/imgs/architecture-diagram.svg)
 
 ## 项目开发计划
 
