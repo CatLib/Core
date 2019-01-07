@@ -2230,6 +2230,16 @@ namespace CatLib.Tests.Stl
             Assert.AreEqual(true, container.Release(ref services));
         }
 
+        [TestMethod]
+        public void TestAliasSetAliasService()
+        {
+            var container = new Container();
+            container.Bind("service", (c, p) => "hello world", true).Alias("alias");
+            container.Alias("new-alias", "alias");
+
+            Assert.AreEqual("hello world", container["new-alias"]);
+        }
+
         /// <summary>
         /// 测试基础容器调用
         /// </summary>

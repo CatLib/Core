@@ -340,7 +340,7 @@ namespace CatLib
             }
 
             alias = FormatService(alias);
-            service = FormatService(service);
+            service = AliasToService(service);
 
             lock (syncRoot)
             {
