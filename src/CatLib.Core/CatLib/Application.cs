@@ -577,11 +577,11 @@ namespace CatLib
         /// </summary>
         private void RegisterCoreAlias()
         {
-            var application = Type2Service(typeof(Application));
+            var application = Type2Service(typeof(IApplication));
             Instance(application, this);
             foreach (var type in new[]
             {
-                typeof(IApplication),
+                typeof(Application),
                 typeof(App),
                 typeof(IContainer)
             })
