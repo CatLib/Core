@@ -196,7 +196,7 @@ namespace CatLib
                 App.Handler = null;
             }
             Process = StartProcess.Terminated;
-            Trigger(ApplicationEvents.OnTerminated, this);
+            Trigger(ApplicationEvents.OnTerminated);
         }
 
         /// <summary>
