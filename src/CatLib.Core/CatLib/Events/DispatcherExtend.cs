@@ -57,7 +57,10 @@ namespace CatLib
                 Guard.Requires<ArgumentNullException>(target != null);
             }
 
-            return dispatcher.On(eventName, (_, userParams) => App.Call(target, methodInfo, userParams), group);
+            return dispatcher.On(eventName,
+                (_, userParams) => App.HasHandler
+                    ? App.Call(target, methodInfo, userParams)
+                    : methodInfo.Invoke(target, userParams), group);
         }
 
         /// <summary>
