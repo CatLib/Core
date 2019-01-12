@@ -7,9 +7,10 @@ src/CatLib.Core.NetStandard/bin/
 src/CatLib.Core.NetStandard/obj/
 TestResults/
 build/
-dist/dist/
-dist/*.meta
-dist/*.dll
-dist/*.md
-dist/README
-dist/LICENSE
+.dist/dist/
+.dist/*.meta
+.dist/*.dll
+.dist/*.md
+.dist/*.xml
+.dist/README
+.dist/LICENSE
