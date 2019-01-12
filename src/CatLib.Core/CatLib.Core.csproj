@@ -27,16 +27,16 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>..\..\build\Net35\</OutputPath>
+    <OutputPath>..\..\build\net35\</OutputPath>
     <DefineConstants>TRACE;CATLIB;CATLIB_PERFORMANCE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <DocumentationFile>..\..\build\Net35\CatLib.Core.xml</DocumentationFile>
+    <DocumentationFile>..\..\build\net35\CatLib.Core.xml</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
-	<Reference Include="System.Core" />
+    <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CatLib\App.cs" />
