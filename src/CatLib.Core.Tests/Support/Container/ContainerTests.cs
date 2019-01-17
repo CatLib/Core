@@ -2249,6 +2249,43 @@ namespace CatLib.Tests.Stl
             return num;
         }
 
+        public class TestNullableValue
+        {
+            public int? Nullable1 { get; set; }
+            public byte? Nullable2 { get; set; }
+
+            [Inject]
+            public int? Nullable3 { get; set; }
+
+            [Inject]
+            public byte? Nullable4 { get; set; }
+
+            public TestNullableValue(int? nullable1, byte? nullable2)
+            {
+                Nullable1 = nullable1;
+                Nullable2 = nullable2;
+            }
+        }
+
+        [TestMethod]
+        public void TestNullable()
+        {
+            var container = new Container();
+            container.Singleton<TestNullableValue>().Needs("$Nullable3").Given(() => 100);
+
+            var v = container.Make<TestNullableValue>(10);
+
+            Assert.AreEqual(true, v.Nullable1.HasValue);
+            Assert.AreEqual(10, v.Nullable1.Value);
+
+            Assert.AreEqual(false, v.Nullable2.HasValue);
+
+            Assert.AreEqual(true, v.Nullable3.HasValue);
+            Assert.AreEqual(100, v.Nullable3.Value);
+
+            Assert.AreEqual(false, v.Nullable4.HasValue);
+        }
+
         #region Rebound
         [TestMethod]
         public void TestOnRebound()

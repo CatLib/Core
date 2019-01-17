@@ -1240,7 +1240,19 @@ namespace CatLib
         /// <returns>解决结果</returns>
         protected virtual object ResolveAttrPrimitive(Bindable makeServiceBindData, string service, PropertyInfo baseParam)
         {
-            return ResloveAttrClass(makeServiceBindData, service, baseParam);
+            if (ResloveFromContextual(makeServiceBindData, service, baseParam.Name, baseParam.PropertyType,
+                out object instance))
+            {
+                return instance;
+            }
+
+            if (baseParam.PropertyType.IsGenericType && baseParam.PropertyType.GetGenericTypeDefinition() ==
+                typeof(Nullable<>))
+            {
+                return null;
+            }
+
+            throw MakeUnresolvableException(baseParam.Name, baseParam.DeclaringType);
         }
 
         /// <summary>
@@ -1270,7 +1282,25 @@ namespace CatLib
         /// <returns>解决结果</returns>
         protected virtual object ResolvePrimitive(Bindable makeServiceBindData, string service, ParameterInfo baseParam)
         {
-            return ResloveClass(makeServiceBindData, service, baseParam);
+            if (ResloveFromContextual(makeServiceBindData, service, baseParam.Name, baseParam.ParameterType,
+                out object instance))
+            {
+                return instance;
+            }
+
+            if (baseParam.IsOptional)
+            {
+                return baseParam.DefaultValue;
+            }
+
+            if (baseParam.ParameterType.IsGenericType && baseParam.ParameterType.GetGenericTypeDefinition() ==
+                typeof(Nullable<>))
+            {
+                return null;
+            }
+
+            throw MakeUnresolvableException(baseParam.Name,
+                baseParam.Member != null ? baseParam.Member.DeclaringType : null);
         }
 
         /// <summary>
