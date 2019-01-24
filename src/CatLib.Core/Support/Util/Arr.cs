@@ -730,5 +730,29 @@ namespace CatLib
                 }
             }
         }
+
+        /// <summary>
+        /// 将规定数组传递给检查器进行检查。
+        /// <para>只有当所有元素通过检查器均为false，那么函数返回false。</para>
+        /// </summary>
+        /// <typeparam name="T">数组类型</typeparam>
+        /// <param name="source">规定数组</param>
+        /// <param name="predicate">检查器</param>
+        /// <returns>是否通过检查</returns>
+        public static bool Test<T>(T[] source, Predicate<T> predicate)
+        {
+            Guard.Requires<ArgumentNullException>(source != null);
+            Guard.Requires<ArgumentNullException>(predicate != null);
+
+            foreach (var result in source)
+            {
+                if (predicate(result))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
     }
 }

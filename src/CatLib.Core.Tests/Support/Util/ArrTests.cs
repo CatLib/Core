@@ -808,5 +808,19 @@ namespace CatLib.Tests.Support.Util
             Assert.AreEqual(0, result3.Length);
             Assert.AreEqual(0, data3.Length);
         }
+
+        [TestMethod]
+        public void TestTest()
+        {
+            var assembiles = new string[]
+            {
+                "CatLib.Core",
+                "CatLib.ILRuntime",
+                "CatLib.Route",
+                "Hello.World"
+            };
+
+            Assert.AreEqual(true, Arr.Test(assembiles, (assembly) => Str.Is("CatLib.*", assembly)));
+        }
     }
 }
