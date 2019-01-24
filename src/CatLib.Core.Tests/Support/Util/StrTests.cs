@@ -323,5 +323,28 @@ namespace CatLib.API.Stl
             Assert.AreEqual(string.Empty, Str.Method(null));
             Assert.AreEqual(string.Empty, Str.Method(string.Empty));
         }
+
+        [TestMethod]
+        public void TestIsArr()
+        {
+            var assembiles = new string[]
+            {
+                "CatLib.Core",
+                "CatLib.ILRuntime",
+                "CatLib.Route",
+                "Hello.World"
+            };
+
+            var checkin = new string[]
+            {
+                "CatLib.*"
+            };
+
+            var result = Arr.Filter(assembiles, (assembly) => Str.Is(checkin, assembly));
+            Assert.AreEqual(3, result.Length);
+            Assert.AreEqual("CatLib.Core", result[0]);
+            Assert.AreEqual("CatLib.ILRuntime", result[1]);
+            Assert.AreEqual("CatLib.Route", result[2]);
+        }
     }
 }

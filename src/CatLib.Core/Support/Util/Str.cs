@@ -102,6 +102,30 @@ namespace CatLib
         }
 
         /// <summary>
+        /// 通过星号匹配表达式来对规定数组进行匹配。
+        /// <para>任意匹配式符合则返回true。</para>
+        /// </summary>
+        /// <typeparam name="T">数组类型</typeparam>
+        /// <param name="patterns">匹配表达式</param>
+        /// <param name="source">规定数组</param>
+        /// <returns>是否通过检查</returns>
+        public static bool Is<T>(string[] patterns, T source)
+        {
+            Guard.Requires<ArgumentNullException>(source != null);
+            Guard.Requires<ArgumentNullException>(patterns != null);
+
+            foreach (var pattern in patterns)
+            {
+                if (Is(pattern, source.ToString()))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        /// <summary>
         /// 将规定字符串翻译为星号匹配表达式
         /// <para>即删减正则表达式中除了星号外的所有功能</para>
         /// </summary>
