@@ -24,7 +24,7 @@ namespace CatLib
         /// <summary>
         /// 版本号
         /// </summary>
-        private static readonly Version version = new Version("1.3.1");
+        private static readonly Version version = new Version("1.4.0");
 
         /// <summary>
         /// 框架启动流程
