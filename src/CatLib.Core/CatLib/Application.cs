@@ -90,7 +90,7 @@ namespace CatLib
         /// <summary>
         /// 服务提供者
         /// </summary>
-        private readonly SortedList<int, List<IServiceProvider>> serviceProviders 
+        private readonly SortedList<int, List<IServiceProvider>> serviceProviders
             = new SortedList<int, List<IServiceProvider>>();
 
         /// <summary>
@@ -598,17 +598,9 @@ namespace CatLib
         /// </summary>
         private void RegisterCoreAlias()
         {
-            var application = Type2Service(typeof(IApplication));
-            Instance(application, this);
-            foreach (var type in new[]
-            {
-                typeof(Application),
-                typeof(App),
-                typeof(IContainer)
-            })
-            {
-                Alias(Type2Service(type), application);
-            }
+            this.Singleton<IApplication>(() => this)
+                .Alias<Application>()
+                .Alias<IContainer>();
         }
 
         /// <summary>
@@ -617,9 +609,8 @@ namespace CatLib
         private void RegisterCoreService()
         {
             var bindable = new BindData(this, null, null, false);
-            this.Singleton<IDispatcher>(
-                (_, __) => new GlobalDispatcher(
-                    (paramInfos, userParams) => GetDependencies(bindable, paramInfos, userParams)));
+            this.Singleton<IDispatcher>(() => new GlobalDispatcher(
+                (paramInfos, userParams) => GetDependencies(bindable, paramInfos, userParams)));
         }
 
         /// <summary>
@@ -627,7 +618,7 @@ namespace CatLib
         /// </summary>
         /// <param name="provider">服务提供者</param>
         /// <returns>基础类型</returns>
-        private Type GetProviderBaseType(IServiceProvider provider)
+        private static Type GetProviderBaseType(IServiceProvider provider)
         {
             var providerType = provider as IServiceProviderType;
             return providerType == null ? provider.GetType() : providerType.BaseType;
