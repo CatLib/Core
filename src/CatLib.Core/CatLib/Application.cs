@@ -141,7 +141,8 @@ namespace CatLib
         /// <summary>
         /// 事件系统
         /// </summary>
-        public IDispatcher Dispatcher => dispatcher ?? (dispatcher = this.Make<IDispatcher>());
+        public IDispatcher Dispatcher => dispatcher ??
+                                         (dispatcher = (IDispatcher) Resolve(Type2Service(typeof(IDispatcher))));
 
         /// <summary>
         /// 调试等级
@@ -543,8 +544,15 @@ namespace CatLib
             if (registering)
             {
                 throw new CodeStandardException(
-                    $"It is not allowed to make services or dependency injection in the registration process, method:{method}");
+                    $"It is not allowed to make services or dependency injection in the {nameof(Register)} process, method:{method}");
             }
+
+            if (Process < StartProcess.Bootstraped)
+            {
+                throw new CodeStandardException(
+                    $"It is not allowed to make services or dependency injection before {nameof(Bootstrap)} process, method:{method}");
+            }
+
             base.GuardConstruct(method);
         }
 

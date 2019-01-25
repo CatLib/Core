@@ -2457,6 +2457,7 @@ namespace CatLib.Tests.Stl
         public void TestRebuildAndFlush()
         {
             var container = new Application();
+            container.Bootstrap();
             var list = new List<object>();
 
             container.Singleton<TestFlushOrderDependencyClass>();
@@ -2487,6 +2488,7 @@ namespace CatLib.Tests.Stl
         public void TestRebuildAndFlushNotWatch()
         {
             var container = new Application();
+            container.Bootstrap();
             var list = new List<object>();
 
             container.Singleton<TestFlushOrderDependencyClass>();

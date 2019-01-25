@@ -268,6 +268,7 @@ namespace CatLib.Tests
         public void MakeAssemblyClass()
         {
             var app = new Application();
+            app.Bootstrap();
             var sortSet = app.Make<SortSet<string, string>>();
 
             Assert.AreNotEqual(null, sortSet);

@@ -479,7 +479,7 @@ namespace CatLib
                 {
                     // 如果为 静态的 那么直接解决这个服务
                     // 在服务静态化的过程会触发 TriggerOnRebound
-                    Resolve(service);
+                    Make(service);
                 }
                 else
                 {
@@ -567,6 +567,7 @@ namespace CatLib
         /// <returns>服务实例，如果构造失败那么返回null</returns>
         public object Make(string service, params object[] userParams)
         {
+            GuardConstruct(nameof(Make));
             return Resolve(service, userParams);
         }
 
@@ -1907,7 +1908,7 @@ namespace CatLib
         }
 
         /// <summary>
-        /// 解决服务
+        /// 解决服务(不会进行GuardConstruct检查)
         /// </summary>
         /// <param name="service">服务名或别名</param>
         /// <param name="userParams">用户传入的构造参数</param>
@@ -1916,9 +1917,8 @@ namespace CatLib
         /// <exception cref="LogicException">出现循环依赖</exception>
         /// <exception cref="UnresolvableException">无法解决服务</exception>
         /// <returns>服务实例</returns>
-        private object Resolve(string service, params object[] userParams)
+        protected object Resolve(string service, params object[] userParams)
         {
-            GuardConstruct(nameof(Make));
             Guard.NotEmptyOrNull(service, nameof(service));
             lock (syncRoot)
             {
