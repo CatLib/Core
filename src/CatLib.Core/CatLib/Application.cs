@@ -141,8 +141,7 @@ namespace CatLib
         /// <summary>
         /// 事件系统
         /// </summary>
-        public IDispatcher Dispatcher => dispatcher ??
-                                         (dispatcher = (IDispatcher) Resolve(Type2Service(typeof(IDispatcher))));
+        public IDispatcher Dispatcher => dispatcher ?? (dispatcher = Resolve<IDispatcher>());
 
         /// <summary>
         /// 调试等级
@@ -578,6 +577,20 @@ namespace CatLib
                     coroutine = nextCoroutine;
                 }
             } while (stack.Count > 0);
+        }
+
+        /// <summary>
+        /// 解决服务(不会进行GuardConstruct检查)
+        /// </summary>
+        /// <typeparam name="TService">服务名</typeparam>
+        /// <param name="userParams">用户传入的构造参数</param>
+        /// <returns>服务实例，如果构造失败那么返回null</returns>
+        /// <exception cref="LogicException">出现循环依赖</exception>
+        /// <exception cref="UnresolvableException">无法解决服务</exception>
+        /// <returns>服务实例</returns>
+        protected TService Resolve<TService>(params object[] userParams)
+        {
+            return (TService)Resolve(Type2Service(typeof(TService)));
         }
 
         /// <summary>
