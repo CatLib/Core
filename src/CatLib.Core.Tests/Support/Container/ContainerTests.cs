@@ -2458,6 +2458,7 @@ namespace CatLib.Tests.Stl
         {
             var container = new Application();
             container.Bootstrap();
+            container.Make<IApplication>();
             var list = new List<object>();
 
             container.Singleton<TestFlushOrderDependencyClass>();
@@ -2489,6 +2490,7 @@ namespace CatLib.Tests.Stl
         {
             var container = new Application();
             container.Bootstrap();
+            container.Make<IApplication>();
             var list = new List<object>();
 
             container.Singleton<TestFlushOrderDependencyClass>();
