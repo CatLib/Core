@@ -12,6 +12,8 @@
 using System;
 using IEnumerator = System.Collections.IEnumerator;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Reflection;
 using System.Threading;
 
 namespace CatLib
@@ -24,7 +26,17 @@ namespace CatLib
         /// <summary>
         /// 版本号
         /// </summary>
-        private static readonly Version version = new Version("1.3.1");
+        private static Version version;
+
+        /// <summary>
+        /// 获取版本号
+        /// </summary>
+        /// <returns></returns>
+        private static Version GetVersion()
+        {
+            return version ?? (version = new Version(FileVersionInfo
+                       .GetVersionInfo(Assembly.GetExecutingAssembly().Location).FileVersion));
+        }
 
         /// <summary>
         /// 框架启动流程
@@ -502,7 +514,7 @@ namespace CatLib
         /// CatLib版本(遵循semver)
         /// </summary>
         [ExcludeFromCodeCoverage]
-        public static string Version => version.ToString();
+        public static string Version => GetVersion().ToString();
 
         /// <summary>
         /// 比较CatLib版本(遵循semver)
@@ -531,7 +543,7 @@ namespace CatLib
         [ExcludeFromCodeCoverage]
         public static int Compare(string comparison)
         {
-            return version.Compare(comparison);
+            return GetVersion().Compare(comparison);
         }
 
         /// <summary>
