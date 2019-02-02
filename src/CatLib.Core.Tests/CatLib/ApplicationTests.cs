@@ -11,6 +11,8 @@
 
 using System;
 using System.Collections;
+using System.Diagnostics;
+using System.Reflection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace CatLib.Tests
@@ -74,6 +76,13 @@ namespace CatLib.Tests
                 yield return 2;
                 yield return base.CoroutineInit();
             }
+        }
+
+        [TestMethod]
+        public void TestGetFileVersion()
+        {
+            Assert.AreEqual(FileVersionInfo.GetVersionInfo(Assembly.GetExecutingAssembly().Location).FileVersion,
+                Application.Version);
         }
 
         [TestMethod]

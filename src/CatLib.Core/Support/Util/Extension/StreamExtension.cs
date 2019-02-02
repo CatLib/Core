@@ -40,8 +40,8 @@ namespace CatLib
         /// <returns>总共传输了多少数据</returns>
         public static long AppendTo(this Stream source, Stream destination, byte[] buffer)
         {
-            Guard.Requires<NullReferenceException>(source != null);
-            Guard.Requires<NullReferenceException>(destination != null);
+            Guard.Requires<ArgumentNullException>(source != null);
+            Guard.Requires<ArgumentNullException>(destination != null);
 
             long result = 0;
             int read;
