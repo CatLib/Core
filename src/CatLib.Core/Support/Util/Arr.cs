@@ -754,5 +754,32 @@ namespace CatLib
 
             return false;
         }
+
+        /// <summary>
+        /// 查找规定数组中的指定元素，如果找到了则使用替代值替换，否则在规定数组尾部增加替换值。
+        /// </summary>
+        /// <typeparam name="T">数组类型</typeparam>
+        /// <param name="source">规定数组</param>
+        /// <param name="predicate">返回true则覆盖当前元素内容</param>
+        /// <param name="value">替换值</param>
+        public static void Set<T>(ref T[] source, Predicate<T> predicate, T value)
+        {
+            Guard.Requires<ArgumentNullException>(predicate != null);
+
+            source = source ?? new T[] { };
+
+            for (var index = 0; index < source.Length; index++)
+            {
+                if (!predicate(source[index]))
+                {
+                    continue;
+                }
+
+                source[index] = value;
+                return;
+            }
+
+            Push(ref source, value);
+        }
     }
 }

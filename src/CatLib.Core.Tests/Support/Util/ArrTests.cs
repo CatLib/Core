@@ -822,5 +822,32 @@ namespace CatLib.Tests.Support.Util
 
             Assert.AreEqual(true, Arr.Test(assembiles, (assembly) => Str.Is("CatLib.*", assembly)));
         }
+
+        [TestMethod]
+        public void TestSetReplace()
+        {
+            var set = new[] {"a", "ab", "abc", "abcd", "abcdef"};
+
+            Arr.Set(ref set, (element) => element == "abc", "hello");
+            Assert.AreEqual("a", set[0]);
+            Assert.AreEqual("ab", set[1]);
+            Assert.AreEqual("hello", set[2]);
+            Assert.AreEqual("abcd", set[3]);
+            Assert.AreEqual("abcdef", set[4]);
+        }
+
+        [TestMethod]
+        public void TestSetPush()
+        {
+            var set = new [] { "a", "ab", "abc", "abcd", "abcdef" };
+
+            Arr.Set(ref set, (element) => element == "none", "hello");
+            Assert.AreEqual("a", set[0]);
+            Assert.AreEqual("ab", set[1]);
+            Assert.AreEqual("abc", set[2]);
+            Assert.AreEqual("abcd", set[3]);
+            Assert.AreEqual("abcdef", set[4]);
+            Assert.AreEqual("hello", set[5]);
+        }
     }
 }
