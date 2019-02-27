@@ -509,6 +509,14 @@ namespace CatLib.Tests
         }
 
         [TestMethod]
+        public void TestForceRegister()
+        {
+            var app = MakeApplication();
+            app.Register(new OrderFirstClass());
+            app.Register(new OrderFirstClass(), true);
+        }
+
+        [TestMethod]
         [ExpectedException(typeof(LogicException))]
         public void TestExistBoostrap()
         {

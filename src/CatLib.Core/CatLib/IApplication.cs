@@ -22,7 +22,8 @@ namespace CatLib
         /// 注册服务提供者
         /// </summary>
         /// <param name="provider">服务提供者</param>
-        void Register(IServiceProvider provider);
+        /// <param name="force">为true则强制注册</param>
+        void Register(IServiceProvider provider, bool force = false);
 
         /// <summary>
         /// 服务提供者是否已经注册过

@@ -314,24 +314,30 @@ namespace CatLib
         /// 注册服务提供者
         /// </summary>
         /// <param name="provider">注册服务提供者</param>
+        /// <param name="force">为true则强制注册</param>
         /// <exception cref="LogicException">服务提供者被重复注册时触发</exception>
-        public virtual void Register(IServiceProvider provider)
+        public virtual void Register(IServiceProvider provider, bool force = false)
         {
-            StartCoroutine(CoroutineRegister(provider));
+            StartCoroutine(CoroutineRegister(provider, force));
         }
 
         /// <summary>
         /// 注册服务提供者
         /// </summary>
         /// <param name="provider">注册服务提供者</param>
+        /// <param name="force">为true则强制注册</param>
         /// <exception cref="LogicException">服务提供者被重复注册时触发</exception>
-        protected IEnumerator CoroutineRegister(IServiceProvider provider)
+        protected IEnumerator CoroutineRegister(IServiceProvider provider, bool force = false)
         {
             Guard.Requires<ArgumentNullException>(provider != null);
 
             if (IsRegisted(provider))
             {
-                throw new LogicException($"Provider [{provider.GetType()}] is already register.");
+                if (!force)
+                {
+                    throw new LogicException($"Provider [{provider.GetType()}] is already register.");
+                }
+                serviceProviderTypes.Remove(GetProviderBaseType(provider));
             }
 
             if (Process == StartProcess.Initing)
