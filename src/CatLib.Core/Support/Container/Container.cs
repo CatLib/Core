@@ -1712,9 +1712,9 @@ namespace CatLib
         }
 
         /// <summary>
-        /// 验证构建状态
+        /// Verify that the current construct is valid.
         /// </summary>
-        /// <param name="method">函数名</param>
+        /// <param name="method">Called function name.</param>
         protected virtual void GuardConstruct(string method)
         {
         }

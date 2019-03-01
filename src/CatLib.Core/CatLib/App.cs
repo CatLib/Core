@@ -16,19 +16,19 @@ using System.Reflection;
 namespace CatLib
 {
     /// <summary>
-    /// CatLib实例
+    /// The <see cref="IApplication"/> static facade.
     /// </summary>
     [ExcludeFromCodeCoverage]
     public abstract class App
     {
         #region Original
         /// <summary>
-        /// 当新建Application时
+        /// Callback when a new <see cref="IApplication"/> instance is created.
         /// </summary>
         private static event Action<IApplication> onNewApplication;
 
         /// <summary>
-        /// 当新建Application时
+        /// Callback when a new <see cref="IApplication"/> instance is created.
         /// </summary>
         public static event Action<IApplication> OnNewApplication
         {
@@ -44,12 +44,12 @@ namespace CatLib
         }
 
         /// <summary>
-        /// CatLib实例
+        /// The <see cref="IApplication"/> instance.
         /// </summary>
         private static IApplication instance;
 
         /// <summary>
-        /// CatLib实例
+        /// Gets or Sets the <see cref="IApplication"/> instance.
         /// </summary>
         public static IApplication Handler
         {
@@ -69,102 +69,61 @@ namespace CatLib
         }
 
         /// <summary>
-        /// 是否拥有全局CatLib实例
+        /// True if the <see cref="IApplication"/> instance exists.
         /// </summary>
         public static bool HasHandler => instance != null;
         #endregion
 
         #region Application API
-        /// <summary>
-        /// 终止CatLib框架
-        /// </summary>
+        /// <inheritdoc cref="IApplication.Terminate"/>
         public static void Terminate()
         {
             Handler.Terminate();
         }
 
-        /// <summary>
-        /// 注册服务提供者
-        /// </summary>
-        /// <param name="provider">服务提供者</param>
-        /// <param name="force">为true则强制注册</param>
+        /// <inheritdoc cref="IApplication.Register"/>
         public static void Register(IServiceProvider provider, bool force = false)
         {
             Handler.Register(provider, force);
         }
 
-        /// <summary>
-        /// 服务提供者是否已经注册过
-        /// </summary>
-        /// <param name="provider">服务提供者</param>
-        /// <returns>服务提供者是否已经注册过</returns>
+        /// <inheritdoc cref="IApplication.IsRegisted"/>
         public static bool IsRegisted(IServiceProvider provider)
         {
             return Handler.IsRegisted(provider);
         }
 
-        /// <summary>
-        /// 获取运行时唯一Id
-        /// </summary>
-        /// <returns>运行时的唯一Id</returns>
+        /// <inheritdoc cref="IApplication.GetRuntimeId"/>
         public static long GetRuntimeId()
         {
             return Handler.GetRuntimeId();
         }
 
-        /// <summary>
-        /// 是否是主线程
-        /// </summary>
+        /// <inheritdoc cref="IApplication.IsMainThread"/>
         public static bool IsMainThread => Handler.IsMainThread;
 
-        /// <summary>
-        /// CatLib版本(遵循semver)
-        /// </summary>
+        /// <inheritdoc cref="Application.Version"/>
         public static string Version => Application.Version;
 
-        /// <summary>
-        /// 比较CatLib版本(遵循semver)
-        /// <para>输入版本大于当前版本则返回<code>-1</code></para>
-        /// <para>输入版本等于当前版本则返回<code>0</code></para>
-        /// <para>输入版本小于当前版本则返回<code>1</code></para>
-        /// </summary>
-        /// <param name="major">主版本号</param>
-        /// <param name="minor">次版本号</param>
-        /// <param name="revised">修订版本号</param>
-        /// <returns>比较结果</returns>
+        /// <inheritdoc cref="Application.Compare(int,int,int)"/>
         public static int Compare(int major, int minor, int revised)
         {
             return Application.Compare(major, minor, revised);
         }
 
-        /// <summary>
-        /// 比较CatLib版本(遵循semver)
-        /// <para>输入版本大于当前版本则返回<code>-1</code></para>
-        /// <para>输入版本等于当前版本则返回<code>0</code></para>
-        /// <para>输入版本小于当前版本则返回<code>1</code></para>
-        /// </summary>
-        /// <param name="version">版本号</param>
-        /// <returns>比较结果</returns>
+        /// <inheritdoc cref="Application.Compare(string)"/>
         public static int Compare(string version)
         {
             return Application.Compare(version);
         }
 
-        /// <summary>
-        /// 获取优先级，如果存在方法优先级定义那么优先返回方法的优先级
-        /// 如果不存在优先级定义那么返回<c>int.MaxValue</c>
-        /// </summary>
-        /// <param name="type">获取优先级的类型</param>
-        /// <param name="method">获取优先级的调用方法</param>
-        /// <returns>优先级</returns>
+        /// <inheritdoc cref="IApplication.GetPriority"/>
         public static int GetPriority(Type type, string method = null)
         {
             return Handler.GetPriority(type, method);
         }
 
-        /// <summary>
-        /// 调试等级
-        /// </summary>
+        /// <inheritdoc cref="IApplication.DebugLevel"/>
         public static DebugLevels DebugLevel
         {
             get => Handler.DebugLevel;
@@ -173,195 +132,97 @@ namespace CatLib
         #endregion
 
         #region Dispatcher API
-        /// <summary>
-        /// 判断给定事件是否存在事件监听器
-        /// </summary>
-        /// <param name="eventName">事件名</param>
-        /// <param name="strict">
-        /// 严格模式
-        /// <para>启用严格模式则不使用正则来进行匹配事件监听器</para>
-        /// </param>
-        /// <returns>是否存在事件监听器</returns>
+        /// <inheritdoc cref="IDispatcher.HasListeners"/>
         public static bool HasListeners(string eventName, bool strict = false)
         {
             return Handler.HasListeners(eventName, strict);
         }
 
-        /// <summary>
-        /// 触发一个事件,并获取事件的返回结果
-        /// </summary>
-        /// <param name="eventName">事件名称</param>
-        /// <param name="payloads">载荷</param>
-        /// <returns>事件结果</returns>
+        /// <inheritdoc cref="IDispatcher.Trigger"/>
         public static object[] Trigger(string eventName, params object[] payloads)
         {
             return Handler.Trigger(eventName, payloads);
         }
 
-        /// <summary>
-        /// 触发一个事件,遇到第一个事件存在处理结果后终止,并获取事件的返回结果
-        /// </summary>
-        /// <param name="eventName">事件名</param>
-        /// <param name="payloads">载荷</param>
-        /// <returns>事件结果</returns>
+        /// <inheritdoc cref="IDispatcher.TriggerHalt"/>
         public static object TriggerHalt(string eventName, params object[] payloads)
         {
             return Handler.TriggerHalt(eventName, payloads);
         }
 
-        /// <summary>
-        /// 注册一个事件监听器
-        /// </summary>
-        /// <param name="eventName">事件名称</param>
-        /// <param name="target">事件调用目标</param>
-        /// <param name="method">事件处理方法</param>
-        /// <returns>事件对象</returns>
+        /// <inheritdoc cref="CatLibDispatcherExtend.On(IDispatcher, string, object, string)"/>
         public static IEvent On(string eventName, object target, string method = null)
         {
             return Handler.On(eventName, target, method);
         }
 
-        /// <summary>
-        /// 注册一个事件监听器
-        /// </summary>
-        /// <param name="eventName">事件名称</param>
-        /// <param name="method">事件处理方法</param>
-        /// <param name="group">事件分组</param>
-        /// <returns>事件对象</returns>
+        /// <inheritdoc cref="CatLibDispatcherExtend.On(IDispatcher, string, Action, object)"/>
         public static IEvent On(string eventName, Action method, object group = null)
         {
             return Handler.On(eventName, method, group);
         }
 
-        /// <summary>
-        /// 注册一个事件监听器
-        /// </summary>
-        /// <param name="eventName">事件名称</param>
-        /// <param name="method">事件处理方法</param>
-        /// <param name="group">事件分组</param>
-        /// <returns>事件对象</returns>
+        /// <inheritdoc cref="CatLibDispatcherExtend.On(IDispatcher, string, Action, object)"/>
         public static IEvent On<T1>(string eventName, Action<T1> method, object group = null)
         {
             return Handler.On(eventName, method, group);
         }
 
-        /// <summary>
-        /// 注册一个事件监听器
-        /// </summary>
-        /// <param name="eventName">事件名称</param>
-        /// <param name="method">事件处理方法</param>
-        /// <param name="group">事件分组</param>
-        /// <returns>事件对象</returns>
+        /// <inheritdoc cref="CatLibDispatcherExtend.On(IDispatcher, string, Action, object)"/>
         public static IEvent On<T1, T2>(string eventName, Action<T1, T2> method, object group = null)
         {
             return Handler.On(eventName, method, group);
         }
 
-        /// <summary>
-        /// 注册一个事件监听器
-        /// </summary>
-        /// <param name="eventName">事件名称</param>
-        /// <param name="method">事件处理方法</param>
-        /// <param name="group">事件分组</param>
-        /// <returns>事件对象</returns>
+        /// <inheritdoc cref="CatLibDispatcherExtend.On(IDispatcher, string, Action, object)"/>
         public static IEvent On<T1, T2, T3>(string eventName, Action<T1, T2, T3> method, object group = null)
         {
             return Handler.On(eventName, method, group);
         }
 
-        /// <summary>
-        /// 注册一个事件监听器
-        /// </summary>
-        /// <param name="eventName">事件名称</param>
-        /// <param name="method">事件处理方法</param>
-        /// <param name="group">事件分组</param>
-        /// <returns>事件对象</returns>
+        /// <inheritdoc cref="CatLibDispatcherExtend.On(IDispatcher, string, Action, object)"/>
         public static IEvent On<T1, T2, T3, T4>(string eventName, Action<T1, T2, T3, T4> method, object group = null)
         {
             return Handler.On(eventName, method, group);
         }
 
-        /// <summary>
-        /// 注册一个事件监听器
-        /// </summary>
-        /// <param name="eventName">事件名称</param>
-        /// <param name="execution">事件调用方法</param>
-        /// <param name="group">事件分组</param>
-        /// <returns>事件对象</returns>
+        /// <inheritdoc />
         public static IEvent Listen(string eventName, Func<string, object[], object> execution, object group = null)
         {
             return Handler.On(eventName, execution, group);
         }
 
-        /// <summary>
-        /// 注册一个事件监听器
-        /// </summary>
-        /// <param name="eventName">事件名称</param>
-        /// <param name="method">事件处理方法</param>
-        /// <param name="group">事件分组</param>
-        /// <returns>事件对象</returns>
+        /// <inheritdoc />
         public static IEvent Listen<TResult>(string eventName, Func<TResult> method, object group = null)
         {
             return Handler.Listen(eventName, method, group);
         }
 
-        /// <summary>
-        /// 注册一个事件监听器
-        /// </summary>
-        /// <param name="eventName">事件名称</param>
-        /// <param name="method">事件处理方法</param>
-        /// <param name="group">事件分组</param>
-        /// <returns>事件对象</returns>
+        /// <inheritdoc />
         public static IEvent Listen<T1, TResult>(string eventName, Func<T1, TResult> method, object group = null)
         {
             return Handler.Listen(eventName, method, group);
         }
 
-        /// <summary>
-        /// 注册一个事件监听器
-        /// </summary>
-        /// <param name="eventName">事件名称</param>
-        /// <param name="method">事件处理方法</param>
-        /// <param name="group">事件分组</param>
-        /// <returns>事件对象</returns>
+        /// <inheritdoc />
         public static IEvent Listen<T1, T2, TResult>(string eventName, Func<T1, T2, TResult> method, object group = null)
         {
             return Handler.Listen(eventName, method, group);
         }
 
-        /// <summary>
-        /// 注册一个事件监听器
-        /// </summary>
-        /// <param name="eventName">事件名称</param>
-        /// <param name="method">事件处理方法</param>
-        /// <param name="group">事件分组</param>
-        /// <returns>事件对象</returns>
+        /// <inheritdoc />
         public static IEvent Listen<T1, T2, T3, TResult>(string eventName, Func<T1, T2, T3, TResult> method, object group = null)
         {
             return Handler.Listen(eventName, method, group);
         }
 
-        /// <summary>
-        /// 注册一个事件监听器
-        /// </summary>
-        /// <param name="eventName">事件名称</param>
-        /// <param name="method">事件处理方法</param>
-        /// <param name="group">事件分组</param>
-        /// <returns>事件对象</returns>
+        /// <inheritdoc />
         public static IEvent Listen<T1, T2, T3, T4, TResult>(string eventName, Func<T1, T2, T3, T4, TResult> method, object group = null)
         {
             return Handler.Listen(eventName, method, group);
         }
 
-        /// <summary>
-        /// 解除注册的事件监听器
-        /// </summary>
-        /// <param name="target">
-        /// 事件解除目标
-        /// <para>如果传入的是字符串(<code>string</code>)将会解除对应事件名的所有事件</para>
-        /// <para>如果传入的是事件对象(<code>IEvent</code>)那么解除对应事件</para>
-        /// <para>如果传入的是其他实例(<code>object</code>)会解除该实例下的所有事件</para>
-        /// </param>
+        /// <inheritdoc cref="IDispatcher.Off"/>
         public static void Off(object target)
         {
             Handler.Off(target);
@@ -810,7 +671,7 @@ namespace CatLib
         {
             Handler.Extend<TService, TConcrete>(closure);
         }
-        
+
         /// <summary>
         /// 扩展容器中的服务
         /// <para>允许在服务构建的过程中配置或者替换服务</para>

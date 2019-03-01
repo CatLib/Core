@@ -19,19 +19,19 @@ using System.Threading;
 namespace CatLib
 {
     /// <summary>
-    /// CatLib程序
+    /// The CatLib <see cref="Application"/> instance.
     /// </summary>
     public class Application : Container, IApplication, IOriginalDispatcher
     {
         /// <summary>
-        /// 版本号
+        /// The version of the CatLib application.
         /// </summary>
         private static Version version;
 
         /// <summary>
-        /// 获取版本号
+        /// Get the version number of the application.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>The CatLib application version.</returns>
         private static Version GetVersion()
         {
             return version ?? (version = new Version(FileVersionInfo
@@ -39,140 +39,141 @@ namespace CatLib
         }
 
         /// <summary>
-        /// 框架启动流程
+        /// The framework start process type.
         /// </summary>
         public enum StartProcess
         {
             /// <summary>
-            /// 构建阶段
+            /// When you create a new <see cref="Application"/>,
+            /// you are in the <see cref="Construct"/> phase.
             /// </summary>
             Construct = 0,
 
             /// <summary>
-            /// 引导流程之前
+            /// Before the <see cref="Application.Bootstrap"/> call.
             /// </summary>
             Bootstrap = 1,
 
             /// <summary>
-            /// 引导流程进行中
+            /// When during <see cref="Application.Bootstrap"/> execution,
+            /// you are in the <see cref="Bootstrapping"/> phase.
             /// </summary>
             Bootstrapping = 2,
 
             /// <summary>
-            /// 引导流程结束之后
+            /// After the <see cref="Application.Bootstrap"/> called.
             /// </summary>
             Bootstraped = 3,
 
             /// <summary>
-            /// 初始化开始之前
+            /// Before the <see cref="Application.Init"/> call.
             /// </summary>
             Init = 4,
 
             /// <summary>
-            /// 初始化中
+            /// When during <see cref="Application.Init"/> execution,
+            /// you are in the <see cref="Initing"/> phase.
             /// </summary>
             Initing = 5,
 
             /// <summary>
-            /// 初始化完成后
+            /// After the <see cref="Application.Init"/> called.
             /// </summary>
             Inited = 6,
 
             /// <summary>
-            /// 框架运行中
+            /// When the framework running.
             /// </summary>
             Running = 7,
 
             /// <summary>
-            /// 框架终止之前
+            /// Before the <see cref="Application.Terminate"/> call.
             /// </summary>
             Terminate = 8,
 
             /// <summary>
-            /// 框架终止进行中
+            /// When during <see cref="Application.Terminate"/> execution,
+            /// you are in the <see cref="Terminating"/> phase.
             /// </summary>
             Terminating = 9,
 
             /// <summary>
-            /// 框架终止之后
+            /// After the <see cref="Application.Terminate"/> called. 
+            /// All resources are destroyed.
             /// </summary>
             Terminated = 10,
         }
 
         /// <summary>
-        /// 服务提供者
+        /// All of the registered service providers.
         /// </summary>
         private readonly SortedList<int, List<IServiceProvider>> serviceProviders
             = new SortedList<int, List<IServiceProvider>>();
 
         /// <summary>
-        /// 注册服务提供者
+        /// The types of the loaded service providers.
         /// </summary>
-        private readonly HashSet<Type> serviceProviderTypes = new HashSet<Type>();
+        private readonly HashSet<Type> loadedProviders = new HashSet<Type>();
 
         /// <summary>
-        /// 是否已经完成引导程序
+        /// True if the application has been bootstrapped.
         /// </summary>
         private bool bootstrapped;
 
         /// <summary>
-        /// 是否已经完成初始化
+        /// True if the application has been initialized.
         /// </summary>
         private bool inited;
 
         /// <summary>
-        /// 是否正在注册中
+        /// True if the <see cref="Register"/> is being executed.
         /// </summary>
         private bool registering;
 
         /// <summary>
-        /// 启动流程
+        /// Indicates the application startup process.
         /// </summary>
         public StartProcess Process { get; private set; }
 
         /// <summary>
-        /// 增量Id
+        /// The unique runtime id.
         /// </summary>
         private long incrementId;
 
         /// <summary>
-        /// 主线程ID
+        /// The main thread id.
         /// </summary>
         private readonly int mainThreadId;
 
-        /// <summary>
-        /// 是否是主线程
-        /// </summary>
+        /// <inheritdoc />
         public bool IsMainThread => mainThreadId == Thread.CurrentThread.ManagedThreadId;
 
         /// <summary>
-        /// 事件系统
+        /// The global event dispatcher.
         /// </summary>
         private IDispatcher dispatcher;
 
-        /// <summary>
-        /// 事件系统
-        /// </summary>
+        /// <inheritdoc cref="dispatcher"/>
         public IDispatcher Dispatcher => dispatcher ?? (dispatcher = Resolve<IDispatcher>());
 
         /// <summary>
-        /// 调试等级
+        /// The debug level.
         /// </summary>
         private DebugLevels debugLevel;
 
         /// <summary>
-        /// 构建一个CatLib实例
+        /// Create a new CatLib <see cref="Application"/> instance. 
         /// </summary>
-        /// <param name="global">是否将当前实例应用到全局</param>
+        /// <param name="global">True if sets the instance to <see cref="App"/> facade.</param>
         public Application(bool global = true)
         {
             mainThreadId = Thread.CurrentThread.ManagedThreadId;
             RegisterCoreAlias();
             RegisterCoreService();
 
-            // 我们使用闭包来保存当前上下文状态
-            // 不要修改为：OnFindType(Type.GetType)这会导致
-            // 作用程序集不是预期作用域。
+            // We use closures to save the current context state
+            // Do not change to: OnFindType(Type.GetType) This 
+            // causes the active assembly to be not the expected scope.
             OnFindType(finder => { return Type.GetType(finder); });
 
             DebugLevel = DebugLevels.Production;
@@ -184,19 +185,14 @@ namespace CatLib
             }
         }
 
-        /// <summary>
-        /// 构建一个新的Application实例
-        /// </summary>
-        /// <param name="global">是否将当前实例应用到全局</param>
-        /// <returns>Application实例</returns>
+        /// <inheritdoc cref="Application(bool)"/>
+        /// <returns>The CatLib <see cref="Application"/> instance.</returns>
         public static Application New(bool global = true)
         {
             return new Application(global);
         }
 
-        /// <summary>
-        /// 终止CatLib框架
-        /// </summary>
+        /// <inheritdoc />
         public virtual void Terminate()
         {
             Process = StartProcess.Terminate;
@@ -212,11 +208,9 @@ namespace CatLib
         }
 
         /// <summary>
-        /// 引导程序
+        /// Bootstrap the given array of bootstrap classes.
         /// </summary>
-        /// <param name="bootstraps">引导程序</param>
-        /// <returns>CatLib实例</returns>
-        /// <exception cref="ArgumentNullException">当引导类型为null时引发</exception>
+        /// <param name="bootstraps">The given bootstrap classes.</param>
         public virtual void Bootstrap(params IBootstrap[] bootstraps)
         {
             Guard.Requires<ArgumentNullException>(bootstraps != null);
@@ -267,17 +261,15 @@ namespace CatLib
         }
 
         /// <summary>
-        /// 初始化
+        /// Init all of the registered service provider.
         /// </summary>
         public virtual void Init()
         {
             StartCoroutine(CoroutineInit());
         }
 
-        /// <summary>
-        /// 初始化
-        /// </summary>
-        /// <exception cref="CodeStandardException">没有调用<c>Bootstrap(...)</c>就尝试初始化时触发</exception>
+        /// <inheritdoc cref="Init"/>
+        /// <returns>Indicate the initialization progress.</returns>
         protected IEnumerator CoroutineInit()
         {
             if (!bootstrapped)
@@ -310,23 +302,15 @@ namespace CatLib
             Trigger(ApplicationEvents.OnStartCompleted, this);
         }
 
-        /// <summary>
-        /// 注册服务提供者
-        /// </summary>
-        /// <param name="provider">注册服务提供者</param>
-        /// <param name="force">为true则强制注册</param>
-        /// <exception cref="LogicException">服务提供者被重复注册时触发</exception>
+        /// <inheritdoc />
         public virtual void Register(IServiceProvider provider, bool force = false)
         {
             StartCoroutine(CoroutineRegister(provider, force));
         }
 
-        /// <summary>
-        /// 注册服务提供者
-        /// </summary>
-        /// <param name="provider">注册服务提供者</param>
-        /// <param name="force">为true则强制注册</param>
-        /// <exception cref="LogicException">服务提供者被重复注册时触发</exception>
+        /// <inheritdoc cref="IApplication.Register"/>
+        /// <returns>Indicates the initialization progress if the 
+        /// application has initialized, otherwise it makes no sense.</returns>
         protected IEnumerator CoroutineRegister(IServiceProvider provider, bool force = false)
         {
             Guard.Requires<ArgumentNullException>(provider != null);
@@ -337,7 +321,7 @@ namespace CatLib
                 {
                     throw new LogicException($"Provider [{provider.GetType()}] is already register.");
                 }
-                serviceProviderTypes.Remove(GetProviderBaseType(provider));
+                loadedProviders.Remove(GetProviderBaseType(provider));
             }
 
             if (Process == StartProcess.Initing)
@@ -367,7 +351,7 @@ namespace CatLib
             }
 
             AddSortedList(serviceProviders, provider, nameof(IServiceProvider.Init));
-            serviceProviderTypes.Add(GetProviderBaseType(provider));
+            loadedProviders.Add(GetProviderBaseType(provider));
 
             if (inited)
             {
@@ -376,11 +360,12 @@ namespace CatLib
         }
 
         /// <summary>
-        /// 增加到排序列表
+        /// Add the specified element to the sorted list.
         /// </summary>
-        /// <param name="list">列表</param>
-        /// <param name="insert">需要插入的记录</param>
-        /// <param name="priorityMethod">优先级函数</param>
+        /// <param name="list">The sorted list.</param>
+        /// <param name="insert">The specified element.</param>
+        /// <param name="priorityMethod">Specify a method name, the priority will 
+        /// be obtained from this method.</param>
         protected void AddSortedList<T>(IDictionary<int, List<T>> list, T insert, string priorityMethod)
         {
             var priority = GetPriority(insert.GetType(), priorityMethod);
@@ -394,9 +379,10 @@ namespace CatLib
         }
 
         /// <summary>
-        /// 初始化服务提供者
+        /// Initialize the specified service provider.
         /// </summary>
-        /// <param name="provider">服务提供者</param>
+        /// <param name="provider">The specified service provider.</param>
+        /// <returns>Indicate the initialization progress.</returns>
         protected virtual IEnumerator InitProvider(IServiceProvider provider)
         {
             Trigger(ApplicationEvents.OnProviderInit, provider);
@@ -410,40 +396,26 @@ namespace CatLib
             Trigger(ApplicationEvents.OnProviderInited, provider);
         }
 
-        /// <summary>
-        /// 服务提供者是否已经注册过
-        /// </summary>
-        /// <param name="provider">服务提供者</param>
-        /// <returns>服务提供者是否已经注册过</returns>
+        /// <inheritdoc />
         public bool IsRegisted(IServiceProvider provider)
         {
             Guard.Requires<ArgumentNullException>(provider != null);
-            return serviceProviderTypes.Contains(GetProviderBaseType(provider));
+            return loadedProviders.Contains(GetProviderBaseType(provider));
         }
 
-        /// <summary>
-        /// 获取运行时唯一Id
-        /// </summary>
-        /// <returns>应用程序内唯一id</returns>
+        /// <inheritdoc />
         public long GetRuntimeId()
         {
             return Interlocked.Increment(ref incrementId);
         }
 
-        /// <summary>
-        /// 获取优先级
-        /// </summary>
-        /// <param name="type">识别的类型</param>
-        /// <param name="method">识别的方法</param>
-        /// <returns>优先级</returns>
+        /// <inheritdoc />
         public int GetPriority(Type type, string method = null)
         {
             return Util.GetPriority(type, method);
         }
 
-        /// <summary>
-        /// 调试等级
-        /// </summary>
+        /// <inheritdoc />
         public DebugLevels DebugLevel
         {
             get => debugLevel;
@@ -454,84 +426,52 @@ namespace CatLib
             }
         }
 
-        /// <summary>
-        /// 触发一个事件,并获取事件的返回结果
-        /// </summary>
-        /// <param name="eventName">事件名称</param>
-        /// <param name="payloads">载荷</param>
-        /// <returns>事件结果</returns>
+        /// <inheritdoc />
         public object[] Trigger(string eventName, params object[] payloads)
         {
             return Dispatcher.Trigger(eventName, payloads);
         }
 
-        /// <summary>
-        /// 触发一个事件,遇到第一个事件存在处理结果后终止,并获取事件的返回结果
-        /// </summary>
-        /// <param name="eventName">事件名</param>
-        /// <param name="payloads">载荷</param>
-        /// <returns>事件结果</returns>
+        /// <inheritdoc />
         public object TriggerHalt(string eventName, params object[] payloads)
         {
             return Dispatcher.TriggerHalt(eventName, payloads);
         }
 
-        /// <summary>
-        /// 判断给定事件是否存在事件监听器
-        /// </summary>
-        /// <param name="eventName">事件名</param>
-        /// <param name="strict">
-        /// 严格模式
-        /// <para>启用严格模式则不使用正则来进行匹配事件监听器</para>
-        /// </param>
-        /// <returns>是否存在事件监听器</returns>
+        /// <inheritdoc />
         public bool HasListeners(string eventName, bool strict = false)
         {
             return Dispatcher.HasListeners(eventName, strict);
         }
 
-        /// <summary>
-        /// 注册一个事件监听器
-        /// </summary>
-        /// <param name="eventName">事件名称</param>
-        /// <param name="execution">事件调用方法</param>
-        /// <param name="group">事件分组</param>
-        /// <returns>事件对象</returns>
+        /// <inheritdoc />
         public IEvent On(string eventName, Func<string, object[], object> execution, object group = null)
         {
             return Dispatcher.On(eventName, execution, group);
         }
 
-        /// <summary>
-        /// 解除注册的事件监听器
-        /// </summary>
-        /// <param name="target">
-        /// 事件解除目标
-        /// <para>如果传入的是字符串(<code>string</code>)将会解除对应事件名的所有事件</para>
-        /// <para>如果传入的是事件对象(<code>IEvent</code>)那么解除对应事件</para>
-        /// <para>如果传入的是其他实例(<code>object</code>)会解除该实例下的所有事件</para>
-        /// </param>
+        /// <inheritdoc />
         public void Off(object target)
         {
             Dispatcher.Off(target);
         }
 
         /// <summary>
-        /// CatLib版本(遵循semver)
+        /// Gets the CatLib <see cref="Application"/> version.
         /// </summary>
         [ExcludeFromCodeCoverage]
         public static string Version => GetVersion().ToString();
 
         /// <summary>
-        /// 比较CatLib版本(遵循semver)
-        /// <para>输入版本大于当前版本则返回<code>-1</code></para>
-        /// <para>输入版本等于当前版本则返回<code>0</code></para>
-        /// <para>输入版本小于当前版本则返回<code>1</code></para>
+        /// Compares to another CatLib <see cref="Application"/> version.
+        /// <para>Returns <code>-1</code> when the input version is greater than the current.</para>
+        /// <para>Returns <code>0</code> when the input version is equal to the current.</para>
+        /// <para>Returns <code>1</code> when the input version is less than the current.</para>
         /// </summary>
-        /// <param name="major">主版本号</param>
-        /// <param name="minor">次版本号</param>
-        /// <param name="revised">修订版本号</param>
-        /// <returns>比较结果</returns>
+        /// <param name="major">The major version number.</param>
+        /// <param name="minor">The minor version number.</param>
+        /// <param name="revised">The revised version number.</param>
+        /// <returns>Returns <code>-1</code> when the input version is greater than the current.</returns>
         [ExcludeFromCodeCoverage]
         public static int Compare(int major, int minor, int revised)
         {
@@ -539,23 +479,20 @@ namespace CatLib
         }
 
         /// <summary>
-        /// 比较CatLib版本(遵循semver)
-        /// <para>输入版本大于当前版本则返回<code>-1</code></para>
-        /// <para>输入版本等于当前版本则返回<code>0</code></para>
-        /// <para>输入版本小于当前版本则返回<code>1</code></para>
+        /// Compares to another CatLib <see cref="Application"/> version.
+        /// <para>Returns <code>-1</code> when the input version is greater than the current.</para>
+        /// <para>Returns <code>0</code> when the input version is equal to the current.</para>
+        /// <para>Returns <code>1</code> when the input version is less than the current.</para>
         /// </summary>
-        /// <param name="comparison">版本号</param>
-        /// <returns>比较结果</returns>
+        /// <param name="version">Another version in string.</param>
+        /// <returns>Returns <code>-1</code> when the input version is greater than the current.</returns>
         [ExcludeFromCodeCoverage]
-        public static int Compare(string comparison)
+        public static int Compare(string version)
         {
-            return GetVersion().Compare(comparison);
+            return GetVersion().Compare(version);
         }
 
-        /// <summary>
-        /// 验证构建状态
-        /// </summary>
-        /// <param name="method">函数名</param>
+        /// <inheritdoc />
         protected override void GuardConstruct(string method)
         {
             if (registering)
@@ -574,45 +511,42 @@ namespace CatLib
         }
 
         /// <summary>
-        /// 启动迭代器
+        /// Call the iterator with the default coroutine.
         /// </summary>
-        /// <param name="coroutine">迭代程序</param>
-        protected void StartCoroutine(IEnumerator coroutine)
+        /// <param name="iterator">The iterator.</param>
+        protected void StartCoroutine(IEnumerator iterator)
         {
             var stack = new Stack<IEnumerator>();
-            stack.Push(coroutine);
+            stack.Push(iterator);
             do
             {
-                coroutine = stack.Pop();
-                while (coroutine.MoveNext())
+                iterator = stack.Pop();
+                while (iterator.MoveNext())
                 {
-                    if (!(coroutine.Current is IEnumerator nextCoroutine))
+                    if (!(iterator.Current is IEnumerator nextCoroutine))
                     {
                         continue;
                     }
 
-                    stack.Push(coroutine);
-                    coroutine = nextCoroutine;
+                    stack.Push(iterator);
+                    iterator = nextCoroutine;
                 }
             } while (stack.Count > 0);
         }
 
         /// <summary>
-        /// 解决服务(不会进行GuardConstruct检查)
+        /// Resolve the given type from the container.(Will not perform <see cref="GuardConstruct"/> check).
         /// </summary>
-        /// <typeparam name="TService">服务名</typeparam>
-        /// <param name="userParams">用户传入的构造参数</param>
-        /// <returns>服务实例，如果构造失败那么返回null</returns>
-        /// <exception cref="LogicException">出现循环依赖</exception>
-        /// <exception cref="UnresolvableException">无法解决服务</exception>
-        /// <returns>服务实例</returns>
+        /// <typeparam name="TService">The service type(name).</typeparam>
+        /// <param name="userParams">The user parameters.</param>
+        /// <returns>The resolved service instance.</returns>
         protected TService Resolve<TService>(params object[] userParams)
         {
             return (TService)Resolve(Type2Service(typeof(TService)));
         }
 
         /// <summary>
-        /// 注册核心别名
+        /// Register the core service aliases.
         /// </summary>
         private void RegisterCoreAlias()
         {
@@ -622,7 +556,7 @@ namespace CatLib
         }
 
         /// <summary>
-        /// 注册核心服务
+        /// Register the core services.
         /// </summary>
         private void RegisterCoreService()
         {
@@ -632,10 +566,10 @@ namespace CatLib
         }
 
         /// <summary>
-        /// 获取服务提供者基础类型
+        /// Get the base type from service provider.
         /// </summary>
-        /// <param name="provider">服务提供者</param>
-        /// <returns>基础类型</returns>
+        /// <param name="provider">The service provider.</param>
+        /// <returns>Base type for service provider.</returns>
         private static Type GetProviderBaseType(IServiceProvider provider)
         {
             var providerType = provider as IServiceProviderType;
