@@ -39,10 +39,6 @@ Install-Package CatLib.Core -Version 1.4.0
 
 您只需要进入 [中文文档](https://catlib.io) 就可以看到她们。
 
-## 项目开发计划
-
-CatLib一直都在建立新的组件来降低开发者的工作量，进入 [CatLib 开发计划](https://www.teambition.com/project/589ce998907a7b661c86de9c/tasks/scrum/589ce9aadf254b9870a7ac90) 来了解未来的开发序列。
-
 ## 贡献
 
 CatLib还是一个年轻的框架，她的成长和你们的贡献是分不开的，如果您想要为项目进行贡献请参考： [CatLib 贡献文档](https://catlib.io/v1/contribution.html) 您的贡献将会被列入贡献者名单，我们欢迎任何形式的Pull Request!
