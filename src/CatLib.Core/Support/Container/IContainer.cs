@@ -169,9 +169,9 @@ namespace CatLib
         /// <summary>
         /// Call the method in bonded container and inject its dependencies.
         /// </summary>
-        /// <param name="method">方法名</param>
-        /// <param name="userParams">用户提供的参数</param>
-        /// <returns>调用结果</returns>
+        /// <param name="method">The method name.</param>
+        /// <param name="userParams">The user parameters.</param>
+        /// <returns>The return value of method.</returns>
         object Invoke(string method, params object[] userParams);
 
         /// <summary>
