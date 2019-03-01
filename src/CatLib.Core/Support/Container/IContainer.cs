@@ -21,153 +21,153 @@ namespace CatLib
     public interface IContainer
     {
         /// <summary>
-        /// 获取服务的绑定数据,如果绑定不存在则返回null
+        /// Gets the binding data of the given service.
         /// </summary>
-        /// <param name="service">服务名或者别名</param>
-        /// <returns>服务绑定数据或者null</returns>
+        /// <param name="service">The service name or alias.</param>
+        /// <returns>Return null If there is no binding data.</returns>
         IBindData GetBind(string service);
 
         /// <summary>
-        /// 是否已经绑定了服务
+        /// Whether the given service has been bound.
         /// </summary>
-        /// <param name="service">服务名或者别名</param>
-        /// <returns>返回一个bool值代表服务是否被绑定</returns>
+        /// <param name="service">The service name or alias.</param>
+        /// <returns>True if the service has been bound.</returns>
         bool HasBind(string service);
 
         /// <summary>
-        /// 是否已经实例静态化
+        /// Whether the existing instance is exists in the container.
         /// </summary>
-        /// <param name="service">服务名或别名</param>
-        /// <returns>是否已经静态化</returns>
+        /// <param name="service">The service name or alias.</param>
+        /// <returns>True if the instance existed.</returns>
         bool HasInstance(string service);
 
         /// <summary>
-        /// 服务是否已经被解决过
+        /// Whether the service has been resolved.
         /// </summary>
-        /// <param name="service">服务名或别名</param>
-        /// <returns>是否已经被解决过</returns>
+        /// <param name="service">The service name or alias.</param>
+        /// <returns>True if the service has been resolved.</returns>
         bool IsResolved(string service);
 
         /// <summary>
-        /// 是否可以生成服务
+        /// Whether the given service can be made.
         /// </summary>
-        /// <param name="service">服务名或者别名</param>
-        /// <returns>是否可以生成服务</returns>
+        /// <param name="service">The service name or alias.</param>
+        /// <returns>True if the given service can be made.</returns>
         bool CanMake(string service);
 
         /// <summary>
-        /// 服务是否是静态化的,如果服务不存在也将返回false
+        /// Whether the given service is singleton bind. false if the service not exists.
         /// </summary>
-        /// <param name="service">服务名或者别名</param>
-        /// <returns>是否是静态化的</returns>
+        /// <param name="service">The service name or alias.</param>
+        /// <returns>True if the service is singleton bind.</returns>
         bool IsStatic(string service);
 
         /// <summary>
-        /// 是否是别名
+        /// Whether the given name is an alias.
         /// </summary>
-        /// <param name="name">名字</param>
-        /// <returns>是否是别名</returns>
+        /// <param name="name">The given name.</param>
+        /// <returns>True if the given name is an alias.</returns>
         bool IsAlias(string name);
 
         /// <summary>
-        /// 绑定一个服务
+        /// Register a binding with the container.
         /// </summary>
-        /// <param name="service">服务名</param>
-        /// <param name="concrete">服务实现</param>
-        /// <param name="isStatic">服务是否静态化</param>
-        /// <returns>服务绑定数据</returns>
+        /// <param name="service">The service name.</param>
+        /// <param name="concrete">The service type.</param>
+        /// <param name="isStatic">Whether the service is singleton bind.</param>
+        /// <returns>The binding data.</returns>
         IBindData Bind(string service, Type concrete, bool isStatic);
 
         /// <summary>
-        /// 绑定一个服务
+        /// Register a binding with the container.
         /// </summary>
-        /// <param name="service">服务名</param>
-        /// <param name="concrete">服务实体</param>
-        /// <param name="isStatic">服务是否静态化</param>
-        /// <returns>服务绑定数据</returns>
+        /// <param name="service">The service name.</param>
+        /// <param name="concrete">Closure return service instance.</param>
+        /// <param name="isStatic">Whether the service is singleton bind.</param>
+        /// <returns>The binding data.</returns>
         IBindData Bind(string service, Func<IContainer, object[], object> concrete, bool isStatic);
 
         /// <summary>
-        /// 如果服务不存在那么则绑定服务
+        /// Register a binding with the container if the service not exists.
         /// </summary>
-        /// <param name="service">服务名</param>
-        /// <param name="concrete">服务实现</param>
-        /// <param name="isStatic">服务是否是静态的</param>
-        /// <param name="bindData">如果绑定失败则返回历史绑定对象</param>
-        /// <returns>是否成功绑定</returns>
+        /// <param name="service">The service name.</param>
+        /// <param name="concrete">Closure return service instance.</param>
+        /// <param name="isStatic">Whether the service is singleton bind.</param>
+        /// <param name="bindData">The binding data.</param>
+        /// <returns>True if register a binding with the container.</returns>
         bool BindIf(string service, Func<IContainer, object[], object> concrete, bool isStatic, out IBindData bindData);
 
         /// <summary>
-        /// 如果服务不存在那么则绑定服务
+        /// Register a binding with the container if the service not exists.
         /// </summary>
-        /// <param name="service">服务名</param>
-        /// <param name="concrete">服务实现</param>
-        /// <param name="isStatic">服务是否是静态的</param>
-        /// <param name="bindData">如果绑定失败则返回历史绑定对象</param>
-        /// <returns>是否成功绑定</returns>
+        /// <param name="service">The service name.</param>
+        /// <param name="concrete">The service type.</param>
+        /// <param name="isStatic">Whether the service is singleton bind.</param>
+        /// <param name="bindData">The binding data.</param>
+        /// <returns>True if register a binding with the container.</returns>
         bool BindIf(string service, Type concrete, bool isStatic, out IBindData bindData);
 
         /// <summary>
-        /// 绑定一个方法到容器
+        /// Register a method with the container.
         /// </summary>
-        /// <param name="method">方法名</param>
-        /// <param name="target">调用目标</param>
-        /// <param name="call">调用方法</param>
-        /// <returns>方法绑定数据</returns>
+        /// <param name="method">The method name.</param>
+        /// <param name="target">The invoking target.</param>
+        /// <param name="call">The method info to invoke.</param>
+        /// <returns>The method binding data.</returns>
         IMethodBind BindMethod(string method, object target, MethodInfo call);
 
         /// <summary>
-        /// 解除绑定的方法
+        /// Unbinds a method from the container.
         /// </summary>
         /// <param name="target">
-        /// 解除目标
-        /// <para>如果为字符串则作为调用方法名</para>
-        /// <para>如果为<code>IMethodBind</code>则作为指定方法</para>
-        /// <para>如果为其他对象则作为调用目标做全体解除</para>
+        /// The target.
+        /// <para>A <code>string</code> will be taken as the method name.</para>
+        /// <para>A <code>IMethodBind</code> will be taken as a given method.</para>
+        /// <para>Other object will be taken as the invoking target.</para>
         /// </param>
         void UnbindMethod(object target);
 
         /// <summary>
-        /// 解除绑定服务
+        /// Unbinds a service from the container.
         /// </summary>
-        /// <param name="service">服务名或者别名</param>
+        /// <param name="service">The service name or alias.</param>
         void Unbind(string service);
 
         /// <summary>
-        /// 为一个及以上的服务定义一个标记
+        /// Assign a set of tags to a given binding.
         /// </summary>
-        /// <param name="tag">标记名</param>
-        /// <param name="service">服务名</param>
+        /// <param name="tag">The tag name.</param>
+        /// <param name="service">The array of service name or alias.</param>
         void Tag(string tag, params string[] service);
 
         /// <summary>
-        /// 根据标记名生成标记所对应的所有服务实例
+        /// Resolve all of the bindings for a given tag.
         /// </summary>
-        /// <param name="tag">标记名</param>
-        /// <returns>将会返回标记所对应的所有服务实例</returns>
+        /// <param name="tag">The tag name.</param>
+        /// <returns>All the services tagged with the given tag name.</returns>
         object[] Tagged(string tag);
 
         /// <summary>
-        /// 静态化一个服务
+        /// Register an existing instance as shared in the container.
         /// </summary>
-        /// <param name="service">服务名或者别名</param>
-        /// <param name="instance">服务实例</param>
-        /// <returns>被修饰器处理后的新的实例</returns>
+        /// <param name="service">The service name or alias.</param>
+        /// <param name="instance">The service instance.</param>
+        /// <returns>New instance after being processed by the decorator.</returns>
         object Instance(string service, object instance);
 
         /// <summary>
-        /// 释放某个单例化的对象
+        /// Release an existing instance in the container.
         /// </summary>
-        /// <param name="mixed">服务名或别名或单例对象</param>
+        /// <param name="mixed">The service name or alias or instance.</param>
         bool Release(object mixed);
 
         /// <summary>
-        /// 清空容器的所有实例，绑定，别名，标签，解决器，方法容器, 扩展
+        /// Flush the container of all bindings and resolved instances.
         /// </summary>
         void Flush();
 
         /// <summary>
-        /// 调用一个已经被绑定的方法
+        /// Call the method in bonded container and inject its dependencies.
         /// </summary>
         /// <param name="method">方法名</param>
         /// <param name="userParams">用户提供的参数</param>
@@ -175,96 +175,93 @@ namespace CatLib
         object Invoke(string method, params object[] userParams);
 
         /// <summary>
-        /// 以依赖注入形式调用一个方法
+        /// Call the given method and inject its dependencies.
         /// </summary>
-        /// <param name="instance">方法对象</param>
-        /// <param name="methodInfo">方法信息</param>
-        /// <param name="userParams">用户传入的参数</param>
-        /// <returns>方法返回值</returns>
+        /// <param name="instance">The instance on which to call the method.</param>
+        /// <param name="methodInfo">The method info.</param>
+        /// <param name="userParams">The user parameters.</param>
+        /// <returns>The return value of method.</returns>
         object Call(object instance, MethodInfo methodInfo, params object[] userParams);
 
         /// <summary>
-        /// 构造服务
+        /// Resolve the given service or alias from the container.
         /// </summary>
-        /// <param name="service">服务名或别名</param>
-        /// <param name="userParams">用户传入的参数</param>
-        /// <returns>服务实例，如果构造失败那么返回null</returns>
+        /// <param name="service">The service name or alias.</param>
+        /// <param name="userParams">The user parameters.</param>
+        /// <returns>The serivce instance. Throw exception if the service can not resolved.</returns>
         object Make(string service, params object[] userParams);
 
         /// <summary>
-        /// 构造服务
+        /// Resolve the given type from the container.
         /// </summary>
-        /// <param name="service">服务名或者别名</param>
-        /// <returns>服务实例，如果构造失败那么返回null</returns>
+        /// <param name="service">The service name or alias.</param>
+        /// <returns>The serivce instance. Throw exception if the service can not resolved.</returns>
 		object this[string service] { get; set; }
 
         /// <summary>
-        /// 为服务设定一个别名
+        /// Alias a service to a different name.
         /// </summary>
-        /// <param name="alias">别名</param>
-        /// <param name="service">映射到的服务名</param>
-        /// <returns>当前容器对象</returns>
+        /// <param name="alias">The alias name to service.</param>
+        /// <param name="service">The service name.</param>
+        /// <returns>The container instance.</returns>
         IContainer Alias(string alias, string service);
 
         /// <summary>
-        /// 扩展容器中的服务
-        /// <para>允许在服务构建的过程中配置或者替换服务</para>
-        /// <para>如果服务已经被构建，拓展会立即生效。</para>
+        /// <see cref="Extend"/> an abstract type in the container.
+        /// <para>Allow configuration or replacement of services during service resolving.</para>
         /// </summary>
-        /// <param name="service">服务名或别名,如果为null则意味着全局有效</param>
-        /// <param name="closure">闭包</param>
+        /// <param name="service">The service name or alias, null if the apply to gloabl.</param>
+        /// <param name="closure">The closure replacement instance.</param>
         void Extend(string service, Func<object, IContainer, object> closure);
 
         /// <summary>
-        /// 当服务被解决时触发的事件
+        /// Register a new resolving callback.
         /// </summary>
-        /// <param name="closure">回调函数</param>
-        /// <returns>当前容器实例</returns>
+        /// <param name="closure">The callback.</param>
+        /// <returns>The container instance.</returns>
         IContainer OnResolving(Action<IBindData, object> closure);
 
         /// <summary>
-        /// 解决服务时事件之后的回调
+        /// Register a new after resolving callback.
         /// </summary>
-        /// <param name="closure">解决事件</param>
-        /// <returns>服务绑定数据</returns>
+        /// <param name="closure">The callback.</param>
+        /// <returns>The container instance.</returns>
         IContainer OnAfterResolving(Action<IBindData, object> closure);
 
         /// <summary>
-        /// 当静态服务被释放时
+        /// Register a new release callback.
         /// </summary>
-        /// <param name="closure">处理释放时的回调</param>
+        /// <param name="closure">The callback.</param>
         IContainer OnRelease(Action<IBindData, object> closure);
 
         /// <summary>
-        /// 当查找类型无法找到时会尝试去调用开发者提供的查找类型函数
+        /// Register a callback for when type finding fails.
         /// </summary>
-        /// <param name="func">查找类型的回调</param>
-        /// <param name="priority">查询优先级(值越小越优先)</param>
-        /// <returns>当前容器实例</returns>
+        /// <param name="func">The callback.</param>
+        /// <param name="priority">The priority.</param>
+        /// <returns>The container instance.</returns>
         IContainer OnFindType(Func<string, Type> func, int priority = int.MaxValue);
 
         /// <summary>
-        /// 关注指定的服务，当服务触发重定义时调用指定对象的指定方法
-        /// <para>调用是以依赖注入的形式进行的</para>
-        /// <para>服务的新建（第一次解决服务）操作并不会触发重定义</para>
+        /// Register a new callback to an abstract's rebind event.
         /// </summary>
-        /// <param name="service">服务名</param>
-        /// <param name="callback">回调</param>
-        /// <returns>服务容器</returns>
+        /// <param name="service">The service name or alias.</param>
+        /// <param name="callback">The callback.</param>
+        /// <returns>The container instance.</returns>
         IContainer OnRebound(string service, Action<object> callback);
 
         /// <summary>
-        /// 在回调区间内暂时性的静态化服务实例
+        /// Temporarily makes the given services static in the callback lifetime.
         /// </summary>
-        /// <param name="callback">回调区间</param>
-        /// <param name="services">服务映射</param>
+        /// <param name="callback">The callback.</param>
+        /// <param name="services">The service mapping.</param>
         void Flash(Action callback, params KeyValuePair<string, object>[] services);
 
         /// <summary>
-        /// 类型转为服务名
+        /// Converts the given type to the service name.
         /// </summary>
-        /// <param name="type">类型</param>
-        /// <returns>转换后的服务名</returns>
+        /// <param name="type">The given type.</param>
+        /// <returns>The service name.</returns>
         string Type2Service(Type type);
     }
 }
