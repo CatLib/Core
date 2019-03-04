@@ -12,12 +12,12 @@
 namespace CatLib
 {
     /// <summary>
-    /// 引导程序接口
+    /// <see cref="IBootstrap"/> is the interface implemented by all bootstrap classes.
     /// </summary>
     public interface IBootstrap
     {
         /// <summary>
-        /// 引导程序接口
+        /// Bootstrap the framework.
         /// </summary>
         void Bootstrap();
     }

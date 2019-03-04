@@ -14,12 +14,12 @@ using System;
 namespace CatLib
 {
     /// <summary>
-    /// 主动标志服务提供者的基础类型
+    /// Allow current service providers to be treated as specified service providers.
     /// </summary>
     public interface IServiceProviderType
     {
         /// <summary>
-        /// 提供者基础类型
+        /// The Type To be treated as specified service providers.
         /// </summary>
         Type BaseType { get; }
     }

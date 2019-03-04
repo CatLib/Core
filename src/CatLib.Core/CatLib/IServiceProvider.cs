@@ -12,17 +12,17 @@
 namespace CatLib
 {
     /// <summary>
-    /// 服务提供者
+    /// <see cref="IServiceProvider"/> is the interface implemented by all service provider classes.
     /// </summary>
     public interface IServiceProvider
     {
         /// <summary>
-        /// 服务提供者初始化
+        /// Initialize the application's service providers.
         /// </summary>
         void Init();
 
         /// <summary>
-        /// 当注册服务提供者
+        /// Register any application services.
         /// </summary>
         void Register();
     }
