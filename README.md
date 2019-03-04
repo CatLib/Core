@@ -37,6 +37,8 @@ Install-Package CatLib.Core -Version 1.4.0
 
 CatLib has the most extensive and thorough [documentation](https://catlib.io), making it a breeze to get started with the framework.
 
+> 需要中文支持? 请访问[CatLib中文文档](https://catlib.io)。
+
 ## Contribution
 
 CatLib is still a young framework, and her growth and your contribution are inseparable. If you want to contribute to the project, please refer to: [CatLib Contribution Guide](https://catlib.io/v1/contribution.html) Your contribution will be included in the list of contributors，Welcome Pull Request!
