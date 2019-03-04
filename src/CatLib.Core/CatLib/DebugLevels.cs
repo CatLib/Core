@@ -12,22 +12,22 @@
 namespace CatLib
 {
     /// <summary>
-    /// 调试等级
+    /// Framework debug level.
     /// </summary>
     public enum DebugLevels
     {
         /// <summary>
-        /// 生产环境
+        /// Production environment
         /// </summary>
         Production,
 
         /// <summary>
-        /// 仿真环境
+        /// Between the production environment and the developer environment
         /// </summary>
         Staging,
 
         /// <summary>
-        /// 开发者模式
+        /// Development environment
         /// </summary>
         Development,
     }

@@ -12,37 +12,40 @@
 namespace CatLib
 {
     /// <summary>
-    /// 门面
+    /// <see cref="Facade{TService}"/> is the abstract implemented by all facade classes.
     /// </summary>
+    /// <remarks>
+    /// <code>public class FileSystem : Facade&gt;IFileSystem&lt;{ }</code>
+    /// </remarks>
     public abstract class Facade<TService>
     {
         /// <summary>
-        /// 实例
+        /// The resolved object instance.
         /// </summary>
         private static TService instance;
 
         /// <summary>
-        /// 绑定数据
+        /// The resolved object bind data.
         /// </summary>
         private static IBindData binder;
 
         /// <summary>
-        /// 是否已经被初始化
+        /// Whether the facade has been initialized.
         /// </summary>
         private static bool inited;
 
         /// <summary>
-        /// 服务名
+        /// The service name.
         /// </summary>
         private static string service;
 
         /// <summary>
-        /// 是否被释放
+        /// Whether the resolved object has been released.
         /// </summary>
         private static bool released;
 
         /// <summary>
-        /// 门面静态构造
+        /// The facade static constructor .
         /// </summary>
         static Facade()
         {
@@ -56,31 +59,26 @@ namespace CatLib
             };
         }
 
-        /// <summary>
-        /// 门面实例
-        /// </summary>
+        /// <inheritdoc cref="instance"/>
         public static TService Instance => HasInstance ? instance : Resolve();
 
         /// <summary>
-        /// 是否拥有门面实例
-        /// <para>如果为非静态绑定那么永远返回<code>false</code></para>
-        /// <para>门面实例判断不能代替:<code>Container.HasInstance</code></para>
+        /// Whether the resolved instance is exists in the facade.
+        /// <para>If it is a non-static binding then return forever <code>false</code></para>
         /// </summary>
         internal static bool HasInstance => binder != null && binder.IsStatic && !released && instance != null;
 
         /// <summary>
-        /// 构建一个服务实例
+        /// Resolve the object instance.
         /// </summary>
-        /// <param name="userParams">用户参数</param>
-        /// <returns>服务实例</returns>
+        /// <param name="userParams">The user parameters.</param>
+        /// <returns>The resolved object.</returns>
         internal static TService Make(params object[] userParams)
         {
             return HasInstance ? instance : Resolve(userParams);
         }
 
-        /// <summary>
-        /// 构建一个服务
-        /// </summary>
+        /// <inheritdoc cref="Make"/>
         private static TService Resolve(params object[] userParams)
         {
             released = false;
@@ -92,8 +90,9 @@ namespace CatLib
             }
             else if (binder != null && !binder.IsStatic)
             {
-                // 如果已经初始化了说明binder已经被初始化过。
-                // 那么提前判断可以优化性能而不用经过一个hash查找。
+                // If it has been initialized, the binder has been initialized.
+                // Then judging in advance can optimize performance without 
+                // going through a hash lookup.
                 return Build(userParams);
             }
 
@@ -109,10 +108,10 @@ namespace CatLib
         }
 
         /// <summary>
-        /// 当服务被释放时
+        /// When the resolved object is released
         /// </summary>
-        /// <param name="oldBinder">旧的绑定器</param>
-        /// <param name="_">忽略的参数</param>
+        /// <param name="oldBinder">The old bind data with resolved object.</param>
+        /// <param name="_">The ignored parameter.</param>
         private static void OnRelease(IBindData oldBinder, object _)
         {
             if (oldBinder != binder)
@@ -125,9 +124,9 @@ namespace CatLib
         }
 
         /// <summary>
-        /// 当服务被重绑定时
+        /// When the resolved object is rebound.
         /// </summary>
-        /// <param name="newService">新的服务实例</param>
+        /// <param name="newService">The new resolved object.</param>
         private static void ServiceRebound(TService newService)
         {
             var newBinder = App.GetBind(service);
@@ -136,9 +135,9 @@ namespace CatLib
         }
 
         /// <summary>
-        /// 重新绑定
+        /// Rebinding the bound data to given binder. 
         /// </summary>
-        /// <param name="newBinder">新的Binder</param>
+        /// <param name="newBinder">The new binder.</param>
         private static void Rebind(IBindData newBinder)
         {
             if (newBinder != null && binder != newBinder && newBinder.IsStatic)
@@ -150,10 +149,10 @@ namespace CatLib
         }
 
         /// <summary>
-        /// 生成服务
+        /// Resolve facade object from the container.
         /// </summary>
-        /// <param name="userParams">服务名</param>
-        /// <returns>服务实例</returns>
+        /// <param name="userParams">The user parameters.</param>
+        /// <returns>The resolved object.</returns>
         private static TService Build(params object[] userParams)
         {
             return (TService)App.Make(service, userParams);
