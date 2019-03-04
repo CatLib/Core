@@ -43,7 +43,7 @@ CatLib is still a young framework, and her growth and your contribution are inse
 
 ## License
 
-The open source license used by CatLib is ：[MIT license](http://opensource.org/licenses/MIT).
+The open source license used by CatLib is [MIT license](http://opensource.org/licenses/MIT).
 
 ## Support
 
