@@ -14,7 +14,7 @@ using System;
 namespace CatLib
 {
     /// <summary>
-    /// 标记的类，函数，属性不再进行覆盖率分析
+    /// Marked classes, functions, attributes no longer perform coverage analysis.
     /// </summary>
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method | AttributeTargets.Field | AttributeTargets.Property | AttributeTargets.Constructor, Inherited = false)]
     public class ExcludeFromCodeCoverageAttribute : Attribute

@@ -14,15 +14,15 @@ using System;
 namespace CatLib
 {
     /// <summary>
-    /// Type类型扩展函数
+    /// Extension method for <see cref="Type"/>
     /// </summary>
     public static class TypeExtend
     {
         /// <summary>
-        /// 将类型转为服务名
+        /// Convert type to service name.
         /// </summary>
-        /// <param name="type">类型</param>
-        /// <returns>服务名</returns>
+        /// <param name="type">The given type.</param>
+        /// <returns>The service name.</returns>
         public static string ToService(this Type type)
         {
             return App.Type2Service(type);
