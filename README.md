@@ -12,7 +12,7 @@
 </a>
 </p>
 
-> English version is coming soon in version 1.4
+> English version is coming soon in version 2.0
 
 ## 关于CatLib
 
