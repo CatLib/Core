@@ -369,6 +369,12 @@ namespace CatLib.API.Stl
         }
 
         [TestMethod]
+        public void TestLevenshteinNull()
+        {
+            Assert.AreEqual(-1, Str.Levenshtein(null, "1"));
+        }
+
+        [TestMethod]
         public void TestJoinList()
         {
             var result = Str.JoinList(new[] {"hello", "world", "catlib"}, "/");

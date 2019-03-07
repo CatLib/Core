@@ -503,6 +503,11 @@ namespace CatLib
         /// </returns>
         public static int Levenshtein(string str1, string str2)
         {
+            if (str1 == null || str2 == null)
+            {
+                return -1;
+            }
+
             var length1 = str1.Length;
             var length2 = str2.Length;
 
