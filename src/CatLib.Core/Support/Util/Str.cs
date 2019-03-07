@@ -517,7 +517,7 @@ namespace CatLib
             }
 
             var p1 = new int[length2 + 1];
-            var p2 = new int[length1 + 1];
+            var p2 = new int[length2 + 1];
 
             for (var i = 0; i <= length2; i++)
             {

@@ -353,6 +353,7 @@ namespace CatLib.API.Stl
         {
             Assert.AreEqual(4, Str.Levenshtein("hello", "world"));
             Assert.AreEqual(5, Str.Levenshtein("hello", "catlib"));
+            Assert.AreEqual(10, Str.Levenshtein("hello", "catlib-world"));
         }
 
         [TestMethod]
