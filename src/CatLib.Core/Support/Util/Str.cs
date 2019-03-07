@@ -551,6 +551,37 @@ namespace CatLib
 
             return p1[length2];
         }
+
+        /// <summary>
+        /// Returns all sequential combination of the given array.
+        /// </summary>
+        /// <remarks>
+        /// v[0] = "hello"
+        /// v[1] = "world"
+        /// var result = Str.JoinList(v, "/"); 
+        /// result[0] == "hello";
+        /// result[1] == "hello/world";
+        /// </remarks>
+        /// <param name="source">The source array.</param>
+        /// <param name="separator">The separator.</param>
+        /// <returns>The sequential combination array.</returns>
+        public static string[] JoinList(string[] source, string separator = null)
+        {
+            Guard.Requires<ArgumentNullException>(source != null);
+            var builder = new StringBuilder();
+            for (var index = 1; index < source.Length; index++)
+            {
+                builder.Append(source[index - 1]);
+                if (!string.IsNullOrEmpty(separator))
+                {
+                    builder.Append(separator);
+                }
+                builder.Append(source[index]);
+                source[index] = builder.ToString();
+                builder.Remove(0, source[index].Length);
+            }
+            return source;
+        }
     }
 }
 

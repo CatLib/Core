@@ -367,5 +367,16 @@ namespace CatLib.API.Stl
             Assert.AreEqual(256, builder.Length);
             Assert.AreEqual(-1, Str.Levenshtein(builder.ToString(), "world"));
         }
+
+        [TestMethod]
+        public void TestJoinList()
+        {
+            var result = Str.JoinList(new[] {"hello", "world", "catlib"}, "/");
+
+            Assert.AreEqual("hello", result[0]);
+            Assert.AreEqual("hello/world", result[1]);
+            Assert.AreEqual("hello/world/catlib", result[2]);
+            Assert.AreEqual(3, result.Length);
+        }
     }
 }
