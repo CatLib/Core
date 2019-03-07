@@ -587,6 +587,12 @@ namespace CatLib
             }
             return source;
         }
+
+        /// <inheritdoc cref="JoinList(string[], char)"/>
+        public static string[] JoinList(string[] source, char separator)
+        {
+            return JoinList(source, separator.ToString());
+        }
     }
 }
 
