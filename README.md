@@ -26,7 +26,7 @@
 **Installed with Nuget**
 
 ```PM
-Install-Package CatLib.Core -Version 1.4.0
+Install-Package CatLib.Core -Version 2.0.0
 ```
 
 **Installed with Github Release**
