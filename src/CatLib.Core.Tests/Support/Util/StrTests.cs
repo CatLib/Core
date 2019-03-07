@@ -10,6 +10,7 @@
  */
 
 using System;
+using System.Text;
 using System.Text.RegularExpressions;
 using CatLib.Tests;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -345,6 +346,26 @@ namespace CatLib.API.Stl
             Assert.AreEqual("CatLib.Core", result[0]);
             Assert.AreEqual("CatLib.ILRuntime", result[1]);
             Assert.AreEqual("CatLib.Route", result[2]);
+        }
+
+        [TestMethod]
+        public void TestLevenshtein()
+        {
+            Assert.AreEqual(4, Str.Levenshtein("hello", "world"));
+            Assert.AreEqual(5, Str.Levenshtein("hello", "catlib"));
+        }
+
+        [TestMethod]
+        public void TestLevenshteinLargeThan255()
+        {
+            var builder = new StringBuilder(256);
+            for (var i = 0; i < 256; i++)
+            {
+                builder.Append('a');
+            }
+
+            Assert.AreEqual(256, builder.Length);
+            Assert.AreEqual(-1, Str.Levenshtein(builder.ToString(), "world"));
         }
     }
 }

@@ -491,6 +491,66 @@ namespace CatLib
 
             return result + mission;
         }
+
+        /// <summary>
+        /// 计算两个字符串之间的相似度。
+        /// </summary>
+        /// <param name="str1">字符串 1.</param>
+        /// <param name="str2">字符串 2.</param>
+        /// <returns>
+        /// 通过Levenshtein算法返回两个字符串的相似度。如果两个字符串之间的
+        /// 任意一个参数长度大于255那么。将会返回-1。
+        /// </returns>
+        public static int Levenshtein(string str1, string str2)
+        {
+            var length1 = str1.Length;
+            var length2 = str2.Length;
+
+            if (length1 > 255 || length2 > 255)
+            {
+                return -1;
+            }
+
+            var p1 = new int[length2 + 1];
+            var p2 = new int[length1 + 1];
+
+            for (var i = 0; i <= length2; i++)
+            {
+                p1[i] = i;
+            }
+
+            int Min(int num1, int num2, int num3)
+            {
+                var min = num1;
+                if (min > num2)
+                {
+                    min = num2;
+                }
+                if (min > num3)
+                {
+                    min = num3;
+                }
+                return min;
+            }
+
+            for (var i = 0; i < length1; i++)
+            {
+                p2[0] = p1[0] + 1;
+                for (var n = 0; n < length2; n++)
+                {
+                    var distance = str1[i] == str2[n]
+                        ? Min(p1[n], p1[n + 1] + 1, p2[n] + 1)
+                        : Min(p1[n] + 1, p1[n + 1] + 1, p2[n] + 1);
+                    p2[n + 1] = distance;
+                }
+
+                var temp = p1;
+                p1 = p2;
+                p2 = temp;
+            }
+
+            return p1[length2];
+        }
     }
 }
 
