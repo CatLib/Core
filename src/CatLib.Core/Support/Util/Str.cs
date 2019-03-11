@@ -42,6 +42,11 @@ namespace CatLib
         }
 
         /// <summary>
+        /// 空格字符串
+        /// </summary>
+        public const string Space = " ";
+
+        /// <summary>
         /// 获取字符串所表达的函数名
         /// </summary>
         /// <param name="pattern">输入字符串</param>
@@ -305,8 +310,8 @@ namespace CatLib
                 leftPadding = needPadding;
             }
 
-            padStr = padStr ?? " ";
-            padStr = padStr.Length <= 0 ? " " : padStr;
+            padStr = padStr ?? Space;
+            padStr = padStr.Length <= 0 ? Space : padStr;
 
             var leftPadCount = leftPadding / padStr.Length + (leftPadding % padStr.Length == 0 ? 0 : 1);
             var rightPadCount = rightPadding / padStr.Length + (rightPadding % padStr.Length == 0 ? 0 : 1);
@@ -438,7 +443,7 @@ namespace CatLib
 
         /// <summary>
         /// 如果长度超过给定的最大字符串长度，则截断字符串。 截断的字符串的最后一个字符将替换为缺省字符串
-        /// <para>eg: Str.Truncate("hello world , the sun is shine",15," ") => hello world...</para>
+        /// <para>eg: Str.Truncate("hello world , the sun is shine", 15, Str.Space) => hello world...</para>
         /// </summary>
         /// <param name="str">要截断的字符串</param>
         /// <param name="length">截断长度(含缺省字符长度)</param>
