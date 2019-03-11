@@ -312,13 +312,14 @@ namespace CatLib
         }
 
         /// <summary>
-        /// 输入数组中的每个值传给回调函数,如果回调函数返回 true，则把输入数组中的当前值加入结果数组中
+        /// 输入数组中的每个值传给回调函数,如果回调函数和期望值(<paramref name="expected"/>)相等，则把输入数组中的当前值加入结果数组中
         /// </summary>
         /// <typeparam name="T">数组类型</typeparam>
         /// <param name="source">规定数组</param>
         /// <param name="predicate">回调函数</param>
+        /// <param name="expected">回调函数的期望值</param>
         /// <returns>需求数组</returns>
-        public static T[] Filter<T>(T[] source, Predicate<T> predicate)
+        public static T[] Filter<T>(T[] source, Predicate<T> predicate, bool expected = true)
         {
             Guard.Requires<ArgumentNullException>(source != null);
             Guard.Requires<ArgumentNullException>(predicate != null);
@@ -327,7 +328,7 @@ namespace CatLib
             var i = 0;
             foreach (var result in source)
             {
-                if (predicate.Invoke(result))
+                if (predicate.Invoke(result) == expected)
                 {
                     elements[i++] = result;
                 }
@@ -338,13 +339,14 @@ namespace CatLib
         }
 
         /// <summary>
-        /// 将规定迭代器中的每个值传给回调函数,如果回调函数返回 true，则把规定迭代器中的当前值加入结果数组中
+        /// 将规定迭代器中的每个值传给回调函数,如果回调函数和期望值(<paramref name="expected"/>)相等，则把规定迭代器中的当前值加入结果数组中
         /// </summary>
         /// <typeparam name="T">数组类型</typeparam>
         /// <param name="source">规定迭代器</param>
         /// <param name="predicate">回调函数</param>
+        /// <param name="expected">回调函数的期望值</param>
         /// <returns>需求数组</returns>
-        public static T[] Filter<T>(IEnumerable<T> source, Predicate<T> predicate)
+        public static T[] Filter<T>(IEnumerable<T> source, Predicate<T> predicate, bool expected = true)
         {
             Guard.Requires<ArgumentNullException>(source != null);
             Guard.Requires<ArgumentNullException>(predicate != null);
@@ -352,7 +354,7 @@ namespace CatLib
             var results = new List<T>();
             foreach (var result in source)
             {
-                if (predicate.Invoke(result))
+                if (predicate.Invoke(result) == expected)
                 {
                     results.Add(result);
                 }
