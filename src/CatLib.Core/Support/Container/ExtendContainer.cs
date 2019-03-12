@@ -1034,6 +1034,7 @@ namespace CatLib
         /// <param name="callback">回调区间</param>
         /// <param name="service">服务名</param>
         /// <param name="instance">实例名</param>
+        [Obsolete("The Flash method will be removed in 2.0.")]
         public static void Flash(this IContainer container, Action callback, string service, object instance)
         {
             container.Flash(callback, new KeyValuePair<string, object>(service, instance));
