@@ -283,9 +283,32 @@ namespace CatLib
         /// <para><see cref="PadTypes.Right"/>填充字符串的右侧。默认。</para>
         /// </param>
         /// <returns>被填充的字符串</returns>
+        [Obsolete("The overload method wile be remove in 2.0 version.")]
         public static string Pad(string str, int length, string padStr = null, PadTypes type = PadTypes.Right)
         {
-            Guard.Requires<ArgumentNullException>(str != null);
+            return Pad(length, str, padStr, type);
+        }
+
+        /// <summary>
+        /// 把字符串填充为新的长度。
+        /// </summary>
+        /// <param name="length">规定新的字符串长度。如果该值小于字符串的原始长度，则不进行任何操作。</param>
+        /// <param name="str">原始字符串,如果为null则为空值</param>
+        /// <param name="padStr">
+        /// 规定供填充使用的字符串。默认是空白。
+        /// <para>如果传入的字符串长度小于等于0那么会使用空白代替。</para>
+        /// <para>注释：空白不是空字符串</para>
+        /// </param>
+        /// <param name="type">
+        /// 规定填充字符串的哪边。
+        /// <para><see cref="PadTypes.Both"/>填充字符串的两侧。如果不是偶数，则右侧获得额外的填充。</para>
+        /// <para><see cref="PadTypes.Left"/>填充字符串的左侧。</para>
+        /// <para><see cref="PadTypes.Right"/>填充字符串的右侧。默认。</para>
+        /// </param>
+        /// <returns>被填充的字符串</returns>
+        public static string Pad(int length, string str = null, string padStr = null, PadTypes type = PadTypes.Right)
+        {
+            str = str ?? string.Empty;
 
             var needPadding = length - str.Length;
             if (needPadding <= 0)
