@@ -12,45 +12,42 @@
 namespace CatLib
 {
     /// <summary>
-    /// 被绑定对象
+    /// <see cref="IBindable"/> is the interface implemented by all bindable data classes.
     /// </summary>
     public interface IBindable
     {
         /// <summary>
-        /// 当前绑定的名字
+        /// The service name.
         /// </summary>
         string Service { get; }
 
         /// <summary>
-        /// 所属服务容器
+        /// The container to which the service belongs.
         /// </summary>
         IContainer Container { get; }
 
         /// <summary>
-        /// 移除绑定
-        /// <para>如果进行的是服务绑定 , 那么在解除绑定时如果是静态化物体将会触发释放</para>
+        /// Unbind the service from the container.
         /// </summary>
+        /// <remarks>
+        /// If the service is a singletoned instance, then the singleton instance 
+        /// that has been built will be automatically released.
+        /// </remarks>
         void Unbind();
     }
 
-    /// <summary>
-    /// 被绑定对象
-    /// </summary>
+    /// <inheritdoc />
     public interface IBindable<TReturn> : IBindable
         where TReturn : IBindable
     {
         /// <summary>
-        /// 当需求某个服务                                                                                                                                                                                                                                                                                                                                                                                  
+        /// When the service specified by the demand.
         /// </summary>
-        /// <param name="service">服务名</param>
-        /// <returns>绑定关系临时数据</returns>
+        /// <param name="service">The specified service name.</param>
+        /// <returns>The given relationship in the context.</returns>
         IGivenData<TReturn> Needs(string service);
 
-        /// <summary>
-        /// 当需求某个服务
-        /// </summary>
-        /// <typeparam name="TService">服务类型</typeparam>
-        /// <returns>绑定关系临时数据</returns>
+        /// <inheritdoc cref="Needs(string)"/>
         IGivenData<TReturn> Needs<TService>();
     }
 }

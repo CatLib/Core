@@ -13,53 +13,41 @@ using System;
 
 namespace CatLib
 {
-    /// <summary>
-    /// 绑定关系临时数据,用于支持链式调用
-    /// </summary>
+    /// <inheritdoc />
     internal sealed class GivenData<TReturn> : IGivenData<TReturn> where TReturn : class, IBindable<TReturn>
     {
-        /// <summary>
-        /// 绑定数据
-        /// </summary>
+        /// <inheritdoc cref="BindData"/>
         private readonly Bindable<TReturn> bindable;
 
         /// <summary>
-        /// 父级容器
+        /// The container to which the service belongs.
         /// </summary>
         private readonly Container container;
 
         /// <summary>
-        /// 需求什么服务
+        /// The demand service.
         /// </summary>
         private string needs;
 
         /// <summary>
-        /// 绑定关系临时数据
+        /// Create an new the given relationship.
         /// </summary>
-        /// <param name="container">依赖注入容器</param>
-        /// <param name="bindable">可绑定数据</param>
+        /// <param name="container">The container instance.</param>
+        /// <param name="bindable">The bindable data.</param>
         internal GivenData(Container container, Bindable<TReturn> bindable)
         {
             this.container = container;
             this.bindable = bindable;
         }
 
-        /// <summary>
-        /// 需求什么服务
-        /// </summary>
-        /// <param name="needs">需求什么服务</param>
-        /// <returns>绑定关系实例</returns>
+        /// <inheritdoc cref="Bindable{TReturn}.Needs"/>
         internal IGivenData<TReturn> Needs(string needs)
         {
             this.needs = needs;
             return this;
         }
 
-        /// <summary>
-        /// 给与什么服务
-        /// </summary>
-        /// <param name="service">给与的服务名或别名</param>
-        /// <returns>服务绑定数据</returns>
+        /// <inheritdoc />
         public TReturn Given(string service)
         {
             Guard.NotEmptyOrNull(service, nameof(service));
@@ -67,21 +55,13 @@ namespace CatLib
             return bindable as TReturn;
         }
 
-        /// <summary>
-        /// 给与什么服务
-        /// </summary>
-        /// <typeparam name="TService">给与的服务名或别名</typeparam>
-        /// <returns>服务绑定数据</returns>
+        /// <inheritdoc />
         public TReturn Given<TService>()
         {
             return Given(container.Type2Service(typeof(TService)));
         }
 
-        /// <summary>
-        /// 给与什么服务
-        /// </summary>
-        /// <param name="closure">给与的服务生成闭包</param>
-        /// <returns>服务绑定数据</returns>
+        /// <inheritdoc />
         public TReturn Given(Func<object> closure)
         {
             Guard.Requires<ArgumentNullException>(closure != null);
