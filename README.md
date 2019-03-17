@@ -12,7 +12,7 @@
 </a>
 </p>
 
-> We are currently preparing to convert the comments in the code to the English version. We look forward to your joining.
+> English version is coming soon in version 2.0
 
 ## 关于CatLib
 
