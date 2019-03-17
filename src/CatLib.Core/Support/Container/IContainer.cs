@@ -16,7 +16,7 @@ using System.Reflection;
 namespace CatLib
 {
     /// <summary>
-    /// 依赖注入容器
+    /// <see cref="IContainer"/> is the interface implemented by all IOC Container classes.
     /// </summary>
     public interface IContainer
     {

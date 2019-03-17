@@ -24,17 +24,17 @@ namespace CatLib
         public bool IsStatic { get; }
 
         /// <summary>
-        /// The resolving callbacks.
+        /// The local resolving callbacks.
         /// </summary>
         private List<Action<IBindData, object>> resolving;
 
         /// <summary>
-        /// The after resolving callbacks.
+        /// The local after resolving callbacks.
         /// </summary>
         private List<Action<IBindData, object>> afterResolving;
 
         /// <summary>
-        /// The release callbacks.
+        /// The local release callbacks.
         /// </summary>
         private List<Action<IBindData, object>> release;
 
@@ -110,30 +110,28 @@ namespace CatLib
         }
 
         /// <summary>
-        /// Trigger all of the resolving callbacks.
+        /// Trigger all of the local resolving callbacks.
         /// </summary>
         /// <param name="instance">The service instance.</param>
-        /// <returns>The service instance.</returns>
+        /// <returns>The decorated service instance.</returns>
         internal object TriggerResolving(object instance)
         {
             return InternalContainer.Trigger(this, instance, resolving);
         }
 
+        /// <inheritdoc cref="TriggerResolving"/>
         /// <summary>
-        /// Trigger all of the after resolving callbacks.
+        /// Trigger all of the local after resolving callbacks.
         /// </summary>
-        /// <param name="instance">The service instance.</param>
-        /// <returns>The service instance.</returns>
         internal object TriggerAfterResolving(object instance)
         {
             return InternalContainer.Trigger(this, instance, afterResolving);
         }
 
+        /// <inheritdoc cref="TriggerResolving"/>
         /// <summary>
-        /// Trigger all of the release callbacks.
+        /// Trigger all of the local release callbacks.
         /// </summary>
-        /// <param name="instance">The service instance.</param>
-        /// <returns>The service instance.</returns>
         internal object TriggerRelease(object instance)
         {
             return InternalContainer.Trigger(this, instance, release);
