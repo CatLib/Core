@@ -190,6 +190,7 @@ namespace CatLib.Tests
         public void TestStructBindAndRebound()
         {
             var app = new Application();
+            app.Bootstrap();
             var makeCount = 0;
             var binder = app.Bind<int>(() =>
             {
@@ -216,6 +217,7 @@ namespace CatLib.Tests
         public void TestStructSingleAndRebound()
         {
             var app = new Application();
+            app.Bootstrap();
             var makeCount = 0;
             var binder = app.Singleton<int>(() =>
             {
@@ -263,6 +265,7 @@ namespace CatLib.Tests
         public void TestStructSingleToBindAndRebound()
         {
             var app = new Application();
+            app.Bootstrap();
             var makeCount = 0;
             var binder = app.Bind<int>(() =>
             {
@@ -290,6 +293,7 @@ namespace CatLib.Tests
         public void TestStructSingleRelease()
         {
             var app = new Application();
+            app.Bootstrap();
             var makeCount = 0;
             var binder = app.Singleton<int>(() =>
             {
@@ -312,6 +316,7 @@ namespace CatLib.Tests
         public void TestStructBindToSingleRebound()
         {
             var app = new Application();
+            app.Bootstrap();
             var makeCount = 0;
             var binder = app.Bind<int>(() =>
             {
@@ -350,6 +355,8 @@ namespace CatLib.Tests
         [ExpectedException(typeof(UnresolvableException))]
         public void TestEmptyFacade()
         {
+            var app = new Application();
+            app.Bootstrap();
             var ins = Facade<IBindData>.Instance;
         }
     }

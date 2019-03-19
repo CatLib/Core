@@ -137,6 +137,7 @@ namespace CatLib.Tests
         public void TestBindIf()
         {
             var app = new Application();
+            app.Bootstrap();
             IBindData bindData;
             Assert.AreEqual(true, App.BindIf("TestBind", (c, p) => 1, out bindData));
             Assert.AreEqual(false, App.BindIf("TestBind", (c, p) => 2, out bindData));
@@ -161,6 +162,7 @@ namespace CatLib.Tests
             var testObject = new object();
             var testObject2 = new object();
             var app = new Application();
+            app.Bootstrap();
             IBindData bindData;
             Assert.AreEqual(true, App.SingletonIf("TestBind", (c, p) => new object(), out bindData));
 

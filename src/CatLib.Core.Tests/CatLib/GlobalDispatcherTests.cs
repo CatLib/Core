@@ -69,7 +69,7 @@ namespace CatLib.Tests
         public void TestT1()
         {
             var dispatcher = new Dispatcher();
-            Application.New();
+            Application.New().Bootstrap();
             var n = 0;
             dispatcher.On("Events.T1", (int num) =>
             {
@@ -129,7 +129,7 @@ namespace CatLib.Tests
         public void TestT1_2()
         {
             var dispatcher = new Dispatcher();
-            Application.New();
+            Application.New().Bootstrap();
             var n = 0;
             var s = string.Empty;
             dispatcher.On("Events.T1_2", (int num, string hello) =>
@@ -177,7 +177,7 @@ namespace CatLib.Tests
         public void Test1_3()
         {
             var dispatcher = new Dispatcher();
-            Application.New();
+            Application.New().Bootstrap();
             var n = 0;
             var s = string.Empty;
             dispatcher.On("Events.T1_3", (int num, string hello, IDispatcher disp) =>
@@ -229,7 +229,7 @@ namespace CatLib.Tests
         public void Test1_4()
         {
             var dispatcher = new Dispatcher();
-            Application.New();
+            Application.New().Bootstrap();
             var n = 0;
             var s = string.Empty;
             dispatcher.On("Events.T1_4", (int num, string hello, IDispatcher disp, IApplication application) =>

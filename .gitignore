@@ -7,3 +7,4 @@ src/CatLib.Core.NetStandard/bin/
 src/CatLib.Core.NetStandard/obj/
 TestResults/
 build/
+.dist/

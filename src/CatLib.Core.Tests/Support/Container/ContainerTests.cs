@@ -2230,6 +2230,16 @@ namespace CatLib.Tests.Stl
             Assert.AreEqual(true, container.Release(ref services));
         }
 
+        [TestMethod]
+        public void TestAliasSetAliasService()
+        {
+            var container = new Container();
+            container.Bind("service", (c, p) => "hello world", true).Alias("alias");
+            container.Alias("new-alias", "alias");
+
+            Assert.AreEqual("hello world", container["new-alias"]);
+        }
+
         /// <summary>
         /// 测试基础容器调用
         /// </summary>
@@ -2237,6 +2247,43 @@ namespace CatLib.Tests.Stl
         public int TestContainerCall(int num)
         {
             return num;
+        }
+
+        public class TestNullableValue
+        {
+            public int? Nullable1 { get; set; }
+            public byte? Nullable2 { get; set; }
+
+            [Inject]
+            public int? Nullable3 { get; set; }
+
+            [Inject]
+            public byte? Nullable4 { get; set; }
+
+            public TestNullableValue(int? nullable1, byte? nullable2)
+            {
+                Nullable1 = nullable1;
+                Nullable2 = nullable2;
+            }
+        }
+
+        [TestMethod]
+        public void TestNullable()
+        {
+            var container = new Container();
+            container.Singleton<TestNullableValue>().Needs("$Nullable3").Given(() => 100);
+
+            var v = container.Make<TestNullableValue>(10);
+
+            Assert.AreEqual(true, v.Nullable1.HasValue);
+            Assert.AreEqual(10, v.Nullable1.Value);
+
+            Assert.AreEqual(false, v.Nullable2.HasValue);
+
+            Assert.AreEqual(true, v.Nullable3.HasValue);
+            Assert.AreEqual(100, v.Nullable3.Value);
+
+            Assert.AreEqual(false, v.Nullable4.HasValue);
         }
 
         #region Rebound
@@ -2410,6 +2457,8 @@ namespace CatLib.Tests.Stl
         public void TestRebuildAndFlush()
         {
             var container = new Application();
+            container.Bootstrap();
+            container.Make<IApplication>();
             var list = new List<object>();
 
             container.Singleton<TestFlushOrderDependencyClass>();
@@ -2440,6 +2489,8 @@ namespace CatLib.Tests.Stl
         public void TestRebuildAndFlushNotWatch()
         {
             var container = new Application();
+            container.Bootstrap();
+            container.Make<IApplication>();
             var list = new List<object>();
 
             container.Singleton<TestFlushOrderDependencyClass>();

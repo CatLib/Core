@@ -11,6 +11,8 @@
 
 using System;
 using System.Collections;
+using System.Diagnostics;
+using System.Reflection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace CatLib.Tests
@@ -74,6 +76,13 @@ namespace CatLib.Tests
                 yield return 2;
                 yield return base.CoroutineInit();
             }
+        }
+
+        [TestMethod]
+        public void TestGetFileVersion()
+        {
+            Assert.AreEqual(FileVersionInfo.GetVersionInfo(Assembly.GetExecutingAssembly().Location).FileVersion,
+                Application.Version);
         }
 
         [TestMethod]
@@ -268,6 +277,7 @@ namespace CatLib.Tests
         public void MakeAssemblyClass()
         {
             var app = new Application();
+            app.Bootstrap();
             var sortSet = app.Make<SortSet<string, string>>();
 
             Assert.AreNotEqual(null, sortSet);
@@ -496,6 +506,14 @@ namespace CatLib.Tests
             {
                 
             }
+        }
+
+        [TestMethod]
+        public void TestForceRegister()
+        {
+            var app = MakeApplication();
+            app.Register(new OrderFirstClass());
+            app.Register(new OrderFirstClass(), true);
         }
 
         [TestMethod]

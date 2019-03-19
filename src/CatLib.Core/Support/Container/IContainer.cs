@@ -258,6 +258,7 @@ namespace CatLib
         /// </summary>
         /// <param name="callback">回调区间</param>
         /// <param name="services">服务映射</param>
+        [Obsolete("The Flash method will be removed in 2.0.")]
         void Flash(Action callback, params KeyValuePair<string, object>[] services);
 
         /// <summary>

@@ -121,6 +121,7 @@ namespace CatLib.Tests.Stl
         public void TestBindMake()
         {
             var container = new Application();
+            container.Bootstrap();
             container.Bind<TestMakeHandClass>((_, __) => new TestMakeHandClass(null));
             container.Singleton<TestSerializeClass>();
             container.Bind<TestMakeClass>().Alias<ITestMakeClass>();
@@ -189,6 +190,7 @@ namespace CatLib.Tests.Stl
         public void TestSingletonFacade()
         {
             var container = new Application();
+            container.Bootstrap();
             container.Singleton<TestSerializeClass>();
             container.Singleton<TestMakeClass>().Alias<ITestMakeClass>();
 
@@ -202,6 +204,7 @@ namespace CatLib.Tests.Stl
         public void TestBindFacade()
         {
             var container = new Application();
+            container.Bootstrap();
             container.Singleton<TestSerializeClass>();
             container.Bind<TestMakeClass>().Alias<ITestMakeClass>();
             container.Bind<TestMakeNullParamsClass>().Alias<ITestMakeNullParamsClass>();

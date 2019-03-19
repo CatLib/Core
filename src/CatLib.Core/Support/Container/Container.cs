@@ -340,7 +340,7 @@ namespace CatLib
             }
 
             alias = FormatService(alias);
-            service = FormatService(service);
+            service = AliasToService(service);
 
             lock (syncRoot)
             {
@@ -479,7 +479,7 @@ namespace CatLib
                 {
                     // 如果为 静态的 那么直接解决这个服务
                     // 在服务静态化的过程会触发 TriggerOnRebound
-                    Resolve(service);
+                    Make(service);
                 }
                 else
                 {
@@ -567,6 +567,7 @@ namespace CatLib
         /// <returns>服务实例，如果构造失败那么返回null</returns>
         public object Make(string service, params object[] userParams)
         {
+            GuardConstruct(nameof(Make));
             return Resolve(service, userParams);
         }
 
@@ -1240,7 +1241,19 @@ namespace CatLib
         /// <returns>解决结果</returns>
         protected virtual object ResolveAttrPrimitive(Bindable makeServiceBindData, string service, PropertyInfo baseParam)
         {
-            return ResloveAttrClass(makeServiceBindData, service, baseParam);
+            if (ResloveFromContextual(makeServiceBindData, service, baseParam.Name, baseParam.PropertyType,
+                out object instance))
+            {
+                return instance;
+            }
+
+            if (baseParam.PropertyType.IsGenericType && baseParam.PropertyType.GetGenericTypeDefinition() ==
+                typeof(Nullable<>))
+            {
+                return null;
+            }
+
+            throw MakeUnresolvableException(baseParam.Name, baseParam.DeclaringType);
         }
 
         /// <summary>
@@ -1270,7 +1283,25 @@ namespace CatLib
         /// <returns>解决结果</returns>
         protected virtual object ResolvePrimitive(Bindable makeServiceBindData, string service, ParameterInfo baseParam)
         {
-            return ResloveClass(makeServiceBindData, service, baseParam);
+            if (ResloveFromContextual(makeServiceBindData, service, baseParam.Name, baseParam.ParameterType,
+                out object instance))
+            {
+                return instance;
+            }
+
+            if (baseParam.IsOptional)
+            {
+                return baseParam.DefaultValue;
+            }
+
+            if (baseParam.ParameterType.IsGenericType && baseParam.ParameterType.GetGenericTypeDefinition() ==
+                typeof(Nullable<>))
+            {
+                return null;
+            }
+
+            throw MakeUnresolvableException(baseParam.Name,
+                baseParam.Member != null ? baseParam.Member.DeclaringType : null);
         }
 
         /// <summary>
@@ -1877,7 +1908,7 @@ namespace CatLib
         }
 
         /// <summary>
-        /// 解决服务
+        /// 解决服务(不会进行GuardConstruct检查)
         /// </summary>
         /// <param name="service">服务名或别名</param>
         /// <param name="userParams">用户传入的构造参数</param>
@@ -1886,9 +1917,8 @@ namespace CatLib
         /// <exception cref="LogicException">出现循环依赖</exception>
         /// <exception cref="UnresolvableException">无法解决服务</exception>
         /// <returns>服务实例</returns>
-        private object Resolve(string service, params object[] userParams)
+        protected object Resolve(string service, params object[] userParams)
         {
-            GuardConstruct(nameof(Make));
             Guard.NotEmptyOrNull(service, nameof(service));
             lock (syncRoot)
             {

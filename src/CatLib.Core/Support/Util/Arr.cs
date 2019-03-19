@@ -312,13 +312,14 @@ namespace CatLib
         }
 
         /// <summary>
-        /// 输入数组中的每个值传给回调函数,如果回调函数返回 true，则把输入数组中的当前值加入结果数组中
+        /// 输入数组中的每个值传给回调函数,如果回调函数和期望值(<paramref name="expected"/>)相等，则把输入数组中的当前值加入结果数组中
         /// </summary>
         /// <typeparam name="T">数组类型</typeparam>
         /// <param name="source">规定数组</param>
         /// <param name="predicate">回调函数</param>
+        /// <param name="expected">回调函数的期望值</param>
         /// <returns>需求数组</returns>
-        public static T[] Filter<T>(T[] source, Predicate<T> predicate)
+        public static T[] Filter<T>(T[] source, Predicate<T> predicate, bool expected = true)
         {
             Guard.Requires<ArgumentNullException>(source != null);
             Guard.Requires<ArgumentNullException>(predicate != null);
@@ -327,7 +328,7 @@ namespace CatLib
             var i = 0;
             foreach (var result in source)
             {
-                if (predicate.Invoke(result))
+                if (predicate.Invoke(result) == expected)
                 {
                     elements[i++] = result;
                 }
@@ -338,13 +339,14 @@ namespace CatLib
         }
 
         /// <summary>
-        /// 将规定迭代器中的每个值传给回调函数,如果回调函数返回 true，则把规定迭代器中的当前值加入结果数组中
+        /// 将规定迭代器中的每个值传给回调函数,如果回调函数和期望值(<paramref name="expected"/>)相等，则把规定迭代器中的当前值加入结果数组中
         /// </summary>
         /// <typeparam name="T">数组类型</typeparam>
         /// <param name="source">规定迭代器</param>
         /// <param name="predicate">回调函数</param>
+        /// <param name="expected">回调函数的期望值</param>
         /// <returns>需求数组</returns>
-        public static T[] Filter<T>(IEnumerable<T> source, Predicate<T> predicate)
+        public static T[] Filter<T>(IEnumerable<T> source, Predicate<T> predicate, bool expected = true)
         {
             Guard.Requires<ArgumentNullException>(source != null);
             Guard.Requires<ArgumentNullException>(predicate != null);
@@ -352,7 +354,7 @@ namespace CatLib
             var results = new List<T>();
             foreach (var result in source)
             {
-                if (predicate.Invoke(result))
+                if (predicate.Invoke(result) == expected)
                 {
                     results.Add(result);
                 }
@@ -729,6 +731,57 @@ namespace CatLib
                     rollback.Invoke(source[index]);
                 }
             }
+        }
+
+        /// <summary>
+        /// 将规定数组传递给检查器进行检查。
+        /// <para>只有当所有元素通过检查器均为false，那么函数返回false。</para>
+        /// </summary>
+        /// <typeparam name="T">数组类型</typeparam>
+        /// <param name="source">规定数组</param>
+        /// <param name="predicate">检查器</param>
+        /// <returns>是否通过检查</returns>
+        public static bool Test<T>(T[] source, Predicate<T> predicate)
+        {
+            Guard.Requires<ArgumentNullException>(source != null);
+            Guard.Requires<ArgumentNullException>(predicate != null);
+
+            foreach (var result in source)
+            {
+                if (predicate(result))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// 查找规定数组中的指定元素，如果找到了则使用替代值替换，否则在规定数组尾部增加替换值。
+        /// </summary>
+        /// <typeparam name="T">数组类型</typeparam>
+        /// <param name="source">规定数组</param>
+        /// <param name="predicate">返回true则覆盖当前元素内容</param>
+        /// <param name="value">替换值</param>
+        public static void Set<T>(ref T[] source, Predicate<T> predicate, T value)
+        {
+            Guard.Requires<ArgumentNullException>(predicate != null);
+
+            source = source ?? new T[] { };
+
+            for (var index = 0; index < source.Length; index++)
+            {
+                if (!predicate(source[index]))
+                {
+                    continue;
+                }
+
+                source[index] = value;
+                return;
+            }
+
+            Push(ref source, value);
         }
     }
 }

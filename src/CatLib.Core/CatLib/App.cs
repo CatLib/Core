@@ -87,9 +87,10 @@ namespace CatLib
         /// 注册服务提供者
         /// </summary>
         /// <param name="provider">服务提供者</param>
-        public static void Register(IServiceProvider provider)
+        /// <param name="force">为true则强制注册</param>
+        public static void Register(IServiceProvider provider, bool force = false)
         {
-            Handler.Register(provider);
+            Handler.Register(provider, force);
         }
 
         /// <summary>
@@ -686,6 +687,7 @@ namespace CatLib
         /// </summary>
         /// <param name="callback">回调区间</param>
         /// <param name="services">服务映射</param>
+        [Obsolete("The Flash method will be removed in 2.0.")]
         public static void Flash(Action callback, params KeyValuePair<string, object>[] services)
         {
             Handler.Flash(callback, services);
@@ -1478,6 +1480,7 @@ namespace CatLib
         /// <param name="callback">回调区间</param>
         /// <param name="service">服务名</param>
         /// <param name="instance">实例名</param>
+        [Obsolete("The Flash method will be removed in 2.0.")]
         public static void Flash(Action callback, string service, object instance)
         {
             Handler.Flash(callback, service, instance);

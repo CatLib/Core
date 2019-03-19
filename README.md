@@ -1,4 +1,4 @@
-﻿<p align="center"><img width="173" height="57" src="https://catlib.io/images/logo.txt.png"></p>
+﻿<p align="center"><img width="173" height="57" src="https://catlib.io/imgs/logo-txt.png"></p>
 
 <p align="center">
 <a href="https://github.com/Catlib/Core/blob/master/LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue.svg" title="license-mit" /></a>
@@ -12,7 +12,7 @@
 </a>
 </p>
 
-> We are currently preparing to convert the comments in the code to the English version. We look forward to your joining.
+> English version is coming soon in version 2.0
 
 ## 关于CatLib
 
@@ -28,7 +28,7 @@
 **使用Nuget安装**
 
 ```PM
-Install-Package CatLib.Core -Version 1.3.0
+Install-Package CatLib.Core -Version 1.4.0
 ```
 
 **直接下载发布版本**
@@ -38,13 +38,6 @@ Install-Package CatLib.Core -Version 1.3.0
 ## 文档
 
 您只需要进入 [中文文档](https://catlib.io) 就可以看到她们。
-
-## 架构图
-![](https://catlib.io/images/architecture-diagram.svg)
-
-## 项目开发计划
-
-CatLib一直都在建立新的组件来降低开发者的工作量，进入 [CatLib 开发计划](https://www.teambition.com/project/589ce998907a7b661c86de9c/tasks/scrum/589ce9aadf254b9870a7ac90) 来了解未来的开发序列。
 
 ## 贡献
 

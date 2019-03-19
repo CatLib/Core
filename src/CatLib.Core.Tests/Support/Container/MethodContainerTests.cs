@@ -21,7 +21,7 @@ namespace CatLib.Core.Tests.Support.Container
         [TestMethod]
         public void TestBindMethod()
         {
-            new Application();
+            (new Application()).Bootstrap();
             App.BindMethod("TestMethod", () => 10);
             App.BindMethod("TestMethodContainer", (IContainer container) => container != null);
             App.BindMethod("TestMethodContainer2", (IContainer container, IContainer container2) =>
@@ -42,7 +42,7 @@ namespace CatLib.Core.Tests.Support.Container
         [TestMethod]
         public void UnBindMethodWithMethodName()
         {
-            new Application();
+            new Application().Bootstrap();
             App.BindMethod("TestMethod10", () => 10);
             App.BindMethod("TestMethod20", () => 20);
 
@@ -89,7 +89,7 @@ namespace CatLib.Core.Tests.Support.Container
         [TestMethod]
         public void TestStaticMethod()
         {
-            new Application();
+            new Application().Bootstrap();
             App.BindMethod<int>("echo", TestStaticMethodAction);
             Assert.AreEqual(200, App.Invoke("echo", 200));
         }
@@ -97,7 +97,7 @@ namespace CatLib.Core.Tests.Support.Container
         [TestMethod]
         public void TestUnbindStaticMethod()
         {
-            new Application();
+            new Application().Bootstrap();
             var bind = App.BindMethod<int>("echo", TestStaticMethodAction);
             Assert.AreEqual(100, App.Invoke("echo", 100));
             App.UnbindMethod(bind);
@@ -110,7 +110,7 @@ namespace CatLib.Core.Tests.Support.Container
         [TestMethod]
         public void TestUnbindWithObject()
         {
-            new Application();
+            new Application().Bootstrap();
             var cls = new TestContainerClass(); 
             App.BindMethod("Helloworld.Func1", cls);
             App.BindMethod("Helloworld.Func2", cls);
@@ -140,7 +140,7 @@ namespace CatLib.Core.Tests.Support.Container
         [TestMethod]
         public void TestContainerMethodContextual()
         {
-            new Application();
+            new Application().Bootstrap();
 
             App.Instance("input", 1000);
             App.Alias("$input", "input");

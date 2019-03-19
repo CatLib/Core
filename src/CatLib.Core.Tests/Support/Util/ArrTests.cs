@@ -392,6 +392,18 @@ namespace CatLib.Tests.Support.Util
         }
 
         [TestMethod]
+        public void TestFilterExpected()
+        {
+            var result = Arr.Filter(new[] {1, 2, 3, 4, 5, 6, 7, 8, 9, 0}, (i) => i % 2 == 0, false);
+            Assert.AreEqual(1, result[0]);
+            Assert.AreEqual(3, result[1]);
+            Assert.AreEqual(5, result[2]);
+            Assert.AreEqual(7, result[3]);
+            Assert.AreEqual(9, result[4]);
+            Assert.AreEqual(5, result.Length);
+        }
+
+        [TestMethod]
         public void TestFilterIEnumerable()
         {
             var result = Arr.Filter(new List<int> { 1, 2, 3, 4, 5, 6, 7, 8, 9, 0 }, (i) => i % 2 == 0);
@@ -807,6 +819,47 @@ namespace CatLib.Tests.Support.Util
             var result3 = Arr.Remove(ref data3, (c) => c % 2 == 0);
             Assert.AreEqual(0, result3.Length);
             Assert.AreEqual(0, data3.Length);
+        }
+
+        [TestMethod]
+        public void TestTest()
+        {
+            var assembiles = new string[]
+            {
+                "CatLib.Core",
+                "CatLib.ILRuntime",
+                "CatLib.Route",
+                "Hello.World"
+            };
+
+            Assert.AreEqual(true, Arr.Test(assembiles, (assembly) => Str.Is("CatLib.*", assembly)));
+        }
+
+        [TestMethod]
+        public void TestSetReplace()
+        {
+            var set = new[] {"a", "ab", "abc", "abcd", "abcdef"};
+
+            Arr.Set(ref set, (element) => element == "abc", "hello");
+            Assert.AreEqual("a", set[0]);
+            Assert.AreEqual("ab", set[1]);
+            Assert.AreEqual("hello", set[2]);
+            Assert.AreEqual("abcd", set[3]);
+            Assert.AreEqual("abcdef", set[4]);
+        }
+
+        [TestMethod]
+        public void TestSetPush()
+        {
+            var set = new [] { "a", "ab", "abc", "abcd", "abcdef" };
+
+            Arr.Set(ref set, (element) => element == "none", "hello");
+            Assert.AreEqual("a", set[0]);
+            Assert.AreEqual("ab", set[1]);
+            Assert.AreEqual("abc", set[2]);
+            Assert.AreEqual("abcd", set[3]);
+            Assert.AreEqual("abcdef", set[4]);
+            Assert.AreEqual("hello", set[5]);
         }
     }
 }
