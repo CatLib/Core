@@ -48,6 +48,7 @@ namespace CatLib
         IGivenData<TReturn> Needs(string service);
 
         /// <inheritdoc cref="Needs(string)"/>
+        /// <typeparam name="TService">The type convert to service name.</typeparam>
         IGivenData<TReturn> Needs<TService>();
     }
 }
