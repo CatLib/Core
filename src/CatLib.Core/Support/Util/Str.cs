@@ -42,6 +42,11 @@ namespace CatLib
         }
 
         /// <summary>
+        /// 空格字符串
+        /// </summary>
+        public const string Space = " ";
+
+        /// <summary>
         /// 获取字符串所表达的函数名
         /// </summary>
         /// <param name="pattern">输入字符串</param>
@@ -278,9 +283,32 @@ namespace CatLib
         /// <para><see cref="PadTypes.Right"/>填充字符串的右侧。默认。</para>
         /// </param>
         /// <returns>被填充的字符串</returns>
+        [Obsolete("The overload method wile be remove in 2.0 version.")]
         public static string Pad(string str, int length, string padStr = null, PadTypes type = PadTypes.Right)
         {
-            Guard.Requires<ArgumentNullException>(str != null);
+            return Pad(length, str, padStr, type);
+        }
+
+        /// <summary>
+        /// 把字符串填充为新的长度。
+        /// </summary>
+        /// <param name="length">规定新的字符串长度。如果该值小于字符串的原始长度，则不进行任何操作。</param>
+        /// <param name="str">原始字符串,如果为null则为空值</param>
+        /// <param name="padStr">
+        /// 规定供填充使用的字符串。默认是空白。
+        /// <para>如果传入的字符串长度小于等于0那么会使用空白代替。</para>
+        /// <para>注释：空白不是空字符串</para>
+        /// </param>
+        /// <param name="type">
+        /// 规定填充字符串的哪边。
+        /// <para><see cref="PadTypes.Both"/>填充字符串的两侧。如果不是偶数，则右侧获得额外的填充。</para>
+        /// <para><see cref="PadTypes.Left"/>填充字符串的左侧。</para>
+        /// <para><see cref="PadTypes.Right"/>填充字符串的右侧。默认。</para>
+        /// </param>
+        /// <returns>被填充的字符串</returns>
+        public static string Pad(int length, string str = null, string padStr = null, PadTypes type = PadTypes.Right)
+        {
+            str = str ?? string.Empty;
 
             var needPadding = length - str.Length;
             if (needPadding <= 0)
@@ -305,8 +333,8 @@ namespace CatLib
                 leftPadding = needPadding;
             }
 
-            padStr = padStr ?? " ";
-            padStr = padStr.Length <= 0 ? " " : padStr;
+            padStr = padStr ?? Space;
+            padStr = padStr.Length <= 0 ? Space : padStr;
 
             var leftPadCount = leftPadding / padStr.Length + (leftPadding % padStr.Length == 0 ? 0 : 1);
             var rightPadCount = rightPadding / padStr.Length + (rightPadding % padStr.Length == 0 ? 0 : 1);
@@ -438,7 +466,7 @@ namespace CatLib
 
         /// <summary>
         /// 如果长度超过给定的最大字符串长度，则截断字符串。 截断的字符串的最后一个字符将替换为缺省字符串
-        /// <para>eg: Str.Truncate("hello world , the sun is shine",15," ") => hello world...</para>
+        /// <para>eg: Str.Truncate("hello world , the sun is shine", 15, Str.Space) => hello world...</para>
         /// </summary>
         /// <param name="str">要截断的字符串</param>
         /// <param name="length">截断长度(含缺省字符长度)</param>
@@ -490,6 +518,108 @@ namespace CatLib
             }
 
             return result + mission;
+        }
+
+        /// <summary>
+        /// 计算两个字符串之间的相似度。
+        /// </summary>
+        /// <param name="str1">字符串 1.</param>
+        /// <param name="str2">字符串 2.</param>
+        /// <returns>
+        /// 通过Levenshtein算法返回两个字符串的相似度。如果两个字符串之间的
+        /// 任意一个参数长度大于255那么。将会返回-1。
+        /// </returns>
+        public static int Levenshtein(string str1, string str2)
+        {
+            if (str1 == null || str2 == null)
+            {
+                return -1;
+            }
+
+            var length1 = str1.Length;
+            var length2 = str2.Length;
+
+            if (length1 > 255 || length2 > 255)
+            {
+                return -1;
+            }
+
+            var p1 = new int[length2 + 1];
+            var p2 = new int[length2 + 1];
+
+            for (var i = 0; i <= length2; i++)
+            {
+                p1[i] = i;
+            }
+
+            int Min(int num1, int num2, int num3)
+            {
+                var min = num1;
+                if (min > num2)
+                {
+                    min = num2;
+                }
+                if (min > num3)
+                {
+                    min = num3;
+                }
+                return min;
+            }
+
+            for (var i = 0; i < length1; i++)
+            {
+                p2[0] = p1[0] + 1;
+                for (var n = 0; n < length2; n++)
+                {
+                    var distance = str1[i] == str2[n]
+                        ? Min(p1[n], p1[n + 1] + 1, p2[n] + 1)
+                        : Min(p1[n] + 1, p1[n + 1] + 1, p2[n] + 1);
+                    p2[n + 1] = distance;
+                }
+
+                var temp = p1;
+                p1 = p2;
+                p2 = temp;
+            }
+
+            return p1[length2];
+        }
+
+        /// <summary>
+        /// Returns all sequential combination of the given array.
+        /// </summary>
+        /// <remarks>
+        /// v[0] = "hello"
+        /// v[1] = "world"
+        /// var result = Str.JoinList(v, "/"); 
+        /// result[0] == "hello";
+        /// result[1] == "hello/world";
+        /// </remarks>
+        /// <param name="source">The source array.</param>
+        /// <param name="separator">The separator.</param>
+        /// <returns>The sequential combination array.</returns>
+        public static string[] JoinList(string[] source, string separator = null)
+        {
+            Guard.Requires<ArgumentNullException>(source != null);
+            var builder = new StringBuilder();
+            for (var index = 1; index < source.Length; index++)
+            {
+                builder.Append(source[index - 1]);
+                if (!string.IsNullOrEmpty(separator))
+                {
+                    builder.Append(separator);
+                }
+                builder.Append(source[index]);
+                source[index] = builder.ToString();
+                builder.Remove(0, source[index].Length);
+            }
+            return source;
+        }
+
+        /// <inheritdoc cref="JoinList(string[], char)"/>
+        public static string[] JoinList(string[] source, char separator)
+        {
+            return JoinList(source, separator.ToString());
         }
     }
 }

@@ -255,6 +255,7 @@ namespace CatLib
         /// </summary>
         /// <param name="callback">The callback.</param>
         /// <param name="services">The service mapping.</param>
+        [Obsolete("The Flash method will be removed in 2.0.")]
         void Flash(Action callback, params KeyValuePair<string, object>[] services);
 
         /// <summary>

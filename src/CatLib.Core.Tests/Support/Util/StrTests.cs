@@ -10,6 +10,7 @@
  */
 
 using System;
+using System.Text;
 using System.Text.RegularExpressions;
 using CatLib.Tests;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -150,35 +151,35 @@ namespace CatLib.API.Stl
         [TestMethod]
         public void TestPad()
         {
-            var result = Str.Pad("hello", 10, "worldtest", Str.PadTypes.Both);
+            var result = Str.Pad(10, "hello", "worldtest", Str.PadTypes.Both);
             Assert.AreEqual("wohellowor", result);
 
-            result = Str.Pad("hello", 10, "worldtest");
+            result = Str.Pad(10, "hello", "worldtest");
             Assert.AreEqual("helloworld", result);
 
-            result = Str.Pad("hello", 10, "worldtest" , Str.PadTypes.Left);
+            result = Str.Pad(10, "hello", "worldtest" , Str.PadTypes.Left);
             Assert.AreEqual("worldhello", result);
 
-            result = Str.Pad("hello", 3, "worldtest", Str.PadTypes.Left);
+            result = Str.Pad(3, "hello", "worldtest", Str.PadTypes.Left);
             Assert.AreEqual("hello", result);
 
-            result = Str.Pad("hello", 10, null, Str.PadTypes.Left);
+            result = Str.Pad(10, "hello", null, Str.PadTypes.Left);
             Assert.AreEqual("     hello", result);
 
-            result = Str.Pad("hello", 10, string.Empty, Str.PadTypes.Left);
+            result = Str.Pad(10, "hello", string.Empty, Str.PadTypes.Left);
             Assert.AreEqual("     hello", result);
         }
 
         [TestMethod]
         public void TestEmptyStrPad()
         {
-            var result = Str.Pad(string.Empty, 10, "wor", Str.PadTypes.Left);
+            var result = Str.Pad(10, string.Empty, "wor", Str.PadTypes.Left);
             Assert.AreEqual("worworworw", result);
 
-            result = Str.Pad(string.Empty, 10, "wor", Str.PadTypes.Both);
+            result = Str.Pad(10, string.Empty, "wor", Str.PadTypes.Both);
             Assert.AreEqual("worwoworwo", result);
 
-            result = Str.Pad(string.Empty, 10, "wor");
+            result = Str.Pad(10, null, "wor");
             Assert.AreEqual("worworworw", result);
         }
 
@@ -264,18 +265,24 @@ namespace CatLib.API.Stl
         }
 
         [TestMethod]
+        public void TestStrSpace()
+        {
+            Assert.AreEqual(" ", Str.Space);
+        }
+
+        [TestMethod]
         public void TestTruncate()
         {
             var str = Str.Truncate("hello world , the sun is shine", 11);
             Assert.AreEqual("hello wo...", str);
 
-            str = Str.Truncate("hello world , the sun is shine", 11, " ");
+            str = Str.Truncate("hello world , the sun is shine", 11, Str.Space);
             Assert.AreEqual("hello...", str);
 
-            str = Str.Truncate("hello world , the sun is shine", 15, " ");
+            str = Str.Truncate("hello world , the sun is shine", 15, Str.Space);
             Assert.AreEqual("hello world...", str);
 
-            str = Str.Truncate("hello world sun sname", 15, " ");
+            str = Str.Truncate("hello world sun sname", 15, Str.Space);
             Assert.AreEqual("hello world..." , str);
 
             var regex = new Regex("orl");
@@ -345,6 +352,55 @@ namespace CatLib.API.Stl
             Assert.AreEqual("CatLib.Core", result[0]);
             Assert.AreEqual("CatLib.ILRuntime", result[1]);
             Assert.AreEqual("CatLib.Route", result[2]);
+        }
+
+        [TestMethod]
+        public void TestLevenshtein()
+        {
+            Assert.AreEqual(4, Str.Levenshtein("hello", "world"));
+            Assert.AreEqual(5, Str.Levenshtein("hello", "catlib"));
+            Assert.AreEqual(10, Str.Levenshtein("hello", "catlib-world"));
+        }
+
+        [TestMethod]
+        public void TestLevenshteinLargeThan255()
+        {
+            var builder = new StringBuilder(256);
+            for (var i = 0; i < 256; i++)
+            {
+                builder.Append('a');
+            }
+
+            Assert.AreEqual(256, builder.Length);
+            Assert.AreEqual(-1, Str.Levenshtein(builder.ToString(), "world"));
+        }
+
+        [TestMethod]
+        public void TestLevenshteinNull()
+        {
+            Assert.AreEqual(-1, Str.Levenshtein(null, "1"));
+        }
+
+        [TestMethod]
+        public void TestJoinList()
+        {
+            var result = Str.JoinList(new[] {"hello", "world", "catlib"}, "/");
+
+            Assert.AreEqual("hello", result[0]);
+            Assert.AreEqual("hello/world", result[1]);
+            Assert.AreEqual("hello/world/catlib", result[2]);
+            Assert.AreEqual(3, result.Length);
+        }
+
+        [TestMethod]
+        public void TestJoinListChar()
+        {
+            var result = Str.JoinList(new[] { "hello", "world", "catlib" }, '@');
+
+            Assert.AreEqual("hello", result[0]);
+            Assert.AreEqual("hello@world", result[1]);
+            Assert.AreEqual("hello@world@catlib", result[2]);
+            Assert.AreEqual(3, result.Length);
         }
     }
 }
