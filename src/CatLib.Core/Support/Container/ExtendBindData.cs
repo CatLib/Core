@@ -18,54 +18,35 @@ namespace CatLib
     /// </summary>
     public static class ExtendBindData
     {
-        /// <summary>
-        /// 为服务设定一个别名
-        /// </summary>
-        /// <typeparam name="TAlias">别名</typeparam>
-        /// <param name="bindData">绑定数据</param>
-        /// <returns>服务绑定数据</returns>
+        /// <inheritdoc cref="IBindData.Alias"/>
+        /// <typeparam name="TAlias">The type convert to alias name.</typeparam>
         public static IBindData Alias<TAlias>(this IBindData bindData)
         {
             return bindData.Alias(bindData.Container.Type2Service(typeof(TAlias)));
         }
 
-        /// <summary>
-        /// 解决服务时触发的回调
-        /// </summary>
-        /// <param name="bindData">绑定数据</param>
-        /// <param name="action">解决事件</param>
-        /// <returns>服务绑定数据</returns>
-        public static IBindData OnResolving(this IBindData bindData, Action action)
+        /// <inheritdoc cref="IBindData.OnResolving"/>
+        public static IBindData OnResolving(this IBindData bindData, Action closure)
         {
-            Guard.Requires<ArgumentNullException>(action != null);
+            Guard.Requires<ArgumentNullException>(closure != null);
             return bindData.OnResolving((_, instance) =>
             {
-                action();
+                closure();
             });
         }
 
-        /// <summary>
-        /// 解决服务时触发的回调
-        /// </summary>
-        /// <param name="bindData">绑定数据</param>
-        /// <param name="action">解决事件</param>
-        /// <returns>服务绑定数据</returns>
-        public static IBindData OnResolving(this IBindData bindData, Action<object> action)
+        /// <inheritdoc cref="IBindData.OnResolving"/>
+        public static IBindData OnResolving(this IBindData bindData, Action<object> closure)
         {
-            Guard.Requires<ArgumentNullException>(action != null);
+            Guard.Requires<ArgumentNullException>(closure != null);
             return bindData.OnResolving((_, instance) =>
             {
-                action(instance);
+                closure(instance);
             });
         }
 
-        /// <summary>
-        /// 解决服务时触发的回调
-        /// </summary>
-        /// <typeparam name="T">指定的类型</typeparam>
-        /// <param name="bindData">绑定数据</param>
-        /// <param name="closure">闭包</param>
-        /// <returns>服务绑定数据</returns>
+        /// <inheritdoc cref="IBindData.OnResolving"/>
+        /// <typeparam name="T">The type of resolve instance.</typeparam>
         public static IBindData OnResolving<T>(this IBindData bindData, Action<T> closure)
         {
             Guard.Requires<ArgumentNullException>(closure != null);
@@ -78,13 +59,7 @@ namespace CatLib
             });
         }
 
-        /// <summary>
-        /// 解决服务时触发的回调
-        /// </summary>
-        /// <typeparam name="T">指定的类型</typeparam>
-        /// <param name="bindData">绑定数据</param>
-        /// <param name="closure">闭包</param>
-        /// <returns>服务绑定数据</returns>
+        /// <inheritdoc cref="OnResolving{T}(IBindData, Action{T})"/>
         public static IBindData OnResolving<T>(this IBindData bindData, Action<IBindData, T> closure)
         {
             Guard.Requires<ArgumentNullException>(closure != null);
@@ -97,42 +72,28 @@ namespace CatLib
             });
         }
 
-        /// <summary>
-        /// 解决服务事件之后的回调
-        /// </summary>
-        /// <param name="bindData">绑定数据</param>
-        /// <param name="action">解决事件</param>
-        /// <returns>服务绑定数据</returns>
-        public static IBindData OnAfterResolving(this IBindData bindData, Action action)
+        /// <inheritdoc cref="IBindData.OnAfterResolving"/>
+        public static IBindData OnAfterResolving(this IBindData bindData, Action closure)
         {
-            Guard.Requires<ArgumentNullException>(action != null);
+            Guard.Requires<ArgumentNullException>(closure != null);
             return bindData.OnAfterResolving((_, instance) =>
             {
-                action();
+                closure();
             });
         }
 
-        /// <summary>
-        /// 解决服务事件之后的回调
-        /// </summary>
-        /// <param name="bindData">绑定数据</param>
-        /// <param name="action">解决事件</param>
-        /// <returns>服务绑定数据</returns>
-        public static IBindData OnAfterResolving(this IBindData bindData, Action<object> action)
+        /// <inheritdoc cref="IBindData.OnAfterResolving"/>
+        public static IBindData OnAfterResolving(this IBindData bindData, Action<object> closure)
         {
-            Guard.Requires<ArgumentNullException>(action != null);
+            Guard.Requires<ArgumentNullException>(closure != null);
             return bindData.OnAfterResolving((_, instance) =>
             {
-                action(instance);
+                closure(instance);
             });
         }
 
-        /// <summary>
-        /// 解决服务事件之后的回调
-        /// </summary>
-        /// <param name="bindData">绑定数据</param>
-        /// <param name="closure">解决事件</param>
-        /// <returns>服务绑定数据</returns>
+        /// <inheritdoc cref="IBindData.OnAfterResolving"/>
+        /// <typeparam name="T">The type of resolve instance.</typeparam>
         public static IBindData OnAfterResolving<T>(this IBindData bindData, Action<T> closure)
         {
             Guard.Requires<ArgumentNullException>(closure != null);
@@ -145,12 +106,7 @@ namespace CatLib
             });
         }
 
-        /// <summary>
-        /// 解决服务事件之后的回调
-        /// </summary>
-        /// <param name="bindData">绑定数据</param>
-        /// <param name="closure">解决事件</param>
-        /// <returns>服务绑定数据</returns>
+        /// <inheritdoc cref="OnAfterResolving{T}(IBindData, Action{T})"/>
         public static IBindData OnAfterResolving<T>(this IBindData bindData, Action<IBindData, T> closure)
         {
             Guard.Requires<ArgumentNullException>(closure != null);
@@ -163,42 +119,28 @@ namespace CatLib
             });
         }
 
-        /// <summary>
-        /// 当静态服务被释放时
-        /// </summary>
-        /// <param name="bindData">绑定数据</param>
-        /// <param name="action">处理事件</param>
-        /// <returns>服务绑定数据</returns>
-        public static IBindData OnRelease(this IBindData bindData, Action action)
+        /// <inheritdoc cref="IBindData.OnRelease"/>
+        public static IBindData OnRelease(this IBindData bindData, Action closure)
         {
-            Guard.Requires<ArgumentNullException>(action != null);
+            Guard.Requires<ArgumentNullException>(closure != null);
             return bindData.OnRelease((_, __) =>
             {
-                action();
+                closure();
             });
         }
 
-        /// <summary>
-        /// 当静态服务被释放时
-        /// </summary>
-        /// <param name="bindData">绑定数据</param>
-        /// <param name="action">处理事件</param>
-        /// <returns>服务绑定数据</returns>
-        public static IBindData OnRelease(this IBindData bindData, Action<object> action)
+        /// <inheritdoc cref="IBindData.OnRelease"/>
+        public static IBindData OnRelease(this IBindData bindData, Action<object> closure)
         {
-            Guard.Requires<ArgumentNullException>(action != null);
+            Guard.Requires<ArgumentNullException>(closure != null);
             return bindData.OnRelease((_, instance) =>
             {
-                action(instance);
+                closure(instance);
             });
         }
 
-        /// <summary>
-        /// 当静态服务被释放时
-        /// </summary>
-        /// <param name="bindData">绑定数据</param>
-        /// <param name="closure">处理事件</param>
-        /// <returns>服务绑定数据</returns>
+        /// <inheritdoc cref="IBindData.OnRelease"/>
+        /// <typeparam name="T">The type of release instance.</typeparam>
         public static IBindData OnRelease<T>(this IBindData bindData, Action<T> closure)
         {
             Guard.Requires<ArgumentNullException>(closure != null);
@@ -211,12 +153,7 @@ namespace CatLib
             });
         }
 
-        /// <summary>
-        /// 当静态服务被释放时
-        /// </summary>
-        /// <param name="bindData">绑定数据</param>
-        /// <param name="closure">处理事件</param>
-        /// <returns>服务绑定数据</returns>
+        /// <inheritdoc cref="OnRelease{T}(IBindData, Action{T})"/>
         public static IBindData OnRelease<T>(this IBindData bindData, Action<IBindData, T> closure)
         {
             Guard.Requires<ArgumentNullException>(closure != null);
