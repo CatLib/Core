@@ -1,5 +1,9 @@
 # Release Notes
 
+## Unreleased
+
+- Fix `Str.Repeat` If the number of repetitions is 0, an abnormal result will be returned. ([#202](https://github.com/CatLib/Core/issues/202) )
+
 ## [v1.4.0 (2019-03-20)](https://github.com/CatLib/Core/releases/tag/v1.4.0)
 
 **Added**

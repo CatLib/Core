@@ -83,6 +83,13 @@ namespace CatLib.API.Stl
         }
 
         [TestMethod]
+        public void TestStrRepeatZero()
+        {
+            var result = Str.Repeat("abc", 0);
+            Assert.AreEqual(string.Empty, result);
+        }
+
+        [TestMethod]
         public void TestStrShuffle()
         {
             var str = "helloworld";

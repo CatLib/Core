@@ -175,9 +175,9 @@ namespace CatLib
             Guard.Requires<ArgumentNullException>(str != null);
             Guard.Requires<ArgumentOutOfRangeException>(num >= 0);
 
-            if (num == 0)
+            if (num <= 0)
             {
-                return str;
+                return string.Empty;
             }
 
             var requested = new StringBuilder();
