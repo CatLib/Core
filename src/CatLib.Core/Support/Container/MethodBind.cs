@@ -14,38 +14,38 @@ using System.Reflection;
 namespace CatLib
 {
     /// <summary>
-    /// 方法绑定数据
+    /// The default method binding data implementation.
     /// </summary>
     internal sealed class MethodBind : Bindable<IMethodBind>, IMethodBind
     {
         /// <summary>
-        /// 方法信息
+        /// The method info.
         /// </summary>
         public MethodInfo MethodInfo { get; }
 
         /// <summary>
-        /// 调用目标
+        /// The instance on which to call the method.
         /// </summary>
         public object Target { get; }
 
         /// <summary>
-        /// 参数表
+        /// An array of the method parameters.
         /// </summary>
         public ParameterInfo[] ParameterInfos { get; }
 
         /// <summary>
-        /// 方法容器
+        /// The <see cref="MethodContainer"/> instance.
         /// </summary>
         private readonly MethodContainer methodContainer;
 
         /// <summary>
-        /// 构建一个绑定数据
+        /// Initialize a new one <see cref="MethodBind"/> instance.
         /// </summary>
-        /// <param name="methodContainer">方法容器</param>
-        /// <param name="container">依赖注入容器</param>
-        /// <param name="service">服务名</param>
-        /// <param name="target">调用目标</param>
-        /// <param name="call">调用方法</param>
+        /// <param name="methodContainer">The <see cref="MethodContainer"/> instance.</param>
+        /// <param name="container">The <see cref="Container"/> instance.</param>
+        /// <param name="service">The service name.</param>
+        /// <param name="target">The instance on which to call the method.</param>
+        /// <param name="call">The method to called.</param>
         public MethodBind(MethodContainer methodContainer, Container container, string service, object target, MethodInfo call)
             : base(container, service)
         {
@@ -56,7 +56,7 @@ namespace CatLib
         }
 
         /// <summary>
-        /// 解除绑定
+        /// Unbinds a method from the container.
         /// </summary>
         protected override void ReleaseBind()
         {

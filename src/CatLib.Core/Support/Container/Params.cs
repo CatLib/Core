@@ -14,36 +14,36 @@ using System.Collections.Generic;
 namespace CatLib
 {
     /// <summary>
-    /// 参数名注入表
+    /// Default parameter table implementation.
     /// </summary>
     [ExcludeFromCodeCoverage]
     public sealed class Params : IParams, IEnumerable<KeyValuePair<string, object>>
     {
         /// <summary>
-        /// 参数表
+        /// The parameter mapping.
         /// </summary>
         private readonly IDictionary<string, object> table;
 
         /// <summary>
-        /// 迭代器
+        /// Gets the iterator.
         /// </summary>
-        /// <returns>迭代器</returns>
+        /// <returns>Return the iterator.</returns>
         System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
         {
             return table.GetEnumerator();
         }
 
         /// <summary>
-        /// 迭代器
+        /// Gets the iterator.
         /// </summary>
-        /// <returns>迭代器</returns>
+        /// <returns>Return the iterator.</returns>
         IEnumerator<KeyValuePair<string, object>> IEnumerable<KeyValuePair<string, object>>.GetEnumerator()
         {
             return table.GetEnumerator();
         }
 
         /// <summary>
-        /// 参数名注入表
+        /// Initialize a new <see cref="Params"/> instance.
         /// </summary>
         public Params()
         {
@@ -51,19 +51,19 @@ namespace CatLib
         }
 
         /// <summary>
-        /// 参数名注入表
+        /// Initialize a new <see cref="Params"/> instance.
         /// </summary>
-        /// <param name="args">参数表</param>
+        /// <param name="args">The parameters mapping.</param>
         public Params(IDictionary<string, object> args)
         {
             table = args;
         }
 
         /// <summary>
-        /// 获取或者设定一个参数
+        /// Get or set a parameter.
         /// </summary>
-        /// <param name="key">参数名</param>
-        /// <returns>参数值</returns>
+        /// <param name="key">The parameter name.</param>
+        /// <returns>The parameter value.</returns>
         public object this[string key]
         {
             get => table[key];
@@ -71,31 +71,31 @@ namespace CatLib
         }
 
         /// <summary>
-        /// 增加一个参数
+        /// Add an parameter.
         /// </summary>
-        /// <param name="key">参数名</param>
-        /// <param name="value">参数值</param>
+        /// <param name="key">The parameter name.</param>
+        /// <param name="value">The parameter value.</param>
         public void Add(string key, object value)
         {
             table.Add(key, value);
         }
 
         /// <summary>
-        /// 移除参数
+        /// Remove an parameter.
         /// </summary>
-        /// <param name="key">参数名</param>
-        /// <returns></returns>
+        /// <param name="key">The parameter name.</param>
+        /// <returns>True if the removed.</returns>
         public bool Remove(string key)
         {
             return table.Remove(key);
         }
 
         /// <summary>
-        /// 获取一个参数
+        /// Gets an parameter value.
         /// </summary>
-        /// <param name="key">参数名</param>
-        /// <param name="value">参数值</param>
-        /// <returns>是否成功获取</returns>
+        /// <param name="key">The parameter name.</param>
+        /// <param name="value">The parameter value.</param>
+        /// <returns>True if the parameter is exist.</returns>
         public bool TryGetValue(string key, out object value)
         {
             return table.TryGetValue(key, out value);
