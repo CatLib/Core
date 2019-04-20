@@ -14,12 +14,12 @@ using System;
 namespace CatLib
 {
     /// <summary>
-    /// 运行时异常
+    /// Represents a generic runtime exception.
     /// </summary>
     public class RuntimeException : Exception
     {
         /// <summary>
-        /// 运行时异常
+        /// Initialize a new <see cref="RuntimeException"/> instnace.
         /// </summary>
         public RuntimeException()
         {
@@ -27,18 +27,18 @@ namespace CatLib
         }
 
         /// <summary>
-        /// 运行时异常
+        /// Initialize a new <see cref="RuntimeException"/> instnace.
         /// </summary>
-        /// <param name="message">异常消息</param>
+        /// <param name="message">The exception message.</param>
         public RuntimeException(string message) : base(message)
         {
         }
 
         /// <summary>
-        /// 运行时异常
+        /// Initialize a new <see cref="RuntimeException"/> instnace.
         /// </summary>
-        /// <param name="message">异常消息</param>
-        /// <param name="innerException">内部异常</param>
+        /// <param name="message">The exception message.</param>
+        /// <param name="innerException">The inner exception.</param>
         public RuntimeException(string message, Exception innerException) : base(message, innerException)
         {
         }

@@ -14,31 +14,31 @@ using System;
 namespace CatLib
 {
     /// <summary>
-    /// 断言异常
+    /// Represents an assertion exception.
     /// </summary>
     [ExcludeFromCodeCoverage]
     public class AssertException : RuntimeException
     {
         /// <summary>
-        /// 断言异常
+        /// Initialize a new <see cref="AssertException"/> instnace.
         /// </summary>
         public AssertException()
         {
         }
 
         /// <summary>
-        /// 断言异常
+        /// Initialize a new <see cref="AssertException"/> instnace.
         /// </summary>
-        /// <param name="message">异常消息</param>
+        /// <param name="message">The exception message.</param>
         public AssertException(string message) : base(message)
         {
         }
 
         /// <summary>
-        /// 断言异常
+        /// Initialize a new <see cref="AssertException"/> instnace.
         /// </summary>
-        /// <param name="message">异常消息</param>
-        /// <param name="innerException">内部异常</param>
+        /// <param name="message">The exception message.</param>
+        /// <param name="innerException">The inner exception.</param>
         public AssertException(string message, Exception innerException) : base(message, innerException)
         {
         }
