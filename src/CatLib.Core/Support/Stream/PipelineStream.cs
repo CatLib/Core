@@ -16,63 +16,57 @@ using System.Threading;
 namespace CatLib
 {
     /// <summary>
-    /// 管道通讯流
-    /// <para>一读一写线程安全</para>
+    /// The pipeline stream.
     /// </summary>
     public class PipelineStream : WrapperStream
     {
         /// <summary>
-        /// 可以被读取的长度
+        /// The count can be read.
         /// </summary>
         private volatile int count;
 
         /// <summary>
-        /// 容量
+        /// The stream capacity.
         /// </summary>
         private readonly int capacity;
 
         /// <summary>
-        /// 休眠时间
+        /// The thread sleep millisecond.
         /// </summary>
         private readonly int sleep;
 
         /// <summary>
-        /// 环形缓冲区
+        /// The <see cref="RingBuffer"/> instance.
         /// </summary>
         private readonly RingBuffer ringBuffer;
 
         /// <summary>
-        /// 当完成读取后触发
+        /// Trigger when reading is complete.
         /// </summary>
         public event Action<Stream> OnRead;
 
         /// <summary>
-        /// 是否已经被释放了
+        /// Whether the stream is disabled.
         /// </summary>
         private volatile bool disabled;
 
         /// <summary>
-        /// 是否已经关闭流了
+        /// Whether the stream is closed.
         /// </summary>
         private volatile bool closed;
 
-        /// <summary>
-        /// 是否可以被读取
-        /// </summary>
+        /// <inheritdoc />
         public override bool CanRead => count > 0 && !disabled;
 
-        /// <summary>
-        /// 是否可以被写入
-        /// </summary>
+        /// <inheritdoc />
         public override bool CanWrite => count < capacity && !closed;
+
         /// <summary>
-        /// 当前流的位置
+        /// The stream position.
         /// </summary>
         private long position;
 
-        /// <summary>
-        /// 流位置
-        /// </summary>
+        /// <inheritdoc />
         public override long Position
         {
             get => position;
@@ -80,30 +74,26 @@ namespace CatLib
         }
 
         /// <summary>
-        /// 流的长度
+        /// The stream length.
         /// </summary>
         private long length;
 
-        /// <summary>
-        /// 流的长度
-        /// </summary>
+        /// <inheritdoc />
         public override long Length => length;
 
-        /// <summary>
-        /// 是否能够设定偏移量
-        /// </summary>
+        /// <inheritdoc />
         public override bool CanSeek => false;
 
         /// <summary>
-        /// 是否已经关闭了流
+        /// Whether is closed the stream.
         /// </summary>
         public bool Closed => closed;
 
         /// <summary>
-        /// 管道通讯流
+        /// Initialize an new <see cref="PipelineStream"/> instnace.
         /// </summary>
-        /// <param name="capacity">缓冲区容量</param>
-        /// <param name="sleep">线程休眠时间</param>
+        /// <param name="capacity">The stream capacity.</param>
+        /// <param name="sleep">The thread sleep time.</param>
         public PipelineStream(int capacity = 4096, int sleep = 1)
         {
             this.capacity = capacity.ToPrime();
@@ -112,48 +102,32 @@ namespace CatLib
         }
 
         /// <summary>
-        /// GC回收时
+        /// Release <see cref="PipelineStream"/> instance.
         /// </summary>
         ~PipelineStream()
         {
             Dispose(!disabled);
         }
 
-        /// <summary>
-        /// 设定流位置（不支持）
-        /// </summary>
-        /// <param name="offset">偏移量</param>
-        /// <param name="origin">偏移方向</param>
-        /// <returns></returns>
+        /// <inheritdoc />
         public override long Seek(long offset, SeekOrigin origin)
         {
             throw new NotSupportedException();
         }
 
-        /// <summary>
-        /// 设定流的长度
-        /// </summary>
-        /// <param name="value">长度</param>
+        /// <inheritdoc />
         public override void SetLength(long value)
         {
             length = Math.Max(0, value);
         }
 
-        /// <summary>
-        /// 刷新缓冲区
-        /// </summary>
+        /// <inheritdoc />
         public override void Flush()
         {
             // ignore
         }
 
-        /// <summary>
-        /// 将流中的数据读取到指定缓冲区
-        /// </summary>
-        /// <param name="buffer">指定缓冲区</param>
-        /// <param name="offset">缓冲区起始偏移量</param>
-        /// <param name="count">读取的长度</param>
-        /// <returns>实际读取的长度</returns>
+        /// <inheritdoc />
         public override int Read(byte[] buffer, int offset, int count)
         {
             while (true)
@@ -200,12 +174,7 @@ namespace CatLib
             }
         }
 
-        /// <summary>
-        /// 将指定缓冲区数据写入流中
-        /// </summary>
-        /// <param name="buffer">指定缓冲区</param>
-        /// <param name="offset">缓冲区起始偏移量</param>
-        /// <param name="count">写入的长度</param>
+        /// <inheritdoc />
         public override void Write(byte[] buffer, int offset, int count)
         {
             while (true)
@@ -238,9 +207,7 @@ namespace CatLib
             }
         }
 
-        /// <summary>
-        /// 关闭流
-        /// </summary>
+        /// <inheritdoc />
         public override void Close()
         {
             if (closed)
@@ -255,7 +222,7 @@ namespace CatLib
         }
 
         /// <summary>
-        /// 断言关闭
+        /// Assert whether the stream closed.
         /// </summary>
         protected void AssertClosed()
         {
@@ -266,7 +233,7 @@ namespace CatLib
         }
 
         /// <summary>
-        /// 断言释放
+        /// Assert whether the stream disabled.
         /// </summary>
         protected void AssertDisabled()
         {
@@ -276,10 +243,7 @@ namespace CatLib
             }
         }
 
-        /// <summary>
-        /// 释放资源
-        /// </summary>
-        /// <param name="disposing">是否进行释放</param>
+        /// <inheritdoc />
         protected override void Dispose(bool disposing)
         {
             if (!disposing || disabled)
