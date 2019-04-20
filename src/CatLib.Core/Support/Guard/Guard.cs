@@ -15,15 +15,15 @@ using System.Collections.Generic;
 namespace CatLib
 {
     /// <summary>
-    /// 守卫
+    /// Guard the code.
     /// </summary>
     public static class Guard
     {
         /// <summary>
-        /// 验证一个条件,并在该协定的条件失败时引发异常。
+        /// Verifies a condition and throws an exception if the condition of the contract fails.
         /// </summary>
-        /// <typeparam name="TException">异常</typeparam>
-        /// <param name="condition">条件</param>
+        /// <typeparam name="TException">Exception triggered when validation fails.</typeparam>
+        /// <param name="condition">The condition of the contract.</param>
         [System.Diagnostics.DebuggerNonUserCode]
         public static void Requires<TException>(bool condition) where TException : Exception, new()
         {
@@ -35,10 +35,10 @@ namespace CatLib
         }
 
         /// <summary>
-        /// 不为空或者null
+        /// Verifies is not empty or null.
         /// </summary>
-        /// <param name="argumentValue">参数值</param>
-        /// <param name="argumentName">参数名</param>
+        /// <param name="argumentValue">The parameter name.</param>
+        /// <param name="argumentName">The parameter name.</param>
         [System.Diagnostics.DebuggerNonUserCode]
         public static void NotEmptyOrNull(string argumentValue, string argumentName)
         {
@@ -49,11 +49,11 @@ namespace CatLib
         }
 
         /// <summary>
-        /// 长度大于0
+        /// Verifies the length is greater than 0
         /// </summary>
-        /// <typeparam name="T">类型</typeparam>
-        /// <param name="argumentValue">参数值</param>
-        /// <param name="argumentName">参数名</param>
+        /// <typeparam name="T">The type of parameter.</typeparam>
+        /// <param name="argumentValue">The parameter value.</param>
+        /// <param name="argumentName">The parameter name.</param>
         [System.Diagnostics.DebuggerNonUserCode]
         public static void CountGreaterZero<T>(IList<T> argumentValue, string argumentName)
         {
@@ -64,10 +64,10 @@ namespace CatLib
         }
 
         /// <summary>
-        /// 元素部位空或者null
+        /// Verifies the element not empty or null.
         /// </summary>
-        /// <param name="argumentValue">参数值</param>
-        /// <param name="argumentName">参数名</param>
+        /// <param name="argumentValue">The parameter value.</param>
+        /// <param name="argumentName">The parameter name.</param>
         [System.Diagnostics.DebuggerNonUserCode]
         public static void ElementNotEmptyOrNull(IList<string> argumentValue, string argumentName)
         {
@@ -81,10 +81,10 @@ namespace CatLib
         }
 
         /// <summary>
-        /// 内容不为空
+        /// Verifies the parameter not null.
         /// </summary>
-        /// <param name="argumentValue">参数值</param>
-        /// <param name="argumentName">参数名</param>
+        /// <param name="argumentValue">The parameter value.</param>
+        /// <param name="argumentName">The parameter name.</param>
         [System.Diagnostics.DebuggerNonUserCode]
         public static void NotNull(object argumentValue, string argumentName)
         {
