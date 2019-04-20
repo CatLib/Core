@@ -16,41 +16,41 @@ using System.Text.RegularExpressions;
 namespace CatLib
 {
     /// <summary>
-    /// 字符串
+    /// String helper.
     /// </summary>
     public static class Str
     {
         /// <summary>
-        /// 填充类型
+        /// Fill types.
         /// </summary>
         public enum PadTypes
         {
             /// <summary>
-            /// 填充字符串的两侧。如果不是偶数，则右侧获得额外的填充。
+            /// Fill both sides of the string. If it is not even, the right side gets extra padding.
             /// </summary>
             Both,
 
             /// <summary>
-            /// 填充字符串的左侧。
+            /// Fill the left side of the string.
             /// </summary>
             Left,
 
             /// <summary>
-            /// 填充字符串的右侧。默认。
+            /// Fill the right side of the string.
             /// </summary>
             Right
         }
 
         /// <summary>
-        /// 空格字符串
+        /// The space string.
         /// </summary>
         public const string Space = " ";
 
         /// <summary>
-        /// 获取字符串所表达的函数名
+        /// Get the function name expressed by the string.
         /// </summary>
-        /// <param name="pattern">输入字符串</param>
-        /// <returns>函数名</returns>
+        /// <param name="pattern">The string.</param>
+        /// <returns>The method name.</returns>
         public static string Method(string pattern)
         {
             if (string.IsNullOrEmpty(pattern))
@@ -95,25 +95,24 @@ namespace CatLib
         }
 
         /// <summary>
-        /// 将规定字符串翻译为星号匹配表达式
-        /// <para>即删减正则表达式中除了星号外的所有功能</para>
+        /// Translate the specified string into an asterisk match expression and test.
         /// </summary>
-        /// <param name="pattern">匹配表达式</param>
-        /// <param name="value">规定字符串</param>
-        /// <returns>是否匹配</returns>
+        /// <param name="pattern">The match pattern.</param>
+        /// <param name="value">The </param>
+        /// <returns>True if matches.</returns>
         public static bool Is(string pattern, string value)
         {
             return pattern == value || Regex.IsMatch(value, "^" + AsteriskWildcard(pattern) + "$");
         }
 
         /// <summary>
-        /// 通过星号匹配表达式来对规定数组进行匹配。
-        /// <para>任意匹配式符合则返回true。</para>
+        /// Translate the specified string into an asterisk match expression and test.
+        /// <para>Returns true if any match patten matches.</para>
         /// </summary>
-        /// <typeparam name="T">数组类型</typeparam>
-        /// <param name="patterns">匹配表达式</param>
-        /// <param name="source">规定数组</param>
-        /// <returns>是否通过检查</returns>
+        /// <typeparam name="T">The type of source array.</typeparam>
+        /// <param name="patterns">The match pattern.</param>
+        /// <param name="source">The source array.</param>
+        /// <returns>True if matches.</returns>
         public static bool Is<T>(string[] patterns, T source)
         {
             Guard.Requires<ArgumentNullException>(source != null);
@@ -131,11 +130,10 @@ namespace CatLib
         }
 
         /// <summary>
-        /// 将规定字符串翻译为星号匹配表达式
-        /// <para>即删减正则表达式中除了星号外的所有功能</para>
+        /// Translate the specified string into an asterisk match expression.
         /// </summary>
-        /// <param name="pattern">规定字符串</param>
-        /// <returns>处理后的字符串</returns>
+        /// <param name="pattern">The match pattern.</param>
+        /// <returns>Returns processed string.</returns>
         public static string AsteriskWildcard(string pattern)
         {
             pattern = Regex.Escape(pattern);
@@ -145,11 +143,11 @@ namespace CatLib
         }
 
         /// <summary>
-        /// 根据长度将字符串分割到数组中
+        /// Split a string into an array based on length.
         /// </summary>
-        /// <param name="str">要分割的字符串</param>
-        /// <param name="length">规定每个数组元素的长度。默认是 1。</param>
-        /// <returns>分割的字符串</returns>
+        /// <param name="str">The specified string.</param>
+        /// <param name="length">Specify the length of each array element.</param>
+        /// <returns>Returns an array of the string.</returns>
         public static string[] Split(string str, int length = 1)
         {
             Guard.Requires<ArgumentNullException>(str != null);
@@ -165,11 +163,11 @@ namespace CatLib
         }
 
         /// <summary>
-        /// 将字符串重复指定的次数
+        /// Repeat the specified number of times the string.
         /// </summary>
-        /// <param name="str">需要被重复的字符串</param>
-        /// <param name="num">重复的次数</param>
-        /// <returns>重复后的字符串</returns>
+        /// <param name="str">String that needs to be repeated.</param>
+        /// <param name="num">Number of repetitions.</param>
+        /// <returns>Return the repeated string.</returns>
         public static string Repeat(string str, int num)
         {
             Guard.Requires<ArgumentNullException>(str != null);
@@ -189,11 +187,11 @@ namespace CatLib
         }
 
         /// <summary>
-        /// 随机打乱字符串中的所有字符
+        /// Disrupt all characters in the string.
         /// </summary>
-        /// <param name="str">需要被打乱的字符串</param>
-        /// <param name="seed">种子</param>
-        /// <returns>被打乱的字符串</returns>
+        /// <param name="str">The specified string.</param>
+        /// <param name="seed">The random seed.</param>
+        /// <returns>Returns disrupted string.</returns>
         public static string Shuffle(string str, int? seed = null)
         {
             Guard.Requires<ArgumentNullException>(str != null);
@@ -221,15 +219,15 @@ namespace CatLib
         }
 
         /// <summary>
-        /// 计算子串在字符串中出现的次数
-        /// <para>该函数不计数重叠的子串</para>
+        /// Calculate the number of times a substring appears in a string.
+        /// <para>This function does not count overlapping substrings.</para>
         /// </summary>
-        /// <param name="str">规定字符串</param>
-        /// <param name="subStr">子字符串</param>
-        /// <param name="start">起始位置</param>
-        /// <param name="length">需要扫描的长度</param>
-        /// <param name="comparison">扫描规则</param>
-        /// <returns>子字符串出现的次数</returns>
+        /// <param name="str">The specified string.</param>
+        /// <param name="subStr">The substring.</param>
+        /// <param name="start">The starting position.</param>
+        /// <param name="length">The length to calculate.</param>
+        /// <param name="comparison">The string comparison.</param>
+        /// <returns>Returns the number of times a substring appears.</returns>
         public static int SubstringCount(string str, string subStr, int start = 0, int? length = null, StringComparison comparison = StringComparison.CurrentCultureIgnoreCase)
         {
             Guard.Requires<ArgumentNullException>(str != null);
@@ -254,10 +252,10 @@ namespace CatLib
         }
 
         /// <summary>
-        /// 反转规定字符串
+        /// Reverse specified string.
         /// </summary>
-        /// <param name="str">规定字符串</param>
-        /// <returns>反转后的字符串</returns>
+        /// <param name="str">The specified string.</param>
+        /// <returns>Returns reversed string.</returns>
         public static string Reverse(string str)
         {
             var chars = str.ToCharArray();
@@ -267,22 +265,18 @@ namespace CatLib
         }
 
         /// <summary>
-        /// 把字符串填充为新的长度。
+        /// Fill the string with the new length.
         /// </summary>
-        /// <param name="str">规定要填充的字符串</param>
-        /// <param name="length">规定新的字符串长度。如果该值小于字符串的原始长度，则不进行任何操作。</param>
-        /// <param name="padStr">
-        /// 规定供填充使用的字符串。默认是空白。
-        /// <para>如果传入的字符串长度小于等于0那么会使用空白代替。</para>
-        /// <para>注释：空白不是空字符串</para>
-        /// </param>
+        /// <param name="str">The string to be filled.</param>
+        /// <param name="length">The new string length. If the value is less than the original length of the string, no action is taken.</param>
+        /// <param name="padStr">A string to be used for padding. The default is blank.</param>
         /// <param name="type">
-        /// 规定填充字符串的哪边。
-        /// <para><see cref="PadTypes.Both"/>填充字符串的两侧。如果不是偶数，则右侧获得额外的填充。</para>
-        /// <para><see cref="PadTypes.Left"/>填充字符串的左侧。</para>
-        /// <para><see cref="PadTypes.Right"/>填充字符串的右侧。默认。</para>
+        /// Fill in which side of the string.
+        /// <para><see cref="PadTypes.Both"/>Fill both sides of the string. If not even, get extra padding on the right side.</para>
+        /// <para><see cref="PadTypes.Left"/>Fill the left side of the string.</para>
+        /// <para><see cref="PadTypes.Right"/>Fill the right side of the string.</para>
         /// </param>
-        /// <returns>被填充的字符串</returns>
+        /// <returns>Returns filled string.</returns>
         [Obsolete("The overload method wile be remove in 2.0 version.")]
         public static string Pad(string str, int length, string padStr = null, PadTypes type = PadTypes.Right)
         {
@@ -290,22 +284,18 @@ namespace CatLib
         }
 
         /// <summary>
-        /// 把字符串填充为新的长度。
+        /// Fill the string with the new length.
         /// </summary>
-        /// <param name="length">规定新的字符串长度。如果该值小于字符串的原始长度，则不进行任何操作。</param>
-        /// <param name="str">原始字符串,如果为null则为空值</param>
-        /// <param name="padStr">
-        /// 规定供填充使用的字符串。默认是空白。
-        /// <para>如果传入的字符串长度小于等于0那么会使用空白代替。</para>
-        /// <para>注释：空白不是空字符串</para>
-        /// </param>
+        /// <param name="str">The string to be filled.</param>
+        /// <param name="length">The new string length. If the value is less than the original length of the string, no action is taken.</param>
+        /// <param name="padStr">A string to be used for padding. The default is blank.</param>
         /// <param name="type">
-        /// 规定填充字符串的哪边。
-        /// <para><see cref="PadTypes.Both"/>填充字符串的两侧。如果不是偶数，则右侧获得额外的填充。</para>
-        /// <para><see cref="PadTypes.Left"/>填充字符串的左侧。</para>
-        /// <para><see cref="PadTypes.Right"/>填充字符串的右侧。默认。</para>
+        /// Fill in which side of the string.
+        /// <para><see cref="PadTypes.Both"/>Fill both sides of the string. If not even, get extra padding on the right side.</para>
+        /// <para><see cref="PadTypes.Left"/>Fill the left side of the string.</para>
+        /// <para><see cref="PadTypes.Right"/>Fill the right side of the string.</para>
         /// </param>
-        /// <returns>被填充的字符串</returns>
+        /// <returns>Returns filled string.</returns>
         public static string Pad(int length, string str = null, string padStr = null, PadTypes type = PadTypes.Right)
         {
             str = str ?? string.Empty;
@@ -344,12 +334,12 @@ namespace CatLib
         }
 
         /// <summary>
-        /// 在规定字符串中查找在规定搜索值，并在规定搜索值之后返回规定字符串的剩余部分。
-        /// <para>如果没有找到则返回规定字符串本身</para>
+        /// Finds the specified value in the string and returns the rest.
+        /// <para>If not found, return the specified string itself.</para>
         /// </summary>
-        /// <param name="str">规定字符串</param>
-        /// <param name="search">规定搜索值</param>
-        /// <returns>剩余部分</returns>
+        /// <param name="str">The specified string.</param>
+        /// <param name="search">The search value.</param>
+        /// <returns>The remaining part.</returns>
         public static string After(string str, string search)
         {
             Guard.Requires<ArgumentNullException>(str != null);
@@ -360,13 +350,13 @@ namespace CatLib
         }
 
         /// <summary>
-        /// 判断规定字符串是否包含规定子字符串
-        /// <para>子字符串是识别大小写的</para>
+        /// Determine whether the specified string contains the specified substring.
+        /// <para>Substrings are case sensitive.</para>
         /// <para></para>
         /// </summary>
-        /// <param name="str">规定字符串</param>
-        /// <param name="needles">规定子字符串</param>
-        /// <returns>是否包含</returns>
+        /// <param name="str">The specified string.</param>
+        /// <param name="needles">An array of the specified substring.</param>
+        /// <returns>True if contains substring.</returns>
         public static bool Contains(string str, params string[] needles)
         {
             Guard.Requires<ArgumentNullException>(str != null);
@@ -384,12 +374,12 @@ namespace CatLib
         }
 
         /// <summary>
-        /// 在规定字符串中替换匹配项
+        /// Replace the match in the specified string.
         /// </summary>
-        /// <param name="matches">匹配项</param>
-        /// <param name="replace">替换的值</param>
-        /// <param name="str">规定字符串</param>
-        /// <returns></returns>
+        /// <param name="matches">An array of the match string.</param>
+        /// <param name="replace">The replacement value.</param>
+        /// <param name="str">The specified string.</param>
+        /// <returns>Returns the replacement string.</returns>
         public static string Replace(string[] matches, string replace, string str)
         {
             Guard.Requires<ArgumentNullException>(matches != null);
@@ -404,13 +394,13 @@ namespace CatLib
         }
 
         /// <summary>
-        /// 替换规定字符串中第一次遇到的匹配项
-        /// <para>该函数对大小写敏感</para>
+        /// Replace the first occurrence of a match in the specified string.
+        /// <para>This function is case sensitive.</para>
         /// </summary>
-        /// <param name="match">匹配项</param>
-        /// <param name="replace">替换的内容</param>
-        /// <param name="str">规定字符串</param>
-        /// <returns>替换后的字符串</returns>
+        /// <param name="match">The match string.</param>
+        /// <param name="replace">The replacement value.</param>
+        /// <param name="str">The specified string.</param>
+        /// <returns>Returns the replacement string.</returns>
         public static string ReplaceFirst(string match, string replace, string str)
         {
             Guard.Requires<ArgumentNullException>(match != null);
@@ -422,13 +412,13 @@ namespace CatLib
         }
 
         /// <summary>
-        /// 替换规定字符串中从后往前第一次遇到的匹配项
-        /// <para>该函数对大小写敏感</para>
+        /// Replaces the first occurrence of a match in the specified string from the back to the front.
+        /// <para>This function is case sensitive.</para>
         /// </summary>
-        /// <param name="match">匹配项</param>
-        /// <param name="replace">替换的内容</param>
-        /// <param name="str">规定字符串</param>
-        /// <returns>替换后的字符串</returns>
+        /// <param name="match">The match string.</param>
+        /// <param name="replace">The replacement value.</param>
+        /// <param name="str">The specified string.</param>
+        /// <returns>Returns the replacement string.</returns>
         public static string ReplaceLast(string match, string replace, string str)
         {
             Guard.Requires<ArgumentNullException>(match != null);
@@ -440,11 +430,11 @@ namespace CatLib
         }
 
         /// <summary>
-        /// 生成一个随机字母（含大小写），数字的字符串。
+        /// Generate a random letter (with case), a string of numbers.
         /// </summary>
-        /// <param name="length">字符串长度</param>
-        /// <param name="seed">种子</param>
-        /// <returns>随机的字符串</returns>
+        /// <param name="length">The length of the generate string.</param>
+        /// <param name="seed">The random seed.</param>
+        /// <returns>The random string.</returns>
         public static string Random(int length = 16, int? seed = null)
         {
             Guard.Requires<ArgumentOutOfRangeException>(length > 0);
@@ -465,14 +455,15 @@ namespace CatLib
         }
 
         /// <summary>
-        /// 如果长度超过给定的最大字符串长度，则截断字符串。 截断的字符串的最后一个字符将替换为缺省字符串
+        /// If the length exceeds the given maximum string length, the string is truncated.
+        /// The last character of the truncated string will be replaced with the mission string.
         /// <para>eg: Str.Truncate("hello world , the sun is shine", 15, Str.Space) => hello world...</para>
         /// </summary>
-        /// <param name="str">要截断的字符串</param>
-        /// <param name="length">截断长度(含缺省字符长度)</param>
-        /// <param name="separator">临近的分隔符，如果设定则截断长度为截断长度最近的分隔符位置,如果传入的是一个正则表达式那么使用正则匹配。</param>
-        /// <param name="mission">缺省字符</param>
-        /// <returns>截断后的字符串</returns>
+        /// <param name="str">The string to be truncated.</param>
+        /// <param name="length">Truncation length (with default character length).</param>
+        /// <param name="separator">The adjacent separator, if set, truncates the separator position with the length of the truncation length, and uses a regular match if a regular expression is passed.</param>
+        /// <param name="mission">The mission string.</param>
+        /// <returns>Reutrns truncated string.</returns>
         public static string Truncate(string str, int length, object separator = null, string mission = null)
         {
             if (str == null || length > str.Length)
@@ -521,13 +512,14 @@ namespace CatLib
         }
 
         /// <summary>
-        /// 计算两个字符串之间的相似度。
+        /// Calculate Levenshtein distance between two strings
         /// </summary>
-        /// <param name="str1">字符串 1.</param>
-        /// <param name="str2">字符串 2.</param>
+        /// <param name="str1">The string 1.</param>
+        /// <param name="str2">The string 2.</param>
         /// <returns>
-        /// 通过Levenshtein算法返回两个字符串的相似度。如果两个字符串之间的
-        /// 任意一个参数长度大于255那么。将会返回-1。
+        /// This function returns the Levenshtein-Distance between the two argument 
+        /// strings or -1, if one of the argument strings is longer than the limit 
+        /// of 255 characters.
         /// </returns>
         public static int Levenshtein(string str1, string str2)
         {
