@@ -88,7 +88,7 @@ namespace CatLib
         /// <summary>
         /// 构建一个新的环型缓冲区实例
         /// </summary>
-        /// <param name="capacity">容量,将为临近2的次方（向上取）</param>
+        /// <param name="capacity">容量,将为临近2的次方(向上取）</param>
         /// <param name="exposable">是否可以访问内部数组</param>
         public RingBuffer(int capacity = 8192, bool exposable = true)
         {

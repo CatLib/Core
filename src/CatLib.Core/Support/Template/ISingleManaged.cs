@@ -14,7 +14,7 @@ using System;
 namespace CatLib
 {
     /// <summary>
-    /// 管理器模版（拓展解决方案为单例）- 扩展内容不对外可见
+    /// 管理器模版(拓展解决方案为单例）- 扩展内容不对外可见
     /// </summary>
     public interface ISingleManaged<TInterface> : IManaged<TInterface>
     {

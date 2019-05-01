@@ -84,8 +84,8 @@ namespace CatLib
         /// <summary>
         /// 根据分数区间移除区间内的元素
         /// </summary>
-        /// <param name="startScore">开始的分数（包含）</param>
-        /// <param name="stopScore">结束的分数（包含）</param>
+        /// <param name="startScore">开始的分数(包含）</param>
+        /// <param name="stopScore">结束的分数(包含）</param>
         /// <returns>被删除的元素个数</returns>
         int RemoveRangeByScore(TScore startScore, TScore stopScore);
 
@@ -114,8 +114,8 @@ namespace CatLib
         /// <summary>
         /// 根据分数区间获取区间内的所有元素
         /// </summary>
-        /// <param name="startScore">开始的分数（包含）</param>
-        /// <param name="stopScore">结束的分数（包含）</param>
+        /// <param name="startScore">开始的分数(包含）</param>
+        /// <param name="stopScore">结束的分数(包含）</param>
         /// <returns>元素列表</returns>
         TElement[] GetElementRangeByScore(TScore startScore, TScore stopScore);
 
