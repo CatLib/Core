@@ -15,16 +15,16 @@ using System.Collections.Generic;
 namespace CatLib
 {
     /// <summary>
-    /// 数组
+    /// Array helper.
     /// </summary>
     public static class Arr
     {
         /// <summary>
-        /// 将多个规定数组合并成一个数组
+        /// Combine multiple specified arrays into one array.
         /// </summary>
-        /// <typeparam name="T">数组类型</typeparam>
-        /// <param name="sources">规定数组</param>
-        /// <returns>合并后的数组</returns>
+        /// <typeparam name="T">The type of array.</typeparam>
+        /// <param name="sources">The specified array.</param>
+        /// <returns>Returns an merged array.</returns>
         public static T[] Merge<T>(params T[][] sources)
         {
             Guard.Requires<ArgumentNullException>(sources != null);
@@ -59,12 +59,12 @@ namespace CatLib
         }
 
         /// <summary>
-        /// 从规定数组中获取一个或者指定数量的随机值
+        /// Get a specified number of random values from a specified array.
         /// </summary>
-        /// <typeparam name="T">数组类型</typeparam>
-        /// <param name="source">规定数组</param>
-        /// <param name="number">随机的数量</param>
-        /// <returns>随机后的元素</returns>
+        /// <typeparam name="T">The type of array.</typeparam>
+        /// <param name="source">The specified array.</param>
+        /// <param name="number">The specified number.</param>
+        /// <returns>An array of the random value.</returns>
         public static T[] Rand<T>(T[] source, int number = 1)
         {
             Guard.Requires<ArgumentNullException>(source != null);
@@ -85,12 +85,12 @@ namespace CatLib
         }
 
         /// <summary>
-        /// 将规定数组中的元素打乱
+        /// Disrupt the elements in the specified array.
         /// </summary>
-        /// <typeparam name="T">数组类型</typeparam>
-        /// <param name="source">规定数组</param>
-        /// <param name="seed">种子</param>
-        /// <returns>打乱后的数组</returns>
+        /// <typeparam name="T">The type of array.</typeparam>
+        /// <param name="source">The specified array.</param>
+        /// <param name="seed">The random seed.</param>
+        /// <returns>Return the disrupted array.</returns>
         public static T[] Shuffle<T>(T[] source, int? seed = null)
         {
             Guard.Requires<ArgumentNullException>(source != null);
@@ -114,22 +114,25 @@ namespace CatLib
         }
 
         /// <summary>
-        /// 从数组中移除指定长度的元素，如果给定了<paramref name="replSource"/>参数，那么新元素从<paramref name="start"/>位置开始插入
+        /// Removes an element of the specified length from the array. If 
+        /// the <paramref name="replSource"/> parameter is given, the new 
+        /// element is inserted from the <paramref name="start"/> position.
         /// </summary>
-        /// <typeparam name="T">数组类型</typeparam>
-        /// <param name="source">规定数组</param>
+        /// <typeparam name="T">The type of array.</typeparam>
+        /// <param name="source">The specified array.</param>
         /// <param name="start">
-        /// 删除元素的开始位置。
-        /// <para>如果该值设置为正数，则从前往后开始删除</para>
-        /// <para>如果该值设置为负数，则从后向前取 <paramref name="start"/> 绝对值。-2 意味着从数组的倒数第二个元素开始</para></param>
-        /// <param name="length">
-        /// 删除元素的个数，也是被返回数组的长度
-        /// <para>如果该值设置为整数，则返回该数量的元素。</para>
-        /// <para>如果该值设置为负数，则则从后向前取 <paramref name="length"/> 绝对值位置终止删除。-1 意味着从数组的倒数第一个元素前删除</para>
-        /// <para>如果该值未设置，则返回从 <paramref name="start"/> 参数设置的位置开始直到数组末端的所有元素。</para>
+        /// Delete the start position of the element.
+        /// <para>If the value is set to a positive number, delete it from the beginning of the trip.</para>
+        /// <para>If the value is set to a negative number, the <paramref name="start"/> absolute value is taken from the back.</para>
         /// </param>
-        /// <param name="replSource">在start位置插入的数组</param>
-        /// <returns>被删除的数组</returns>
+        /// <param name="length">
+        /// Number of deleted elements.
+        /// <para>If the value is set to a positive number, then the number of elements is returned。</para>
+        /// <para>If the value is set to a negative number, then remove the <paramref name="length"/> absolute position from the back to the front to delete.</para>
+        /// <para>If the value is not set, then all elements from the position set by the <paramref name="start"/> parameter to the end of the array are returned.</para>
+        /// </param>
+        /// <param name="replSource">An array inserted at the start position.</param>
+        /// <returns>An removed array.</returns>
         public static T[] Splice<T>(ref T[] source, int start, int? length = null, T[] replSource = null)
         {
             Guard.Requires<ArgumentNullException>(source != null);
@@ -140,7 +143,6 @@ namespace CatLib
 
             if (length.Value == source.Length)
             {
-                // 现在移除所有旧的元素，然后用新的元素替换。
                 Array.Copy(source, requested, source.Length);
                 source = replSource ?? new T[] { };
                 return requested;
@@ -151,22 +153,22 @@ namespace CatLib
             if (replSource == null || replSource.Length == 0)
             {
                 var newSource = new T[source.Length - length.Value];
-                // 现在只删除不插入
                 if (start > 0)
                 {
                     Array.Copy(source, 0, newSource, 0, start);
                 }
+
                 Array.Copy(source, start + length.Value, newSource, start, source.Length - (start + length.Value));
                 source = newSource;
             }
             else
             {
                 var newSource = new T[source.Length - length.Value + replSource.Length];
-                // 删除并且插入
                 if (start > 0)
                 {
                     Array.Copy(source, 0, newSource, 0, start);
                 }
+
                 Array.Copy(replSource, 0, newSource, start, replSource.Length);
                 Array.Copy(source, start + length.Value, newSource, start + replSource.Length,
                     source.Length - (start + length.Value));
@@ -177,11 +179,11 @@ namespace CatLib
         }
 
         /// <summary>
-        /// 修剪数组
+        /// Cut the array.
         /// </summary>
-        /// <typeparam name="T">数组类型</typeparam>
-        /// <param name="source">源数组</param>
-        /// <param name="count">裁剪范围，负数为从后向前修剪</param>
+        /// <typeparam name="T">The type of array.</typeparam>
+        /// <param name="source">The source array.</param>
+        /// <param name="count">Crop range, negative numbers are trimmed from back to front.</param>
         public static void Cut<T>(ref T[] source, int count)
         {
             if (source == null || source.Length <= 0 || count == 0)
@@ -211,13 +213,14 @@ namespace CatLib
         }
 
         /// <summary>
-        /// 将数组分为新的数组块
-        /// <para>其中每个数组的单元数目由 <paramref name="size"/> 参数决定。最后一个数组的单元数目可能会少几个。</para>
+        /// Divide an array into new array blocks.
+        /// <para>The number of cells in each array is determined by 
+        /// the <paramref name="size"/> parameter. The number of cells in the last array may be a few.</para>
         /// </summary>
-        /// <typeparam name="T">数组类型</typeparam>
-        /// <param name="source">规定数组</param>
-        /// <param name="size">每个分块的大小</param>
-        /// <returns></returns>
+        /// <typeparam name="T">The type of array.</typeparam>
+        /// <param name="source">The specified array.</param>
+        /// <param name="size">The size of the block.</param>
+        /// <returns>Return an array of the block.</returns>
         public static T[][] Chunk<T>(T[] source, int size)
         {
             Guard.Requires<ArgumentNullException>(source != null);
@@ -244,14 +247,14 @@ namespace CatLib
         }
 
         /// <summary>
-        /// 对数组进行填充，如果传入了规定数组，那么会在规定数组的基础上进行填充
+        /// Fill the array, if the specified array is passed in, it will be filled based on the specified array.
         /// </summary>
-        /// <typeparam name="T">数组类型</typeparam>
-        /// <param name="start">起始下标</param>
-        /// <param name="length">填充长度</param>
-        /// <param name="value">填充的值</param>
-        /// <param name="source">规定数组</param>
-        /// <returns>填充后的数组</returns>
+        /// <typeparam name="T">The type of array.</typeparam>
+        /// <param name="start">The starting index.</param>
+        /// <param name="length">The filling length.</param>
+        /// <param name="value">The filling value.</param>
+        /// <param name="source">The specified array.</param>
+        /// <returns>Returns an filled array.</returns>
         public static T[] Fill<T>(int start, int length, T value, T[] source = null)
         {
             Guard.Requires<ArgumentOutOfRangeException>(start >= 0);
@@ -278,12 +281,14 @@ namespace CatLib
         }
 
         /// <summary>
-        /// 将数组每个值传给回调函数，如果回调函数返回 true，则移除数组中对应的元素，并返回被移除的元素
+        /// Pass each value of the array to the callback function, if the callback
+        /// function returns true, remove the corresponding element in the array
+        /// and return the removed element
         /// </summary>
-        /// <typeparam name="T">数组类型</typeparam>
-        /// <param name="source">规定数组</param>
-        /// <param name="predicate">回调函数</param>
-        /// <returns>被移除的数组</returns>
+        /// <typeparam name="T">The type of array.</typeparam>
+        /// <param name="source">The specified array.</param>
+        /// <param name="predicate">The callback.</param>
+        /// <returns>Returns an removed array.</returns>
         public static T[] Remove<T>(ref T[] source, Predicate<T> predicate)
         {
             Guard.Requires<ArgumentNullException>(source != null);
@@ -312,13 +317,15 @@ namespace CatLib
         }
 
         /// <summary>
-        /// 输入数组中的每个值传给回调函数,如果回调函数和期望值(<paramref name="expected"/>)相等，则把输入数组中的当前值加入结果数组中
+        /// Each value in the source array is passed to the callback function. 
+        /// If the callback function is equal to the <paramref name="expected"/> 
+        /// value, the current value in the input array is added to the result array.
         /// </summary>
-        /// <typeparam name="T">数组类型</typeparam>
-        /// <param name="source">规定数组</param>
-        /// <param name="predicate">回调函数</param>
-        /// <param name="expected">回调函数的期望值</param>
-        /// <returns>需求数组</returns>
+        /// <typeparam name="T">The type of array.</typeparam>
+        /// <param name="source">The specified array.</param>
+        /// <param name="predicate">The callback.</param>
+        /// <param name="expected">The expected value.</param>
+        /// <returns>Returns an filtered array.</returns>
         public static T[] Filter<T>(T[] source, Predicate<T> predicate, bool expected = true)
         {
             Guard.Requires<ArgumentNullException>(source != null);
@@ -339,13 +346,15 @@ namespace CatLib
         }
 
         /// <summary>
-        /// 将规定迭代器中的每个值传给回调函数,如果回调函数和期望值(<paramref name="expected"/>)相等，则把规定迭代器中的当前值加入结果数组中
+        /// Each value in the source array is passed to the callback function. 
+        /// If the callback function is equal to the <paramref name="expected"/> 
+        /// value, the current value in the input array is added to the result array.
         /// </summary>
-        /// <typeparam name="T">数组类型</typeparam>
-        /// <param name="source">规定迭代器</param>
-        /// <param name="predicate">回调函数</param>
-        /// <param name="expected">回调函数的期望值</param>
-        /// <returns>需求数组</returns>
+        /// <typeparam name="T">The type of array.</typeparam>
+        /// <param name="source">The specified array.</param>
+        /// <param name="predicate">The callback.</param>
+        /// <param name="expected">The expected value.</param>
+        /// <returns>Returns an filtered array.</returns>
         public static T[] Filter<T>(IEnumerable<T> source, Predicate<T> predicate, bool expected = true)
         {
             Guard.Requires<ArgumentNullException>(source != null);
@@ -364,13 +373,14 @@ namespace CatLib
         }
 
         /// <summary>
-        /// 将数组值传入用户自定义函数，自定义函数返回的值作为新的数组值
+        /// Pass the array value into the callback function, the value returned
+        /// by the custom function as the new array value
         /// </summary>
-        /// <typeparam name="T">数组类型</typeparam>
-        /// <typeparam name="TReturn">返回值类型</typeparam>
-        /// <param name="source">规定数组</param>
-        /// <param name="callback">自定义函数</param>
-        /// <returns>处理后的数组</returns>
+        /// <typeparam name="T">The type of array.</typeparam>
+        /// <typeparam name="TReturn">The type of return value.</typeparam>
+        /// <param name="source">The specified array.</param>
+        /// <param name="callback">The callback.</param>
+        /// <returns>Returns an new array.</returns>
         public static TReturn[] Map<T, TReturn>(T[] source, Func<T, TReturn> callback)
         {
             Guard.Requires<ArgumentNullException>(callback != null);
@@ -390,13 +400,14 @@ namespace CatLib
         }
 
         /// <summary>
-        /// 将迭代器的值传入用户自定义函数，自定义函数返回的值作为新的数组值
+        /// Pass the value of the iterator into the callback function, and the
+        /// value returned by the custom function as the new array value.
         /// </summary>
-        /// <typeparam name="T">数组类型</typeparam>
-        /// <typeparam name="TReturn">返回值类型</typeparam>
-        /// <param name="source">规定迭代器</param>
-        /// <param name="callback">自定义函数</param>
-        /// <returns>处理后的数组</returns>
+        /// <typeparam name="T">The type of array.</typeparam>
+        /// <typeparam name="TReturn">The type of return value.</typeparam>
+        /// <param name="source">The source iterator.</param>
+        /// <param name="callback">The callback.</param>
+        /// <returns>Returns an new array.</returns>
         public static TReturn[] Map<T, TReturn>(IEnumerable<T> source, Func<T, TReturn> callback)
         {
             Guard.Requires<ArgumentNullException>(callback != null);
@@ -416,11 +427,12 @@ namespace CatLib
         }
 
         /// <summary>
-        /// 删除数组中的最后一个元素，并将删除的元素作为返回值返回
+        /// Delete the last element in the array and return the deleted element
+        /// as the return value.
         /// </summary>
-        /// <typeparam name="T">删除数组中的最后一个元素</typeparam>
-        /// <param name="source">规定数组</param>
-        /// <returns>被删除的元素</returns>
+        /// <typeparam name="T">The type of the array.</typeparam>
+        /// <param name="source">The specified array.</param>
+        /// <returns>Returns removed element.</returns>
         public static T Pop<T>(ref T[] source)
         {
             Guard.Requires<ArgumentNullException>(source != null);
@@ -432,12 +444,12 @@ namespace CatLib
         }
 
         /// <summary>
-        /// 将一个或多个元素加入数组尾端
+        /// Add one or more elements to the end of the array
         /// </summary>
-        /// <typeparam name="T">数组类型</typeparam>
-        /// <param name="source">规定数组</param>
-        /// <param name="elements">要加入的元素</param>
-        /// <returns>数组的元素个数</returns>
+        /// <typeparam name="T">The type of array.</typeparam>
+        /// <param name="source">The specified array.</param>
+        /// <param name="elements">The added elements.</param>
+        /// <returns>Returns the length of the new array.</returns>
         public static int Push<T>(ref T[] source, params T[] elements)
         {
             Guard.Requires<ArgumentNullException>(source != null);
@@ -450,15 +462,16 @@ namespace CatLib
         }
 
         /// <summary>
-        /// 向用户自定义函数发送数组中的值，并返回一个字符串
-        /// <para>如果数组是空的且未传递<paramref name="initial"/>参数，该函数返回 null</para>
-        /// <para>如果指定了<paramref name="initial"/>参数，则该参数将被当成是数组中的第一个值来处理，如果数组为空的话就作为最终返回值(string)</para>
+        /// Pass a value from an array to a callback function and return a string.
+        /// <para>The function returns null if the array is empty and the <paramref name="initial"/> parameter is not passed.</para>
+        /// <para>If the <paramref name="initial"/> parameter is specified, the parameter will be treated as the first value
+        /// in the array, and if the array is empty, it will be the final return value (string).</para>
         /// </summary>
-        /// <typeparam name="T">数组类型</typeparam>
-        /// <param name="source">规定数组</param>
-        /// <param name="callback">自定义函数</param>
-        /// <param name="initial">初始值</param>
-        /// <returns></returns>
+        /// <typeparam name="T">The type of array.</typeparam>
+        /// <param name="source">The specified array.</param>
+        /// <param name="callback">The callback.</param>
+        /// <param name="initial">The initial value.</param>
+        /// <returns>Returnd the processed string.</returns>
         public static string Reduce<T>(T[] source, Func<object, T, string> callback, object initial = null)
         {
             Guard.Requires<ArgumentNullException>(source != null);
@@ -473,22 +486,22 @@ namespace CatLib
         }
 
         /// <summary>
-        /// 在数组中根据条件取出一段值，并返回。
+        /// Take a value from the array according to the condition and return.
         /// </summary>
-        /// <typeparam name="T">数组类型</typeparam>
-        /// <param name="source">规定数组</param>
+        /// <typeparam name="T">The type of array.</typeparam>
+        /// <param name="source">The specified array.</param>
         /// <param name="start">
-        /// 取出元素的开始位置。
-        /// <para>如果该值设置为正数，则从前往后开始取</para>
-        /// <para>如果该值设置为负数，则从后向前取 <paramref name="start"/> 绝对值。-2 意味着从数组的倒数第二个元素开始</para>
+        /// Remove the starting position of the element.
+        /// <para>If the value is set to a positive number, it will be taken from the beginning of the trip.</para>
+        /// <para>If the value is set to a negative number, the <paramref name="start"/> absolute value is taken from the back.</para>
         /// </param>
         /// <param name="length">
-        /// 被返回数组的长度
-        /// <para>如果该值设置为整数，则返回该数量的元素。</para>
-        /// <para>如果该值设置为负数，则则从后向前取 <paramref name="length"/> 绝对值位置终止取出。-1 意味着从数组的倒数第一个元素前终止</para>
-        /// <para>如果该值未设置，则返回从 <paramref name="start"/> 参数设置的位置开始直到数组末端的所有元素。</para>
+        /// Returns the length of the array.
+        /// <para>If the value is set to a positive number, then the number of elements is returned。</para>
+        /// <para>If the value is set to a negative number, then remove the <paramref name="length"/> absolute position from the back to the front to delete.</para>
+        /// <para>If the value is not set, then all elements from the position set by the <paramref name="start"/> parameter to the end of the array are returned.</para>
         /// </param>
-        /// <returns>取出的数组</returns>
+        /// <returns>Returns an new array.</returns>
         public static T[] Slice<T>(T[] source, int start, int? length = null)
         {
             Guard.Requires<ArgumentNullException>(source != null);
@@ -502,11 +515,11 @@ namespace CatLib
         }
 
         /// <summary>
-        /// 删除数组中第一个元素，并返回被删除元素的值
+        /// Removed the first element in the array and return the value of the removed element.
         /// </summary>
-        /// <typeparam name="T">数组类型</typeparam>
-        /// <param name="source">规定数组</param>
-        /// <returns>被删除元素的值</returns>
+        /// <typeparam name="T">The type of array.</typeparam>
+        /// <param name="source">The specified array.</param>
+        /// <returns>Returns the removed value.</returns>
         public static T Shift<T>(ref T[] source)
         {
             Guard.Requires<ArgumentNullException>(source != null);
@@ -522,12 +535,12 @@ namespace CatLib
         }
 
         /// <summary>
-        /// 向数组插入新元素。新数组的值将被插入到数组的开头。
+        /// Add a new element at the beginning of the array.
         /// </summary>
-        /// <typeparam name="T">数组类型</typeparam>
-        /// <param name="source">规定数组</param>
-        /// <param name="elements">插入的元素</param>
-        /// <returns>数组元素个数</returns>
+        /// <typeparam name="T">The type of array.</typeparam>
+        /// <param name="source">The specified array.</param>
+        /// <param name="elements">The added element.</param>
+        /// <returns>Returns the length of the new array.</returns>
         public static int Unshift<T>(ref T[] source, params T[] elements)
         {
             Guard.Requires<ArgumentNullException>(source != null);
@@ -544,19 +557,19 @@ namespace CatLib
         }
 
         /// <summary>
-        /// 以相反的顺序返回数组
+        /// Return arrays in reverse order.
         /// </summary>
-        /// <typeparam name="T">数组类型</typeparam>
-        /// <param name="source">规定数组</param>
+        /// <typeparam name="T">The type of array.</typeparam>
+        /// <param name="source">The specified array.</param>
         /// <param name="start">
-        /// 起始元素的开始位置。
-        /// <para>如果该值设置为正数，则从前往后开始取</para>
-        /// <para>如果该值设置为负数，则从后向前取 <paramref name="start"/> 绝对值。-2 意味着从数组的倒数第二个元素开始</para></param>
+        /// The starting position of the starting element.
+        /// <para>If the value is set to a positive number, it will be taken from the beginning of the trip.</para>
+        /// <para>If the value is set to a negative number, the <paramref name="start"/> absolute value is taken from the back.</para></param>
         /// <param name="length">
-        /// 被返回数组的长度
-        /// <para>如果该值设置为整数，则返回该数量的元素。</para>
-        /// <para>如果该值设置为负数，则则从后向前取 <paramref name="length"/> 绝对值位置终止取出。-1 意味着从数组的倒数第一个元素前终止</para>
-        /// <para>如果该值未设置，则返回从 <paramref name="start"/> 参数设置的位置开始直到数组末端的所有元素。</para>
+        /// Returns the length of the array.
+        /// <para>If the value is set to a positive number, then the number of elements is returned。</para>
+        /// <para>If the value is set to a negative number, then remove the <paramref name="length"/> absolute position from the back to the front to delete.</para>
+        /// <para>If the value is not set, then all elements from the position set by the <paramref name="start"/> parameter to the end of the array are returned.</para>
         /// </param>
         /// <returns>反转的数组</returns>
         public static T[] Reverse<T>(T[] source, int start = 0, int? length = null)
@@ -579,12 +592,13 @@ namespace CatLib
         }
 
         /// <summary>
-        /// 从数组中检索符合全部匹配值的初始元素下标，如果返回-1则代表没有出现
+        /// Retrieve the initial element index that matches all matching values from the array.
+        /// If it returns -1, it means that it does not appear.
         /// </summary>
-        /// <typeparam name="T">数组类型</typeparam>
-        /// <param name="source">规定数组</param>
-        /// <param name="match">要匹配的值，如果有多个，只有全部的匹配才算匹配</param>
-        /// <returns>如果要检索的值没有出现，则该方法返回 -1</returns>
+        /// <typeparam name="T">The type of array.</typeparam>
+        /// <param name="source">The specified array.</param>
+        /// <param name="match">The value to match, if there are more than one, only all matches will match.</param>
+        /// <returns>Returning -1 means that the specified value was not retrieved.</returns>
         public static int IndexOf<T>(T[] source, params T[] match)
         {
             if (match == null || match.Length <= 0
@@ -622,12 +636,13 @@ namespace CatLib
         }
 
         /// <summary>
-        /// 从数组中检索指定的任意匹配值所在的下标，如果返回-1则代表没有出现
+        /// Retrieve the subscript of the specified arbitrary matching value from the array.
+        /// If it returns -1, it means that it does not appear.
         /// </summary>
-        /// <typeparam name="T">数组类型</typeparam>
-        /// <param name="source">规定数组</param>
-        /// <param name="match">要匹配的值</param>
-        /// <returns>如果要检索的值没有出现，则该方法返回 -1</returns>
+        /// <typeparam name="T">The type of array.</typeparam>
+        /// <param name="source">The specified array.</param>
+        /// <param name="match">The value to match.Match as long as there is an element match.</param>
+        /// <returns>Returning -1 means that the specified value was not retrieved.</returns>
         public static int IndexOfAny<T>(T[] source, params T[] match)
         {
             if (match == null || match.Length <= 0
@@ -651,12 +666,12 @@ namespace CatLib
         }
 
         /// <summary>
-        /// 排除掉数组中的指定值
+        /// Exclude the specified value in the array.
         /// </summary>
-        /// <typeparam name="T">数组类型</typeparam>
-        /// <param name="source">需要过滤的数组</param>
-        /// <param name="match">数组需要排除掉的值</param>
-        /// <returns>过滤后的数组</returns>
+        /// <typeparam name="T">The type of array.</typeparam>
+        /// <param name="source">The source array.</param>
+        /// <param name="match">An array of exclude value.</param>
+        /// <returns>Returns an array of processed.</returns>
         public static T[] Difference<T>(T[] source, params T[] match)
         {
             Guard.Requires<ArgumentNullException>(source != null);
@@ -679,13 +694,13 @@ namespace CatLib
         }
 
         /// <summary>
-        /// 移除并返回指定下标的数组元素
-        /// <para>如果下标传入的是负数那么将会从末尾移除</para>
+        /// Remove and return the array element of the specified index.
+        /// <para>If the index is passed a negative number then it will be removed from the end.</para>
         /// </summary>
-        /// <typeparam name="T">数组类型</typeparam>
-        /// <param name="source">规定数组</param>
-        /// <param name="index">数组下标</param>
-        /// <returns>被移除的元素</returns>
+        /// <typeparam name="T">The type of array.</typeparam>
+        /// <param name="source">The specified array.</param>
+        /// <param name="index">The index of array.</param>
+        /// <returns>Returns removed element.</returns>
         public static T RemoveAt<T>(ref T[] source, int index)
         {
             Guard.Requires<ArgumentNullException>(source != null);
@@ -696,13 +711,14 @@ namespace CatLib
         }
 
         /// <summary>
-        /// 临时性的回调元素，如果遇到异常或者完成回调后会进行回滚元素回调
+        /// A temporary callback element that rolls back element callbacks
+        /// if an exception is encountered or a callback is completed.
         /// </summary>
-        /// <typeparam name="T">数组类型</typeparam>
-        /// <param name="source">规定数组</param>
-        /// <param name="process">顺序回调</param>
-        /// <param name="completed">所有回调完成后</param>
-        /// <param name="rollback">回滚回调</param>
+        /// <typeparam name="T">The type of array.</typeparam>
+        /// <param name="source">The specified array.</param>
+        /// <param name="process">The order callback.</param>
+        /// <param name="completed">After all callbacks are completed.</param>
+        /// <param name="rollback">Rollback callback.</param>
         public static void Flash<T>(T[] source, Action<T> process, Action<T> rollback, Action completed)
         {
             Guard.Requires<ArgumentNullException>(source != null);
@@ -734,13 +750,13 @@ namespace CatLib
         }
 
         /// <summary>
-        /// 将规定数组传递给检查器进行检查。
-        /// <para>只有当所有元素通过检查器均为false，那么函数返回false。</para>
+        /// Pass the specified array to the callback test.
+        /// <para>The function returns false only if all elements pass the checker are false.</para>
         /// </summary>
-        /// <typeparam name="T">数组类型</typeparam>
-        /// <param name="source">规定数组</param>
-        /// <param name="predicate">检查器</param>
-        /// <returns>是否通过检查</returns>
+        /// <typeparam name="T">The type of array.</typeparam>
+        /// <param name="source">The specified array.</param>
+        /// <param name="predicate">The callback.</param>
+        /// <returns>True if pass the test.</returns>
         public static bool Test<T>(T[] source, Predicate<T> predicate)
         {
             Guard.Requires<ArgumentNullException>(source != null);
@@ -758,12 +774,13 @@ namespace CatLib
         }
 
         /// <summary>
-        /// 查找规定数组中的指定元素，如果找到了则使用替代值替换，否则在规定数组尾部增加替换值。
+        /// Finds the specified element in the specified array, and replaces it with a substitute value if found,
+        /// otherwise adds a replacement value at the end of the specified array.
         /// </summary>
-        /// <typeparam name="T">数组类型</typeparam>
-        /// <param name="source">规定数组</param>
-        /// <param name="predicate">返回true则覆盖当前元素内容</param>
-        /// <param name="value">替换值</param>
+        /// <typeparam name="T">The type of array.</typeparam>
+        /// <param name="source">The specified array.</param>
+        /// <param name="predicate">The callback to find element.</param>
+        /// <param name="value">The replacement value.</param>
         public static void Set<T>(ref T[] source, Predicate<T> predicate, T value)
         {
             Guard.Requires<ArgumentNullException>(predicate != null);

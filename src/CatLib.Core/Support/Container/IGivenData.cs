@@ -14,31 +14,24 @@ using System;
 namespace CatLib
 {
     /// <summary>
-    /// 绑定关系临时数据,用于支持链式调用
+    /// Indicates the given relationship in the context.
     /// </summary>
-    /// <typeparam name="TReturn">返回类型</typeparam>
+    /// <typeparam name="TReturn">The type of the <see cref="IBindable"/>.</typeparam>
     public interface IGivenData<TReturn>
         where TReturn : IBindable
     {
         /// <summary>
-        /// 给与什么服务
+        /// Give the specified service.
         /// </summary>
-        /// <param name="service">给与的服务名或别名</param>
-        /// <returns>服务绑定数据</returns>
+        /// <param name="service">The service name or alias.</param>
+        /// <returns>The instance of the <see cref="IBindData"/></returns>
         TReturn Given(string service);
 
-        /// <summary>
-        /// 给与什么服务
-        /// </summary>
-        /// <typeparam name="TService">给与的服务名或别名</typeparam>
-        /// <returns>服务绑定数据</returns>
+        /// <inheritdoc cref="Given(string)"/>
         TReturn Given<TService>();
 
-        /// <summary>
-        /// 给与什么服务
-        /// </summary>
-        /// <param name="closure">给定的服务</param>
-        /// <returns>服务绑定数据</returns>
+        /// <inheritdoc cref="Given(string)"/>
+        /// <param name="closure">The closure returns the given instance.</param>
         TReturn Given(Func<object> closure);
     }
 }

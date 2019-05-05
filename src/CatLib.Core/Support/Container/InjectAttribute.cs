@@ -14,7 +14,7 @@ using System;
 namespace CatLib
 {
     /// <summary>
-    /// 注入标记
+    /// The injection attribute.
     /// </summary>
     [AttributeUsage(AttributeTargets.Interface |
                     AttributeTargets.Property)]

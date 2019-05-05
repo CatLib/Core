@@ -15,52 +15,46 @@ using System.Collections.Generic;
 namespace CatLib
 {
     /// <summary>
-    /// 可绑定对象
+    /// The bindable data indicates relational data related to the specified service.
     /// </summary>
     public abstract class Bindable : IBindable
     {
-        /// <summary>
-        /// 当前绑定的名字
-        /// </summary>
+        /// <inheritdoc />
         public string Service { get; }
 
         /// <summary>
-        /// 所属服务容器
+        /// The container to which the service belongs.
         /// </summary>
         public IContainer Container => InternalContainer;
 
-        /// <summary>
-        /// 父级容器
-        /// </summary>
+        /// <inheritdoc cref="Container"/>
         protected readonly Container InternalContainer;
 
         /// <summary>
-        /// 服务关系上下文
-        /// 当前服务需求某个服务时可以指定给与什么服务
+        /// The mapping of the service context.
         /// </summary>
         private Dictionary<string, string> contextual;
 
         /// <summary>
-        /// 服务上下文闭包
-        /// 当前服务需求某个服务时给定的闭包
+        /// The closure mapping of the service context.
         /// </summary>
         private Dictionary<string, Func<object>> contextualClosure;
 
         /// <summary>
-        /// 同步锁
+        /// Synchronize locking object
         /// </summary>
         protected readonly object SyncRoot = new object();
 
         /// <summary>
-        /// 是否被释放
+        /// Whether the bindable data is destroyed. 
         /// </summary>
         private bool isDestroy;
 
         /// <summary>
-        /// 构建一个绑定数据
+        /// Create an new <see cref="Bindable"/> instance.
         /// </summary>
-        /// <param name="container">依赖注入容器</param>
-        /// <param name="service">服务名</param>
+        /// <param name="container">The container instance.</param>
+        /// <param name="service">The service name.</param>
         protected Bindable(Container container, string service)
         {
             InternalContainer = container;
@@ -68,9 +62,7 @@ namespace CatLib
             isDestroy = false;
         }
 
-        /// <summary>
-        /// 解除绑定
-        /// </summary>
+        /// <inheritdoc />
         public void Unbind()
         {
             lock (SyncRoot)
@@ -81,16 +73,15 @@ namespace CatLib
         }
 
         /// <summary>
-        /// 为服务增加上下文
+        /// Add the context with service.
         /// </summary>
-        /// <param name="needs">需求什么服务</param>
-        /// <param name="given">给与什么服务</param>
-        /// <returns>服务绑定数据</returns>
+        /// <param name="needs">Demand specified service.</param>
+        /// <param name="given">Given speified service or alias.</param>
         internal void AddContextual(string needs, string given)
         {
             lock (SyncRoot)
             {
-                GuardIsDestroy();
+                AssertDestroyed();
                 if (contextual == null)
                 {
                     contextual = new Dictionary<string, string>();
@@ -104,16 +95,13 @@ namespace CatLib
             }
         }
 
-        /// <summary>
-        /// 为服务增加上下文
-        /// </summary>
-        /// <param name="needs">需求什么服务</param>
-        /// <param name="given">给与什么服务</param>
+        /// <inheritdoc cref="AddContextual(string, string)"/>
+        /// <param name="given">The closure return the given service instance.</param>
         internal void AddContextual(string needs, Func<object> given)
         {
             lock (SyncRoot)
             {
-                GuardIsDestroy();
+                AssertDestroyed();
                 if (contextualClosure == null)
                 {
                     contextualClosure = new Dictionary<string, Func<object>>();
@@ -128,10 +116,10 @@ namespace CatLib
         }
 
         /// <summary>
-        /// 获取上下文的需求关系
+        /// Get the demand context of the service.
         /// </summary>
-        /// <param name="needs">需求的服务</param>
-        /// <returns>给与的服务</returns>
+        /// <param name="needs">The demand service.</param>
+        /// <returns>The given service or alias.</returns>
         internal string GetContextual(string needs)
         {
             if (contextual == null)
@@ -141,11 +129,8 @@ namespace CatLib
             return contextual.TryGetValue(needs, out string contextualNeeds) ? contextualNeeds : null;
         }
 
-        /// <summary>
-        /// 获取上下文关系闭包实现
-        /// </summary>
-        /// <param name="needs">需求的服务</param>
-        /// <returns>给与的闭包</returns>
+        /// <inheritdoc cref="GetContextual"/>
+        /// <returns>The closure return the given service instance.</returns>
         internal Func<object> GetContextualClosure(string needs)
         {
             if (contextualClosure == null)
@@ -155,54 +140,42 @@ namespace CatLib
             return contextualClosure.TryGetValue(needs, out Func<object> closure) ? closure : null;
         }
 
-        /// <summary>
-        /// 解除绑定
-        /// </summary>
+        /// <inheritdoc cref="Unbind"/>
         protected abstract void ReleaseBind();
 
         /// <summary>
-        /// 守卫是否被释放
+        /// Verify that the current instance i has been released
         /// </summary>
-        protected void GuardIsDestroy()
+        protected void AssertDestroyed()
         {
             if (isDestroy)
             {
-                throw new LogicException("Current bind has be mark Destroy.");
+                throw new LogicException("The current instance is destroyed.");
             }
         }
     }
 
-    /// <summary>
-    /// 可绑定对象
-    /// </summary>
+    /// <inheritdoc />
     public abstract class Bindable<TReturn> : Bindable, IBindable<TReturn> where TReturn : class, IBindable<TReturn>
     {
         /// <summary>
-        /// 给与数据
+        /// Indicates the given relationship in the context.
         /// </summary>
         private GivenData<TReturn> given;
 
-        /// <summary>
-        /// 构建一个绑定数据
-        /// </summary>
-        /// <param name="container">依赖注入容器</param>
-        /// <param name="service">服务名</param>
+        /// <inheritdoc />
         protected Bindable(Container container, string service)
             : base(container, service)
         {
         }
 
-        /// <summary>
-        /// 当需求某个服务                                                                                                                                                                                                                                                                                                                                                                                  
-        /// </summary>
-        /// <param name="service">服务名</param>
-        /// <returns>绑定关系临时数据</returns>
+        /// <inheritdoc />
         public IGivenData<TReturn> Needs(string service)
         {
             Guard.NotEmptyOrNull(service, nameof(service));
             lock (SyncRoot)
             {
-                GuardIsDestroy();
+                AssertDestroyed();
                 if (given == null)
                 {
                     given = new GivenData<TReturn>(InternalContainer, this);
@@ -212,11 +185,7 @@ namespace CatLib
             return given;
         }
 
-        /// <summary>
-        /// 当需求某个服务
-        /// </summary>
-        /// <typeparam name="TService">服务类型</typeparam>
-        /// <returns>绑定关系临时数据</returns>
+        /// <inheritdoc />
         public IGivenData<TReturn> Needs<TService>()
         {
             return Needs(InternalContainer.Type2Service(typeof(TService)));

@@ -12,7 +12,7 @@
 namespace CatLib
 {
     /// <summary>
-    /// 管理器模版（拓展解决方案为单例）
+    /// 管理器模版(拓展解决方案为单例）
     /// </summary>
     public abstract class SingleManager<TInterface> : SingleManaged<TInterface>, ISingleManager<TInterface>
     {

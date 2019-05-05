@@ -16,28 +16,28 @@ using System.Text;
 namespace CatLib
 {
     /// <summary>
-    /// Stream扩展函数
+    /// The stream extension function.
     /// </summary>
     public static class StreamExtension
     {
         /// <summary>
-        /// 将当前流追加到目标流中
+        /// Append the source stream to the destination stream.
         /// </summary>
-        /// <param name="source">源数据流</param>
-        /// <param name="destination">目标数据流</param>
-        /// <returns>总共传输了多少数据</returns>
+        /// <param name="source">The source stream.</param>
+        /// <param name="destination">The destination stream.</param>
+        /// <returns>Byte length of transmitted data.</returns>
         public static long AppendTo(this Stream source, Stream destination)
         {
             return source.AppendTo(destination, ThreadStatic.Buffer);
         }
 
         /// <summary>
-        /// 将当前流追加到目标流中
+        /// Append the source stream to the destination stream.
         /// </summary>
-        /// <param name="source">源数据流</param>
-        /// <param name="destination">目标数据流</param>
-        /// <param name="buffer">所使用的缓冲区</param>
-        /// <returns>总共传输了多少数据</returns>
+        /// <param name="source">The source stream.</param>
+        /// <param name="destination">The destination stream.</param>
+        /// <param name="buffer">The buffer to use.</param>
+        /// <returns>Byte length of transmitted data.</returns>
         public static long AppendTo(this Stream source, Stream destination, byte[] buffer)
         {
             Guard.Requires<ArgumentNullException>(source != null);
@@ -55,12 +55,12 @@ namespace CatLib
         }
 
         /// <summary>
-        /// 将流转为字符串
+        /// Read the stream's data and convert it to a string.
         /// </summary>
-        /// <param name="source">源数据流</param>
-        /// <param name="encoding">编码</param>
-        /// <param name="closed">是否自动关闭流</param>
-        /// <returns>字符串</returns>
+        /// <param name="source">The source stream.</param>
+        /// <param name="encoding">The encoding for data.</param>
+        /// <param name="closed">Whether auto closed stream.</param>
+        /// <returns>The string.</returns>
         public static string ToText(this Stream source, Encoding encoding = null, bool closed = true)
         {
             Guard.Requires<ArgumentNullException>(source != null);

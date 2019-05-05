@@ -14,53 +14,53 @@ using System;
 namespace CatLib
 {
     /// <summary>
-    /// 服务绑定数据
+    /// The bind data indicates relational data related to the specified service.
     /// </summary>
     public interface IBindData : IBindable<IBindData>
     {
         /// <summary>
-        /// 服务实现
+        /// The delegate return service concrete.
         /// </summary>
         Func<IContainer, object[], object> Concrete { get; }
 
         /// <summary>
-        /// 是否是静态服务
+        /// True if the service is singleton(static).
         /// </summary>
         bool IsStatic { get; }
 
         /// <summary>
-        /// 为服务设定一个别名
+        /// Alias service to a different name.
         /// </summary>
-        /// <param name="alias">别名</param>
-        /// <returns>服务绑定数据</returns>
+        /// <param name="alias">The alias.</param>
+        /// <returns>The current instance.</returns>
         IBindData Alias(string alias);
 
         /// <summary>
-        /// 为服务打上一个标签
+        /// Assign a tag to a given service.
         /// </summary>
-        /// <param name="tag">标签名</param>
-        /// <returns>服务绑定数据</returns>
+        /// <param name="tag">The tag name.</param>
+        /// <returns>The current instance.</returns>
         IBindData Tag(string tag);
 
         /// <summary>
-        /// 解决服务时触发的回调
+        /// Register a new resolving callback.
         /// </summary>
-        /// <param name="closure">解决事件</param>
-        /// <returns>服务绑定数据</returns>
+        /// <param name="closure">The resolving callback.</param>
+        /// <returns>The current instance.</returns>
         IBindData OnResolving(Action<IBindData, object> closure);
 
         /// <summary>
-        /// 解决服务时事件之后的回调
+        /// Register a new after resolving callback.
         /// </summary>
-        /// <param name="closure">解决事件</param>
-        /// <returns>服务绑定数据</returns>
+        /// <param name="closure">The after resolving callback.</param>
+        /// <returns>The current instance.</returns>
         IBindData OnAfterResolving(Action<IBindData, object> closure);
 
         /// <summary>
-        /// 当服务被释放时
+        /// Register a new release callback.
         /// </summary>
-        /// <param name="closure">处理事件</param>
-        /// <returns>服务绑定数据</returns>
+        /// <param name="closure">The release callback.</param>
+        /// <returns>The current instance.</returns>
         IBindData OnRelease(Action<IBindData, object> closure);
     }
 }

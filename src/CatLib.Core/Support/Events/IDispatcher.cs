@@ -14,54 +14,52 @@ using System;
 namespace CatLib
 {
     /// <summary>
-    /// 事件调度器
+    /// <see cref="IDispatcher"/> is the interface implemented by all event listener systems.
     /// </summary>
     public interface IDispatcher
     {
         /// <summary>
-        /// 判断给定事件是否存在事件监听器
+        /// Determine if a given event has listeners.
         /// </summary>
-        /// <param name="eventName">事件名</param>
-        /// <param name="strict">
-        /// 严格模式
-        /// <para>启用严格模式则不使用正则来进行匹配事件监听器</para>
-        /// </param>
-        /// <returns>是否存在事件监听器</returns>
+        /// <param name="eventName">The event name.</param>
+        /// <param name="strict">Indicates whether the event is matched by a wildcard.</param>
+        /// <returns>true if a given event has listener.</returns>
         bool HasListeners(string eventName, bool strict = false);
 
         /// <summary>
-        /// 触发一个事件,并获取事件监听器的返回结果
+        /// Fire an event and call the listeners.
         /// </summary>
-        /// <param name="eventName">事件名称</param>
-        /// <param name="payloads">载荷</param>
-        /// <returns>事件结果</returns>
+        /// <param name="eventName">The event name.</param>
+        /// <param name="payloads">The object passed to the listener.</param>
+        /// <returns>The listener return values.</returns>
         object[] Trigger(string eventName, params object[] payloads);
 
         /// <summary>
-        /// 触发一个事件,遇到第一个事件存在处理结果后终止,并获取事件监听器的返回结果
+        /// Trigger an event, terminate after encountering the first event
+        /// , and get the return result of the listener
         /// </summary>
-        /// <param name="eventName">事件名</param>
-        /// <param name="payloads">载荷</param>
-        /// <returns>事件结果</returns>
+        /// <param name="eventName">The event name.</param>
+        /// <param name="payloads">The object passed to the listener.</param>
+        /// <returns>The first return result of the listener.</returns>
         object TriggerHalt(string eventName, params object[] payloads);
 
         /// <summary>
-        /// 注册一个事件监听器
+        /// Register an event listener with the dispatcher.
         /// </summary>
-        /// <param name="eventName">事件名称</param>
-        /// <param name="execution">事件调用方法</param>
-        /// <param name="group">事件分组，为<code>Null</code>则不进行分组</param>
+        /// <param name="eventName">The event name.</param>
+        /// <param name="execution">The event listener.</param>
+        /// <param name="group">The event group，If it is null, it will not be grouped.</param>
         /// <returns>事件对象</returns>
         IEvent On(string eventName, Func<string, object[], object> execution, object group = null);
 
         /// <summary>
-        /// 解除注册的事件监听器
+        /// Remove a set of listeners from the dispatcher.
         /// </summary>
         /// <param name="target">
-        /// 事件解除目标
-        /// <para>如果传入的是字符串(<code>string</code>)将会解除对应事件名的所有事件</para>
-        /// <para>如果传入的是事件对象(<code>IEvent</code>)那么解除对应事件</para>
-        /// <para>如果传入的是分组(<code>object</code>)会解除该分组下的所有事件</para>
+        /// <para>If the <see cref="string"/> is passed in, all events corresponding 
+        /// to the event name will be removed.</para>
+        /// <para>If the event object (IEvent) is passed, the corresponding event is released.</para>
+        /// <para>If the incoming object is an object, all events under the group will be released.</para>
         /// </param>
         void Off(object target);
     }

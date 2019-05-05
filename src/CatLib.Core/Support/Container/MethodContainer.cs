@@ -16,40 +16,40 @@ using System.Reflection;
 namespace CatLib
 {
     /// <summary>
-    /// 方法容器
+    /// The catlib ioc method container implemented.
     /// </summary>
     internal sealed class MethodContainer
     {
         /// <summary>
-        /// 调用方法目标 映射到 方法名字
+        /// Call method target map to method names.
         /// </summary>
         private readonly Dictionary<object, List<string>> targetToMethodsMappings;
 
         /// <summary>
-        /// 绑定数据
+        /// An map of the method bing data.
         /// </summary>
         private readonly Dictionary<string, MethodBind> methodMappings;
 
         /// <summary>
-        /// 依赖注入容器
+        /// The <see cref="Container"/> instnace.
         /// </summary>
         private readonly Container container;
 
         /// <summary>
-        /// 依赖解决器
+        /// The dependent solver.
         /// </summary>
         private readonly Func<Bindable, ParameterInfo[], object[], object[]> dependenciesResolved;
 
         /// <summary>
-        /// 同步锁
+        /// The sync lock.
         /// </summary>
         private readonly object syncRoot;
 
         /// <summary>
-        /// 构建一个新的方法容器
+        /// Initialize a new one <see cref="MethodContainer"/> instance.
         /// </summary>
-        /// <param name="container"></param>
-        /// <param name="dependenciesResolved">依赖解决器</param>
+        /// <param name="container">The <see cref="Container"/> instance.</param>
+        /// <param name="dependenciesResolved">The dependent solver.</param>
         internal MethodContainer(Container container, Func<Bindable, ParameterInfo[], object[], object[]> dependenciesResolved)
         {
             this.container = container;
@@ -60,12 +60,12 @@ namespace CatLib
         }
 
         /// <summary>
-        /// 绑定一个方法
+        /// Register a method with the container.
         /// </summary>
-        /// <param name="method">通过这个名字可以调用方法</param>
-        /// <param name="target">方法调用目标</param>
-        /// <param name="methodInfo">在方法调用目标中被调用的方法</param>
-        /// <returns></returns>
+        /// <param name="method">The method name.</param>
+        /// <param name="target">The invoking target.</param>
+        /// <param name="methodInfo">The method info to invoke.</param>
+        /// <returns>The method binding data.</returns>
         public IMethodBind Bind(string method, object target, MethodInfo methodInfo)
         {
             Guard.NotEmptyOrNull(method, nameof(method));
@@ -102,11 +102,11 @@ namespace CatLib
         }
 
         /// <summary>
-        /// 调用方法
+        /// Call the method in bonded container and inject its dependencies.
         /// </summary>
-        /// <param name="method">方法名</param>
-        /// <param name="userParams">用户传入的参数</param>
-        /// <returns>方法调用结果</returns>
+        /// <param name="method">The method name.</param>
+        /// <param name="userParams">The user parameters.</param>
+        /// <returns>The return value of method.</returns>
         public object Invoke(string method, params object[] userParams)
         {
             Guard.NotEmptyOrNull(method, nameof(method));
@@ -125,13 +125,13 @@ namespace CatLib
         }
 
         /// <summary>
-        /// 解除绑定
+        /// Unbinds a method from the container.
         /// </summary>
         /// <param name="target">
-        /// 解除目标
-        /// <para>如果为字符串则作为调用方法名</para>
-        /// <para>如果为<code>IMethodBind</code>则作为指定方法</para>
-        /// <para>如果为其他对象则作为调用目标做全体解除</para>
+        /// The target.
+        /// <para>A <code>string</code> will be taken as the method name.</para>
+        /// <para>A <code>IMethodBind</code> will be taken as a given method.</para>
+        /// <para>Other object will be taken as the invoking target.</para>
         /// </param>
         public void Unbind(object target)
         {
@@ -162,9 +162,9 @@ namespace CatLib
         }
 
         /// <summary>
-        /// 解除绑定
+        /// Unbinds a method from the container.
         /// </summary>
-        /// <param name="methodBind">方法绑定</param>
+        /// <param name="methodBind">The method binding data.</param>
         internal void Unbind(MethodBind methodBind)
         {
             lock (syncRoot)
@@ -191,9 +191,9 @@ namespace CatLib
         }
 
         /// <summary>
-        /// 根据对象绑定移除为该对象绑定的所有方法
+        /// Remove all methods bound to the object.
         /// </summary>
-        /// <param name="target">对象信息</param>
+        /// <param name="target">The object.</param>
         private void UnbindWithObject(object target)
         {
             if (!targetToMethodsMappings.TryGetValue(target, out List<string> methods))
@@ -208,7 +208,7 @@ namespace CatLib
         }
 
         /// <summary>
-        /// 清空容器的所有实例，绑定，别名，标签，解决器
+        /// Flush the container of all method bindings.
         /// </summary>
         public void Flush()
         {
@@ -220,9 +220,9 @@ namespace CatLib
         }
 
         /// <summary>
-        /// 生成一个方法没有找到异常
+        /// Create a method without not found exception.
         /// </summary>
-        /// <param name="method"></param>
+        /// <param name="method">The method name.</param>
         private LogicException MakeMethodNotFoundException(string method)
         {
             return new LogicException($"Method [{method}] is not found.");

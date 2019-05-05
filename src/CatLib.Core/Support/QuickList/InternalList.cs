@@ -14,7 +14,7 @@ using System;
 namespace CatLib
 {
     /// <summary>
-    /// 内部列表
+    /// The internal list.
     /// </summary>
     internal sealed class InternalList<TElement>
     {

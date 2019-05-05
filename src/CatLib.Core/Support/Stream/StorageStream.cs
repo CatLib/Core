@@ -15,33 +15,31 @@ using System.IO;
 namespace CatLib
 {
     /// <summary>
-    /// 存储数据流
+    /// The memory storage stream.
     /// </summary>
     public class StorageStream : WrapperStream
     {
         /// <summary>
-        /// 当前游标所处的位置
+        /// The stream position.
         /// </summary>
         private long position;
 
         /// <summary>
-        /// 是否已经被释放了
+        /// Whether the stream is disabled.
         /// </summary>
         private bool disabled;
 
         /// <summary>
-        /// 是否是可写的
+        /// Whether the stream is writeable.
         /// </summary>
         private readonly bool writable;
 
         /// <summary>
-        /// 存储数据
+        /// The <see cref="IStorage"/> instance.
         /// </summary>
         private readonly IStorage storage;
 
-        /// <summary>
-        /// 偏移量
-        /// </summary>
+        /// <inheritdoc />
         public override long Position
         {
             get
@@ -52,9 +50,7 @@ namespace CatLib
             set => Seek(value, SeekOrigin.Begin);
         }
 
-        /// <summary>
-        /// 数据的长度
-        /// </summary>
+        /// <inheritdoc />
         public override long Length
         {
             get
@@ -64,32 +60,26 @@ namespace CatLib
             }
         }
 
-        /// <summary>
-        /// 是否是可以写入数据的
-        /// </summary>
+        /// <inheritdoc />
         public override bool CanWrite => !Disposed && writable;
 
-        /// <summary>
-        /// 是否可以进行游标偏移
-        /// </summary>
+        /// <inheritdoc />
         public override bool CanSeek => !Disposed;
 
-        /// <summary>
-        /// 是否可以读取数据
-        /// </summary>
+        /// <inheritdoc />
         public override bool CanRead => !Disposed;
 
         /// <summary>
-        /// 是否已经被释放
+        /// Whether the stream is disabled.
         /// </summary>
         protected bool Disposed => disabled || storage.Disabled;
 
         /// <summary>
-        /// 存储数据流
+        /// Initialize an new <see cref="StorageStream"/> stream instance.
         /// </summary>
-        /// <param name="storage">单个内存块的分块</param>
-        /// <param name="writable">是否是可写的</param>
-        /// <param name="timeout">锁超时时间</param>
+        /// <param name="storage">The <see cref="IStorage"/> instance.</param>
+        /// <param name="writable">Whether the storage is writeable.</param>
+        /// <param name="timeout">The locker time for stream read or write.</param>
         public StorageStream(IStorage storage, bool writable = true, int timeout = 1000)
         {
             Guard.Requires<ArgumentNullException>(storage != null);
@@ -126,19 +116,14 @@ namespace CatLib
         }
 
         /// <summary>
-        /// GC回收时
+        /// Released the storage stream.
         /// </summary>
         ~StorageStream()
         {
             Dispose(!disabled);
         }
 
-        /// <summary>
-        /// 偏移游标到指定位置
-        /// </summary>
-        /// <param name="offset">偏移量</param>
-        /// <param name="origin">偏移方向</param>
-        /// <returns>新的位置</returns>
+        /// <inheritdoc />
         public override long Seek(long offset, SeekOrigin origin)
         {
             AssertDisabled();
@@ -180,12 +165,7 @@ namespace CatLib
             return position;
         }
 
-        /// <summary>
-        /// 写入数据
-        /// </summary>
-        /// <param name="buffer">需要写入的字节流</param>
-        /// <param name="offset">字节流的起始位置</param>
-        /// <param name="count">需要写入的长度</param>
+        /// <inheritdoc />
         public override void Write(byte[] buffer, int offset, int count)
         {
             AssertWritable();
@@ -194,13 +174,7 @@ namespace CatLib
             position += count;
         }
 
-        /// <summary>
-        /// 读取数据到指定缓冲区
-        /// </summary>
-        /// <param name="buffer">指定缓冲区</param>
-        /// <param name="offset">缓冲区的起始位置</param>
-        /// <param name="count">需要读取的长度</param>
-        /// <returns>实际读取的长度</returns>
+        /// <inheritdoc />
         public override int Read(byte[] buffer, int offset, int count)
         {
             AssertDisabled();
@@ -209,27 +183,21 @@ namespace CatLib
             return read;
         }
 
-        /// <summary>
-        /// 设定长度
-        /// </summary>
-        /// <param name="value">新的长度值</param>
+        /// <inheritdoc />
         public override void SetLength(long value)
         {
             throw new NotSupportedException();
         }
 
-        /// <summary>
-        /// 清除当前流的缓冲区
-        /// </summary>
+        /// <inheritdoc />
         [ExcludeFromCodeCoverage]
         public override void Flush()
         {
-            // 只有存在数据落地或者转移的情况下此函数才有效
-            // 由于是内存缓存，所以这里我们忽略这个函数
+            // ignore
         }
 
         /// <summary>
-        /// 获取线程占用异常
+        /// Gets the thread occupy exception.
         /// </summary>
         /// <returns>异常</returns>
         [ExcludeFromCodeCoverage]
@@ -238,10 +206,7 @@ namespace CatLib
             return new IOException("The resource is already occupied by other threads");
         }
 
-        /// <summary>
-        /// 释放资源
-        /// </summary>
-        /// <param name="disposing">是否进行释放</param>
+        /// <inheritdoc />
         protected override void Dispose(bool disposing)
         {
             try
@@ -274,7 +239,7 @@ namespace CatLib
         }
 
         /// <summary>
-        /// 断言是否已经被释放
+        /// Assert the stream is disabled.
         /// </summary>
         private void AssertDisabled()
         {
@@ -285,7 +250,7 @@ namespace CatLib
         }
 
         /// <summary>
-        /// 断言是否能够写入
+        /// Assert the stream is writeable.
         /// </summary>
         private void AssertWritable()
         {

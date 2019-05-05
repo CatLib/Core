@@ -14,30 +14,24 @@ using System.Collections;
 namespace CatLib
 {
     /// <summary>
-    /// 基础服务提供者
+    /// <see cref="ServiceProvider"/> is default service provider class 
+    /// for all concrete ServiceProvider classes.
     /// </summary>
     [ExcludeFromCodeCoverage]
     public abstract class ServiceProvider : IServiceProvider, ICoroutineInit
     {
-        /// <summary>
-        /// 服务提供者初始化
-        /// </summary>
+        /// <inheritdoc />
         public virtual void Init()
         {
         }
 
-        /// <summary>
-        /// 协同初始化
-        /// </summary>
-        /// <returns>迭代器</returns>
+        /// <inheritdoc />
         public virtual IEnumerator CoroutineInit()
         {
             yield break;
         }
 
-        /// <summary>
-        /// 当注册服务提供者
-        /// </summary>
+        /// <inheritdoc />
         public virtual void Register()
         {
         }

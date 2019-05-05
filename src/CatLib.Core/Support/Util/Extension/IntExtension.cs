@@ -14,15 +14,15 @@ using System;
 namespace CatLib
 {
     /// <summary>
-    /// Int 扩展函数
+    /// Int extension function
     /// </summary>
     public static class IntExtension
     {
         /// <summary>
-        /// 计算规定值最近的二的次幂
+        /// Calculate the power of the nearest two.
         /// </summary>
-        /// <param name="min">规定的值</param>
-        /// <returns>容量</returns>
+        /// <param name="min">The starting number.</param>
+        /// <returns>The  power of the nearest two.</returns>
         public static int ToPrime(this int min)
         {
             min = Math.Max(0, min);

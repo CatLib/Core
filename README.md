@@ -12,45 +12,42 @@
 </a>
 </p>
 
-> English version is coming soon in version 2.0
+## About CatLib
 
-## 关于CatLib
+`CatLib Core` is the Dependency injection container and helper functions library for `CatLib`. 
 
-`CatLib Core` 是 `CatLib` 的最小可用框架。仅提供最基础的功能，是其他框架开发者作为基础的理想选择。
+- [Service Provider](https://catlib.io/v1/architecture/service-provider.html)
+- [CatLib Application](https://catlib.io/v1/architecture/application.html)
+- [IOC Container](https://catlib.io/v1/architecture/container.html).
+- [Facades](https://catlib.io/v1/architecture/facade.html).
 
-- [服务提供者](https://catlib.io/v1/architecture/service-provider.html)
-- [CatLib核心](https://catlib.io/v1/architecture/application.html)
-- [依赖注入容器](https://catlib.io/v1/architecture/container.html).
-- [服务门面](https://catlib.io/v1/architecture/facade.html).
+## Install CatLib Core
 
-## 安装CatLib Core
-
-**使用Nuget安装**
+**Installed with Nuget**
 
 ```PM
-Install-Package CatLib.Core -Version 1.4.0
+Install-Package CatLib.Core -Version 2.0.0
 ```
 
-**直接下载发布版本**
+**Installed with Github Release**
 
-下载[最新版本](https://github.com/CatLib/Core/releases)。
+[Download the latest version](https://github.com/CatLib/Core/releases)。
 
-## 文档
+## Learning CatLib
 
-您只需要进入 [中文文档](https://catlib.io) 就可以看到她们。
+CatLib has the most extensive and thorough [documentation](https://catlib.io), making it a breeze to get started with the framework.
 
-## 贡献
+> 需要中文支持? 请访问[CatLib中文文档](https://catlib.io)。
 
-CatLib还是一个年轻的框架，她的成长和你们的贡献是分不开的，如果您想要为项目进行贡献请参考： [CatLib 贡献文档](https://catlib.io/v1/contribution.html) 您的贡献将会被列入贡献者名单，我们欢迎任何形式的Pull Request!
+## Contribution
 
-issues 不仅仅只是用于bug跟踪 , 如果您有好的意见或者想法，也欢迎创建 issues 一起讨论。
+CatLib is still a young framework, and her growth and your contribution are inseparable. If you want to contribute to the project, please refer to: [CatLib Contribution Guide](https://catlib.io/v1/contribution.html) Your contribution will be included in the list of contributors，Welcome Pull Request!
 
-## 授权
+## License
 
-CatLib使用的开源许可是：[MIT license](http://opensource.org/licenses/MIT).
+The open source license used by CatLib is [MIT license](http://opensource.org/licenses/MIT).
 
-## 技术支持
+## Support
 
-* QQ群: 150371044 (验证: CatLib Support)
 * email: support@catlib.io
 * slack: [catlib.slack](https://catlib.slack.com/messages/internals/)

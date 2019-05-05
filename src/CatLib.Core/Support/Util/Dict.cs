@@ -207,10 +207,10 @@ namespace CatLib
         }
 
         /// <summary>
-        /// 使用点（.）来访问深度字典
+        /// 使用点(.）来访问深度字典
         /// </summary>
         /// <param name="dict">规定字典</param>
-        /// <param name="key">键，支持使用点（.）来进行深度访问</param>
+        /// <param name="key">键，支持使用点(.）来进行深度访问</param>
         /// <param name="def">默认值</param>
         /// <returns>字典值</returns>
         public static object Get(IDictionary<string, object> dict, string key, object def = null)
@@ -230,10 +230,10 @@ namespace CatLib
         }
 
         /// <summary>
-        /// 使用点（.）来访问深度字典，并为其指定位置设定一个值
+        /// 使用点(.）来访问深度字典，并为其指定位置设定一个值
         /// </summary>
         /// <param name="dict">规定字典</param>
-        /// <param name="key">键，支持使用点（.）来进行深度访问</param>
+        /// <param name="key">键，支持使用点(.）来进行深度访问</param>
         /// <param name="val">设定的值</param>
         public static void Set(IDictionary<string, object> dict, string key, object val)
         {
@@ -245,10 +245,10 @@ namespace CatLib
         }
 
         /// <summary>
-        /// 使用点（.）来访问深度字典，并移除其中指定的值
+        /// 使用点(.）来访问深度字典，并移除其中指定的值
         /// </summary>
         /// <param name="dict">规定字典</param>
-        /// <param name="key">键，支持使用点（.）来进行深度访问</param>
+        /// <param name="key">键，支持使用点(.）来进行深度访问</param>
         public static bool Remove(IDictionary<string, object> dict, string key)
         {
             Guard.Requires<ArgumentNullException>(dict != null);
@@ -262,7 +262,7 @@ namespace CatLib
         /// 通过深度数组来访问字典
         /// </summary>
         /// <param name="dict">规定字典</param>
-        /// <param name="keys">深度数组（深度数组以倒序传入）</param>
+        /// <param name="keys">深度数组(深度数组以倒序传入）</param>
         /// <returns>字典值</returns>
         private static object GetValueByDepthArray(IDictionary<string, object> dict, ref string[] keys)
         {
@@ -285,7 +285,7 @@ namespace CatLib
         /// 通过深度数组来访问字典，并为其指定位置设定一个值
         /// </summary>
         /// <param name="dict">规定字典</param>
-        /// <param name="keys">深度数组（深度数组以倒序传入）</param>
+        /// <param name="keys">深度数组(深度数组以倒序传入）</param>
         /// <param name="value">设定值</param>
         private static void SetValueByDepthArray(IDictionary<string, object> dict, ref string[] keys, object value)
         {
@@ -311,7 +311,7 @@ namespace CatLib
         /// 通过深度数组来移除数组中的一个值
         /// </summary>
         /// <param name="dict">规定字典</param>
-        /// <param name="keys">深度数组（深度数组以倒序传入）</param>
+        /// <param name="keys">深度数组(深度数组以倒序传入）</param>
         private static bool RemoveValueByDepthArray(IDictionary<string, object> dict, ref string[] keys)
         {
             var perv = new Stack<KeyValuePair<string, IDictionary<string, object>>>(keys.Length);

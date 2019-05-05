@@ -14,13 +14,15 @@ using System.Collections;
 namespace CatLib
 {
     /// <summary>
-    /// 协同初始化
+    /// Allow coroutine to be used during the <see cref="Application.Init"/> process.
     /// </summary>
     public interface ICoroutineInit
     {
         /// <summary>
-        /// 服务提供者初始化
+        /// Initialize the service provider with a coroutine.
         /// </summary>
+        /// <remarks>The next coroutine will be executed only after the current coroutine is completed.</remarks>
+        /// <returns>The iterator object.</returns>
         IEnumerator CoroutineInit();
     }
 }

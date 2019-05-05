@@ -14,13 +14,13 @@ using System;
 namespace CatLib
 {
     /// <summary>
-    /// 代码逻辑异常
+    /// Represents a logical exception encountered during execution.
     /// </summary>
     [ExcludeFromCodeCoverage]
     public class LogicException : RuntimeException
     {
         /// <summary>
-        /// 代码逻辑异常
+        /// Initialize a new <see cref="LogicException"/> instnace.
         /// </summary>
         public LogicException()
         {
@@ -28,18 +28,18 @@ namespace CatLib
         }
 
         /// <summary>
-        /// 代码逻辑异常
+        /// Initialize a new <see cref="LogicException"/> instnace.
         /// </summary>
-        /// <param name="message">异常消息</param>
+        /// <param name="message">The exception message.</param>
         public LogicException(string message) : base(message)
         {
         }
 
         /// <summary>
-        /// 代码逻辑异常
+        /// Initialize a new <see cref="LogicException"/> instnace.
         /// </summary>
-        /// <param name="message">异常消息</param>
-        /// <param name="innerException">内部异常</param>
+        /// <param name="message">The exception message.</param>
+        /// <param name="innerException">The inner exception.</param>
         public LogicException(string message, Exception innerException) : base(message, innerException)
         {
         }

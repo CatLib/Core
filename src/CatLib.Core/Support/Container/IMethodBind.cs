@@ -12,7 +12,7 @@
 namespace CatLib
 {
     /// <summary>
-    /// 方法绑定数据
+    /// The method binding data.
     /// </summary>
     public interface IMethodBind : IBindable<IMethodBind>
     {

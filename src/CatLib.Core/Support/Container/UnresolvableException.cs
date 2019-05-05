@@ -14,13 +14,13 @@ using System;
 namespace CatLib
 {
     /// <summary>
-    /// 未能解决异常
+    /// Failed to resolve the service exception.
     /// </summary>
     [ExcludeFromCodeCoverage]
     public class UnresolvableException : RuntimeException
     {
         /// <summary>
-        /// 未能解决异常
+        /// Initialize a new one <see cref="UnresolvableException"/> instnace.
         /// </summary>
         public UnresolvableException()
         {
@@ -28,18 +28,18 @@ namespace CatLib
         }
 
         /// <summary>
-        /// 未能解决异常
+        /// Initialize a new one <see cref="UnresolvableException"/> instnace.
         /// </summary>
-        /// <param name="message">异常消息</param>
+        /// <param name="message">The exception message.</param>
         public UnresolvableException(string message) : base(message)
         {
         }
 
         /// <summary>
-        /// 未能解决异常
+        /// Initialize a new one <see cref="UnresolvableException"/> instnace.
         /// </summary>
-        /// <param name="message">异常消息</param>
-        /// <param name="innerException">内部异常</param>
+        /// <param name="message">The exception message.</param>
+        /// <param name="innerException">The inner exception.</param>
         public UnresolvableException(string message, Exception innerException) : base(message, innerException)
         {
         }

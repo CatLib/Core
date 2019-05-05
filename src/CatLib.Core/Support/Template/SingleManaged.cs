@@ -15,7 +15,7 @@ using System.Collections.Generic;
 namespace CatLib
 {
     /// <summary>
-    /// 管理器模版（拓展解决方案为单例）- 扩展内容不对外可见
+    /// 管理器模版(拓展解决方案为单例）- 扩展内容不对外可见
     /// </summary>
     public abstract class SingleManaged<TInterface> : Managed<TInterface>, ISingleManaged<TInterface>, IDisposable
     {

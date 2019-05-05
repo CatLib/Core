@@ -15,16 +15,16 @@ using System.Text;
 namespace CatLib
 {
     /// <summary>
-    /// 字符串扩展
+    /// The string extension function.
     /// </summary>
     public static class StringExtension
     {
         /// <summary>
-        /// 将指定字符串转为Stream流
+        /// Convert the specified string to a stream
         /// </summary>
-        /// <param name="str">指定字符串</param>
-        /// <param name="encoding">使用的编码</param>
-        /// <returns></returns>
+        /// <param name="str">The specified string.</param>
+        /// <param name="encoding">The string encoding.</param>
+        /// <returns>The stream instance.</returns>
         public static Stream ToStream(this string str, Encoding encoding = null)
         {
             return new MemoryStream((encoding ?? Util.Encoding).GetBytes(str));

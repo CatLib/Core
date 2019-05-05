@@ -15,47 +15,37 @@ using System.IO;
 namespace CatLib
 {
     /// <summary>
-    /// 包装流
+    /// The wrapper stream.
     /// </summary>
     [ExcludeFromCodeCoverage]
     public class WrapperStream : Stream
     {
         /// <summary>
-        /// 基础流
+        /// Gets the base stream.
         /// </summary>
         public Stream BaseStream { get; }
 
-        /// <summary>
-        /// 流是否可读
-        /// </summary>
+        /// <inheritdoc />
         public override bool CanRead => BaseStream.CanRead;
 
-        /// <summary>
-        /// 流是否可以偏移
-        /// </summary>
+        /// <inheritdoc />
         public override bool CanSeek => BaseStream.CanSeek;
 
-        /// <summary>
-        /// 流是否可写
-        /// </summary>
+        /// <inheritdoc />
         public override bool CanWrite => BaseStream.CanWrite;
 
-        /// <summary>
-        /// 流的偏移位置
-        /// </summary>
+        /// <inheritdoc />
         public override long Position
         {
             get => BaseStream.Position;
             set => Seek(value, SeekOrigin.Begin);
         }
 
-        /// <summary>
-        /// 流的长度
-        /// </summary>
+        /// <inheritdoc />
         public override long Length => BaseStream.Length;
 
         /// <summary>
-        /// 构建一个包装流
+        /// Initialize an new <see cref="WrapperStream"/> stream instance.
         /// </summary>
         public WrapperStream()
         {
@@ -63,61 +53,40 @@ namespace CatLib
         }
 
         /// <summary>
-        /// 构建一个包装流
+        /// Initialize an new <see cref="WrapperStream"/> stream instance.
         /// </summary>
-        /// <param name="stream">基础流</param>
+        /// <param name="stream">The base stream.</param>
         public WrapperStream(Stream stream)
         {
             Guard.Requires<ArgumentNullException>(stream != null);
             BaseStream = stream;
         }
 
-        /// <summary>
-        /// 偏移流到指定位置
-        /// </summary>
-        /// <param name="offset">指定位置</param>
-        /// <param name="origin">偏移方向</param>
-        /// <returns>新的位置</returns>
+        /// <inheritdoc />
         public override long Seek(long offset, SeekOrigin origin)
         {
             return BaseStream.Seek(offset, origin);
         }
 
-        /// <summary>
-        /// 刷新流的缓冲区
-        /// </summary>
+        /// <inheritdoc />
         public override void Flush()
         {
             BaseStream.Flush();
         }
 
-        /// <summary>
-        /// 在流中写入指定缓冲区的数据
-        /// </summary>
-        /// <param name="buffer">指定缓冲区</param>
-        /// <param name="offset">指定缓冲区偏移量</param>
-        /// <param name="count">写入的长度</param>
+        /// <inheritdoc />
         public override void Write(byte[] buffer, int offset, int count)
         {
             BaseStream.Write(buffer, offset, count);
         }
 
-        /// <summary>
-        /// 设定流的长度
-        /// </summary>
-        /// <param name="value">长度</param>
+        /// <inheritdoc />
         public override void SetLength(long value)
         {
             BaseStream.SetLength(value);
         }
 
-        /// <summary>
-        /// 读取流的数据到指定缓冲区
-        /// </summary>
-        /// <param name="buffer">指定缓冲区</param>
-        /// <param name="offset">指定缓冲区偏移量</param>
-        /// <param name="count">读取的长度</param>
-        /// <returns>实际读取的长度</returns>
+        /// <inheritdoc />
         public override int Read(byte[] buffer, int offset, int count)
         {
             return BaseStream.Read(buffer, offset, count);

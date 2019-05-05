@@ -15,32 +15,32 @@ using System.IO;
 namespace CatLib
 {
     /// <summary>
-    /// 组合流，允许将多个不同的流组合成一个流
+    /// <see cref="CombineStream"/> allow multiple different streams to be combined into one stream.
     /// </summary>
     public class CombineStream : WrapperStream
     {
         /// <summary>
-        /// 全局游标位置
+        /// Indicates the position of the current cursor.
         /// </summary>
         private long globalPosition;
 
         /// <summary>
-        /// 当前所处的流
+        /// Indicates the index of the current stream.
         /// </summary>
         private int index;
 
         /// <summary>
-        /// 组合流
+        /// An array of multiple streams.
         /// </summary>
         private readonly Stream[] streams;
 
         /// <summary>
-        /// 组合流的长度
+        /// The length of the <see cref="CombineStream"/>.
         /// </summary>
         private long length;
 
         /// <summary>
-        /// 组合流的长度
+        /// The length of the <see cref="CombineStream"/>.
         /// </summary>
         public override long Length
         {
@@ -60,9 +60,7 @@ namespace CatLib
             }
         }
 
-        /// <summary>
-        /// 是否能够偏移
-        /// </summary>
+        /// <inheritdoc />
         public override bool CanSeek
         {
             get
@@ -78,18 +76,14 @@ namespace CatLib
             }
         }
 
-        /// <summary>
-        /// 获取当前偏移量
-        /// </summary>
+        /// <inheritdoc />
         public override long Position
         {
             get => globalPosition;
             set => Seek(value, SeekOrigin.Begin);
         }
 
-        /// <summary>
-        /// 是否是可读的
-        /// </summary>
+        /// <inheritdoc />
         public override bool CanRead
         {
             get
@@ -105,32 +99,30 @@ namespace CatLib
             }   
         }
 
-        /// <summary>
-        /// 是否是可写的
-        /// </summary>
+        /// <inheritdoc />
         public override bool CanWrite => false;
 
         /// <summary>
-        /// 组合流关闭时是否自动关闭流
+        /// Whether to close the sub stream when closing the combined stream
         /// </summary>
         private readonly bool autoClosed;
 
         /// <summary>
-        /// 构建一个组合流实例，允许将两个不同的流组合成一个流
+        /// Initialize an new <see cref="CombineStream"/> instance.
         /// </summary>
-        /// <param name="left">流</param>
-        /// <param name="right">流</param>
-        /// <param name="closed">当组合流释放时是否自动关闭其中的流</param>
+        /// <param name="left">The left stream.</param>
+        /// <param name="right">The right stream.</param>
+        /// <param name="closed">Whether to close the sub stream when closing the combined stream.</param>
         public CombineStream(Stream left, Stream right, bool closed = false)
             : this(new[] { left, right }, closed)
         {
         }
 
         /// <summary>
-        /// 构建一个组合流实例，允许将多个流组合成一个流
+        /// Initialize an new <see cref="CombineStream"/> instance.
         /// </summary>
-        /// <param name="source">流</param>
-        /// <param name="closed">当组合流释放时是否自动关闭其中的流</param>
+        /// <param name="source">An array of the sub stream.</param>
+        /// <param name="closed">Whether to close the sub stream when closing the combined stream.</param>
         public CombineStream(Stream[] source, bool closed = false)
         {
             index = 0;
@@ -139,12 +131,7 @@ namespace CatLib
             autoClosed = closed;
         }
 
-        /// <summary>
-        /// 设定位置偏移
-        /// </summary>
-        /// <param name="offset">偏移量</param>
-        /// <param name="origin">偏移方向</param>
-        /// <returns>当前偏移量</returns>
+        /// <inheritdoc />
         public override long Seek(long offset, SeekOrigin origin)
         {
             if (!CanSeek)
@@ -186,10 +173,10 @@ namespace CatLib
         }
 
         /// <summary>
-        /// 计算偏移下标
+        /// Calculate sub stream index and relative positions
         /// </summary>
-        /// <param name="globalPosition">全局位置</param>
-        /// <param name="localPosition">本地偏移量</param>
+        /// <param name="globalPosition">The position of the current cursor.</param>
+        /// <param name="localPosition">The relative position.</param>
         protected int CalculatedIndex(long globalPosition, ref long localPosition)
         {
             long length = 0;
@@ -208,13 +195,7 @@ namespace CatLib
             throw new AssertException($"Failed to determine {nameof(localPosition)}");
         }
 
-        /// <summary>
-        /// 读取组合流的数据到缓冲区
-        /// </summary>
-        /// <param name="buffer">缓冲区</param>
-        /// <param name="offset">缓冲区偏移量</param>
-        /// <param name="count">希望读取的长度</param>
-        /// <returns>实际读取的长度</returns>
+        /// <inheritdoc />
         public override int Read(byte[] buffer, int offset, int count)
         {
             Guard.Requires<ArgumentNullException>(buffer != null);
@@ -246,38 +227,25 @@ namespace CatLib
             return result;
         }
 
-        /// <summary>
-        /// 写入数据到组合流
-        /// </summary>
-        /// <param name="buffer">缓冲区</param>
-        /// <param name="offset">偏移量</param>
-        /// <param name="count"></param>
+        /// <inheritdoc />
         public override void Write(byte[] buffer, int offset, int count)
         {
             throw new NotSupportedException($"{nameof(CombineStream)} not supported {nameof(Write)}.");
         }
 
-        /// <summary>
-        /// 设定流的长度
-        /// </summary>
-        /// <param name="value">长度</param>
+        /// <inheritdoc />
         public override void SetLength(long value)
         {
             throw new NotSupportedException($"{nameof(CombineStream)} not supported {nameof(SetLength)}.");
         }
 
-        /// <summary>
-        /// Flush Stream
-        /// </summary>
+        /// <inheritdoc />
         public override void Flush()
         {
             throw new NotSupportedException($"{nameof(CombineStream)} not supported {nameof(Flush)}.");
         }
 
-        /// <summary>
-        /// 当组合流释放时
-        /// </summary>
-        /// <param name="disposing"></param>
+        /// <inheritdoc />
         protected override void Dispose(bool disposing)
         {
             try

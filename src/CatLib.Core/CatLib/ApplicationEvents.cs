@@ -12,62 +12,62 @@
 namespace CatLib
 {
     /// <summary>
-    /// 应用程序事件
+    /// Contains all events dispatched by an Application.
     /// </summary>
     public sealed class ApplicationEvents
     {
         /// <summary>
-        /// 当引导程序开始之前
+        /// Before the <see cref="Application.Bootstrap"/> call.
         /// </summary>
         public static readonly string OnBootstrap = "CatLib.ApplicationEvents.OnBootstrap";
 
         /// <summary>
-        /// 当引导程序进行中
+        /// When the <see cref="Application.Bootstrap"/> call is in progress.
         /// </summary>
         public static readonly string Bootstrapping = "CatLib.ApplicationEvents.Bootstrapping";
 
         /// <summary>
-        /// 当引导完成时
+        /// After the <see cref="Application.Bootstrap"/> called.
         /// </summary>
         public static readonly string OnBootstraped = "CatLib.ApplicationEvents.OnBootstraped";
 
         /// <summary>
-        /// 当注册服务提供者
+        /// When registering for a service provider.
         /// </summary>
         public static readonly string OnRegisterProvider = "CatLib.ApplicationEvents.OnRegisterProvider";
 
         /// <summary>
-        /// 当初始化开始之前
+        /// Before the <see cref="Application.Init"/> call.
         /// </summary>
         public static readonly string OnInit = "CatLib.ApplicationEvents.OnInit";
 
         /// <summary>
-        /// 当服务提供者初始化进行前
+        /// Before the <see cref="IServiceProvider.Init"/> call.
         /// </summary>
         public static readonly string OnProviderInit = "CatLib.ApplicationEvents.OnProviderInit";
 
         /// <summary>
-        /// 当服务提供者初始化结束后
+        /// After the <see cref="IServiceProvider.Init"/> called.
         /// </summary>
         public static readonly string OnProviderInited = "CatLib.ApplicationEvents.OnProviderInited";
 
         /// <summary>
-        /// 当初始化完成之后
+        /// After the <see cref="Application.Init"/> called.
         /// </summary>
         public static readonly string OnInited = "CatLib.ApplicationEvents.OnInited";
 
         /// <summary>
-        /// 当程序启动完成
+        /// When the framework is started.
         /// </summary>
         public static readonly string OnStartCompleted = "CatLib.ApplicationEvents.OnStartCompleted";
 
         /// <summary>
-        /// 当程序终止之前
+        /// Before the <see cref="Application.Terminate"/> call.
         /// </summary>
         public static readonly string OnTerminate = "CatLib.ApplicationEvents.OnTerminate";
 
         /// <summary>
-        /// 当程序终止之后
+        /// After the <see cref="Application.Terminate"/> called.
         /// </summary>
         public static readonly string OnTerminated = "CatLib.ApplicationEvents.OnTerminated";
     }

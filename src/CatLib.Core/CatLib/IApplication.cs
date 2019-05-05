@@ -14,51 +14,51 @@ using System;
 namespace CatLib
 {
     /// <summary>
-    /// 应用程序接口
+    /// <see cref="IApplication"/> is the interface implemented by all application classes.
     /// </summary>
     public interface IApplication : IContainer, IDispatcher
     {
         /// <summary>
-        /// 注册服务提供者
+        /// Register a service provider with the application.
         /// </summary>
-        /// <param name="provider">服务提供者</param>
-        /// <param name="force">为true则强制注册</param>
+        /// <param name="provider">The service provider.</param>
+        /// <param name="force">True if the force register.</param>
         void Register(IServiceProvider provider, bool force = false);
 
         /// <summary>
-        /// 服务提供者是否已经注册过
+        /// Checks whether the given service provider is registered.
         /// </summary>
-        /// <param name="provider">服务提供者</param>
-        /// <returns>服务提供者是否已经注册过</returns>
+        /// <param name="provider">The service provider.</param>
+        /// <returns>True if the service provider is registered.</returns>
         bool IsRegisted(IServiceProvider provider);
 
         /// <summary>
-        /// 获取程序运行时唯一Id
+        /// Gets the unique runtime id.
         /// </summary>
-        /// <returns>运行时的唯一Id</returns>
+        /// <returns>The unique runtime id.</returns>
         long GetRuntimeId();
 
         /// <summary>
-        /// 是否是主线程
+        /// True if we're on the main thread.
         /// </summary>
         bool IsMainThread { get; }
 
         /// <summary>
-        /// 获取优先级，如果存在方法优先级定义那么优先返回方法的优先级
-        /// 如果不存在优先级定义那么返回<c>int.MaxValue</c>
+        /// Gets the prioirty. If there exists a method priority definition then returns it.
+        /// Otherwise, returns <c>int.MaxValue</c>.
         /// </summary>
-        /// <param name="type">获取优先级的类型</param>
-        /// <param name="method">获取优先级的调用方法</param>
-        /// <returns>优先级</returns>
+        /// <param name="type">The type of priority to get.</param>
+        /// <param name="method">The method via which to get the prioirty.</param>
+        /// <returns>Prioirty of the given type.</returns>
         int GetPriority(Type type, string method = null);
 
         /// <summary>
-        /// 调试等级
+        /// Gets or sets the debug level.
         /// </summary>
         DebugLevels DebugLevel { get; set; }
 
         /// <summary>
-        /// 终止CatLib框架
+        /// Terminates the <see cref="IApplication"/>.
         /// </summary>
         void Terminate();
     }

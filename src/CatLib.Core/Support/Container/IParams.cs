@@ -12,16 +12,16 @@
 namespace CatLib
 {
     /// <summary>
-    /// 参数名注入表
+    /// All parameter tables must implement this interface.
     /// </summary>
     public interface IParams
     {
         /// <summary>
-        /// 获取一个参数
+        /// Get a parameter.
         /// </summary>
-        /// <param name="key">参数名</param>
-        /// <param name="value">参数值</param>
-        /// <returns>是否成功获取</returns>
+        /// <param name="key">The parameter name.</param>
+        /// <param name="value">The parameter value.</param>
+        /// <returns>True if the parameter exist.</returns>
         bool TryGetValue(string key, out object value);
     }
 }
