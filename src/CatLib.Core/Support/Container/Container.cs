@@ -1787,19 +1787,6 @@ namespace CatLib
         }
 
         /// <summary>
-        /// Pre build the specified service.
-        /// If a non-null value is returned, the subsequent build will 
-        /// be terminated and the value will be returned as an object instance
-        /// </summary>
-        /// <param name="makeServiceBindData">The bind data for the <see cref="Make"/> service.</param>
-        /// <param name="userParams">An array for the user parameter.</param>
-        /// <returns>The service instance.</returns>
-        protected virtual object BuiltWithCache(IBindable bindData, object[] userParams)
-        {
-            return null;
-        }
-
-        /// <summary>
         /// Trigger all of the extend callbacks.
         /// </summary>
         /// <param name="service">The service name.</param>
