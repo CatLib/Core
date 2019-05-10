@@ -1836,7 +1836,7 @@ namespace CatLib
         /// <param name="makeServiceBindData">The bind data for the <see cref="Make"/> service.</param>
         /// <param name="userParams">An array for the user parameter.</param>
         /// <returns>The service instance.</returns>
-        private object Build(BindData makeServiceBindData, object[] userParams)
+        protected virtual object Build(BindData makeServiceBindData, object[] userParams)
         {
             var instance = makeServiceBindData.Concrete != null
                 ? makeServiceBindData.Concrete(this, userParams)
