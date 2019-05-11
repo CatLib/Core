@@ -99,7 +99,6 @@
     <Compile Include="Support\Stream\StorageStream.cs" />
     <Compile Include="Support\Storage\MemoryStorage.cs" />
     <Compile Include="Support\Stream\WrapperStream.cs" />
-    <Compile Include="Support\Util\Dict.cs" />
     <Compile Include="Support\SortSet\SortSet.cs" />
     <Compile Include="Support\Util\Arr.cs" />
     <Compile Include="Support\Util\Extension\IntExtension.cs" />
