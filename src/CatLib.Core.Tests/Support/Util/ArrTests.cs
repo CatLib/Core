@@ -751,19 +751,6 @@ namespace CatLib.Tests.Support.Util
         }
 
         [TestMethod]
-        public void TestEmptyFlash()
-        {
-            var data = new int[] { };
-            var isCall = false;
-            Arr.Flash(data, (i) => { }, (o) => { }, () =>
-            {
-                isCall = true;
-            });
-
-            Assert.AreEqual(true, isCall);
-        }
-
-        [TestMethod]
         public void TestCut()
         {
             var data = new char[] { '1', '2', '3', '4', '5' };
