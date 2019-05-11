@@ -87,9 +87,6 @@
     <Compile Include="Support\Exception\LogicException.cs" />
     <Compile Include="Support\Exception\RuntimeException.cs" />
     <Compile Include="Support\Guard\Guard.cs" />
-    <Compile Include="Support\QuickList\InternalList.cs" />
-    <Compile Include="Support\QuickList\IQuickList.cs" />
-    <Compile Include="Support\QuickList\QuickList.cs" />
     <Compile Include="Support\RingBuffer\IRingBuffer.cs" />
     <Compile Include="Support\RingBuffer\RingBuffer.cs" />
     <Compile Include="Support\Storage\IStorage.cs" />
