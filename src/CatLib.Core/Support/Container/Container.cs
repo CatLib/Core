@@ -163,7 +163,7 @@ namespace CatLib
             UserParamsStack = new Stack<object[]>(32);
 
             injectTarget = typeof(InjectAttribute);
-            methodContainer = new MethodContainer(this, GetDependencies);
+            methodContainer = new MethodContainer(this);
             flushing = false;
             instanceId = 0;
         }
@@ -1420,7 +1420,7 @@ namespace CatLib
         /// <param name="baseParams">The dependent parameters array for <see cref="Make"/> service.</param>
         /// <param name="userParams">An array for the user parameter.</param>
         /// <returns>An array of resolved instances for dependent parameters.</returns>
-        protected virtual object[] GetDependencies(Bindable makeServiceBindData, ParameterInfo[] baseParams, object[] userParams)
+        protected internal virtual object[] GetDependencies(Bindable makeServiceBindData, ParameterInfo[] baseParams, object[] userParams)
         {
             if (baseParams.Length <= 0)
             {

@@ -36,11 +36,6 @@ namespace CatLib
         private readonly Container container;
 
         /// <summary>
-        /// The dependent solver.
-        /// </summary>
-        private readonly Func<Bindable, ParameterInfo[], object[], object[]> dependenciesResolved;
-
-        /// <summary>
         /// The sync lock.
         /// </summary>
         private readonly object syncRoot;
@@ -49,13 +44,11 @@ namespace CatLib
         /// Initialize a new one <see cref="MethodContainer"/> instance.
         /// </summary>
         /// <param name="container">The <see cref="Container"/> instance.</param>
-        /// <param name="dependenciesResolved">The dependent solver.</param>
-        internal MethodContainer(Container container, Func<Bindable, ParameterInfo[], object[], object[]> dependenciesResolved)
+        internal MethodContainer(Container container)
         {
             this.container = container;
             targetToMethodsMappings = new Dictionary<object, List<string>>();
             methodMappings = new Dictionary<string, MethodBind>();
-            this.dependenciesResolved = dependenciesResolved;
             syncRoot = new object();
         }
 
@@ -118,7 +111,7 @@ namespace CatLib
                     throw MakeMethodNotFoundException(method);
                 }
 
-                var injectParams = dependenciesResolved(methodBind, methodBind.ParameterInfos, userParams) ??
+                var injectParams = container.GetDependencies(methodBind, methodBind.ParameterInfos, userParams) ??
                                    new object[] { };
                 return methodBind.MethodInfo.Invoke(methodBind.Target, injectParams);
             }
