@@ -386,13 +386,6 @@ namespace CatLib
             return Handler.OnRebound(service, callback);
         }
 
-        /// <inheritdoc cref="IContainer.Flash(Action, KeyValuePair{string, object}[])"/>
-        [Obsolete("The Flash method will be removed in 2.0.")]
-        public static void Flash(Action callback, params KeyValuePair<string, object>[] services)
-        {
-            Handler.Flash(callback, services);
-        }
-
         /// <inheritdoc cref="IContainer.Type2Service(Type)"/>
         public static string Type2Service(Type type)
         {
@@ -840,13 +833,6 @@ namespace CatLib
         public static void Watch<TService>(Action<TService> method)
         {
             Handler.Watch(method);
-        }
-
-        /// <inheritdoc cref="ExtendContainer.Flash(IContainer, Action, string, object)"/>
-        [Obsolete("The Flash method will be removed in 2.0.")]
-        public static void Flash(Action callback, string service, object instance)
-        {
-            Handler.Flash(callback, service, instance);
         }
 
         /// <inheritdoc cref="ExtendContainer.Type2Service{TService}(IContainer)"/>

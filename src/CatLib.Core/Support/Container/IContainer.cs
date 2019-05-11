@@ -251,14 +251,6 @@ namespace CatLib
         IContainer OnRebound(string service, Action<object> callback);
 
         /// <summary>
-        /// Temporarily makes the given services static in the callback lifetime.
-        /// </summary>
-        /// <param name="callback">The callback.</param>
-        /// <param name="services">The service mapping.</param>
-        [Obsolete("The Flash method will be removed in 2.0.")]
-        void Flash(Action callback, params KeyValuePair<string, object>[] services);
-
-        /// <summary>
         /// Converts the given type to the service name.
         /// </summary>
         /// <param name="type">The given type.</param>

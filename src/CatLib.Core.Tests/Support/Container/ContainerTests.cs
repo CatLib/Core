@@ -1709,55 +1709,6 @@ namespace CatLib.Tests.Stl
         }
 
         [TestMethod]
-        public void TestNullFlash()
-        {
-            var container = MakeContainer();
-            container.Flash(() =>
-            {
-            }, null);
-
-            // no throw error is success
-        }
-
-        [TestMethod]
-        public void TestEmptyFlash()
-        {
-            var container = MakeContainer();
-            container.Flash(() =>
-            {
-            }, new KeyValuePair<string, object>[] { });
-
-            // no throw error is success
-        }
-
-        [TestMethod]
-        public void TestFlashRecursive()
-        {
-            var container = MakeContainer();
-
-            var call = 0;
-            container.Flash(() =>
-            {
-                call++;
-                Assert.AreEqual(1, container.Make("hello"));
-                Assert.AreEqual(2, container.Make("world"));
-                container.Flash(() =>
-                {
-                    call++;
-                    Assert.AreEqual(10, container.Make("hello"));
-                    Assert.AreEqual(2, container.Make("world"));
-                }, new KeyValuePair<string, object>("hello", 10));
-                Assert.AreEqual(1, container.Make("hello"));
-                Assert.AreEqual(2, container.Make("world"));
-            },new KeyValuePair<string, object>("hello", 1)
-                , new KeyValuePair<string, object>("world", 2));
-
-            Assert.AreEqual(false, container.HasInstance("hello"));
-            Assert.AreEqual(false, container.HasInstance("world"));
-            Assert.AreEqual(2, call);
-        }
-
-        [TestMethod]
         public void OnResolvingExistsObject()
         {
             var container = MakeContainer();
@@ -2353,21 +2304,6 @@ namespace CatLib.Tests.Stl
             container.Bind("Hello", (_, __) => oldObject);
             var ins = container["Hello"];
             Assert.AreSame(newObject, ins);
-        }
-
-        [TestMethod]
-        public void TestFlashOnBind()
-        {
-            var container = new Application();
-            container.Bind<IBindData>((c, p) => 100);
-
-            ExceptionAssert.Throws<RuntimeException>(() =>
-            {
-                App.Flash(() =>
-                {
-
-                }, App.Type2Service(typeof(IBindData)), 200);
-            });
         }
 
         [TestMethod]

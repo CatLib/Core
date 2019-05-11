@@ -1021,19 +1021,6 @@ namespace CatLib
         }
 
         /// <summary>
-        /// Temporarily makes the given services static in the callback lifetime.
-        /// </summary>
-        /// <param name="container">The <see cref="IContainer"/> instance.</param>
-        /// <param name="callback">The callback.</param>
-        /// <param name="service">The service name.</param>
-        /// <param name="instance">The instance.</param>
-        [Obsolete("The Flash method will be removed in 2.0.")]
-        public static void Flash(this IContainer container, Action callback, string service, object instance)
-        {
-            container.Flash(callback, new KeyValuePair<string, object>(service, instance));
-        }
-
-        /// <summary>
         /// Converts the given type to the service name.
         /// </summary>
         /// <typeparam name="TService">The given type.</typeparam>
