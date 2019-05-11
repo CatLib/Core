@@ -49,12 +49,15 @@
   <ItemGroup>
     <Compile Remove="CatLib\Facades\**" />
     <Compile Remove="Support\FilterChain\**" />
+    <Compile Remove="Support\QuickList\**" />
     <Compile Remove="Support\Template\**" />
     <EmbeddedResource Remove="CatLib\Facades\**" />
     <EmbeddedResource Remove="Support\FilterChain\**" />
+    <EmbeddedResource Remove="Support\QuickList\**" />
     <EmbeddedResource Remove="Support\Template\**" />
     <None Remove="CatLib\Facades\**" />
     <None Remove="Support\FilterChain\**" />
+    <None Remove="Support\QuickList\**" />
     <None Remove="Support\Template\**" />
   </ItemGroup>
 
@@ -107,9 +110,6 @@
     <Compile Include="..\CatLib.Core\Support\Exception\LogicException.cs" Link="Support\Exception\LogicException.cs" />
     <Compile Include="..\CatLib.Core\Support\Exception\RuntimeException.cs" Link="Support\Exception\RuntimeException.cs" />
     <Compile Include="..\CatLib.Core\Support\Guard\Guard.cs" Link="Support\Guard\Guard.cs" />
-    <Compile Include="..\CatLib.Core\Support\QuickList\InternalList.cs" Link="Support\QuickList\InternalList.cs" />
-    <Compile Include="..\CatLib.Core\Support\QuickList\IQuickList.cs" Link="Support\QuickList\IQuickList.cs" />
-    <Compile Include="..\CatLib.Core\Support\QuickList\QuickList.cs" Link="Support\QuickList\QuickList.cs" />
     <Compile Include="..\CatLib.Core\Support\RingBuffer\IRingBuffer.cs" Link="Support\RingBuffer\IRingBuffer.cs" />
     <Compile Include="..\CatLib.Core\Support\RingBuffer\RingBuffer.cs" Link="Support\RingBuffer\RingBuffer.cs" />
     <Compile Include="..\CatLib.Core\Support\SortSet\SortSet.cs" Link="Support\SortSet\SortSet.cs" />
@@ -136,7 +136,6 @@
     <Folder Include="Support\Events\" />
     <Folder Include="Support\Exception\" />
     <Folder Include="Support\Guard\" />
-    <Folder Include="Support\QuickList\" />
     <Folder Include="Support\SortSet\" />
     <Folder Include="Support\Stream\" />
     <Folder Include="Support\RingBuffer\" />
