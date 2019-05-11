@@ -106,7 +106,6 @@
     <Compile Include="Support\Util\Str.cs" />
     <Compile Include="Support\Util\Extension\StreamExtension.cs" />
     <Compile Include="Support\Util\SystemTime.cs" />
-    <Compile Include="Support\Util\ThreadStatic.cs" />
     <Compile Include="Support\Util\Util.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

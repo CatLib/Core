@@ -126,7 +126,6 @@
     <Compile Include="..\CatLib.Core\Support\Util\Extension\StringExtension.cs" Link="Support\Util\Extension\StringExtension.cs" />
     <Compile Include="..\CatLib.Core\Support\Util\Str.cs" Link="Support\Util\Str.cs" />
     <Compile Include="..\CatLib.Core\Support\Util\SystemTime.cs" Link="Support\Util\SystemTime.cs" />
-    <Compile Include="..\CatLib.Core\Support\Util\ThreadStatic.cs" Link="Support\Util\ThreadStatic.cs" />
     <Compile Include="..\CatLib.Core\Support\Util\Util.cs" Link="Support\Util\Util.cs" />
   </ItemGroup>
 

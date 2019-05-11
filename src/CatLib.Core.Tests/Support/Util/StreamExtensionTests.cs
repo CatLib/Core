@@ -50,7 +50,8 @@ namespace CatLib.Core.Tests.Support.Util
         {
             var stream1 = new StorageStream(new MemoryStorage());
             var builder = new StringBuilder();
-            for (var i = 0; i < (ThreadStatic.Buffer.Length / 10) + 1; i++)
+            var buffer = new byte[4096];
+            for (var i = 0; i < (buffer.Length / 10) + 1; i++)
             {
                 stream1.Write(Encoding.Default.GetBytes("1234567890"), 0, 10);
                 builder.Append("1234567890");
@@ -64,7 +65,8 @@ namespace CatLib.Core.Tests.Support.Util
         {
             var stream1 = new StorageStream(new MemoryStorage());
             var builder = new StringBuilder();
-            for (var i = 0; i < (ThreadStatic.Buffer.Length / 10) + 1; i++)
+            var buffer = new byte[4096];
+            for (var i = 0; i < (buffer.Length / 10) + 1; i++)
             {
                 var data = Encoding.UTF8.GetBytes("12中文34测试的5这是67890");
                 stream1.Write(data, 0, data.Length);

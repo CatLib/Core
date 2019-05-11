@@ -21,6 +21,12 @@ namespace CatLib
     public static class StreamExtension
     {
         /// <summary>
+        /// 默认的缓冲区
+        /// </summary>
+        [ThreadStatic]
+        private static readonly byte[] buffer = new byte[4096];
+
+        /// <summary>
         /// Append the source stream to the destination stream.
         /// </summary>
         /// <param name="source">The source stream.</param>
@@ -28,7 +34,7 @@ namespace CatLib
         /// <returns>Byte length of transmitted data.</returns>
         public static long AppendTo(this Stream source, Stream destination)
         {
-            return source.AppendTo(destination, ThreadStatic.Buffer);
+            return source.AppendTo(destination, buffer);
         }
 
         /// <summary>
@@ -99,9 +105,9 @@ namespace CatLib
                 }
 
                 MemoryStream targetStream;
-                if (length > 0 && length <= ThreadStatic.Buffer.Length)
+                if (length > 0 && length <= buffer.Length)
                 {
-                    targetStream = new MemoryStream(ThreadStatic.Buffer, 0, ThreadStatic.Buffer.Length, true, true);
+                    targetStream = new MemoryStream(buffer, 0, buffer.Length, true, true);
                 }
                 else
                 {
