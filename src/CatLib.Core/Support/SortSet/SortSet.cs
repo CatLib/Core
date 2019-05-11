@@ -20,7 +20,7 @@ namespace CatLib
     /// Ordered set
     /// </summary>
     [DebuggerDisplay("Count = {" + nameof(Count) + "}")]
-    public sealed class SortSet<TElement, TScore> : ISortSet<TElement, TScore>
+    public sealed class SortSet<TElement, TScore> : IEnumerable<TElement>
         where TScore : IComparable<TScore>
     {
         /// <summary>
