@@ -106,7 +106,6 @@
     <Compile Include="..\CatLib.Core\Support\QuickList\QuickList.cs" Link="Support\QuickList\QuickList.cs" />
     <Compile Include="..\CatLib.Core\Support\RingBuffer\IRingBuffer.cs" Link="Support\RingBuffer\IRingBuffer.cs" />
     <Compile Include="..\CatLib.Core\Support\RingBuffer\RingBuffer.cs" Link="Support\RingBuffer\RingBuffer.cs" />
-    <Compile Include="..\CatLib.Core\Support\SortSet\ISortSet.cs" Link="Support\SortSet\ISortSet.cs" />
     <Compile Include="..\CatLib.Core\Support\SortSet\SortSet.cs" Link="Support\SortSet\SortSet.cs" />
     <Compile Include="..\CatLib.Core\Support\Storage\IStorage.cs" Link="Support\Storage\IStorage.cs" />
     <Compile Include="..\CatLib.Core\Support\Storage\MemoryStorage.cs" Link="Support\Storage\MemoryStorage.cs" />
