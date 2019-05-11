@@ -101,7 +101,7 @@ namespace CatLib.Core.Tests.Support.Stream
             var segmentStream = new SegmentStream(baseStream, 11);
             var buffer = new byte[255];
             Assert.AreEqual(11, segmentStream.Read(buffer, 0, 255));
-            Assert.AreEqual("hello world", CatLib.Util.Encoding.GetString(buffer, 0, 11));
+            Assert.AreEqual("hello world", CatLib.Str.Encoding.GetString(buffer, 0, 11));
         }
 
         [TestMethod]
@@ -111,7 +111,7 @@ namespace CatLib.Core.Tests.Support.Stream
             var segmentStream = new SegmentStream(baseStream, 11);
             var buffer = new byte[255];
             Assert.AreEqual(11, segmentStream.Read(buffer, 0, 255));
-            Assert.AreEqual("hello world", CatLib.Util.Encoding.GetString(buffer, 0, 11));
+            Assert.AreEqual("hello world", CatLib.Str.Encoding.GetString(buffer, 0, 11));
             Assert.AreEqual(0, segmentStream.Read(buffer, 0, 255));
         }
 
@@ -122,7 +122,7 @@ namespace CatLib.Core.Tests.Support.Stream
             var segmentStream = new SegmentStream(baseStream, 11);
             var buffer = new byte[5];
             Assert.AreEqual(5, segmentStream.Read(buffer, 0, 5));
-            Assert.AreEqual("hello", CatLib.Util.Encoding.GetString(buffer, 0, 5));
+            Assert.AreEqual("hello", CatLib.Str.Encoding.GetString(buffer, 0, 5));
         }
 
         [TestMethod]
@@ -140,7 +140,7 @@ namespace CatLib.Core.Tests.Support.Stream
         {
             var baseStream = "hello world , my name is miaomiao".ToStream();
             var segmentStream = new SegmentStream(baseStream, 11);
-            var buffer = CatLib.Util.Encoding.GetBytes("hello world");
+            var buffer = CatLib.Str.Encoding.GetBytes("hello world");
 
             segmentStream.Write(buffer, 0, buffer.Length);
         }
