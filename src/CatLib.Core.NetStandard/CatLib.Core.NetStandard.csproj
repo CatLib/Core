@@ -47,6 +47,15 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="CatLib\Facades\**" />
+    <Compile Remove="Support\Template\**" />
+    <EmbeddedResource Remove="CatLib\Facades\**" />
+    <EmbeddedResource Remove="Support\Template\**" />
+    <None Remove="CatLib\Facades\**" />
+    <None Remove="Support\Template\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Compile Remove="..\CatLib.Core\Properties\AssemblyInfo.cs" />
   </ItemGroup>
 
@@ -60,10 +69,6 @@
     <Compile Include="..\CatLib.Core\CatLib\Events\IGlobalDispatcher.cs" Link="CatLib\Events\IGlobalDispatcher.cs" />
     <Compile Include="..\CatLib.Core\CatLib\Events\IOriginalDispatcher.cs" Link="CatLib\Events\IOriginalDispatcher.cs" />
     <Compile Include="..\CatLib.Core\CatLib\Facade.cs" Link="CatLib\Facade.cs" />
-    <Compile Include="..\CatLib.Core\CatLib\Facades\Template\Managed.cs" Link="CatLib\Facades\Template\Managed.cs" />
-    <Compile Include="..\CatLib.Core\CatLib\Facades\Template\Manager.cs" Link="CatLib\Facades\Template\Manager.cs" />
-    <Compile Include="..\CatLib.Core\CatLib\Facades\Template\SingleManaged.cs" Link="CatLib\Facades\Template\SingleManaged.cs" />
-    <Compile Include="..\CatLib.Core\CatLib\Facades\Template\SingleManager.cs" Link="CatLib\Facades\Template\SingleManager.cs" />
     <Compile Include="..\CatLib.Core\CatLib\IApplication.cs" Link="CatLib\IApplication.cs" />
     <Compile Include="..\CatLib.Core\CatLib\IBootstrap.cs" Link="CatLib\IBootstrap.cs" />
     <Compile Include="..\CatLib.Core\CatLib\ICoroutineInit.cs" Link="CatLib\ICoroutineInit.cs" />
@@ -114,14 +119,6 @@
     <Compile Include="..\CatLib.Core\Support\Stream\SegmentStream.cs" Link="Support\Stream\SegmentStream.cs" />
     <Compile Include="..\CatLib.Core\Support\Stream\StorageStream.cs" Link="Support\Stream\StorageStream.cs" />
     <Compile Include="..\CatLib.Core\Support\Stream\WrapperStream.cs" Link="Support\Stream\WrapperStream.cs" />
-    <Compile Include="..\CatLib.Core\Support\Template\IManaged.cs" Link="Support\Template\IManaged.cs" />
-    <Compile Include="..\CatLib.Core\Support\Template\IManager.cs" Link="Support\Template\IManager.cs" />
-    <Compile Include="..\CatLib.Core\Support\Template\ISingleManaged.cs" Link="Support\Template\ISingleManaged.cs" />
-    <Compile Include="..\CatLib.Core\Support\Template\ISingleManager.cs" Link="Support\Template\ISingleManager.cs" />
-    <Compile Include="..\CatLib.Core\Support\Template\Managed.cs" Link="Support\Template\Managed.cs" />
-    <Compile Include="..\CatLib.Core\Support\Template\Manager.cs" Link="Support\Template\Manager.cs" />
-    <Compile Include="..\CatLib.Core\Support\Template\SingleManaged.cs" Link="Support\Template\SingleManaged.cs" />
-    <Compile Include="..\CatLib.Core\Support\Template\SingleManager.cs" Link="Support\Template\SingleManager.cs" />
     <Compile Include="..\CatLib.Core\Support\Util\Arr.cs" Link="Support\Util\Arr.cs" />
     <Compile Include="..\CatLib.Core\Support\Util\Dict.cs" Link="Support\Util\Dict.cs" />
     <Compile Include="..\CatLib.Core\Support\Util\Enum.cs" Link="Support\Util\Enum.cs" />
@@ -138,7 +135,6 @@
   <ItemGroup>
     <Folder Include="..\CatLib.Core\Properties\" />
     <Folder Include="CatLib\Events\" />
-    <Folder Include="CatLib\Facades\Template\" />
     <Folder Include="Support\Attribute\" />
     <Folder Include="Support\Events\" />
     <Folder Include="Support\Exception\" />
@@ -147,7 +143,6 @@
     <Folder Include="Support\QuickList\" />
     <Folder Include="Support\SortSet\" />
     <Folder Include="Support\Stream\" />
-    <Folder Include="Support\Template\" />
     <Folder Include="Support\RingBuffer\" />
     <Folder Include="Support\Storage\" />
     <Folder Include="Support\Util\Extension\" />
