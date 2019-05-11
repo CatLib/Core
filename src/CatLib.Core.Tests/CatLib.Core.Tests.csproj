@@ -58,7 +58,6 @@
     <Compile Include="Support\Stream\SegmentStreamTests.cs" />
     <Compile Include="Support\Stream\StorageStreamTests.cs" />
     <Compile Include="Support\Util\ArrTests.cs" />
-    <Compile Include="Support\Util\DictTests.cs" />
     <Compile Include="Support\Util\StreamExtensionTests.cs" />
     <Compile Include="Support\Util\StringExtensionTests.cs" />
     <Compile Include="Support\Util\StrTests.cs" />
