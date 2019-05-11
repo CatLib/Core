@@ -24,19 +24,15 @@ namespace CatLib
     public class Application : Container, IApplication, IOriginalDispatcher
     {
         /// <summary>
-        /// The version of the CatLib application.
+        /// The version of the framework application.
         /// </summary>
-        private static Version version;
+        private static string version;
 
         /// <summary>
-        /// Get the version number of the application.
+        /// Gets the CatLib <see cref="Application"/> version.
         /// </summary>
-        /// <returns>The CatLib application version.</returns>
-        private static Version GetVersion()
-        {
-            return version ?? (version = new Version(FileVersionInfo
-                       .GetVersionInfo(Assembly.GetExecutingAssembly().Location).FileVersion));
-        }
+        public static string Version => version ?? (version = FileVersionInfo
+                       .GetVersionInfo(Assembly.GetExecutingAssembly().Location).FileVersion);
 
         /// <summary>
         /// The framework start process type.
@@ -454,42 +450,6 @@ namespace CatLib
         public void Off(object target)
         {
             Dispatcher.Off(target);
-        }
-
-        /// <summary>
-        /// Gets the CatLib <see cref="Application"/> version.
-        /// </summary>
-        [ExcludeFromCodeCoverage]
-        public static string Version => GetVersion().ToString();
-
-        /// <summary>
-        /// Compares to another CatLib <see cref="Application"/> version.
-        /// <para>Returns <code>-1</code> when the input version is greater than the current.</para>
-        /// <para>Returns <code>0</code> when the input version is equal to the current.</para>
-        /// <para>Returns <code>1</code> when the input version is less than the current.</para>
-        /// </summary>
-        /// <param name="major">The major version number.</param>
-        /// <param name="minor">The minor version number.</param>
-        /// <param name="revised">The revised version number.</param>
-        /// <returns>Returns <code>-1</code> when the input version is greater than the current.</returns>
-        [ExcludeFromCodeCoverage]
-        public static int Compare(int major, int minor, int revised)
-        {
-            return Compare($"{major}.{minor}.{revised}");
-        }
-
-        /// <summary>
-        /// Compares to another CatLib <see cref="Application"/> version.
-        /// <para>Returns <code>-1</code> when the input version is greater than the current.</para>
-        /// <para>Returns <code>0</code> when the input version is equal to the current.</para>
-        /// <para>Returns <code>1</code> when the input version is less than the current.</para>
-        /// </summary>
-        /// <param name="version">Another version in string.</param>
-        /// <returns>Returns <code>-1</code> when the input version is greater than the current.</returns>
-        [ExcludeFromCodeCoverage]
-        public static int Compare(string version)
-        {
-            return GetVersion().Compare(version);
         }
 
         /// <inheritdoc />

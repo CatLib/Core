@@ -105,18 +105,6 @@ namespace CatLib
         /// <inheritdoc cref="Application.Version"/>
         public static string Version => Application.Version;
 
-        /// <inheritdoc cref="Application.Compare(int,int,int)"/>
-        public static int Compare(int major, int minor, int revised)
-        {
-            return Application.Compare(major, minor, revised);
-        }
-
-        /// <inheritdoc cref="Application.Compare(string)"/>
-        public static int Compare(string version)
-        {
-            return Application.Compare(version);
-        }
-
         /// <inheritdoc cref="IApplication.GetPriority"/>
         public static int GetPriority(Type type, string method = null)
         {

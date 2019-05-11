@@ -67,7 +67,6 @@
     <Compile Include="Support\Util\StringExtensionTests.cs" />
     <Compile Include="Support\Util\StrTests.cs" />
     <Compile Include="Support\Util\SystemTimeTests.cs" />
-    <Compile Include="Support\VersionTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\CatLib.Core\CatLib.Core.csproj">
