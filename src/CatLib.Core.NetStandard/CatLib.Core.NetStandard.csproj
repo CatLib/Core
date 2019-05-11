@@ -48,10 +48,13 @@
 
   <ItemGroup>
     <Compile Remove="CatLib\Facades\**" />
+    <Compile Remove="Support\FilterChain\**" />
     <Compile Remove="Support\Template\**" />
     <EmbeddedResource Remove="CatLib\Facades\**" />
+    <EmbeddedResource Remove="Support\FilterChain\**" />
     <EmbeddedResource Remove="Support\Template\**" />
     <None Remove="CatLib\Facades\**" />
+    <None Remove="Support\FilterChain\**" />
     <None Remove="Support\Template\**" />
   </ItemGroup>
 
@@ -103,8 +106,6 @@
     <Compile Include="..\CatLib.Core\Support\Exception\CodeStandardException.cs" Link="Support\Exception\CodeStandardException.cs" />
     <Compile Include="..\CatLib.Core\Support\Exception\LogicException.cs" Link="Support\Exception\LogicException.cs" />
     <Compile Include="..\CatLib.Core\Support\Exception\RuntimeException.cs" Link="Support\Exception\RuntimeException.cs" />
-    <Compile Include="..\CatLib.Core\Support\FilterChain\FilterChain.cs" Link="Support\FilterChain\FilterChain.cs" />
-    <Compile Include="..\CatLib.Core\Support\FilterChain\IFilterChain.cs" Link="Support\FilterChain\IFilterChain.cs" />
     <Compile Include="..\CatLib.Core\Support\Guard\Guard.cs" Link="Support\Guard\Guard.cs" />
     <Compile Include="..\CatLib.Core\Support\QuickList\InternalList.cs" Link="Support\QuickList\InternalList.cs" />
     <Compile Include="..\CatLib.Core\Support\QuickList\IQuickList.cs" Link="Support\QuickList\IQuickList.cs" />
@@ -138,7 +139,6 @@
     <Folder Include="Support\Attribute\" />
     <Folder Include="Support\Events\" />
     <Folder Include="Support\Exception\" />
-    <Folder Include="Support\FilterChain\" />
     <Folder Include="Support\Guard\" />
     <Folder Include="Support\QuickList\" />
     <Folder Include="Support\SortSet\" />
