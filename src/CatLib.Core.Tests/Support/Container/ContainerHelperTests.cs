@@ -533,7 +533,7 @@ namespace CatLib.Tests
         {
             var container = new Container();
             var obj = new object();
-            container.Bind<IAwait>((p) => (bool) p[0] ? obj : new object()).Alias("created");
+            container.Bind<object>((p) => (bool) p[0] ? obj : new object()).Alias("created");
             Assert.AreSame(obj, container.Make("created", true));
             Assert.AreNotSame(obj, container.Make("created", false));
         }
@@ -543,7 +543,7 @@ namespace CatLib.Tests
         {
             var container = new Container();
             var obj = new object();
-            container.Singleton<IAwait>((p) => (bool)p[0] ? obj : new object()).Alias("created");
+            container.Singleton<object>((p) => (bool)p[0] ? obj : new object()).Alias("created");
             Assert.AreSame(obj, container.Make("created", true));
             Assert.AreSame(obj, container.Make("created", false));
         }
@@ -553,8 +553,8 @@ namespace CatLib.Tests
         {
             var container = new Container();
             var obj = new object();
-            Assert.AreEqual(true, container.BindIf<IAwait>((p) => (bool)p[0] ? obj : new object(), out IBindData bindData));
-            Assert.AreEqual(false, container.BindIf<IAwait>((p) => null, out bindData));
+            Assert.AreEqual(true, container.BindIf<object>((p) => (bool)p[0] ? obj : new object(), out IBindData bindData));
+            Assert.AreEqual(false, container.BindIf<object>((p) => null, out bindData));
             bindData.Alias("created");
             Assert.AreSame(obj, container.Make("created", true));
             Assert.AreNotSame(obj, container.Make("created", false));
@@ -565,8 +565,8 @@ namespace CatLib.Tests
         {
             var container = new Container();
             var obj = new object();
-            Assert.AreEqual(true, container.SingletonIf<IAwait>((p) => (bool)p[0] ? obj : new object(), out IBindData bindData));
-            Assert.AreEqual(false, container.SingletonIf<IAwait>((p) => null, out bindData));
+            Assert.AreEqual(true, container.SingletonIf<object>((p) => (bool)p[0] ? obj : new object(), out IBindData bindData));
+            Assert.AreEqual(false, container.SingletonIf<object>((p) => null, out bindData));
             bindData.Alias("created");
             Assert.AreSame(obj, container.Make("created", true));
             Assert.AreSame(obj, container.Make("created", false));
