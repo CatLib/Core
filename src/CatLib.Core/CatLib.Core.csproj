@@ -86,8 +86,6 @@
     <Compile Include="Support\Exception\CodeStandardException.cs" />
     <Compile Include="Support\Exception\LogicException.cs" />
     <Compile Include="Support\Exception\RuntimeException.cs" />
-    <Compile Include="Support\FilterChain\FilterChain.cs" />
-    <Compile Include="Support\FilterChain\IFilterChain.cs" />
     <Compile Include="Support\Guard\Guard.cs" />
     <Compile Include="Support\QuickList\InternalList.cs" />
     <Compile Include="Support\QuickList\IQuickList.cs" />
