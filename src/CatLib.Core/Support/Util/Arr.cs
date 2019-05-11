@@ -711,45 +711,6 @@ namespace CatLib
         }
 
         /// <summary>
-        /// A temporary callback element that rolls back element callbacks
-        /// if an exception is encountered or a callback is completed.
-        /// </summary>
-        /// <typeparam name="T">The type of array.</typeparam>
-        /// <param name="source">The specified array.</param>
-        /// <param name="process">The order callback.</param>
-        /// <param name="completed">After all callbacks are completed.</param>
-        /// <param name="rollback">Rollback callback.</param>
-        public static void Flash<T>(T[] source, Action<T> process, Action<T> rollback, Action completed)
-        {
-            Guard.Requires<ArgumentNullException>(source != null);
-
-            if (source.Length <= 0)
-            {
-                completed.Invoke();
-                return;
-            }
-
-            var index = 0;
-            try
-            {
-                foreach (var result in source)
-                {
-                    ++index;
-                    process.Invoke(result);
-                }
-
-                completed();
-            }
-            finally
-            {
-                while (--index >= 0)
-                {
-                    rollback.Invoke(source[index]);
-                }
-            }
-        }
-
-        /// <summary>
         /// Pass the specified array to the callback test.
         /// <para>The function returns false only if all elements pass the checker are false.</para>
         /// </summary>
