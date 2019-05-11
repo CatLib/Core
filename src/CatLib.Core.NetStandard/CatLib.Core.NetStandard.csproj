@@ -133,7 +133,6 @@
     <Compile Include="..\CatLib.Core\Support\Util\SystemTime.cs" Link="Support\Util\SystemTime.cs" />
     <Compile Include="..\CatLib.Core\Support\Util\ThreadStatic.cs" Link="Support\Util\ThreadStatic.cs" />
     <Compile Include="..\CatLib.Core\Support\Util\Util.cs" Link="Support\Util\Util.cs" />
-    <Compile Include="..\CatLib.Core\Support\Util\Version.cs" Link="Support\Util\Version.cs" />
   </ItemGroup>
 
   <ItemGroup>

@@ -125,7 +125,6 @@
     <Compile Include="Support\Util\SystemTime.cs" />
     <Compile Include="Support\Util\ThreadStatic.cs" />
     <Compile Include="Support\Util\Util.cs" />
-    <Compile Include="Support\Util\Version.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
