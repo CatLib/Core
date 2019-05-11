@@ -787,69 +787,6 @@ namespace CatLib
             }
         }
 
-        /// <inheritdoc />
-        public void Flash(Action callback, params KeyValuePair<string, object>[] services)
-        {
-            lock (syncRoot)
-            {
-                if (services == null || services.Length <= 0)
-                {
-                    callback();
-                    return;
-                }
-
-                Stack<KeyValuePair<string, object>> serviceStack = null;
-                try
-                {
-                    foreach (var service in services)
-                    {
-                        try
-                        {
-                            // If the service is bound, then we think this is not a service available for Flash.
-                            // So we throw an exception to terminate the operation。
-                            if (HasBind(service.Key))
-                            {
-                                throw new LogicException(
-                                    $"Flash service [{service.Key}] name has be used for {nameof(Bind)} or {nameof(Alias)}.");
-                            }
-                        }
-                        catch
-                        {
-                            // Empty the service stack if an exception occurs during HasBind execution.
-                            // Because the service has not been replaced and there is no need to 
-                            // perform a restore operation。
-                            serviceStack = null;
-                            throw;
-                        }
-
-                        if (!HasInstance(service.Key))
-                        {
-                            continue;
-                        }
-
-                        // If the service already exists, add the old service to the stack.
-                        // Wait for the Flash operation to complete before restoring the 
-                        // old service instance.
-                        serviceStack = serviceStack ?? new Stack<KeyValuePair<string, object>>(services.Length);
-                        serviceStack.Push(new KeyValuePair<string, object>(service.Key, Make(service.Key)));
-                    }
-
-                    Arr.Flash(services,
-                        service => Instance(service.Key, service.Value),
-                        service => Release(service.Key),
-                        callback);
-                }
-                finally
-                {
-                    while (serviceStack != null && serviceStack.Count > 0)
-                    {
-                        var service = serviceStack.Pop();
-                        Instance(service.Key, service.Value);
-                    }
-                }
-            }
-        }
-
         /// <summary>
         /// Determine if specified type is the default base type of the container.
         /// </summary>
@@ -1665,18 +1602,16 @@ namespace CatLib
 
             var bind = GetBind(service);
             instance = instance ?? Make(service);
-            Flash(() =>
+
+            for (var index = 0; index < callbacks.Count; index++)
             {
-                for (var index = 0; index < callbacks.Count; index++)
+                callbacks[index](instance);
+                // If it is a not singleton(static) binding then each callback is given a separate instance.
+                if (index + 1 < callbacks.Count && (bind == null || !bind.IsStatic))
                 {
-                    callbacks[index](instance);
-                    // If it is a not singleton(static) binding then each callback is given a separate instance.
-                    if (index + 1 < callbacks.Count && (bind == null || !bind.IsStatic))
-                    {
-                        instance = Make(service);
-                    }
+                    instance = Make(service);
                 }
-            }, Pair(typeof(IBindData), bind));
+            }
         }
 
         /// <summary>
@@ -1689,17 +1624,6 @@ namespace CatLib
             {
                 disposable.Dispose();
             }
-        }
-
-        /// <summary>
-        /// Returns the key-value pair for the specified type and instance.
-        /// </summary>
-        /// <param name="type">The specified type.</param>
-        /// <param name="instance">The specified instance.</param>
-        /// <returns>The key-value pair for the specified type and instance.</returns>
-        private KeyValuePair<string, object> Pair(Type type, object instance)
-        {
-            return new KeyValuePair<string, object>(Type2Service(type), instance);
         }
 
         /// <summary>
