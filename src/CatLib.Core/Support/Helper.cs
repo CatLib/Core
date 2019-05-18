@@ -10,48 +10,20 @@
  */
 
 using System;
-using System.Reflection;
 
 namespace CatLib
 {
     /// <summary>
     /// 通用支持
     /// </summary>
-    public static class Util
+    internal static class Helper
     {
-        /// <summary>
-        /// 获取优先级
-        /// </summary>
-        /// <param name="type">识别的类型</param>
-        /// <param name="method">识别的方法</param>
-        /// <returns>优先级</returns>
-        public static int GetPriority(Type type, string method = null)
-        {
-            Guard.Requires<ArgumentNullException>(type != null);
-            var priority = typeof(PriorityAttribute);
-            var currentPriority = int.MaxValue;
-
-            MethodInfo methodInfo;
-            if (method != null &&
-                (methodInfo = type.GetMethod(method)) != null &&
-                methodInfo.IsDefined(priority, false))
-            {
-                currentPriority = ((PriorityAttribute)methodInfo.GetCustomAttributes(priority, false)[0]).Priorities;
-            }
-            else if (type.IsDefined(priority, false))
-            {
-                currentPriority = ((PriorityAttribute)type.GetCustomAttributes(priority, false)[0]).Priorities;
-            }
-
-            return currentPriority;
-        }
-
         /// <summary>
         /// 构建一个随机生成器
         /// </summary>
         /// <param name="seed">种子</param>
         /// <returns>随机生成器</returns>
-        public static System.Random MakeRandom(int? seed = null)
+        internal static System.Random MakeRandom(int? seed = null)
         {
             return new System.Random(seed.GetValueOrDefault(MakeSeed()));
         }
@@ -60,7 +32,7 @@ namespace CatLib
         /// 生成种子
         /// </summary>
         /// <returns>种子</returns>
-        public static int MakeSeed()
+        internal static int MakeSeed()
         {
             return Environment.TickCount ^ Guid.NewGuid().GetHashCode();
         }

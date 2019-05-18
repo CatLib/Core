@@ -408,7 +408,23 @@ namespace CatLib
         /// <inheritdoc />
         public int GetPriority(Type type, string method = null)
         {
-            return Util.GetPriority(type, method);
+            Guard.Requires<ArgumentNullException>(type != null);
+            var priority = typeof(PriorityAttribute);
+            var currentPriority = int.MaxValue;
+
+            MethodInfo methodInfo;
+            if (method != null &&
+                (methodInfo = type.GetMethod(method)) != null &&
+                methodInfo.IsDefined(priority, false))
+            {
+                currentPriority = ((PriorityAttribute)methodInfo.GetCustomAttributes(priority, false)[0]).Priorities;
+            }
+            else if (type.IsDefined(priority, false))
+            {
+                currentPriority = ((PriorityAttribute)type.GetCustomAttributes(priority, false)[0]).Priorities;
+            }
+
+            return currentPriority;
         }
 
         /// <inheritdoc />
