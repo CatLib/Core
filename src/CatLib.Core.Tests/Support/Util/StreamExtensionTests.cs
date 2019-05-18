@@ -39,7 +39,7 @@ namespace CatLib.Core.Tests.Support.Util
         [TestMethod]
         public void TestStreamToTextOtherStream()
         {
-            var stream1 = new StorageStream(new MemoryStorage());
+            var stream1 = new MemoryStream();
             stream1.Write(Encoding.Default.GetBytes("Hello world"), 0, 11);
             stream1.Seek(0, SeekOrigin.Begin);
             Assert.AreEqual("Hello world", stream1.ToText());
@@ -48,7 +48,7 @@ namespace CatLib.Core.Tests.Support.Util
         [TestMethod]
         public void TestStreamToTextLarage()
         {
-            var stream1 = new StorageStream(new MemoryStorage());
+            var stream1 = new MemoryStream();
             var builder = new StringBuilder();
             var buffer = new byte[4096];
             for (var i = 0; i < (buffer.Length / 10) + 1; i++)
@@ -63,7 +63,7 @@ namespace CatLib.Core.Tests.Support.Util
         [TestMethod]
         public void TestChineseText()
         {
-            var stream1 = new StorageStream(new MemoryStorage());
+            var stream1 = new MemoryStream();
             var builder = new StringBuilder();
             var buffer = new byte[4096];
             for (var i = 0; i < (buffer.Length / 10) + 1; i++)
