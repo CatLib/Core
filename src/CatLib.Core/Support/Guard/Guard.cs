@@ -17,8 +17,27 @@ namespace CatLib
     /// <summary>
     /// Guard the code.
     /// </summary>
-    public static class Guard
+    public sealed class Guard
     {
+        private static Guard that;
+
+        /// <summary>
+        /// Gets the singleton instance of the Guard functionality.
+        /// </summary>
+        /// <remarks>Users can use this to plug-in custom assertions through csharp extension methods.</remarks>
+        public static Guard That
+        {
+            get
+            {
+                if (that == null)
+                {
+                    that = new Guard();
+                }
+
+                return that;
+            }
+        }
+
         /// <summary>
         /// Verifies a condition and throws an exception if the condition of the contract fails.
         /// </summary>
