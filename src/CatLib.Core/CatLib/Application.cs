@@ -311,7 +311,7 @@ namespace CatLib
         {
             Guard.Requires<ArgumentNullException>(provider != null);
 
-            if (IsRegisted(provider))
+            if (IsRegistered(provider))
             {
                 if (!force)
                 {
@@ -393,7 +393,7 @@ namespace CatLib
         }
 
         /// <inheritdoc />
-        public bool IsRegisted(IServiceProvider provider)
+        public bool IsRegistered(IServiceProvider provider)
         {
             Guard.Requires<ArgumentNullException>(provider != null);
             return loadedProviders.Contains(GetProviderBaseType(provider));
