@@ -205,7 +205,7 @@ namespace CatLib.Tests
         }
 
         [TestMethod]
-        [ExpectedException(typeof(CodeStandardException))]
+        [ExpectedExceptionAndMessage(typeof(CodeStandardException))]
         public void TestInitingRegisterProvider()
         {
             var application = Application.New();
@@ -219,7 +219,7 @@ namespace CatLib.Tests
         }
 
         [TestMethod]
-        [ExpectedException(typeof(CodeStandardException))]
+        [ExpectedExceptionAndMessage(typeof(CodeStandardException))]
         public void TestTerminateRegisterProvider()
         {
             var application = Application.New();
@@ -506,14 +506,6 @@ namespace CatLib.Tests
             {
                 
             }
-        }
-
-        [TestMethod]
-        public void TestForceRegister()
-        {
-            var app = MakeApplication();
-            app.Register(new OrderFirstClass());
-            app.Register(new OrderFirstClass(), true);
         }
 
         [TestMethod]
