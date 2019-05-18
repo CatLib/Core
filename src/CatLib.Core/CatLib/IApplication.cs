@@ -30,7 +30,7 @@ namespace CatLib
         /// </summary>
         /// <param name="provider">The service provider.</param>
         /// <returns>True if the service provider is registered.</returns>
-        bool IsRegisted(IServiceProvider provider);
+        bool IsRegistered(IServiceProvider provider);
 
         /// <summary>
         /// Gets the unique runtime id.

@@ -88,10 +88,10 @@ namespace CatLib
             Handler.Register(provider, force);
         }
 
-        /// <inheritdoc cref="IApplication.IsRegisted"/>
-        public static bool IsRegisted(IServiceProvider provider)
+        /// <inheritdoc cref="IApplication.IsRegistered"/>
+        public static bool IsRegistered(IServiceProvider provider)
         {
-            return Handler.IsRegisted(provider);
+            return Handler.IsRegistered(provider);
         }
 
         /// <inheritdoc cref="IApplication.GetRuntimeId"/>
