@@ -865,7 +865,7 @@ namespace CatLib
                     return true;
                 }
 
-                if (IsBasicType(result.GetType()) && typeof(IVariant).IsAssignableFrom(conversionType))
+                if (IsBasicType(result.GetType()) && conversionType.IsDefined(typeof(VariantAttribute), false))
                 {
                     try
                     {
