@@ -97,7 +97,7 @@ namespace CatLib
             var requested = new T[source.Length];
             Array.Copy(source, requested, source.Length);
 
-            var random = Util.MakeRandom(seed);
+            var random = Helper.MakeRandom(seed);
             for (var i = 0; i < requested.Length; i++)
             {
                 var index = random.Next(0, requested.Length - 1);
@@ -137,7 +137,7 @@ namespace CatLib
         {
             Guard.Requires<ArgumentNullException>(source != null);
 
-            Util.NormalizationPosition(source.Length, ref start, ref length);
+            Helper.NormalizationPosition(source.Length, ref start, ref length);
 
             var requested = new T[length.Value];
 
@@ -506,7 +506,7 @@ namespace CatLib
         {
             Guard.Requires<ArgumentNullException>(source != null);
 
-            Util.NormalizationPosition(source.Length, ref start, ref length);
+            Helper.NormalizationPosition(source.Length, ref start, ref length);
 
             var requested = new T[length.Value];
             Array.Copy(source, start, requested, 0, length.Value);
@@ -581,7 +581,7 @@ namespace CatLib
                 return source;
             }
 
-            Util.NormalizationPosition(source.Length, ref start, ref length);
+            Helper.NormalizationPosition(source.Length, ref start, ref length);
             var tmpSource = new T[source.Length];
             Array.Copy(source, tmpSource, source.Length);
             Array.Reverse(tmpSource, start, length.Value);
