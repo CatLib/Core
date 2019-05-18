@@ -461,11 +461,13 @@ namespace CatLib
                     $"It is not allowed to make services or dependency injection in the {nameof(Register)} process, method:{method}");
             }
 
+            // todo: rebuild event system.
+            /*
             if (Process < StartProcess.Bootstraped)
             {
                 throw new CodeStandardException(
                     $"It is not allowed to make services or dependency injection before {nameof(Bootstrap)} process, method:{method}");
-            }
+            }*/
 
             base.GuardConstruct(method);
         }

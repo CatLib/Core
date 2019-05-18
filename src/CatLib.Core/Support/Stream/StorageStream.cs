@@ -115,14 +115,6 @@ namespace CatLib
             }
         }
 
-        /// <summary>
-        /// Released the storage stream.
-        /// </summary>
-        ~StorageStream()
-        {
-            Dispose(!disabled);
-        }
-
         /// <inheritdoc />
         public override long Seek(long offset, SeekOrigin origin)
         {
@@ -211,14 +203,14 @@ namespace CatLib
         {
             try
             {
-                if (!disposing || disabled)
+                if (!disposing || disabled || storage == null)
                 {
                     return;
                 }
 
                 disabled = true;
 
-                if (storage.Disabled || storage.Locker == null)
+                if (storage.Disabled)
                 {
                     return;
                 }

@@ -1,0 +1,18 @@
+language: csharp
+mono: none
+dotnet: 2.1.502
+
+stages:
+  - compile
+  - test
+
+jobs:
+  include:
+    - stage: compile
+      script:
+        - dotnet build -c Release
+    - stage: test
+      script:
+        - dotnet test -c Release -s ../settings.runsettings /p:CollectCoverage=true /p:CoverletOutputFormat=\"json,teamcity,opencover\" /p:CoverletOutput=\"../../coverage/\" /p:Exclude=[*.Tests]* /p:Threshold=90 /p:ThresholdType=line
+      after_success:
+        - bash <(curl -s https://codecov.io/bash) -f coverage/coverage.opencover.xml -t $CODE_COV_TOKEN

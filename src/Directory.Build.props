@@ -1,0 +1,48 @@
+<Project>
+  <PropertyGroup>
+	<IsTestProject>$(MSBuildProjectName.Contains('Tests'))</IsTestProject>
+	<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <WarningsAsErrors />
+  </PropertyGroup>
+  
+  <ItemGroup>
+	  <AdditionalFiles Include="$(MSBuildThisFileDirectory)stylecop.json" Link="stylecop.json" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <!--PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="3.1.0-beta3-final" />
+    <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="2.9.2" />
+    <PackageReference Include="StyleCop.Analyzers" Version="1.1.118">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+    </PackageReference>
+	  <PackageReference Include="SonarAnalyzer.CSharp" Version="7.14.0.8411">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+    </PackageReference!-->
+  </ItemGroup>
+
+  <Choose>
+	<When Condition="'$(IsTestProject)' == 'true'">
+	  <PropertyGroup>
+        <CodeAnalysisRuleSet>$(MSBuildThisFileDirectory)analysis.test.ruleset</CodeAnalysisRuleSet>
+      </PropertyGroup>
+	  
+	  <ItemGroup>
+		<PackageReference Include="coverlet.msbuild" Version="2.6.1">
+		  <PrivateAssets>all</PrivateAssets>
+		  <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+		</PackageReference>
+		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.1.0" />
+		<PackageReference Include="Moq" Version="4.11.0-rc1" />
+		<PackageReference Include="MSTest.TestAdapter" Version="2.0.0-beta4" />
+		<PackageReference Include="MSTest.TestFramework" Version="2.0.0-beta4" />
+	  </ItemGroup>
+	</When>
+	<Otherwise>
+	  <PropertyGroup>
+        <CodeAnalysisRuleSet>$(MSBuildThisFileDirectory)analysis.ruleset</CodeAnalysisRuleSet>
+      </PropertyGroup>
+	</Otherwise>
+  </Choose>
+</Project>

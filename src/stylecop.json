@@ -1,0 +1,25 @@
+{
+  "settings":{
+    "orderingRules":{
+        "usingDirectivesPlacement" : "outsideNamespace"
+    },
+	"documentationRules":{
+		"documentInternalElements" : false
+	},
+	"readabilityRules":{
+		"allowBuiltInTypeAliases": true
+	},
+	"maintainabilityRules":{
+		"topLevelTypes" : [ 
+			"class",
+			"interface",
+			"enum",
+			"delegate",
+			"struct"
+		]
+	},
+	"layoutRules":{
+		"newlineAtEndOfFile" : "require"
+	}
+  }
+}
