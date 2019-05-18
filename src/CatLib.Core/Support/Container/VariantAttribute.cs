@@ -9,13 +9,15 @@
  * Document: https://catlib.io/
  */
 
+using System;
+
 namespace CatLib
 {
     /// <summary>
-    /// 可转变的
-    /// <para>实现该接口的类，允许依赖注入容器将用户传入的基本类型(包含string)转变为目标类</para>
+    /// A constructor that represents the class allows a primitive type(Include string) to be passed in to be converted to the current class.
     /// </summary>
-    public interface IVariant
+    [AttributeUsage(AttributeTargets.Class)]
+    public class VariantAttribute : Attribute
     {
     }
 }

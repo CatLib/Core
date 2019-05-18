@@ -1994,7 +1994,8 @@ namespace CatLib.Tests.Stl
             });
         }
 
-        public class VariantModel : IVariant
+        [Variant]
+        public class VariantModel
         {
             public int num;
             public VariantModel(int num)
