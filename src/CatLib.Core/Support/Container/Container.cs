@@ -12,6 +12,7 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Runtime.ExceptionServices;
 using System.Text;
 
 namespace CatLib
@@ -1443,7 +1444,7 @@ namespace CatLib
                 return null;
             }
 
-            Exception exception = null;
+            ExceptionDispatchInfo exceptionDispatchInfo = null;
             foreach (var constructor in constructors)
             {
                 try
@@ -1452,15 +1453,15 @@ namespace CatLib
                 }
                 catch (Exception ex)
                 {
-                    if (exception == null)
+                    if (exceptionDispatchInfo == null)
                     {
-                        exception = ex;
+                        exceptionDispatchInfo = ExceptionDispatchInfo.Capture(ex);
                     }
                 }
             }
 
-            Guard.Requires<AssertException>(exception != null);
-            throw exception;
+            exceptionDispatchInfo?.Throw();
+            throw new AssertException("Exception dispatch info is null.");
         }
 
         /// <summary>
