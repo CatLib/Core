@@ -200,7 +200,7 @@ namespace CatLib
         public static string Shuffle(string str, int? seed = null)
         {
             Guard.Requires<ArgumentNullException>(str != null);
-            var random = Util.MakeRandom(seed);
+            var random = Helper.MakeRandom(seed);
 
             var requested = new string[str.Length];
             for (var i = 0; i < str.Length; i++)
@@ -238,7 +238,7 @@ namespace CatLib
             Guard.Requires<ArgumentNullException>(str != null);
             Guard.Requires<ArgumentNullException>(subStr != null);
 
-            Util.NormalizationPosition(str.Length, ref start, ref length);
+            Helper.NormalizationPosition(str.Length, ref start, ref length);
 
             var count = 0;
             while (length.Value > 0)
@@ -445,7 +445,7 @@ namespace CatLib
             Guard.Requires<ArgumentOutOfRangeException>(length > 0);
 
             var requested = string.Empty;
-            var random = Util.MakeRandom(seed);
+            var random = Helper.MakeRandom(seed);
             for (int len; (len = requested.Length) < length;)
             {
                 var size = length - len;
