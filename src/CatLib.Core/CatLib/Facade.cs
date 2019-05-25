@@ -137,7 +137,7 @@ namespace CatLib
         {
             var newBinder = App.GetBind(Service);
             Rebind(newBinder);
-            instance = (newBinder == null || !newBinder.IsStatic) ? default : newService;
+            instance = (newBinder == null || !newBinder.IsStatic) ? default(TService) : newService;
         }
 
         /// <summary>
