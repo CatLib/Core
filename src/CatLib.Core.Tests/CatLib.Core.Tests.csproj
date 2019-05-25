@@ -11,6 +11,12 @@
     <WarningsAsErrors />
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <WarningsAsErrors />
+    <GenerateSerializationAssemblies>Off</GenerateSerializationAssemblies>
+  </PropertyGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\CatLib.Core\CatLib.Core.csproj" />
   </ItemGroup>
