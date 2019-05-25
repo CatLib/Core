@@ -693,14 +693,14 @@ namespace CatLib
         {
             if (node == null)
             {
-                element = default;
+                element = default(TElement);
                 return false;
             }
 
             var result = node.Element;
             if (!Remove(node.Element, node.Score))
             {
-                element = default;
+                element = default(TElement);
                 return false;
             }
 

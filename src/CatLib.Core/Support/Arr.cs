@@ -727,7 +727,7 @@ namespace CatLib
             Guard.Requires<ArgumentNullException>(index < source.Length);
 
             var result = Splice(ref source, index, 1);
-            return result.Length > 0 ? result[0] : default;
+            return result.Length > 0 ? result[0] : default(T);
         }
 
         /// <summary>

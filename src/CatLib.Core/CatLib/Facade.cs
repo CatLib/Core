@@ -58,7 +58,7 @@ namespace CatLib
             Service = App.Type2Service(typeof(TService));
             App.OnNewApplication += app =>
             {
-                instance = default;
+                instance = default(TService);
                 binder = null;
                 inited = false;
                 released = false;
@@ -125,7 +125,7 @@ namespace CatLib
                 return;
             }
 
-            Facade<TService>.instance = default;
+            Facade<TService>.instance = default(TService);
             released = true;
         }
 
