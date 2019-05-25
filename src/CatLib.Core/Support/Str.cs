@@ -28,7 +28,7 @@ namespace CatLib
         /// <summary>
         /// Fill types.
         /// </summary>
-        public enum PadTypes
+        public enum PadType
         {
             /// <summary>
             /// Fill both sides of the string. If it is not even, the right side gets extra padding.
@@ -282,13 +282,13 @@ namespace CatLib
         /// <param name="padStr">A string to be used for padding. The default is blank.</param>
         /// <param name="type">
         /// Fill in which side of the string.
-        /// <para><see cref="PadTypes.Both"/>Fill both sides of the string. If not even, get extra padding on the right side.</para>
-        /// <para><see cref="PadTypes.Left"/>Fill the left side of the string.</para>
-        /// <para><see cref="PadTypes.Right"/>Fill the right side of the string.</para>
+        /// <para><see cref="PadType.Both"/>Fill both sides of the string. If not even, get extra padding on the right side.</para>
+        /// <para><see cref="PadType.Left"/>Fill the left side of the string.</para>
+        /// <para><see cref="PadType.Right"/>Fill the right side of the string.</para>
         /// </param>
         /// <returns>Returns filled string.</returns>
         [Obsolete("The overload method wile be remove in 2.0 version.")]
-        public static string Pad(string str, int length, string padStr = null, PadTypes type = PadTypes.Right)
+        public static string Pad(string str, int length, string padStr = null, PadType type = PadType.Right)
         {
             return Pad(length, str, padStr, type);
         }
@@ -301,12 +301,12 @@ namespace CatLib
         /// <param name="padStr">A string to be used for padding. The default is blank.</param>
         /// <param name="type">
         /// Fill in which side of the string.
-        /// <para><see cref="PadTypes.Both"/>Fill both sides of the string. If not even, get extra padding on the right side.</para>
-        /// <para><see cref="PadTypes.Left"/>Fill the left side of the string.</para>
-        /// <para><see cref="PadTypes.Right"/>Fill the right side of the string.</para>
+        /// <para><see cref="PadType.Both"/>Fill both sides of the string. If not even, get extra padding on the right side.</para>
+        /// <para><see cref="PadType.Left"/>Fill the left side of the string.</para>
+        /// <para><see cref="PadType.Right"/>Fill the right side of the string.</para>
         /// </param>
         /// <returns>Returns filled string.</returns>
-        public static string Pad(int length, string str = null, string padStr = null, PadTypes type = PadTypes.Right)
+        public static string Pad(int length, string str = null, string padStr = null, PadType type = PadType.Right)
         {
             str = str ?? string.Empty;
 
@@ -319,12 +319,12 @@ namespace CatLib
             int rightPadding;
             var leftPadding = rightPadding = 0;
 
-            if (type == PadTypes.Both)
+            if (type == PadType.Both)
             {
                 leftPadding = needPadding >> 1;
                 rightPadding = (needPadding >> 1) + (needPadding % 2 == 0 ? 0 : 1);
             }
-            else if (type == PadTypes.Right)
+            else if (type == PadType.Right)
             {
                 rightPadding = needPadding;
             }

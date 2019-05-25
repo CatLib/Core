@@ -26,7 +26,7 @@ namespace CatLib
         /// <summary>
         /// Gets or sets the debug level.
         /// </summary>
-        DebugLevels DebugLevel { get; set; }
+        DebugLevel DebugLevel { get; set; }
 
         /// <summary>
         /// Register a service provider with the application.

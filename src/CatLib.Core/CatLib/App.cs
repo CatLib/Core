@@ -80,7 +80,7 @@ namespace CatLib
         public static string Version => Application.Version;
 
         /// <inheritdoc cref="IApplication.DebugLevel"/>
-        public static DebugLevels DebugLevel
+        public static DebugLevel DebugLevel
         {
             get => Handler.DebugLevel;
             set => Handler.DebugLevel = value;

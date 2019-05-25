@@ -72,7 +72,7 @@ namespace CatLib
         /// <summary>
         /// The debug level.
         /// </summary>
-        private DebugLevels debugLevel;
+        private DebugLevel debugLevel;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Application"/> class.
@@ -89,7 +89,7 @@ namespace CatLib
             // causes the active assembly to be not the expected scope.
             OnFindType(finder => { return Type.GetType(finder); });
 
-            DebugLevel = DebugLevels.Production;
+            DebugLevel = DebugLevel.Production;
             Process = StartProcess.Construct;
 
             if (global)
@@ -182,13 +182,13 @@ namespace CatLib
         public bool IsMainThread => mainThreadId == Thread.CurrentThread.ManagedThreadId;
 
         /// <inheritdoc />
-        public DebugLevels DebugLevel
+        public DebugLevel DebugLevel
         {
             get => debugLevel;
             set
             {
                 debugLevel = value;
-                Instance(Type2Service(typeof(DebugLevels)), debugLevel);
+                Instance(Type2Service(typeof(DebugLevel)), debugLevel);
             }
         }
 

@@ -151,32 +151,32 @@ namespace CatLib.API.Stl
         [TestMethod]
         public void TestPad()
         {
-            var result = Str.Pad(10, "hello", "worldtest", Str.PadTypes.Both);
+            var result = Str.Pad(10, "hello", "worldtest", Str.PadType.Both);
             Assert.AreEqual("wohellowor", result);
 
             result = Str.Pad(10, "hello", "worldtest");
             Assert.AreEqual("helloworld", result);
 
-            result = Str.Pad(10, "hello", "worldtest" , Str.PadTypes.Left);
+            result = Str.Pad(10, "hello", "worldtest" , Str.PadType.Left);
             Assert.AreEqual("worldhello", result);
 
-            result = Str.Pad(3, "hello", "worldtest", Str.PadTypes.Left);
+            result = Str.Pad(3, "hello", "worldtest", Str.PadType.Left);
             Assert.AreEqual("hello", result);
 
-            result = Str.Pad(10, "hello", null, Str.PadTypes.Left);
+            result = Str.Pad(10, "hello", null, Str.PadType.Left);
             Assert.AreEqual("     hello", result);
 
-            result = Str.Pad(10, "hello", string.Empty, Str.PadTypes.Left);
+            result = Str.Pad(10, "hello", string.Empty, Str.PadType.Left);
             Assert.AreEqual("     hello", result);
         }
 
         [TestMethod]
         public void TestEmptyStrPad()
         {
-            var result = Str.Pad(10, string.Empty, "wor", Str.PadTypes.Left);
+            var result = Str.Pad(10, string.Empty, "wor", Str.PadType.Left);
             Assert.AreEqual("worworworw", result);
 
-            result = Str.Pad(10, string.Empty, "wor", Str.PadTypes.Both);
+            result = Str.Pad(10, string.Empty, "wor", Str.PadType.Both);
             Assert.AreEqual("worwoworwo", result);
 
             result = Str.Pad(10, null, "wor");

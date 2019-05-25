@@ -304,8 +304,8 @@ namespace CatLib.Tests
         [TestMethod]
         public void TestDebugLevel()
         {
-            App.DebugLevel = DebugLevels.Development;
-            Assert.AreEqual(DebugLevels.Development, App.DebugLevel);
+            App.DebugLevel = DebugLevel.Development;
+            Assert.AreEqual(DebugLevel.Development, App.DebugLevel);
         }
 
         /// <summary>
