@@ -19,12 +19,12 @@ namespace CatLib
     public interface IBindData : IBindable<IBindData>
     {
         /// <summary>
-        /// The delegate return service concrete.
+        /// Gets the delegate return service concrete.
         /// </summary>
         Func<IContainer, object[], object> Concrete { get; }
 
         /// <summary>
-        /// True if the service is singleton(static).
+        /// Gets a value indicating whether true if the service is singleton(static).
         /// </summary>
         bool IsStatic { get; }
 
@@ -33,7 +33,9 @@ namespace CatLib
         /// </summary>
         /// <param name="alias">The alias.</param>
         /// <returns>The current instance.</returns>
+#pragma warning disable CA1716
         IBindData Alias(string alias);
+#pragma warning restore CA1716
 
         /// <summary>
         /// Assign a tag to a given service.

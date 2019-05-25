@@ -21,27 +21,28 @@ namespace CatLib
     public class CodeStandardException : LogicException
     {
         /// <summary>
-        /// Initialize a new <see cref="CodeStandardException"/> instnace.
+        /// Initializes a new instance of the <see cref="CodeStandardException"/> class.
         /// </summary>
         public CodeStandardException()
         {
-
         }
 
         /// <summary>
-        /// Initialize a new <see cref="CodeStandardException"/> instnace.
+        /// Initializes a new instance of the <see cref="CodeStandardException"/> class.
         /// </summary>
         /// <param name="message">The exception message.</param>
-        public CodeStandardException(string message) : base(message)
+        public CodeStandardException(string message)
+            : base(message)
         {
         }
 
         /// <summary>
-        /// Initialize a new <see cref="CodeStandardException"/> instnace.
+        /// Initializes a new instance of the <see cref="CodeStandardException"/> class.
         /// </summary>
         /// <param name="message">The exception message.</param>
         /// <param name="innerException">The inner exception.</param>
-        public CodeStandardException(string message, Exception innerException) : base(message, innerException)
+        public CodeStandardException(string message, Exception innerException)
+            : base(message, innerException)
         {
         }
     }

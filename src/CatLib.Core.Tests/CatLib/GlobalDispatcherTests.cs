@@ -22,7 +22,7 @@ namespace CatLib.Tests
             Application.New();
 
             var n = string.Empty;
-            var a = new object[]{};
+            var a = System.Array.Empty<object>();
             var r = new object();
             App.Listen("Events.On", (name, args) =>
             {

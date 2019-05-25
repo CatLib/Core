@@ -17,12 +17,12 @@ namespace CatLib
     /// <summary>
     /// A <see cref="SegmentStream"/> can be used to wrap a stream of a specified slice。
     /// Make the stream of the specified shard access like the traditional
-    /// stream from the beginning to the end。
+    /// stream from the beginning to the end。.
     /// </summary>
     public class SegmentStream : WrapperStream
     {
         /// <summary>
-        /// The initial position of the base stream
+        /// The initial position of the base stream.
         /// </summary>
         private readonly long initialPosition;
 
@@ -32,7 +32,7 @@ namespace CatLib
         private readonly long partSize;
 
         /// <summary>
-        /// Initialize an new <see cref="SegmentStream"/> stream instance.
+        /// Initializes a new instance of the <see cref="SegmentStream"/> class.
         /// </summary>
         /// <param name="stream">The base stream.</param>
         /// <param name="partSize">The slice size.</param>
@@ -43,7 +43,7 @@ namespace CatLib
             {
                 throw new InvalidOperationException($"Base stream of {nameof(SegmentStream)} must be seekable");
             }
-            
+
             initialPosition = stream.Position;
             var remainingSize = stream.Length - stream.Position;
 
@@ -57,11 +57,6 @@ namespace CatLib
             }
         }
 
-        /// <summary>
-        /// The remaining size.
-        /// </summary>
-        private long RemainingSize => partSize - Position;
-
         /// <inheritdoc />
         public override long Length
         {
@@ -72,6 +67,7 @@ namespace CatLib
                 {
                     length = partSize;
                 }
+
                 return length;
             }
         }
@@ -82,6 +78,11 @@ namespace CatLib
             get => base.Position - initialPosition;
             set => base.Position = value;
         }
+
+        /// <summary>
+        /// Gets the remaining size.
+        /// </summary>
+        private long RemainingSize => partSize - Position;
 
         /// <inheritdoc />
         public override long Seek(long offset, SeekOrigin origin)

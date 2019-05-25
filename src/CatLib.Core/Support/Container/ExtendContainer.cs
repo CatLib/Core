@@ -14,8 +14,8 @@ using System.Collections.Generic;
 
 namespace CatLib
 {
-    ///<summary>
-    /// The container extension function
+    /// <summary>
+    /// The container extension function.
     /// </summary>
     public static class ExtendContainer
     {
@@ -101,6 +101,8 @@ namespace CatLib
         /// </summary>
         /// <typeparam name="TAlias">The alias name.</typeparam>
         /// <typeparam name="TService">The service name.</typeparam>
+        /// <param name="container">The container instance.</param>
+        /// <returns>Returns the container instance.</returns>
         public static IContainer Alias<TAlias, TService>(this IContainer container)
         {
             return container.Alias(container.Type2Service(typeof(TAlias)), container.Type2Service(typeof(TService)));
@@ -109,7 +111,7 @@ namespace CatLib
         /// <summary>
         /// Register a binding with the container.
         /// </summary>
-        /// <typeparam name="TService">The service name (also indicates specific implementation)</typeparam>
+        /// <typeparam name="TService">The service name (also indicates specific implementation).</typeparam>
         /// <param name="container">The <see cref="IContainer"/> instance.</param>
         /// <returns>The service binding data.</returns>
         public static IBindData Bind<TService>(this IContainer container)
@@ -198,7 +200,7 @@ namespace CatLib
         /// <summary>
         /// Register a binding with the container if the service not exists.
         /// </summary>
-        /// <typeparam name="TService">The service name (also indicates specific implementation)</typeparam>
+        /// <typeparam name="TService">The service name (also indicates specific implementation).</typeparam>
         /// <param name="container">The <see cref="IContainer"/> instance.</param>
         /// <param name="bindData">The binding data.</param>
         /// <returns>True if register a binding with the container.</returns>
@@ -308,7 +310,8 @@ namespace CatLib
         /// <param name="container">The <see cref="IContainer"/> instance.</param>
         /// <param name="concrete">The service concrete.</param>
         /// <returns>The service binding data.</returns>
-        public static IBindData Singleton<TService>(this IContainer container,
+        public static IBindData Singleton<TService>(
+            this IContainer container,
             Func<IContainer, object[], object> concrete)
         {
             Guard.Requires<ArgumentNullException>(concrete != null);
@@ -335,7 +338,8 @@ namespace CatLib
         /// <param name="container">The <see cref="IContainer"/> instance.</param>
         /// <param name="concrete">The service concrete.</param>
         /// <returns>The service binding data.</returns>
-        public static IBindData Singleton<TService>(this IContainer container,
+        public static IBindData Singleton<TService>(
+            this IContainer container,
             Func<object> concrete)
         {
             Guard.Requires<ArgumentNullException>(concrete != null);
@@ -431,6 +435,7 @@ namespace CatLib
         /// <param name="method">The method name.</param>
         /// <param name="target">The invoking target.</param>
         /// <param name="call">The method info to invoke.</param>
+        /// <returns>Returns the method bind instance.</returns>
         public static IMethodBind BindMethod(this IContainer container, string method, object target, string call = null)
         {
             Guard.NotEmptyOrNull(method, nameof(method));
@@ -445,6 +450,7 @@ namespace CatLib
         /// <param name="container">The <see cref="IContainer"/> instance.</param>
         /// <param name="method">The method name.</param>
         /// <param name="callback">The method to invoke.</param>
+        /// <returns>Returns the method bind instance.</returns>
         public static IMethodBind BindMethod(this IContainer container, string method, Func<object> callback)
         {
             Guard.Requires<ArgumentNullException>(method != null);
@@ -458,6 +464,7 @@ namespace CatLib
         /// <param name="container">The <see cref="IContainer"/> instance.</param>
         /// <param name="method">The method name.</param>
         /// <param name="callback">The method to invoke.</param>
+        /// <returns>Returns the method bind instance.</returns>
         public static IMethodBind BindMethod<T1>(this IContainer container, string method, Func<T1, object> callback)
         {
             Guard.Requires<ArgumentNullException>(method != null);
@@ -484,6 +491,7 @@ namespace CatLib
         /// <param name="container">The <see cref="IContainer"/> instance.</param>
         /// <param name="method">The method name.</param>
         /// <param name="callback">The method to invoke.</param>
+        /// <returns>Returns the method bind instance.</returns>
         public static IMethodBind BindMethod<T1, T2, T3>(this IContainer container, string method, Func<T1, T2, T3, object> callback)
         {
             Guard.Requires<ArgumentNullException>(method != null);
@@ -497,6 +505,7 @@ namespace CatLib
         /// <param name="container">The <see cref="IContainer"/> instance.</param>
         /// <param name="method">The method name.</param>
         /// <param name="callback">The method to invoke.</param>
+        /// <returns>Returns the method bind instance.</returns>
         public static IMethodBind BindMethod<T1, T2, T3, T4>(this IContainer container, string method, Func<T1, T2, T3, T4, object> callback)
         {
             Guard.Requires<ArgumentNullException>(method != null);
@@ -531,6 +540,7 @@ namespace CatLib
         /// <typeparam name="TService">The service name.</typeparam>
         /// <param name="container">The <see cref="IContainer"/> instance.</param>
         /// <param name="instance">The service instance.</param>
+        /// <returns>Object processed by the decorator.</returns>
         public static object Instance<TService>(this IContainer container, object instance)
         {
             return container.Instance(container.Type2Service(typeof(TService)), instance);
@@ -656,7 +666,7 @@ namespace CatLib
         }
 
         /// <summary>
-        /// Wrap a method called in a dependency injection form
+        /// Wrap a method called in a dependency injection form.
         /// </summary>
         /// <param name="container">The <see cref="IContainer"/> instance.</param>
         /// <param name="method">The method to called.</param>
@@ -674,7 +684,7 @@ namespace CatLib
         }
 
         /// <summary>
-        /// Wrap a method called in a dependency injection form
+        /// Wrap a method called in a dependency injection form.
         /// </summary>
         /// <param name="container">The <see cref="IContainer"/> instance.</param>
         /// <param name="method">The method to called.</param>
@@ -692,7 +702,7 @@ namespace CatLib
         }
 
         /// <summary>
-        /// Wrap a method called in a dependency injection form
+        /// Wrap a method called in a dependency injection form.
         /// </summary>
         /// <param name="container">The <see cref="IContainer"/> instance.</param>
         /// <param name="method">The method to called.</param>
@@ -710,7 +720,7 @@ namespace CatLib
         }
 
         /// <summary>
-        /// Wrap a method called in a dependency injection form
+        /// Wrap a method called in a dependency injection form.
         /// </summary>
         /// <param name="container">The <see cref="IContainer"/> instance.</param>
         /// <param name="method">The method to called.</param>
@@ -796,7 +806,8 @@ namespace CatLib
         /// <param name="closure">The closure.</param>
         public static void Extend<TService, TConcrete>(this IContainer container, Func<TConcrete, IContainer, object> closure)
         {
-            container.Extend(container.Type2Service(typeof(TService)),
+            container.Extend(
+                container.Type2Service(typeof(TService)),
                 (instance, c) => closure((TConcrete)instance, c));
         }
 
@@ -815,6 +826,7 @@ namespace CatLib
                 {
                     return closure((TConcrete)instance, c);
                 }
+
                 return instance;
             });
         }
@@ -834,6 +846,7 @@ namespace CatLib
                 {
                     return closure((TConcrete)instance);
                 }
+
                 return instance;
             });
         }
@@ -843,7 +856,7 @@ namespace CatLib
         /// </summary>
         /// <param name="container">The <see cref="IContainer"/> instance.</param>
         /// <param name="callback">The callback.</param>
-        /// <returns>The <see cref="IContainer"/> instance.</returns>
+        /// <returns>Returns the <see cref="IContainer"/> instance.</returns>
         public static IContainer OnRelease(this IContainer container, Action<object> callback)
         {
             Guard.Requires<ArgumentNullException>(callback != null);
@@ -855,7 +868,7 @@ namespace CatLib
         /// </summary>
         /// <param name="container">The <see cref="IContainer"/> instance.</param>
         /// <param name="closure">The callback.</param>
-        /// <returns>The <see cref="IContainer"/> instance.</returns>
+        /// <returns>Returns the <see cref="IContainer"/> instance.</returns>
         public static IContainer OnRelease<T>(this IContainer container, Action<T> closure)
         {
             Guard.Requires<ArgumentNullException>(closure != null);
@@ -873,7 +886,7 @@ namespace CatLib
         /// </summary>
         /// <param name="container">The <see cref="IContainer"/> instance.</param>
         /// <param name="closure">The callback.</param>
-        /// <returns>The <see cref="IContainer"/> instance.</returns>
+        /// <returns>Returns the <see cref="IContainer"/> instance.</returns>
         public static IContainer OnRelease<T>(this IContainer container, Action<IBindData, T> closure)
         {
             Guard.Requires<ArgumentNullException>(closure != null);
@@ -891,7 +904,7 @@ namespace CatLib
         /// </summary>
         /// <param name="container">The <see cref="IContainer"/> instance.</param>
         /// <param name="callback">The callback.</param>
-        /// <returns>The <see cref="IContainer"/> instance.</returns>
+        /// <returns>Returns the <see cref="IContainer"/> instance.</returns>
         public static IContainer OnResolving(this IContainer container, Action<object> callback)
         {
             Guard.Requires<ArgumentNullException>(callback != null);
@@ -908,7 +921,7 @@ namespace CatLib
         /// <typeparam name="T">The specified type.</typeparam>
         /// <param name="container">The <see cref="IContainer"/> instance.</param>
         /// <param name="closure">The closure.</param>
-        /// <returns>The <see cref="IContainer"/> instance.</returns>
+        /// <returns>Returns the <see cref="IContainer"/> instance.</returns>
         public static IContainer OnResolving<T>(this IContainer container, Action<T> closure)
         {
             Guard.Requires<ArgumentNullException>(closure != null);
@@ -928,7 +941,7 @@ namespace CatLib
         /// <typeparam name="T">The specified type.</typeparam>
         /// <param name="container">The <see cref="IContainer"/> instance.</param>
         /// <param name="closure">The closure.</param>
-        /// <returns>The <see cref="IContainer"/> instance.</returns>
+        /// <returns>Returns the <see cref="IContainer"/> instance.</returns>
         public static IContainer OnResolving<T>(this IContainer container, Action<IBindData, T> closure)
         {
             Guard.Requires<ArgumentNullException>(closure != null);
@@ -946,7 +959,7 @@ namespace CatLib
         /// </summary>
         /// <param name="container">The <see cref="IContainer"/> instance.</param>
         /// <param name="callback">The callback.</param>
-        /// <returns>The <see cref="IContainer"/> instance.</returns>
+        /// <returns>Returns the <see cref="IContainer"/> instance.</returns>
         public static IContainer OnAfterResolving(this IContainer container, Action<object> callback)
         {
             Guard.Requires<ArgumentNullException>(callback != null);
@@ -963,7 +976,7 @@ namespace CatLib
         /// <typeparam name="T">The specified type.</typeparam>
         /// <param name="container">The <see cref="IContainer"/> instance.</param>
         /// <param name="closure">The closure.</param>
-        /// <returns>The <see cref="IContainer"/> instance.</returns>
+        /// <returns>Returns the <see cref="IContainer"/> instance.</returns>
         public static IContainer OnAfterResolving<T>(this IContainer container, Action<T> closure)
         {
             Guard.Requires<ArgumentNullException>(closure != null);
@@ -983,7 +996,7 @@ namespace CatLib
         /// <typeparam name="T">The specified type.</typeparam>
         /// <param name="container">The <see cref="IContainer"/> instance.</param>
         /// <param name="closure">The closure.</param>
-        /// <returns>The <see cref="IContainer"/> instance.</returns>
+        /// <returns>Returns the <see cref="IContainer"/> instance.</returns>
         public static IContainer OnAfterResolving<T>(this IContainer container, Action<IBindData, T> closure)
         {
             Guard.Requires<ArgumentNullException>(closure != null);

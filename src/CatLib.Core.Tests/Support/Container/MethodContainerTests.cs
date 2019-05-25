@@ -13,6 +13,8 @@ using System;
 using CatLib.Tests;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
+#pragma warning disable CA1034
+
 namespace CatLib.Core.Tests.Support.Container
 {
     [TestClass]
@@ -111,7 +113,7 @@ namespace CatLib.Core.Tests.Support.Container
         public void TestUnbindWithObject()
         {
             new Application().Bootstrap();
-            var cls = new TestContainerClass(); 
+            var cls = new TestContainerClass();
             App.BindMethod("Helloworld.Func1", cls);
             App.BindMethod("Helloworld.Func2", cls);
 

@@ -19,16 +19,13 @@ namespace CatLib
     /// </summary>
     public abstract class Bindable : IBindable
     {
-        /// <inheritdoc />
-        public string Service { get; }
-
         /// <summary>
-        /// The container to which the service belongs.
+        /// Synchronize locking object.
         /// </summary>
-        public IContainer Container => InternalContainer;
+        private readonly object locker = new object();
 
         /// <inheritdoc cref="Container"/>
-        protected readonly Container InternalContainer;
+        private readonly Container container;
 
         /// <summary>
         /// The mapping of the service context.
@@ -41,31 +38,39 @@ namespace CatLib
         private Dictionary<string, Func<object>> contextualClosure;
 
         /// <summary>
-        /// Synchronize locking object
-        /// </summary>
-        protected readonly object SyncRoot = new object();
-
-        /// <summary>
-        /// Whether the bindable data is destroyed. 
+        /// Whether the bindable data is destroyed.
         /// </summary>
         private bool isDestroy;
 
         /// <summary>
-        /// Create an new <see cref="Bindable"/> instance.
+        /// Initializes a new instance of the <see cref="Bindable"/> class.
         /// </summary>
         /// <param name="container">The container instance.</param>
         /// <param name="service">The service name.</param>
         protected Bindable(Container container, string service)
         {
-            InternalContainer = container;
+            this.container = container;
             Service = service;
             isDestroy = false;
         }
 
         /// <inheritdoc />
+        public string Service { get; }
+
+        /// <summary>
+        /// Gets the container to which the service belongs.
+        /// </summary>
+        public IContainer Container => container;
+
+        /// <summary>
+        /// Gets synchronize locking object.
+        /// </summary>
+        protected object Locker => locker;
+
+        /// <inheritdoc />
         public void Unbind()
         {
-            lock (SyncRoot)
+            lock (locker)
             {
                 isDestroy = true;
                 ReleaseBind();
@@ -79,18 +84,20 @@ namespace CatLib
         /// <param name="given">Given speified service or alias.</param>
         internal void AddContextual(string needs, string given)
         {
-            lock (SyncRoot)
+            lock (locker)
             {
                 AssertDestroyed();
                 if (contextual == null)
                 {
                     contextual = new Dictionary<string, string>();
                 }
+
                 if (contextual.ContainsKey(needs)
                     || (contextualClosure != null && contextualClosure.ContainsKey(needs)))
                 {
                     throw new LogicException($"Needs [{needs}] is already exist.");
                 }
+
                 contextual.Add(needs, given);
             }
         }
@@ -99,18 +106,20 @@ namespace CatLib
         /// <param name="given">The closure return the given service instance.</param>
         internal void AddContextual(string needs, Func<object> given)
         {
-            lock (SyncRoot)
+            lock (locker)
             {
                 AssertDestroyed();
                 if (contextualClosure == null)
                 {
                     contextualClosure = new Dictionary<string, Func<object>>();
                 }
+
                 if (contextualClosure.ContainsKey(needs)
                     || (contextual != null && contextual.ContainsKey(needs)))
                 {
                     throw new LogicException($"Needs [{needs}] is already exist.");
                 }
+
                 contextualClosure.Add(needs, given);
             }
         }
@@ -126,6 +135,7 @@ namespace CatLib
             {
                 return null;
             }
+
             return contextual.TryGetValue(needs, out string contextualNeeds) ? contextualNeeds : null;
         }
 
@@ -137,6 +147,7 @@ namespace CatLib
             {
                 return null;
             }
+
             return contextualClosure.TryGetValue(needs, out Func<object> closure) ? closure : null;
         }
 
@@ -144,7 +155,7 @@ namespace CatLib
         protected abstract void ReleaseBind();
 
         /// <summary>
-        /// Verify that the current instance i has been released
+        /// Verify that the current instance i has been released.
         /// </summary>
         protected void AssertDestroyed()
         {
@@ -155,15 +166,22 @@ namespace CatLib
         }
     }
 
+#pragma warning disable SA1402
+
     /// <inheritdoc />
-    public abstract class Bindable<TReturn> : Bindable, IBindable<TReturn> where TReturn : class, IBindable<TReturn>
+    public abstract class Bindable<TReturn> : Bindable, IBindable<TReturn>
+        where TReturn : class, IBindable<TReturn>
     {
         /// <summary>
         /// Indicates the given relationship in the context.
         /// </summary>
         private GivenData<TReturn> given;
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Bindable{TReturn}"/> class.
+        /// </summary>
+        /// <param name="container">The container instance.</param>
+        /// <param name="service">The service name.</param>
         protected Bindable(Container container, string service)
             : base(container, service)
         {
@@ -173,22 +191,24 @@ namespace CatLib
         public IGivenData<TReturn> Needs(string service)
         {
             Guard.NotEmptyOrNull(service, nameof(service));
-            lock (SyncRoot)
+            lock (Locker)
             {
                 AssertDestroyed();
                 if (given == null)
                 {
-                    given = new GivenData<TReturn>(InternalContainer, this);
+                    given = new GivenData<TReturn>((Container)Container, this);
                 }
+
                 given.Needs(service);
             }
+
             return given;
         }
 
         /// <inheritdoc />
         public IGivenData<TReturn> Needs<TService>()
         {
-            return Needs(InternalContainer.Type2Service(typeof(TService)));
+            return Needs(Container.Type2Service(typeof(TService)));
         }
     }
 }

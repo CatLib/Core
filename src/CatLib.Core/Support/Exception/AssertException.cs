@@ -21,26 +21,28 @@ namespace CatLib
     public class AssertException : RuntimeException
     {
         /// <summary>
-        /// Initialize a new <see cref="AssertException"/> instnace.
+        /// Initializes a new instance of the <see cref="AssertException"/> class.
         /// </summary>
         public AssertException()
         {
         }
 
         /// <summary>
-        /// Initialize a new <see cref="AssertException"/> instnace.
+        /// Initializes a new instance of the <see cref="AssertException"/> class.
         /// </summary>
         /// <param name="message">The exception message.</param>
-        public AssertException(string message) : base(message)
+        public AssertException(string message)
+            : base(message)
         {
         }
 
         /// <summary>
-        /// Initialize a new <see cref="AssertException"/> instnace.
+        /// Initializes a new instance of the <see cref="AssertException"/> class.
         /// </summary>
         /// <param name="message">The exception message.</param>
         /// <param name="innerException">The inner exception.</param>
-        public AssertException(string message, Exception innerException) : base(message, innerException)
+        public AssertException(string message, Exception innerException)
+            : base(message, innerException)
         {
         }
     }

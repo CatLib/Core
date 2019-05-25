@@ -13,10 +13,12 @@ using System;
 using System.Diagnostics;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
+#pragma warning disable CA1034
+
 namespace CatLib.Tests.Stl
 {
     /// <summary>
-    /// 容器性能测试
+    /// 容器性能测试.
     /// </summary>
     [TestClass]
     public class ContainerPerformanceTests
@@ -29,13 +31,13 @@ namespace CatLib.Tests.Stl
             {
                 action();
             }
+
             sw.Stop();
             Console.WriteLine("["+ name + "]执行花费{0}ms.", sw.Elapsed.TotalMilliseconds);
         }
 
         public class TestSerializeClass
         {
-            
         }
 
         [TestMethod]
@@ -53,7 +55,7 @@ namespace CatLib.Tests.Stl
 
             Watch("CreateInstance(object[])", () =>
             {
-                Activator.CreateInstance(typeof(TestSerializeClass), new object[]{});
+                Activator.CreateInstance(typeof(TestSerializeClass), Array.Empty<object>());
             }, 1000000);
         }
 
@@ -61,7 +63,6 @@ namespace CatLib.Tests.Stl
         {
             public TestMakeHandClass(TestSerializeClass cls)
             {
-
             }
         }
 
@@ -69,7 +70,6 @@ namespace CatLib.Tests.Stl
         {
             public TestMakeClass(TestSerializeClass cls)
             {
-                
             }
         }
 
@@ -77,7 +77,6 @@ namespace CatLib.Tests.Stl
         {
             public TestMakeClass2(TestSerializeClass cls)
             {
-
             }
         }
 
@@ -85,11 +84,11 @@ namespace CatLib.Tests.Stl
         {
             public TestMakeNullParamsClass()
             {
-
             }
         }
 
         public interface ITestMakeClass { }
+
         public interface ITestMakeNullParamsClass { }
 
         [TestMethod]
@@ -126,12 +125,12 @@ namespace CatLib.Tests.Stl
             container.Singleton<TestSerializeClass>();
             container.Bind<TestMakeClass>().Alias<ITestMakeClass>();
             container.Bind<TestMakeNullParamsClass>().Alias<ITestMakeNullParamsClass>();
-        
+
             Watch("TestBindMake(非反射) 1000000次", () =>
             {
                 App.Make<TestMakeHandClass>();
             }, 1000000);
-            
+
             Watch("TestBindMake(反射，依赖注入) 1000000次", () =>
             {
                 App.Make<ITestMakeClass>();
@@ -145,19 +144,17 @@ namespace CatLib.Tests.Stl
 
         public class TestMakeClassFacade : Facade<ITestMakeClass>
         {
-            
         }
 
         public class TestMakeClassNoParamsFacade : Facade<ITestMakeNullParamsClass>
         {
-
         }
 
         public abstract class OriginalFacade<TInterface> where TInterface : new()
         {
             private static TInterface instance;
             /// <summary>
-            /// 门面实例
+            /// 门面实例.
             /// </summary>
             public static TInterface Instance
             {

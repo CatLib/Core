@@ -14,31 +14,21 @@ using System;
 namespace CatLib
 {
     /// <summary>
-    /// 事件对象
+    /// 事件对象.
     /// </summary>
     internal class Event : IEvent
     {
         /// <summary>
-        /// 原始事件名
-        /// </summary>
-        public string Name { get; }
-
-        /// <summary>
-        /// 事件根源对象
-        /// </summary>
-        public object Group { get; }
-
-        /// <summary>
-        /// 依赖解决器
+        /// 依赖解决器.
         /// </summary>
         private readonly Func<string, object[], object> execution;
 
         /// <summary>
-        /// 创建一个事件对象
+        /// Initializes a new instance of the <see cref="Event"/> class.
         /// </summary>
-        /// <param name="eventName">事件名</param>
-        /// <param name="group">事件分组</param>
-        /// <param name="execution">事件执行器</param>
+        /// <param name="eventName">事件名.</param>
+        /// <param name="group">事件分组.</param>
+        /// <param name="execution">事件执行器.</param>
         public Event(string eventName, object group, Func<string, object[], object> execution)
         {
             Name = eventName;
@@ -47,11 +37,21 @@ namespace CatLib
         }
 
         /// <summary>
-        /// 调用事件处理函数
+        /// Gets 原始事件名.
         /// </summary>
-        /// <param name="eventName">调用事件的完整名字</param>
-        /// <param name="payloads">事件载荷</param>
-        /// <returns>事件处理结果</returns>
+        public string Name { get; }
+
+        /// <summary>
+        /// Gets 事件根源对象.
+        /// </summary>
+        public object Group { get; }
+
+        /// <summary>
+        /// 调用事件处理函数.
+        /// </summary>
+        /// <param name="eventName">调用事件的完整名字.</param>
+        /// <param name="payloads">事件载荷.</param>
+        /// <returns>事件处理结果.</returns>
         public object Call(string eventName, params object[] payloads)
         {
             return execution(eventName, payloads);

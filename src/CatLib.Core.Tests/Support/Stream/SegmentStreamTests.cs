@@ -46,7 +46,7 @@ namespace CatLib.Core.Tests.Support.Stream
             Assert.AreEqual("my name is miaomiao", segmentStream.ToText());
         }
 
-        
+
         [TestMethod]
         public void TestSeekEnd()
         {
@@ -56,7 +56,7 @@ namespace CatLib.Core.Tests.Support.Stream
 
             Assert.AreEqual("world", segmentStream.ToText());
         }
-        
+
         [TestMethod]
         public void TestSeekCurrent()
         {

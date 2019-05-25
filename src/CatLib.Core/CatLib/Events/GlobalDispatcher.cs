@@ -12,22 +12,23 @@
 using System;
 using System.Reflection;
 
+// todo: removed with new event system.
 namespace CatLib
 {
     /// <summary>
-    /// 全局事件系统
+    /// 全局事件系统.
     /// </summary>
     internal sealed class GlobalDispatcher : Dispatcher, IGlobalDispatcher
     {
         /// <summary>
-        /// 依赖解决器
+        /// 依赖解决器.
         /// </summary>
         private readonly Func<ParameterInfo[], object[], object[]> dependResolved;
 
         /// <summary>
-        /// 构建一个新的全局事件系统实例
+        /// Initializes a new instance of the <see cref="GlobalDispatcher"/> class.
         /// </summary>
-        /// <param name="dependResolved">依赖解决器</param>
+        /// <param name="dependResolved">依赖解决器.</param>
         public GlobalDispatcher(Func<ParameterInfo[], object[], object[]> dependResolved)
         {
             Guard.Requires<ArgumentNullException>(dependResolved != null);
@@ -35,12 +36,12 @@ namespace CatLib
         }
 
         /// <summary>
-        /// 注册一个事件监听器
+        /// 注册一个事件监听器.
         /// </summary>
-        /// <param name="eventName">事件名称</param>
-        /// <param name="action">事件处理方法</param>
-        /// <param name="group">事件分组</param>
-        /// <returns>事件对象</returns>
+        /// <param name="eventName">事件名称.</param>
+        /// <param name="action">事件处理方法.</param>
+        /// <param name="group">事件分组.</param>
+        /// <returns>事件对象.</returns>
         public IEvent On(string eventName, Action action, object group = null)
         {
             Guard.Requires<ArgumentNullException>(action != null);
@@ -52,12 +53,12 @@ namespace CatLib
         }
 
         /// <summary>
-        /// 注册一个事件监听器
+        /// 注册一个事件监听器.
         /// </summary>
-        /// <param name="eventName">事件名称</param>
-        /// <param name="action">事件处理方法</param>
-        /// <param name="group">事件分组</param>
-        /// <returns>事件对象</returns>
+        /// <param name="eventName">事件名称.</param>
+        /// <param name="action">事件处理方法.</param>
+        /// <param name="group">事件分组.</param>
+        /// <returns>事件对象.</returns>
         public IEvent On<T0>(string eventName, Action<T0> action, object group = null)
         {
             Guard.Requires<ArgumentNullException>(action != null);
@@ -71,12 +72,12 @@ namespace CatLib
         }
 
         /// <summary>
-        /// 注册一个事件监听器
+        /// 注册一个事件监听器.
         /// </summary>
-        /// <param name="eventName">事件名称</param>
-        /// <param name="action">事件处理方法</param>
-        /// <param name="group">事件分组</param>
-        /// <returns>事件对象</returns>
+        /// <param name="eventName">事件名称.</param>
+        /// <param name="action">事件处理方法.</param>
+        /// <param name="group">事件分组.</param>
+        /// <returns>事件对象.</returns>
         public IEvent On<T0, T1>(string eventName, Action<T0, T1> action, object group = null)
         {
             Guard.Requires<ArgumentNullException>(action != null);
@@ -90,12 +91,12 @@ namespace CatLib
         }
 
         /// <summary>
-        /// 注册一个事件监听器
+        /// 注册一个事件监听器.
         /// </summary>
-        /// <param name="eventName">事件名称</param>
-        /// <param name="action">事件处理方法</param>
-        /// <param name="group">事件分组</param>
-        /// <returns>事件对象</returns>
+        /// <param name="eventName">事件名称.</param>
+        /// <param name="action">事件处理方法.</param>
+        /// <param name="group">事件分组.</param>
+        /// <returns>事件对象.</returns>
         public IEvent On<T0, T1, T2>(string eventName, Action<T0, T1, T2> action, object group = null)
         {
             Guard.Requires<ArgumentNullException>(action != null);
@@ -109,12 +110,12 @@ namespace CatLib
         }
 
         /// <summary>
-        /// 注册一个事件监听器
+        /// 注册一个事件监听器.
         /// </summary>
-        /// <param name="eventName">事件名称</param>
-        /// <param name="action">事件处理方法</param>
-        /// <param name="group">事件分组</param>
-        /// <returns>事件对象</returns>
+        /// <param name="eventName">事件名称.</param>
+        /// <param name="action">事件处理方法.</param>
+        /// <param name="group">事件分组.</param>
+        /// <returns>事件对象.</returns>
         public IEvent On<T0, T1, T2, T3>(string eventName, Action<T0, T1, T2, T3> action, object group = null)
         {
             Guard.Requires<ArgumentNullException>(action != null);
@@ -128,12 +129,12 @@ namespace CatLib
         }
 
         /// <summary>
-        /// 注册一个事件监听器
+        /// 注册一个事件监听器.
         /// </summary>
-        /// <param name="eventName">事件名称</param>
-        /// <param name="func">事件处理方法</param>
-        /// <param name="group">事件分组</param>
-        /// <returns>事件对象</returns>
+        /// <param name="eventName">事件名称.</param>
+        /// <param name="func">事件处理方法.</param>
+        /// <param name="group">事件分组.</param>
+        /// <returns>事件对象.</returns>
         public IEvent Listen<TResult>(string eventName, Func<TResult> func, object group = null)
         {
             Guard.Requires<ArgumentNullException>(func != null);
@@ -141,12 +142,12 @@ namespace CatLib
         }
 
         /// <summary>
-        /// 注册一个事件监听器
+        /// 注册一个事件监听器.
         /// </summary>
-        /// <param name="eventName">事件名称</param>
-        /// <param name="func">事件处理方法</param>
-        /// <param name="group">事件分组</param>
-        /// <returns>事件对象</returns>
+        /// <param name="eventName">事件名称.</param>
+        /// <param name="func">事件处理方法.</param>
+        /// <param name="group">事件分组.</param>
+        /// <returns>事件对象.</returns>
         public IEvent Listen<T0, TResult>(string eventName, Func<T0, TResult> func, object group = null)
         {
             Guard.Requires<ArgumentNullException>(func != null);
@@ -159,12 +160,12 @@ namespace CatLib
         }
 
         /// <summary>
-        /// 注册一个事件监听器
+        /// 注册一个事件监听器.
         /// </summary>
-        /// <param name="eventName">事件名称</param>
-        /// <param name="func">事件处理方法</param>
-        /// <param name="group">事件分组</param>
-        /// <returns>事件对象</returns>
+        /// <param name="eventName">事件名称.</param>
+        /// <param name="func">事件处理方法.</param>
+        /// <param name="group">事件分组.</param>
+        /// <returns>事件对象.</returns>
         public IEvent Listen<T0, T1, TResult>(string eventName, Func<T0, T1, TResult> func, object group = null)
         {
             Guard.Requires<ArgumentNullException>(func != null);
@@ -177,12 +178,12 @@ namespace CatLib
         }
 
         /// <summary>
-        /// 注册一个事件监听器
+        /// 注册一个事件监听器.
         /// </summary>
-        /// <param name="eventName">事件名称</param>
-        /// <param name="func">事件处理方法</param>
-        /// <param name="group">事件分组</param>
-        /// <returns>事件对象</returns>
+        /// <param name="eventName">事件名称.</param>
+        /// <param name="func">事件处理方法.</param>
+        /// <param name="group">事件分组.</param>
+        /// <returns>事件对象.</returns>
         public IEvent Listen<T0, T1, T2, TResult>(string eventName, Func<T0, T1, T2, TResult> func, object group = null)
         {
             Guard.Requires<ArgumentNullException>(func != null);
@@ -195,12 +196,12 @@ namespace CatLib
         }
 
         /// <summary>
-        /// 注册一个事件监听器
+        /// 注册一个事件监听器.
         /// </summary>
-        /// <param name="eventName">事件名称</param>
-        /// <param name="func">事件处理方法</param>
-        /// <param name="group">事件分组</param>
-        /// <returns>事件对象</returns>
+        /// <param name="eventName">事件名称.</param>
+        /// <param name="func">事件处理方法.</param>
+        /// <param name="group">事件分组.</param>
+        /// <returns>事件对象.</returns>
         public IEvent Listen<T0, T1, T2, T3, TResult>(string eventName, Func<T0, T1, T2, T3, TResult> func, object group = null)
         {
             Guard.Requires<ArgumentNullException>(func != null);

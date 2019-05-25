@@ -16,7 +16,7 @@ using System.Collections.Generic;
 namespace CatLib.Tests.Stl
 {
     /// <summary>
-    /// SortSet测试
+    /// SortSet测试.
     /// </summary>
     [TestClass]
     public class SortSetTests
@@ -58,7 +58,7 @@ namespace CatLib.Tests.Stl
         }
 
         [TestMethod]
-        
+
         public void TestRank()
         {
             var n = 100;
@@ -86,6 +86,7 @@ namespace CatLib.Tests.Stl
                 {
                     Assert.AreEqual(3, sortSets.GetRangeCount(80, 90));
                 }
+
                 Console.WriteLine(faild);
             }
         }
@@ -130,7 +131,7 @@ namespace CatLib.Tests.Stl
         }
 
         /// <summary>
-        /// 对象插入测试
+        /// 对象插入测试.
         /// </summary>
         [TestMethod]
         public void ObjectInsertTest()
@@ -152,7 +153,7 @@ namespace CatLib.Tests.Stl
         }
 
         /// <summary>
-        /// 根据排名区间获取元素
+        /// 根据排名区间获取元素.
         /// </summary>
         [TestMethod]
         public void GetElementRangeByRank()
@@ -175,7 +176,7 @@ namespace CatLib.Tests.Stl
         }
 
         /// <summary>
-        /// 根据分数区间获取元素
+        /// 根据分数区间获取元素.
         /// </summary>
         [TestMethod]
         public void GetElementRangeByScore()
@@ -192,12 +193,13 @@ namespace CatLib.Tests.Stl
             {
                 Assert.AreEqual(n++, e);
             }
+
             var list2 = new SortSet<int, int>();
             Assert.AreEqual(0, list2.GetElementRangeByScore(3, 8).Length);
         }
 
         /// <summary>
-        /// 根据分数区间移除元素
+        /// 根据分数区间移除元素.
         /// </summary>
         [TestMethod]
         public void RemoveRangeByScore()
@@ -209,6 +211,7 @@ namespace CatLib.Tests.Stl
                 {
                     list.Add(i, i);
                 }
+
                 list.RemoveRangeByScore(3, 8);
                 Assert.AreEqual(0, list.GetElementByRank(0));
                 Assert.AreEqual(1, list.GetElementByRank(1));
@@ -218,6 +221,7 @@ namespace CatLib.Tests.Stl
                 {
                     list.Add(i, i);
                 }
+
                 list.Add(33, 3);
                 list.RemoveRangeByScore(3, 3);
                 Assert.AreEqual(0, list.GetElementByRank(0));
@@ -228,7 +232,7 @@ namespace CatLib.Tests.Stl
         }
 
         /// <summary>
-        /// 根据排名区间移除元素
+        /// 根据排名区间移除元素.
         /// </summary>
         [TestMethod]
         public void RemoveRangeByRank()
@@ -250,6 +254,7 @@ namespace CatLib.Tests.Stl
                 {
                     list.Add(i, i);
                 }
+
                 list.Add(33, 3);
                 list.RemoveRangeByRank(3, 3);
                 Assert.AreEqual(0, list.GetElementByRank(0));
@@ -261,7 +266,7 @@ namespace CatLib.Tests.Stl
         }
 
         /// <summary>
-        /// 根据排名获取元素 (有序集成员按照Score从大到小排序)
+        /// 根据排名获取元素 (有序集成员按照Score从大到小排序).
         /// </summary>
         [TestMethod]
         public void GetElementByRevRank()
@@ -273,6 +278,7 @@ namespace CatLib.Tests.Stl
                 {
                     list.Add(i, i);
                 }
+
                 Assert.AreEqual(6, list.GetElementByRevRank(3));
                 Assert.AreEqual(9, list.GetElementByRevRank(0));
                 Assert.AreEqual(0, list.GetElementByRevRank(9));
@@ -280,7 +286,7 @@ namespace CatLib.Tests.Stl
         }
 
         /// <summary>
-        /// 反向迭代遍历
+        /// 反向迭代遍历.
         /// </summary>
         [TestMethod]
         public void ReversEnumerator()
@@ -301,7 +307,7 @@ namespace CatLib.Tests.Stl
         }
 
         /// <summary>
-        /// 边界值测试
+        /// 边界值测试.
         /// </summary>
         [TestMethod]
         public void BoundTestScoreRangeCount()
@@ -320,7 +326,7 @@ namespace CatLib.Tests.Stl
         }
 
         /// <summary>
-        /// 空的列表执行分数区间内的元素数量查询
+        /// 空的列表执行分数区间内的元素数量查询.
         /// </summary>
         [TestMethod]
         public void EmptyListScoreRangeCount()
@@ -330,7 +336,7 @@ namespace CatLib.Tests.Stl
         }
 
         /// <summary>
-        /// 分数区间内的元素数量
+        /// 分数区间内的元素数量.
         /// </summary>
         [TestMethod]
         public void ScoreRangeCount()
@@ -348,11 +354,12 @@ namespace CatLib.Tests.Stl
                     lst.Add(i);
                 }
             }
+
             Assert.AreEqual(lst.Count, list.GetRangeCount(0, 100));
         }
 
         /// <summary>
-        /// 增加元素测试
+        /// 增加元素测试.
         /// </summary>
         [TestMethod]
         public void AddElementTest()
@@ -366,6 +373,7 @@ namespace CatLib.Tests.Stl
             {
                 var val = rand.Next();
                 list.Add(val, val);
+
                 //list.Add(i,i);
             }
 
@@ -384,7 +392,7 @@ namespace CatLib.Tests.Stl
         }
 
         /// <summary>
-        /// 删除测试
+        /// 删除测试.
         /// </summary>
         [TestMethod]
         public void RemoveTest()
@@ -421,7 +429,7 @@ namespace CatLib.Tests.Stl
         }
 
         /// <summary>
-        /// 根据排名获取元素
+        /// 根据排名获取元素.
         /// </summary>
         [TestMethod]
         public void GetElementByRank()
@@ -433,6 +441,7 @@ namespace CatLib.Tests.Stl
             {
                 list.Add(i, i);
             }
+
             var rand = new System.Random();
             for (var i = 0; i < Math.Min(num, 100); i++)
             {
@@ -448,7 +457,7 @@ namespace CatLib.Tests.Stl
         }
 
         /// <summary>
-        /// 获取排名 , 有序集成员按照Score从大到小排序
+        /// 获取排名 , 有序集成员按照Score从大到小排序.
         /// </summary>
         [TestMethod]
         public void GetRevRank()
@@ -458,11 +467,12 @@ namespace CatLib.Tests.Stl
             {
                 list.Add(i, i);
             }
+
             Assert.AreEqual(6, list.GetRevRank(3));
         }
 
         /// <summary>
-        /// 获取排名位置
+        /// 获取排名位置.
         /// </summary>
         [TestMethod]
         public void GetRankTest()
@@ -480,6 +490,7 @@ namespace CatLib.Tests.Stl
                     {
                         lst.Add(i);
                     }
+
                     list.Add(i, i);
                 }
 
@@ -496,7 +507,7 @@ namespace CatLib.Tests.Stl
         }
 
         /// <summary>
-        /// 顺序插入测试
+        /// 顺序插入测试.
         /// </summary>
         [TestMethod]
         public void SequentialAddTest()
@@ -515,7 +526,7 @@ namespace CatLib.Tests.Stl
         }
 
         /// <summary>
-        /// 空列表遍历
+        /// 空列表遍历.
         /// </summary>
         [TestMethod]
         public void EmptyListForeach()
@@ -540,7 +551,7 @@ namespace CatLib.Tests.Stl
         }
 
         /// <summary>
-        /// 删除已经存在的元素
+        /// 删除已经存在的元素.
         /// </summary>
         [TestMethod]
         public void OverrideElement()
@@ -552,7 +563,7 @@ namespace CatLib.Tests.Stl
         }
 
         /// <summary>
-        /// 是否包含元素
+        /// 是否包含元素.
         /// </summary>
         [TestMethod]
         public void ContainsTest()
@@ -565,7 +576,7 @@ namespace CatLib.Tests.Stl
         }
 
         /// <summary>
-        /// 获取分数测试
+        /// 获取分数测试.
         /// </summary>
         [TestMethod]
         public void GetScoreTest()
@@ -576,7 +587,7 @@ namespace CatLib.Tests.Stl
         }
 
         /// <summary>
-        /// 获取同步
+        /// 获取同步.
         /// </summary>
         [TestMethod]
         public void GetSyncRootTest()
@@ -588,7 +599,7 @@ namespace CatLib.Tests.Stl
         }
 
         /// <summary>
-        /// GetElementByRank 溢出测试
+        /// GetElementByRank 溢出测试.
         /// </summary>
         [TestMethod]
         public void GetElementByRankOverflowTest()
@@ -603,7 +614,7 @@ namespace CatLib.Tests.Stl
         }
 
         /// <summary>
-        /// GetElementByRank 空内容测试
+        /// GetElementByRank 空内容测试.
         /// </summary>
         [TestMethod]
         public void GetElementByRankEmptyTest()
@@ -616,7 +627,7 @@ namespace CatLib.Tests.Stl
         }
 
         /// <summary>
-        /// 获取排名溢出测试
+        /// 获取排名溢出测试.
         /// </summary>
         [TestMethod]
         public void GetRankOverflowTest()
@@ -628,7 +639,7 @@ namespace CatLib.Tests.Stl
         }
 
         /// <summary>
-        /// 获取排名反转溢出测试
+        /// 获取排名反转溢出测试.
         /// </summary>
         [TestMethod]
         public void GetRevRankOverflowTest()
@@ -641,7 +652,7 @@ namespace CatLib.Tests.Stl
         }
 
         /// <summary>
-        /// 最大等级约束测试
+        /// 最大等级约束测试.
         /// </summary>
         [TestMethod]
         public void MaxLevelLimitTest()
@@ -654,7 +665,7 @@ namespace CatLib.Tests.Stl
         }
 
         /// <summary>
-        /// 清空测试
+        /// 清空测试.
         /// </summary>
         [TestMethod]
         public void ClearTest()
@@ -664,6 +675,7 @@ namespace CatLib.Tests.Stl
             {
                 master.Add(i, i);
             }
+
             master.Clear();
             for (var i = 0; i < 65536; i++)
             {
@@ -679,7 +691,7 @@ namespace CatLib.Tests.Stl
         }
 
         /// <summary>
-        /// 头尾测试
+        /// 头尾测试.
         /// </summary>
         [TestMethod]
         public void FirstLastTest()
@@ -706,6 +718,7 @@ namespace CatLib.Tests.Stl
             {
                 master.Add(i, i);
             }
+
             for (var i = 0; i < 65536; i++)
             {
                 Assert.AreEqual(65535 - i, master.Last());
@@ -714,7 +727,7 @@ namespace CatLib.Tests.Stl
         }
 
         /// <summary>
-        /// 尾部推出测试
+        /// 尾部推出测试.
         /// </summary>
         public void PopTest()
         {
@@ -733,7 +746,7 @@ namespace CatLib.Tests.Stl
         }
 
         /// <summary>
-        /// 头部推出测试
+        /// 头部推出测试.
         /// </summary>
         public void ShiftTest()
         {
@@ -747,11 +760,12 @@ namespace CatLib.Tests.Stl
             {
                 Assert.AreEqual(i, master.Shift());
             }
+
             Assert.AreEqual(0, master.Count);
         }
 
         /// <summary>
-        /// 边界测试
+        /// 边界测试.
         /// </summary>
         [TestMethod]
         public void BoundFirstTest()
@@ -764,7 +778,7 @@ namespace CatLib.Tests.Stl
         }
 
         /// <summary>
-        /// 边界测试
+        /// 边界测试.
         /// </summary>
         [TestMethod]
         public void BoundLastTest()
@@ -777,7 +791,7 @@ namespace CatLib.Tests.Stl
         }
 
         /// <summary>
-        /// 转为数组测试
+        /// 转为数组测试.
         /// </summary>
         [TestMethod]
         public void ToArray()
@@ -802,7 +816,7 @@ namespace CatLib.Tests.Stl
         }
 
         /// <summary>
-        /// 相同的分数测试
+        /// 相同的分数测试.
         /// </summary>
         [TestMethod]
         public void SameScoreTest()
@@ -838,7 +852,7 @@ namespace CatLib.Tests.Stl
         }
 
         /// <summary>
-        /// 弹出空的有序集
+        /// 弹出空的有序集.
         /// </summary>
         [TestMethod]
         public void PopEmptySortSet()
@@ -852,7 +866,7 @@ namespace CatLib.Tests.Stl
         }
 
         /// <summary>
-        /// 弹出空的有序集
+        /// 弹出空的有序集.
         /// </summary>
         [TestMethod]
         public void ShiftEmptySortSet()
@@ -866,7 +880,7 @@ namespace CatLib.Tests.Stl
         }
 
         /// <summary>
-        /// 有序集的第一个元素
+        /// 有序集的第一个元素.
         /// </summary>
         [TestMethod]
         public void FirstEmptySortSet()
@@ -880,7 +894,7 @@ namespace CatLib.Tests.Stl
         }
 
         /// <summary>
-        /// 有序集的最后一个元素
+        /// 有序集的最后一个元素.
         /// </summary>
         [TestMethod]
         public void LastEmptySortSet()
@@ -894,7 +908,7 @@ namespace CatLib.Tests.Stl
         }
 
         /// <summary>
-        /// 有序集迭代删除(连续删除元素立即生效测试)
+        /// 有序集迭代删除(连续删除元素立即生效测试).
         /// </summary>
         [TestMethod]
         public void TestIterationsDeleted()

@@ -10,8 +10,9 @@
  */
 
 using System;
-using System.Collections.Generic;
 using System.Reflection;
+
+#pragma warning disable CA1716
 
 namespace CatLib
 {
@@ -20,6 +21,13 @@ namespace CatLib
     /// </summary>
     public interface IContainer
     {
+        /// <summary>
+        /// Resolve the given type from the container.
+        /// </summary>
+        /// <param name="service">The service name or alias.</param>
+        /// <returns>The serivce instance. Throw exception if the service can not resolved.</returns>
+        object this[string service] { get; set; }
+
         /// <summary>
         /// Gets the binding data of the given service.
         /// </summary>
@@ -112,17 +120,17 @@ namespace CatLib
         /// </summary>
         /// <param name="method">The method name.</param>
         /// <param name="target">The invoking target.</param>
-        /// <param name="call">The method info to invoke.</param>
+        /// <param name="called">The method info to invoke.</param>
         /// <returns>The method binding data.</returns>
-        IMethodBind BindMethod(string method, object target, MethodInfo call);
+        IMethodBind BindMethod(string method, object target, MethodInfo called);
 
         /// <summary>
         /// Unbinds a method from the container.
         /// </summary>
         /// <param name="target">
         /// The target.
-        /// <para>A <code>string</code> will be taken as the method name.</para>
-        /// <para>A <code>IMethodBind</code> will be taken as a given method.</para>
+        /// <para>A. <code>string</code> will be taken as the method name.</para>
+        /// <para>A. <code>IMethodBind</code> will be taken as a given method.</para>
         /// <para>Other object will be taken as the invoking target.</para>
         /// </param>
         void UnbindMethod(object target);
@@ -159,6 +167,7 @@ namespace CatLib
         /// Release an existing instance in the container.
         /// </summary>
         /// <param name="mixed">The service name or alias or instance.</param>
+        /// <returns>True if the existing instance has been released.</returns>
         bool Release(object mixed);
 
         /// <summary>
@@ -177,11 +186,11 @@ namespace CatLib
         /// <summary>
         /// Call the given method and inject its dependencies.
         /// </summary>
-        /// <param name="instance">The instance on which to call the method.</param>
+        /// <param name="target">The instance on which to call the method.</param>
         /// <param name="methodInfo">The method info.</param>
         /// <param name="userParams">The user parameters.</param>
         /// <returns>The return value of method.</returns>
-        object Call(object instance, MethodInfo methodInfo, params object[] userParams);
+        object Call(object target, MethodInfo methodInfo, params object[] userParams);
 
         /// <summary>
         /// Resolve the given service or alias from the container.
@@ -190,13 +199,6 @@ namespace CatLib
         /// <param name="userParams">The user parameters.</param>
         /// <returns>The serivce instance. Throw exception if the service can not resolved.</returns>
         object Make(string service, params object[] userParams);
-
-        /// <summary>
-        /// Resolve the given type from the container.
-        /// </summary>
-        /// <param name="service">The service name or alias.</param>
-        /// <returns>The serivce instance. Throw exception if the service can not resolved.</returns>
-		object this[string service] { get; set; }
 
         /// <summary>
         /// Alias a service to a different name.
@@ -232,6 +234,7 @@ namespace CatLib
         /// Register a new release callback.
         /// </summary>
         /// <param name="closure">The callback.</param>
+        /// <returns>The container instance.</returns>
         IContainer OnRelease(Action<IBindData, object> closure);
 
         /// <summary>

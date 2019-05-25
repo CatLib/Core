@@ -11,18 +11,13 @@
 
 using System;
 using System.Collections.Generic;
+using CatLibContainer = CatLib.Container;
 
 namespace CatLib
 {
     /// <inheritdoc cref="IBindData"/>
     public sealed class BindData : Bindable<IBindData>, IBindData
     {
-        /// <inheritdoc />
-        public Func<IContainer, object[], object> Concrete { get; }
-
-        /// <inheritdoc />
-        public bool IsStatic { get; }
-
         /// <summary>
         /// The local resolving callbacks.
         /// </summary>
@@ -39,7 +34,7 @@ namespace CatLib
         private List<Action<IBindData, object>> release;
 
         /// <summary>
-        /// Create a new <see cref="BindData"/> instance.
+        /// Initializes a new instance of the <see cref="BindData"/> class.
         /// </summary>
         /// <param name="container">The container instance.</param>
         /// <param name="service">The service name.</param>
@@ -53,13 +48,19 @@ namespace CatLib
         }
 
         /// <inheritdoc />
+        public Func<IContainer, object[], object> Concrete { get; }
+
+        /// <inheritdoc />
+        public bool IsStatic { get; }
+
+        /// <inheritdoc />
         public IBindData Alias(string alias)
         {
-            lock (SyncRoot)
+            lock (Locker)
             {
                 AssertDestroyed();
                 Guard.NotEmptyOrNull(alias, nameof(alias));
-                InternalContainer.Alias(alias, Service);
+                Container.Alias(alias, Service);
                 return this;
             }
         }
@@ -67,11 +68,11 @@ namespace CatLib
         /// <inheritdoc />
         public IBindData Tag(string tag)
         {
-            lock (SyncRoot)
+            lock (Locker)
             {
                 AssertDestroyed();
                 Guard.NotEmptyOrNull(tag, nameof(tag));
-                InternalContainer.Tag(tag, Service);
+                Container.Tag(tag, Service);
                 return this;
             }
         }
@@ -103,12 +104,6 @@ namespace CatLib
             return this;
         }
 
-        /// <inheritdoc />
-        protected override void ReleaseBind()
-        {
-            InternalContainer.Unbind(this);
-        }
-
         /// <summary>
         /// Trigger all of the local resolving callbacks.
         /// </summary>
@@ -116,7 +111,7 @@ namespace CatLib
         /// <returns>The decorated service instance.</returns>
         internal object TriggerResolving(object instance)
         {
-            return InternalContainer.Trigger(this, instance, resolving);
+            return CatLibContainer.Trigger(this, instance, resolving);
         }
 
         /// <inheritdoc cref="TriggerResolving"/>
@@ -125,7 +120,7 @@ namespace CatLib
         /// </summary>
         internal object TriggerAfterResolving(object instance)
         {
-            return InternalContainer.Trigger(this, instance, afterResolving);
+            return CatLibContainer.Trigger(this, instance, afterResolving);
         }
 
         /// <inheritdoc cref="TriggerResolving"/>
@@ -134,7 +129,13 @@ namespace CatLib
         /// </summary>
         internal object TriggerRelease(object instance)
         {
-            return InternalContainer.Trigger(this, instance, release);
+            return CatLibContainer.Trigger(this, instance, release);
+        }
+
+        /// <inheritdoc />
+        protected override void ReleaseBind()
+        {
+            ((Container)Container).Unbind(this);
         }
 
         /// <summary>
@@ -146,7 +147,7 @@ namespace CatLib
         {
             Guard.NotNull(closure, nameof(closure));
 
-            lock (SyncRoot)
+            lock (Locker)
             {
                 AssertDestroyed();
 

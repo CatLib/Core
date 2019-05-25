@@ -14,7 +14,7 @@ using System;
 namespace CatLib
 {
     /// <summary>
-    /// Extension method for <see cref="Type"/>
+    /// Extension method for <see cref="Type"/>.
     /// </summary>
     public static class TypeExtend
     {

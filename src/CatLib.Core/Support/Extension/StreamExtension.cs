@@ -20,11 +20,21 @@ namespace CatLib
     /// </summary>
     public static class StreamExtension
     {
-        /// <summary>
-        /// 默认的缓冲区
-        /// </summary>
         [ThreadStatic]
-        private static readonly byte[] buffer = new byte[4096];
+        private static byte[] buffer;
+
+        private static byte[] Buffer
+        {
+            get
+            {
+                if (buffer == null)
+                {
+                    buffer = new byte[4096];
+                }
+
+                return buffer;
+            }
+        }
 
         /// <summary>
         /// Append the source stream to the destination stream.
@@ -34,7 +44,7 @@ namespace CatLib
         /// <returns>Byte length of transmitted data.</returns>
         public static long AppendTo(this Stream source, Stream destination)
         {
-            return source.AppendTo(destination, buffer);
+            return source.AppendTo(destination, Buffer);
         }
 
         /// <summary>
@@ -81,17 +91,17 @@ namespace CatLib
                 var memoryStream = source as MemoryStream;
                 if (memoryStream != null)
                 {
-                    byte[] buffer;
+                    byte[] internalBuffer;
                     try
                     {
-                        buffer = memoryStream.GetBuffer();
+                        internalBuffer = memoryStream.GetBuffer();
                     }
                     catch (UnauthorizedAccessException)
                     {
-                        buffer = memoryStream.ToArray();
+                        internalBuffer = memoryStream.ToArray();
                     }
 
-                    return encoding.GetString(buffer, 0, (int)memoryStream.Length);
+                    return encoding.GetString(internalBuffer, 0, (int)memoryStream.Length);
                 }
 
                 var length = 0;
@@ -105,9 +115,9 @@ namespace CatLib
                 }
 
                 MemoryStream targetStream;
-                if (length > 0 && length <= buffer.Length)
+                if (length > 0 && length <= Buffer.Length)
                 {
-                    targetStream = new MemoryStream(buffer, 0, buffer.Length, true, true);
+                    targetStream = new MemoryStream(Buffer, 0, Buffer.Length, true, true);
                 }
                 else
                 {

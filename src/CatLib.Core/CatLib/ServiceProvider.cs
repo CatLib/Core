@@ -15,7 +15,7 @@ using System.Diagnostics.CodeAnalysis;
 namespace CatLib
 {
     /// <summary>
-    /// <see cref="ServiceProvider"/> is default service provider class 
+    /// <see cref="ServiceProvider"/> is default service provider class
     /// for all concrete ServiceProvider classes.
     /// </summary>
     [ExcludeFromCodeCoverage]

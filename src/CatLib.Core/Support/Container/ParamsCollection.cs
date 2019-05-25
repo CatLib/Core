@@ -18,12 +18,40 @@ namespace CatLib
     /// Default parameter table implementation.
     /// </summary>
     [ExcludeFromCodeCoverage]
-    public sealed class Params : IParams, IEnumerable<KeyValuePair<string, object>>
+    public sealed class ParamsCollection : IParams, IEnumerable<KeyValuePair<string, object>>
     {
         /// <summary>
         /// The parameter mapping.
         /// </summary>
         private readonly IDictionary<string, object> table;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ParamsCollection"/> class.
+        /// </summary>
+        public ParamsCollection()
+        {
+            table = new Dictionary<string, object>();
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ParamsCollection"/> class.
+        /// </summary>
+        /// <param name="args">The parameters mapping.</param>
+        public ParamsCollection(IDictionary<string, object> args)
+        {
+            table = args;
+        }
+
+        /// <summary>
+        /// Get or set a parameter.
+        /// </summary>
+        /// <param name="key">The parameter name.</param>
+        /// <returns>The parameter value.</returns>
+        public object this[string key]
+        {
+            get => table[key];
+            set => table[key] = value;
+        }
 
         /// <summary>
         /// Gets the iterator.
@@ -41,34 +69,6 @@ namespace CatLib
         IEnumerator<KeyValuePair<string, object>> IEnumerable<KeyValuePair<string, object>>.GetEnumerator()
         {
             return table.GetEnumerator();
-        }
-
-        /// <summary>
-        /// Initialize a new <see cref="Params"/> instance.
-        /// </summary>
-        public Params()
-        {
-            table = new Dictionary<string, object>();
-        }
-
-        /// <summary>
-        /// Initialize a new <see cref="Params"/> instance.
-        /// </summary>
-        /// <param name="args">The parameters mapping.</param>
-        public Params(IDictionary<string, object> args)
-        {
-            table = args;
-        }
-
-        /// <summary>
-        /// Get or set a parameter.
-        /// </summary>
-        /// <param name="key">The parameter name.</param>
-        /// <returns>The parameter value.</returns>
-        public object this[string key]
-        {
-            get => table[key];
-            set => table[key] = value;
         }
 
         /// <summary>

@@ -56,6 +56,7 @@ namespace CatLib.Core.Tests.Support.Util
                 stream1.Write(Encoding.Default.GetBytes("1234567890"), 0, 10);
                 builder.Append("1234567890");
             }
+
             stream1.Seek(0, SeekOrigin.Begin);
             Assert.AreEqual(builder.ToString(), stream1.ToText());
         }
@@ -72,6 +73,7 @@ namespace CatLib.Core.Tests.Support.Util
                 stream1.Write(data, 0, data.Length);
                 builder.Append("12中文34测试的5这是67890");
             }
+
             stream1.Seek(0, SeekOrigin.Begin);
             Assert.AreEqual(builder.ToString(), stream1.ToText());
         }

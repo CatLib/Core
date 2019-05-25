@@ -14,7 +14,8 @@ using System;
 namespace CatLib
 {
     /// <inheritdoc />
-    internal sealed class GivenData<TReturn> : IGivenData<TReturn> where TReturn : class, IBindable<TReturn>
+    internal sealed class GivenData<TReturn> : IGivenData<TReturn>
+        where TReturn : class, IBindable<TReturn>
     {
         /// <inheritdoc cref="BindData"/>
         private readonly Bindable<TReturn> bindable;
@@ -30,7 +31,7 @@ namespace CatLib
         private string needs;
 
         /// <summary>
-        /// Create an new the given relationship.
+        /// Initializes a new instance of the <see cref="GivenData{TReturn}"/> class.
         /// </summary>
         /// <param name="container">The container instance.</param>
         /// <param name="bindable">The bindable data.</param>
@@ -38,13 +39,6 @@ namespace CatLib
         {
             this.container = container;
             this.bindable = bindable;
-        }
-
-        /// <inheritdoc cref="Bindable{TReturn}.Needs"/>
-        internal IGivenData<TReturn> Needs(string needs)
-        {
-            this.needs = needs;
-            return this;
         }
 
         /// <inheritdoc />
@@ -67,6 +61,13 @@ namespace CatLib
             Guard.Requires<ArgumentNullException>(closure != null);
             bindable.AddContextual(needs, closure);
             return bindable as TReturn;
+        }
+
+        /// <inheritdoc cref="Bindable{TReturn}.Needs"/>
+        internal IGivenData<TReturn> Needs(string needs)
+        {
+            this.needs = needs;
+            return this;
         }
     }
 }

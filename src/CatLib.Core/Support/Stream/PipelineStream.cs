@@ -18,13 +18,10 @@ namespace CatLib
     /// <summary>
     /// The pipeline stream.
     /// </summary>
+#pragma warning disable S3881
     public class PipelineStream : WrapperStream
+#pragma warning restore S3881
     {
-        /// <summary>
-        /// The count can be read.
-        /// </summary>
-        private volatile int count;
-
         /// <summary>
         /// The stream capacity.
         /// </summary>
@@ -41,9 +38,9 @@ namespace CatLib
         private readonly RingBuffer ringBuffer;
 
         /// <summary>
-        /// Trigger when reading is complete.
+        /// The count can be read.
         /// </summary>
-        public event Action<Stream> OnRead;
+        private volatile int count;
 
         /// <summary>
         /// Whether the stream is disabled.
@@ -55,42 +52,18 @@ namespace CatLib
         /// </summary>
         private volatile bool closed;
 
-        /// <inheritdoc />
-        public override bool CanRead => count > 0 && !disabled;
-
-        /// <inheritdoc />
-        public override bool CanWrite => count < capacity && !closed;
-
         /// <summary>
         /// The stream position.
         /// </summary>
         private long position;
-
-        /// <inheritdoc />
-        public override long Position
-        {
-            get => position;
-            set => throw new NotSupportedException();
-        }
 
         /// <summary>
         /// The stream length.
         /// </summary>
         private long length;
 
-        /// <inheritdoc />
-        public override long Length => length;
-
-        /// <inheritdoc />
-        public override bool CanSeek => false;
-
         /// <summary>
-        /// Whether is closed the stream.
-        /// </summary>
-        public bool Closed => closed;
-
-        /// <summary>
-        /// Initialize an new <see cref="PipelineStream"/> instnace.
+        /// Initializes a new instance of the <see cref="PipelineStream"/> class.
         /// </summary>
         /// <param name="capacity">The stream capacity.</param>
         /// <param name="sleep">The thread sleep time.</param>
@@ -102,12 +75,33 @@ namespace CatLib
         }
 
         /// <summary>
-        /// Release <see cref="PipelineStream"/> instance.
+        /// Trigger when reading is complete.
         /// </summary>
-        ~PipelineStream()
+        public event Action<Stream> OnRead;
+
+        /// <inheritdoc />
+        public override bool CanRead => count > 0 && !disabled;
+
+        /// <inheritdoc />
+        public override bool CanWrite => count < capacity && !closed;
+
+        /// <inheritdoc />
+        public override long Position
         {
-            Dispose(!disabled);
+            get => position;
+            set => throw new NotSupportedException();
         }
+
+        /// <inheritdoc />
+        public override long Length => length;
+
+        /// <inheritdoc />
+        public override bool CanSeek => false;
+
+        /// <summary>
+        /// Gets a value indicating whether is closed the stream.
+        /// </summary>
+        public bool Closed => closed;
 
         /// <inheritdoc />
         public override long Seek(long offset, SeekOrigin origin)
@@ -139,6 +133,7 @@ namespace CatLib
                     {
                         return 0;
                     }
+
                     Thread.Sleep(sleep);
                 }
 
@@ -153,6 +148,7 @@ namespace CatLib
                         {
                             return 0;
                         }
+
                         continue;
                     }
 

@@ -41,7 +41,7 @@ namespace CatLib
         private readonly object syncRoot;
 
         /// <summary>
-        /// Initialize a new one <see cref="MethodContainer"/> instance.
+        /// Initializes a new instance of the <see cref="MethodContainer"/> class.
         /// </summary>
         /// <param name="container">The <see cref="Container"/> instance.</param>
         internal MethodContainer(Container container)
@@ -112,7 +112,7 @@ namespace CatLib
                 }
 
                 var injectParams = container.GetDependencies(methodBind, methodBind.ParameterInfos, userParams) ??
-                                   new object[] { };
+                                   Array.Empty<object>();
                 return methodBind.MethodInfo.Invoke(methodBind.Target, injectParams);
             }
         }
@@ -122,8 +122,8 @@ namespace CatLib
         /// </summary>
         /// <param name="target">
         /// The target.
-        /// <para>A <code>string</code> will be taken as the method name.</para>
-        /// <para>A <code>IMethodBind</code> will be taken as a given method.</para>
+        /// <para>A. <code>string</code> will be taken as the method name.</para>
+        /// <para>A. <code>IMethodBind</code> will be taken as a given method.</para>
         /// <para>Other object will be taken as the invoking target.</para>
         /// </param>
         public void Unbind(object target)
@@ -146,11 +146,24 @@ namespace CatLib
                     {
                         return;
                     }
+
                     methodBind.Unbind();
                     return;
                 }
 
                 UnbindWithObject(target);
+            }
+        }
+
+        /// <summary>
+        /// Flush the container of all method bindings.
+        /// </summary>
+        public void Flush()
+        {
+            lock (syncRoot)
+            {
+                targetToMethodsMappings.Clear();
+                methodMappings.Clear();
             }
         }
 
@@ -184,6 +197,15 @@ namespace CatLib
         }
 
         /// <summary>
+        /// Create a method without not found exception.
+        /// </summary>
+        /// <param name="method">The method name.</param>
+        private static LogicException MakeMethodNotFoundException(string method)
+        {
+            return new LogicException($"Method [{method}] is not found.");
+        }
+
+        /// <summary>
         /// Remove all methods bound to the object.
         /// </summary>
         /// <param name="target">The object.</param>
@@ -198,27 +220,6 @@ namespace CatLib
             {
                 Unbind(method);
             }
-        }
-
-        /// <summary>
-        /// Flush the container of all method bindings.
-        /// </summary>
-        public void Flush()
-        {
-            lock (syncRoot)
-            {
-                targetToMethodsMappings.Clear();
-                methodMappings.Clear();
-            }
-        }
-
-        /// <summary>
-        /// Create a method without not found exception.
-        /// </summary>
-        /// <param name="method">The method name.</param>
-        private LogicException MakeMethodNotFoundException(string method)
-        {
-            return new LogicException($"Method [{method}] is not found.");
         }
     }
 }

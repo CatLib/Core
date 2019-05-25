@@ -20,6 +20,6 @@ namespace CatLib.Core.Tests.Support.Util
         public void TestToStream()
         {
             Assert.AreNotEqual(null, "hello world".ToStream());
-        } 
+        }
     }
 }

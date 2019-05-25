@@ -10,11 +10,11 @@
  */
 
 using System;
-using IEnumerator = System.Collections.IEnumerator;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Reflection;
 using System.Threading;
+using IEnumerator = System.Collections.IEnumerator;
 
 namespace CatLib
 {
@@ -29,10 +29,74 @@ namespace CatLib
         private static string version;
 
         /// <summary>
-        /// Gets the CatLib <see cref="Application"/> version.
+        /// All of the registered service providers.
         /// </summary>
-        public static string Version => version ?? (version = FileVersionInfo
-                       .GetVersionInfo(Assembly.GetExecutingAssembly().Location).FileVersion);
+        private readonly SortedList<int, List<IServiceProvider>> serviceProviders
+            = new SortedList<int, List<IServiceProvider>>();
+
+        /// <summary>
+        /// The types of the loaded service providers.
+        /// </summary>
+        private readonly HashSet<Type> loadedProviders = new HashSet<Type>();
+
+        /// <summary>
+        /// The main thread id.
+        /// </summary>
+        private readonly int mainThreadId;
+
+        /// <summary>
+        /// True if the application has been bootstrapped.
+        /// </summary>
+        private bool bootstrapped;
+
+        /// <summary>
+        /// True if the application has been initialized.
+        /// </summary>
+        private bool inited;
+
+        /// <summary>
+        /// True if the <see cref="Register"/> is being executed.
+        /// </summary>
+        private bool registering;
+
+        /// <summary>
+        /// The unique runtime id.
+        /// </summary>
+        private long incrementId;
+
+        /// <summary>
+        /// The global event dispatcher.
+        /// </summary>
+        private IDispatcher dispatcher;
+
+        /// <summary>
+        /// The debug level.
+        /// </summary>
+        private DebugLevels debugLevel;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Application"/> class.
+        /// </summary>
+        /// <param name="global">True if sets the instance to <see cref="App"/> facade.</param>
+        public Application(bool global = true)
+        {
+            mainThreadId = Thread.CurrentThread.ManagedThreadId;
+            RegisterCoreAlias();
+            RegisterCoreService();
+
+            // We use closures to save the current context state
+            // Do not change to: OnFindType(Type.GetType) This
+            // causes the active assembly to be not the expected scope.
+            OnFindType(finder => { return Type.GetType(finder); });
+
+            DebugLevel = DebugLevels.Production;
+            Process = StartProcess.Construct;
+
+            if (global)
+            {
+                App.Handler = this;
+            }
+        }
 
         /// <summary>
         /// The framework start process type.
@@ -94,90 +158,37 @@ namespace CatLib
             Terminating = 9,
 
             /// <summary>
-            /// After the <see cref="Application.Terminate"/> called. 
+            /// After the <see cref="Application.Terminate"/> called.
             /// All resources are destroyed.
             /// </summary>
             Terminated = 10,
         }
 
         /// <summary>
-        /// All of the registered service providers.
+        /// Gets the CatLib <see cref="Application"/> version.
         /// </summary>
-        private readonly SortedList<int, List<IServiceProvider>> serviceProviders
-            = new SortedList<int, List<IServiceProvider>>();
+        public static string Version => version ?? (version = FileVersionInfo
+                       .GetVersionInfo(Assembly.GetExecutingAssembly().Location).FileVersion);
 
         /// <summary>
-        /// The types of the loaded service providers.
-        /// </summary>
-        private readonly HashSet<Type> loadedProviders = new HashSet<Type>();
-
-        /// <summary>
-        /// True if the application has been bootstrapped.
-        /// </summary>
-        private bool bootstrapped;
-
-        /// <summary>
-        /// True if the application has been initialized.
-        /// </summary>
-        private bool inited;
-
-        /// <summary>
-        /// True if the <see cref="Register"/> is being executed.
-        /// </summary>
-        private bool registering;
-
-        /// <summary>
-        /// Indicates the application startup process.
+        /// Gets indicates the application startup process.
         /// </summary>
         public StartProcess Process { get; private set; }
-
-        /// <summary>
-        /// The unique runtime id.
-        /// </summary>
-        private long incrementId;
-
-        /// <summary>
-        /// The main thread id.
-        /// </summary>
-        private readonly int mainThreadId;
-
-        /// <inheritdoc />
-        public bool IsMainThread => mainThreadId == Thread.CurrentThread.ManagedThreadId;
-
-        /// <summary>
-        /// The global event dispatcher.
-        /// </summary>
-        private IDispatcher dispatcher;
 
         /// <inheritdoc cref="dispatcher"/>
         public IDispatcher Dispatcher => dispatcher ?? (dispatcher = Resolve<IDispatcher>());
 
-        /// <summary>
-        /// The debug level.
-        /// </summary>
-        private DebugLevels debugLevel;
+        /// <inheritdoc />
+        public bool IsMainThread => mainThreadId == Thread.CurrentThread.ManagedThreadId;
 
-        /// <summary>
-        /// Create a new CatLib <see cref="Application"/> instance. 
-        /// </summary>
-        /// <param name="global">True if sets the instance to <see cref="App"/> facade.</param>
-        public Application(bool global = true)
+        /// <inheritdoc />
+        public DebugLevels DebugLevel
         {
-            mainThreadId = Thread.CurrentThread.ManagedThreadId;
-            RegisterCoreAlias();
-            RegisterCoreService();
-
-            // We use closures to save the current context state
-            // Do not change to: OnFindType(Type.GetType) This 
-            // causes the active assembly to be not the expected scope.
-            OnFindType(finder => { return Type.GetType(finder); });
-
-            DebugLevel = DebugLevels.Production;
-            Process = StartProcess.Construct;
-
-            if (global)
+            get => debugLevel;
+            set
             {
-                App.Handler = this;
+                debugLevel = value;
+                Instance(Type2Service(typeof(DebugLevels)), debugLevel);
             }
         }
 
@@ -199,6 +210,7 @@ namespace CatLib
             {
                 App.Handler = null;
             }
+
             Process = StartProcess.Terminated;
             Trigger(ApplicationEvents.OnTerminated);
         }
@@ -264,6 +276,102 @@ namespace CatLib
             StartCoroutine(CoroutineInit());
         }
 
+        /// <inheritdoc />
+        public virtual void Register(IServiceProvider provider, bool force = false)
+        {
+            StartCoroutine(CoroutineRegister(provider, force));
+        }
+
+        /// <inheritdoc />
+        public bool IsRegistered(IServiceProvider provider)
+        {
+            Guard.Requires<ArgumentNullException>(provider != null);
+            return loadedProviders.Contains(GetProviderBaseType(provider));
+        }
+
+        /// <inheritdoc />
+        public long GetRuntimeId()
+        {
+            return Interlocked.Increment(ref incrementId);
+        }
+
+        /// <inheritdoc />
+        public int GetPriority(Type type, string method = null)
+        {
+            Guard.Requires<ArgumentNullException>(type != null);
+            var priority = typeof(PriorityAttribute);
+            var currentPriority = int.MaxValue;
+
+            MethodInfo methodInfo;
+            if (method != null &&
+                (methodInfo = type.GetMethod(method)) != null &&
+                methodInfo.IsDefined(priority, false))
+            {
+                currentPriority = ((PriorityAttribute)methodInfo.GetCustomAttributes(priority, false)[0]).Priorities;
+            }
+            else if (type.IsDefined(priority, false))
+            {
+                currentPriority = ((PriorityAttribute)type.GetCustomAttributes(priority, false)[0]).Priorities;
+            }
+
+            return currentPriority;
+        }
+
+        /// <inheritdoc />
+        public object[] Trigger(string eventName, params object[] payloads)
+        {
+            return Dispatcher.Trigger(eventName, payloads);
+        }
+
+        /// <inheritdoc />
+        public object TriggerHalt(string eventName, params object[] payloads)
+        {
+            return Dispatcher.TriggerHalt(eventName, payloads);
+        }
+
+        /// <inheritdoc />
+        public bool HasListeners(string eventName, bool strict = false)
+        {
+            return Dispatcher.HasListeners(eventName, strict);
+        }
+
+        /// <inheritdoc />
+        public IEvent On(string eventName, Func<string, object[], object> execution, object group = null)
+        {
+            return Dispatcher.On(eventName, execution, group);
+        }
+
+        /// <inheritdoc />
+        public void Off(object target)
+        {
+            Dispatcher.Off(target);
+        }
+
+        /// <summary>
+        /// Call the iterator with the default coroutine.
+        /// </summary>
+        /// <param name="iterator">The iterator.</param>
+        protected static void StartCoroutine(IEnumerator iterator)
+        {
+            var stack = new Stack<IEnumerator>();
+            stack.Push(iterator);
+            do
+            {
+                iterator = stack.Pop();
+                while (iterator.MoveNext())
+                {
+                    if (!(iterator.Current is IEnumerator nextCoroutine))
+                    {
+                        continue;
+                    }
+
+                    stack.Push(iterator);
+                    iterator = nextCoroutine;
+                }
+            }
+            while (stack.Count > 0);
+        }
+
         /// <inheritdoc cref="Init"/>
         /// <returns>Indicate the initialization progress.</returns>
         protected IEnumerator CoroutineInit()
@@ -298,14 +406,8 @@ namespace CatLib
             Trigger(ApplicationEvents.OnStartCompleted, this);
         }
 
-        /// <inheritdoc />
-        public virtual void Register(IServiceProvider provider, bool force = false)
-        {
-            StartCoroutine(CoroutineRegister(provider, force));
-        }
-
         /// <inheritdoc cref="IApplication.Register"/>
-        /// <returns>Indicates the initialization progress if the 
+        /// <returns>Indicates the initialization progress if the
         /// application has initialized, otherwise it makes no sense.</returns>
         protected IEnumerator CoroutineRegister(IServiceProvider provider, bool force = false)
         {
@@ -317,6 +419,7 @@ namespace CatLib
                 {
                     throw new LogicException($"Provider [{provider.GetType()}] is already register.");
                 }
+
                 loadedProviders.Remove(GetProviderBaseType(provider));
             }
 
@@ -358,9 +461,10 @@ namespace CatLib
         /// <summary>
         /// Add the specified element to the sorted list.
         /// </summary>
+        /// <typeparam name="T">The type of the element.</typeparam>
         /// <param name="list">The sorted list.</param>
         /// <param name="insert">The specified element.</param>
-        /// <param name="priorityMethod">Specify a method name, the priority will 
+        /// <param name="priorityMethod">Specify a method name, the priority will
         /// be obtained from this method.</param>
         protected void AddSortedList<T>(IDictionary<int, List<T>> list, T insert, string priorityMethod)
         {
@@ -368,7 +472,8 @@ namespace CatLib
 
             if (!list.TryGetValue(priority, out List<T> providers))
             {
-                list.Add(priority, providers = new List<T>());
+                providers = new List<T>();
+                list.Add(priority, providers);
             }
 
             providers.Add(insert);
@@ -393,82 +498,6 @@ namespace CatLib
         }
 
         /// <inheritdoc />
-        public bool IsRegistered(IServiceProvider provider)
-        {
-            Guard.Requires<ArgumentNullException>(provider != null);
-            return loadedProviders.Contains(GetProviderBaseType(provider));
-        }
-
-        /// <inheritdoc />
-        public long GetRuntimeId()
-        {
-            return Interlocked.Increment(ref incrementId);
-        }
-
-        /// <inheritdoc />
-        public int GetPriority(Type type, string method = null)
-        {
-            Guard.Requires<ArgumentNullException>(type != null);
-            var priority = typeof(PriorityAttribute);
-            var currentPriority = int.MaxValue;
-
-            MethodInfo methodInfo;
-            if (method != null &&
-                (methodInfo = type.GetMethod(method)) != null &&
-                methodInfo.IsDefined(priority, false))
-            {
-                currentPriority = ((PriorityAttribute)methodInfo.GetCustomAttributes(priority, false)[0]).Priorities;
-            }
-            else if (type.IsDefined(priority, false))
-            {
-                currentPriority = ((PriorityAttribute)type.GetCustomAttributes(priority, false)[0]).Priorities;
-            }
-
-            return currentPriority;
-        }
-
-        /// <inheritdoc />
-        public DebugLevels DebugLevel
-        {
-            get => debugLevel;
-            set
-            {
-                debugLevel = value;
-                Instance(Type2Service(typeof(DebugLevels)), debugLevel);
-            }
-        }
-
-        /// <inheritdoc />
-        public object[] Trigger(string eventName, params object[] payloads)
-        {
-            return Dispatcher.Trigger(eventName, payloads);
-        }
-
-        /// <inheritdoc />
-        public object TriggerHalt(string eventName, params object[] payloads)
-        {
-            return Dispatcher.TriggerHalt(eventName, payloads);
-        }
-
-        /// <inheritdoc />
-        public bool HasListeners(string eventName, bool strict = false)
-        {
-            return Dispatcher.HasListeners(eventName, strict);
-        }
-
-        /// <inheritdoc />
-        public IEvent On(string eventName, Func<string, object[], object> execution, object group = null)
-        {
-            return Dispatcher.On(eventName, execution, group);
-        }
-
-        /// <inheritdoc />
-        public void Off(object target)
-        {
-            Dispatcher.Off(target);
-        }
-
-        /// <inheritdoc />
         protected override void GuardConstruct(string method)
         {
             if (registering)
@@ -478,6 +507,7 @@ namespace CatLib
             }
 
             // todo: rebuild event system.
+#pragma warning disable S125 // Sections of code should not be commented out
             /*
             if (Process < StartProcess.Bootstraped)
             {
@@ -486,41 +516,29 @@ namespace CatLib
             }*/
 
             base.GuardConstruct(method);
-        }
-
-        /// <summary>
-        /// Call the iterator with the default coroutine.
-        /// </summary>
-        /// <param name="iterator">The iterator.</param>
-        protected void StartCoroutine(IEnumerator iterator)
-        {
-            var stack = new Stack<IEnumerator>();
-            stack.Push(iterator);
-            do
-            {
-                iterator = stack.Pop();
-                while (iterator.MoveNext())
-                {
-                    if (!(iterator.Current is IEnumerator nextCoroutine))
-                    {
-                        continue;
-                    }
-
-                    stack.Push(iterator);
-                    iterator = nextCoroutine;
-                }
-            } while (stack.Count > 0);
+#pragma warning restore S125 // Sections of code should not be commented out
         }
 
         /// <summary>
         /// Resolve the given type from the container.(Will not perform <see cref="GuardConstruct"/> check).
         /// </summary>
         /// <typeparam name="TService">The service type(name).</typeparam>
-        /// <param name="userParams">The user parameters.</param>
         /// <returns>The resolved service instance.</returns>
-        protected TService Resolve<TService>(params object[] userParams)
+        protected TService Resolve<TService>()
         {
+            // todo: rebuild event system.
             return (TService)Resolve(Type2Service(typeof(TService)));
+        }
+
+        /// <summary>
+        /// Get the base type from service provider.
+        /// </summary>
+        /// <param name="provider">The service provider.</param>
+        /// <returns>Base type for service provider.</returns>
+        private static Type GetProviderBaseType(IServiceProvider provider)
+        {
+            var providerType = provider as IServiceProviderType;
+            return providerType == null ? provider.GetType() : providerType.BaseType;
         }
 
         /// <summary>
@@ -541,17 +559,6 @@ namespace CatLib
             var bindable = new BindData(this, null, null, false);
             this.Singleton<IDispatcher>(() => new GlobalDispatcher(
                 (paramInfos, userParams) => GetDependencies(bindable, paramInfos, userParams)));
-        }
-
-        /// <summary>
-        /// Get the base type from service provider.
-        /// </summary>
-        /// <param name="provider">The service provider.</param>
-        /// <returns>Base type for service provider.</returns>
-        private static Type GetProviderBaseType(IServiceProvider provider)
-        {
-            var providerType = provider as IServiceProviderType;
-            return providerType == null ? provider.GetType() : providerType.BaseType;
         }
     }
 }

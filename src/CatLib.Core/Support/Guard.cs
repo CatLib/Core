@@ -44,19 +44,21 @@ namespace CatLib
         /// <typeparam name="TException">Exception triggered when validation fails.</typeparam>
         /// <param name="condition">The condition of the contract.</param>
         [System.Diagnostics.DebuggerNonUserCode]
-        public static void Requires<TException>(bool condition) where TException : Exception, new()
+        public static void Requires<TException>(bool condition)
+            where TException : Exception, new()
         {
             if (condition)
             {
                 return;
             }
+
             throw new TException();
         }
 
         /// <summary>
         /// Verifies is not empty or null.
         /// </summary>
-        /// <param name="argumentValue">The parameter name.</param>
+        /// <param name="argumentValue">The parameter value.</param>
         /// <param name="argumentName">The parameter name.</param>
         [System.Diagnostics.DebuggerNonUserCode]
         public static void NotEmptyOrNull(string argumentValue, string argumentName)
@@ -68,7 +70,7 @@ namespace CatLib
         }
 
         /// <summary>
-        /// Verifies the length is greater than 0
+        /// Verifies the length is greater than 0.
         /// </summary>
         /// <typeparam name="T">The type of parameter.</typeparam>
         /// <param name="argumentValue">The parameter value.</param>

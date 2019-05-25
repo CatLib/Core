@@ -13,6 +13,8 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.IO;
 
+#pragma warning disable CA1034
+
 namespace CatLib
 {
     [TestClass]
@@ -130,6 +132,7 @@ namespace CatLib
         public class CannotSeekStream : Stream
         {
             public override bool CanRead { get; }
+
             public override bool CanSeek => false;
 
             public override bool CanWrite { get; }

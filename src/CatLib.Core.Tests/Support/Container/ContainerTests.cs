@@ -14,10 +14,14 @@ using System.Collections.Generic;
 using System.Reflection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
+#pragma warning disable CA1034
+#pragma warning disable CA1031
+#pragma warning disable CA1051
+
 namespace CatLib.Tests.Stl
 {
     /// <summary>
-    /// 容器测试用例
+    /// 容器测试用例.
     /// </summary>
     [TestClass]
     public class ContainerTest
@@ -58,9 +62,8 @@ namespace CatLib.Tests.Stl
             Assert.AreEqual(true, isThrow);
         }
 
-        #region Tag
         /// <summary>
-        /// 是否可以标记服务
+        /// 是否可以标记服务.
         /// </summary>
         [TestMethod]
         public void CanTagService()
@@ -74,7 +77,7 @@ namespace CatLib.Tests.Stl
         }
 
         /// <summary>
-        /// 检测无效的Tag输入
+        /// 检测无效的Tag输入.
         /// </summary>
         [TestMethod]
         public void CheckIllegalTagInput()
@@ -102,7 +105,7 @@ namespace CatLib.Tests.Stl
         }
 
         /// <summary>
-        /// 是否可以根据标签生成服务
+        /// 是否可以根据标签生成服务.
         /// </summary>
         [TestMethod]
         public void CanMakeWithTaged()
@@ -147,7 +150,7 @@ namespace CatLib.Tests.Stl
         }
 
         /// <summary>
-        /// 测试不存在的Tag
+        /// 测试不存在的Tag.
         /// </summary>
         [TestMethod]
         public void CheckNotExistTaged()
@@ -160,7 +163,7 @@ namespace CatLib.Tests.Stl
         }
 
         /// <summary>
-        /// 合并标记
+        /// 合并标记.
         /// </summary>
         [TestMethod]
         public void MergeTag()
@@ -178,7 +181,7 @@ namespace CatLib.Tests.Stl
         }
 
         /// <summary>
-        /// 空服务测试
+        /// 空服务测试.
         /// </summary>
         [TestMethod]
         public void NullTagService()
@@ -190,11 +193,9 @@ namespace CatLib.Tests.Stl
             });
         }
 
-        #endregion
 
-        #region Bind
         /// <summary>
-        /// 测试无法被绑定的类型
+        /// 测试无法被绑定的类型.
         /// </summary>
         [TestMethod]
         public void TestBindUnableBuilt()
@@ -213,11 +214,12 @@ namespace CatLib.Tests.Stl
             {
                 isError = true;
             }
+
             Assert.AreEqual(true, isError);
         }
 
         /// <summary>
-        /// 是否能够进行如果不存在则绑定的操作
+        /// 是否能够进行如果不存在则绑定的操作.
         /// </summary>
         [TestMethod]
         public void CanBindIf()
@@ -233,7 +235,7 @@ namespace CatLib.Tests.Stl
         }
 
         /// <summary>
-        /// 是否能够进行如果不存在则绑定的操作
+        /// 是否能够进行如果不存在则绑定的操作.
         /// </summary>
         [TestMethod]
         public void CanBindIfByType()
@@ -249,7 +251,7 @@ namespace CatLib.Tests.Stl
         }
 
         /// <summary>
-        /// 检测无效的绑定
+        /// 检测无效的绑定.
         /// </summary>
         [TestMethod]
         public void CheckIllegalBind()
@@ -293,7 +295,7 @@ namespace CatLib.Tests.Stl
         }
 
         /// <summary>
-        /// 静态绑定方法
+        /// 静态绑定方法.
         /// </summary>
         [TestMethod]
         public void CanBindFuncStatic()
@@ -312,7 +314,7 @@ namespace CatLib.Tests.Stl
         }
 
         /// <summary>
-        /// 非静态绑定
+        /// 非静态绑定.
         /// </summary>
         [TestMethod]
         public void CanBindFunc()
@@ -328,7 +330,7 @@ namespace CatLib.Tests.Stl
         }
 
         /// <summary>
-        /// 检测获取绑定
+        /// 检测获取绑定.
         /// </summary>
         [TestMethod]
         public void CanGetBind()
@@ -347,7 +349,7 @@ namespace CatLib.Tests.Stl
         }
 
         /// <summary>
-        /// 检测非法的获取绑定
+        /// 检测非法的获取绑定.
         /// </summary>
         [TestMethod]
         public void CheckIllegalGetBind()
@@ -367,7 +369,7 @@ namespace CatLib.Tests.Stl
         }
 
         /// <summary>
-        /// 检测是否拥有绑定
+        /// 检测是否拥有绑定.
         /// </summary>
         [TestMethod]
         public void CanHasBind()
@@ -383,7 +385,7 @@ namespace CatLib.Tests.Stl
         }
 
         /// <summary>
-        /// 检查是否是静态的函数
+        /// 检查是否是静态的函数.
         /// </summary>
         [TestMethod]
         public void CanIsStatic()
@@ -399,11 +401,9 @@ namespace CatLib.Tests.Stl
             Assert.IsFalse(container.IsStatic("CanIsStaticNotStatic"));
             Assert.IsTrue(container.HasBind("CanIsStaticNotStatic"));
         }
-        #endregion
 
-        #region Alias
         /// <summary>
-        /// 正常的设定别名
+        /// 正常的设定别名.
         /// </summary>
         [TestMethod]
         public void CheckNormalAlias()
@@ -423,7 +423,7 @@ namespace CatLib.Tests.Stl
         }
 
         /// <summary>
-        /// 检测非法的别名输入
+        /// 检测非法的别名输入.
         /// </summary>
         [TestMethod]
         public void CheckIllegalAlias()
@@ -462,11 +462,9 @@ namespace CatLib.Tests.Stl
                 container.Alias("AliasNameOther3", null);
             });
         }
-        #endregion
 
-        #region Call
         /// <summary>
-        /// 被注入的测试类
+        /// 被注入的测试类.
         /// </summary>
         public class CallTestClassInject
         {
@@ -475,8 +473,9 @@ namespace CatLib.Tests.Stl
                 return 2;
             }
         }
+
         /// <summary>
-        /// 调用测试类
+        /// 调用测试类.
         /// </summary>
         public class CallTestClass
         {
@@ -492,7 +491,7 @@ namespace CatLib.Tests.Stl
         }
 
         /// <summary>
-        /// 调用测试类
+        /// 调用测试类.
         /// </summary>
         public class CallTestClassLoopDependency
         {
@@ -506,7 +505,6 @@ namespace CatLib.Tests.Stl
         {
             public LoopDependencyClass(LoopDependencyClass2 cls)
             {
-
             }
         }
 
@@ -514,12 +512,11 @@ namespace CatLib.Tests.Stl
         {
             public LoopDependencyClass2(LoopDependencyClass cls)
             {
-
             }
         }
 
         /// <summary>
-        /// 循环依赖测试
+        /// 循环依赖测试.
         /// </summary>
         [TestMethod]
         public void CheckLoopDependency()
@@ -537,7 +534,7 @@ namespace CatLib.Tests.Stl
         }
 
         /// <summary>
-        /// 调用方法注入测试
+        /// 调用方法注入测试.
         /// </summary>
         [TestMethod]
         public void CheckDelegateCall()
@@ -645,7 +642,7 @@ namespace CatLib.Tests.Stl
         }
 
         /// <summary>
-        /// 可以调用方法
+        /// 可以调用方法.
         /// </summary>
         [TestMethod]
         public void CanCallMethod()
@@ -662,7 +659,7 @@ namespace CatLib.Tests.Stl
         }
 
         /// <summary>
-        /// 无参数调用函数
+        /// 无参数调用函数.
         /// </summary>
         [TestMethod]
         public void CanCallMethodNoParam()
@@ -676,7 +673,7 @@ namespace CatLib.Tests.Stl
         }
 
         /// <summary>
-        /// 测试无效的调用方法
+        /// 测试无效的调用方法.
         /// </summary>
         [TestMethod]
         public void CheckIllegalCallMethod()
@@ -721,7 +718,7 @@ namespace CatLib.Tests.Stl
         }
 
         /// <summary>
-        /// 测试无效的传入参数
+        /// 测试无效的传入参数.
         /// </summary>
         [TestMethod]
         public void CheckIllegalCallMethodParam()
@@ -755,6 +752,7 @@ namespace CatLib.Tests.Stl
         }
 
         class SimpleTestClass1 { }
+
         class SimpleTestClass2 { }
 
         [TestMethod]
@@ -765,7 +763,8 @@ namespace CatLib.Tests.Stl
             container.Bind<SimpleTestClass2>();
 
             var objOut = new object();
-            var call = container.Wrap((object[] obj, SimpleTestClass1 cls1, SimpleTestClass2 cls2) =>
+            var call = container.Wrap(
+                (object[] obj, SimpleTestClass1 cls1, SimpleTestClass2 cls2) =>
             {
                 Assert.AreSame(objOut, obj[0]);
                 Assert.AreNotEqual(null, cls1);
@@ -775,9 +774,7 @@ namespace CatLib.Tests.Stl
 
             call.Invoke();
         }
-        #endregion
 
-        #region Make
         public class MakeTestClass
         {
             private readonly MakeTestClassDependency dependency;
@@ -846,7 +843,7 @@ namespace CatLib.Tests.Stl
         }
 
         /// <summary>
-        /// 非类的属性注入
+        /// 非类的属性注入.
         /// </summary>
         [TestMethod]
         public void MakeNoClassAttrInject()
@@ -860,7 +857,7 @@ namespace CatLib.Tests.Stl
         }
 
         /// <summary>
-        /// 跨域生成没有绑定的服务
+        /// 跨域生成没有绑定的服务.
         /// </summary>
         [TestMethod]
         public void MakeNoBindType()
@@ -890,7 +887,7 @@ namespace CatLib.Tests.Stl
         }
 
         /// <summary>
-        /// 无参构造函数的类进行make
+        /// 无参构造函数的类进行make.
         /// </summary>
         [TestMethod]
         public void MakeNoParamConstructor()
@@ -902,7 +899,7 @@ namespace CatLib.Tests.Stl
         }
 
         /// <summary>
-        /// 注入非类类型参数的构造函数
+        /// 注入非类类型参数的构造函数.
         /// </summary>
         [TestMethod]
         public void MakeNotClassConstructor()
@@ -921,7 +918,7 @@ namespace CatLib.Tests.Stl
         }
 
         /// <summary>
-        /// 是否能正常生成服务
+        /// 是否能正常生成服务.
         /// </summary>
         [TestMethod]
         public void CanMake()
@@ -943,7 +940,7 @@ namespace CatLib.Tests.Stl
         }
 
         /// <summary>
-        /// 引发一个类型不一致的异常
+        /// 引发一个类型不一致的异常.
         /// </summary>
         [TestMethod]
         public void CheckIllegalMakeTypeIsNotSame()
@@ -960,7 +957,7 @@ namespace CatLib.Tests.Stl
         }
 
         /// <summary>
-        /// 可以生成静态的对象
+        /// 可以生成静态的对象.
         /// </summary>
         [TestMethod]
         public void CanMakeStaticAlias()
@@ -979,7 +976,7 @@ namespace CatLib.Tests.Stl
         }
 
         /// <summary>
-        /// 可以根据别名来生成对应不同的实例
+        /// 可以根据别名来生成对应不同的实例.
         /// </summary>
         [TestMethod]
         public void CanMakeWithAlias()
@@ -996,7 +993,7 @@ namespace CatLib.Tests.Stl
         }
 
         /// <summary>
-        /// 能够生成常规绑定
+        /// 能够生成常规绑定.
         /// </summary>
         [TestMethod]
         public void CanMakeNormalBind()
@@ -1017,7 +1014,7 @@ namespace CatLib.Tests.Stl
         }
 
         /// <summary>
-        /// 必须参数约束
+        /// 必须参数约束.
         /// </summary>
         [TestMethod]
         public void CheckMakeRequired()
@@ -1032,7 +1029,7 @@ namespace CatLib.Tests.Stl
         }
 
         /// <summary>
-        /// 无效的生成服务
+        /// 无效的生成服务.
         /// </summary>
         [TestMethod]
         public void CheckIllegalMake()
@@ -1047,11 +1044,12 @@ namespace CatLib.Tests.Stl
         }
 
         /// <summary>
-        /// 参数注入标记测试类
+        /// 参数注入标记测试类.
         /// </summary>
         public class TestMakeParamInjectAttrClass
         {
             private IMsg msg;
+
             public TestMakeParamInjectAttrClass(IMsg msg)
             {
                 this.msg = msg;
@@ -1064,7 +1062,7 @@ namespace CatLib.Tests.Stl
         }
 
         /// <summary>
-        /// 参数可以使用注入标记
+        /// 参数可以使用注入标记.
         /// </summary>
         [TestMethod]
         public void CanParamUseInjectAttr()
@@ -1109,7 +1107,6 @@ namespace CatLib.Tests.Stl
         {
             public TestMakeBasePrimitiveConstructor(int value)
             {
-
             }
         }
 
@@ -1146,7 +1143,6 @@ namespace CatLib.Tests.Stl
 
             protected override void GuardResolveInstance(object instance, string makeService)
             {
-
             }
         }
 
@@ -1231,11 +1227,12 @@ namespace CatLib.Tests.Stl
         }
 
         /// <summary>
-        /// 参数注入是必须的
+        /// 参数注入是必须的.
         /// </summary>
         public class TestMakeParamInjectAttrRequiredClass
         {
             private IMsg msg;
+
             public TestMakeParamInjectAttrRequiredClass(
                 IMsg msg)
             {
@@ -1249,7 +1246,7 @@ namespace CatLib.Tests.Stl
         }
 
         /// <summary>
-        /// 参数可以使用注入标记
+        /// 参数可以使用注入标记.
         /// </summary>
         [TestMethod]
         public void CanParamUseInjectAttrRequired()
@@ -1274,7 +1271,7 @@ namespace CatLib.Tests.Stl
         }
 
         /// <summary>
-        /// 测试结构体注入
+        /// 测试结构体注入.
         /// </summary>
         class TestMakeStructInject
         {
@@ -1286,7 +1283,7 @@ namespace CatLib.Tests.Stl
         }
 
         /// <summary>
-        /// 可以进行结构体注入
+        /// 可以进行结构体注入.
         /// </summary>
         [TestMethod]
         public void CanMakeStructInject()
@@ -1311,7 +1308,7 @@ namespace CatLib.Tests.Stl
         }
 
         /// <summary>
-        /// 测试泛型注入
+        /// 测试泛型注入.
         /// </summary>
         class TestMakeGenericInject
         {
@@ -1320,7 +1317,7 @@ namespace CatLib.Tests.Stl
         }
 
         /// <summary>
-        /// 可以进行泛型注入
+        /// 可以进行泛型注入.
         /// </summary>
         [TestMethod]
         public void CanMakeGenericInject()
@@ -1350,7 +1347,7 @@ namespace CatLib.Tests.Stl
         }
 
         /// <summary>
-        /// 可以进行泛型注入
+        /// 可以进行泛型注入.
         /// </summary>
         [TestMethod]
         public void OptionalInject()
@@ -1397,7 +1394,7 @@ namespace CatLib.Tests.Stl
         }
 
         /// <summary>
-        /// 实例一个无效的类
+        /// 实例一个无效的类.
         /// </summary>
         [TestMethod]
         public void InvalidClassNew()
@@ -1415,7 +1412,7 @@ namespace CatLib.Tests.Stl
         }
 
         /// <summary>
-        /// 继承注入
+        /// 继承注入.
         /// </summary>
         [TestMethod]
         public void InheritanceInject()
@@ -1463,7 +1460,7 @@ namespace CatLib.Tests.Stl
         }
 
         /// <summary>
-        /// 复杂的上下文关系测试
+        /// 复杂的上下文关系测试.
         /// </summary>
         [TestMethod]
         public void ComplexContextualRelationshipTest1()
@@ -1478,7 +1475,7 @@ namespace CatLib.Tests.Stl
         }
 
         /// <summary>
-        /// 复杂的上下文关系测试
+        /// 复杂的上下文关系测试.
         /// </summary>
         [TestMethod]
         public void ComplexContextualRelationshipTest2()
@@ -1499,7 +1496,7 @@ namespace CatLib.Tests.Stl
         }
 
         /// <summary>
-        /// 复杂的上下文关系测试
+        /// 复杂的上下文关系测试.
         /// </summary>
         [TestMethod]
         public void ComplexContextualRelationshipTest3()
@@ -1514,7 +1511,7 @@ namespace CatLib.Tests.Stl
         }
 
         /// <summary>
-        /// 复杂的上下文关系测试
+        /// 复杂的上下文关系测试.
         /// </summary>
         [TestMethod]
         public void ComplexContextualRelationshipTest4()
@@ -1527,11 +1524,9 @@ namespace CatLib.Tests.Stl
             var cls = container.Make<ComplexClassAlias>();
             Assert.AreEqual("ComplexInjectClass1", cls.Msg.Message());
         }
-        #endregion
 
-        #region Instance
         /// <summary>
-        /// 可以正确的给定静态实例
+        /// 可以正确的给定静态实例.
         /// </summary>
         [TestMethod]
         public void CanInstance()
@@ -1547,7 +1542,7 @@ namespace CatLib.Tests.Stl
         }
 
         /// <summary>
-        /// 测试无效的实例
+        /// 测试无效的实例.
         /// </summary>
         [TestMethod]
         public void CheckIllegalInstance()
@@ -1561,7 +1556,7 @@ namespace CatLib.Tests.Stl
         }
 
         /// <summary>
-        /// 能够通过release
+        /// 能够通过release.
         /// </summary>
         [TestMethod]
         public void CanInstanceWithRelease()
@@ -1590,12 +1585,14 @@ namespace CatLib.Tests.Stl
             {
                 return;
             }
+
             Assert.Fail();
         }
 
         public class TestDisposableClass : IDisposable
         {
             public bool isDispose;
+
             public void Dispose()
             {
                 isDispose = true;
@@ -1611,7 +1608,6 @@ namespace CatLib.Tests.Stl
             container.Release<TestDisposableClass>();
             Assert.AreEqual(true, cls.isDispose);
         }
-        #endregion
 
         [TestMethod]
         public void TestOneWatch()
@@ -1725,7 +1721,7 @@ namespace CatLib.Tests.Stl
         }
 
         /// <summary>
-        /// 测试释放所有静态服务
+        /// 测试释放所有静态服务.
         /// </summary>
         [TestMethod]
         public void TestReleaseAllStaticService()
@@ -1822,6 +1818,7 @@ namespace CatLib.Tests.Stl
             {
                 isThrow = ex.InnerException.GetType() == typeof(MissingMethodException);
             }
+
             Assert.AreEqual(true, isThrow);
         }
 
@@ -1850,6 +1847,7 @@ namespace CatLib.Tests.Stl
                 isThrow = ex.InnerException.GetType() == typeof(TargetInvocationException);
                 isException = ex.InnerException.InnerException.Message == "TestConstructorExceptionClass";
             }
+
             Assert.AreEqual(true, isThrow);
             Assert.AreEqual(true, isException);
         }
@@ -1874,7 +1872,8 @@ namespace CatLib.Tests.Stl
             var container = MakeContainer();
             container.Bind<ParamsTypeInjectTest>();
 
-            var result = container.Make<ParamsTypeInjectTest>(new Params
+            var result = container.Make<ParamsTypeInjectTest>(
+                new ParamsCollection
             {
                 {"num2", 100},
                 {"num1", 50},
@@ -1892,11 +1891,12 @@ namespace CatLib.Tests.Stl
             var container = MakeContainer();
             container.Bind<ParamsTypeInjectTest>();
 
-            var result = container.Make<ParamsTypeInjectTest>(new Params
+            var result = container.Make<ParamsTypeInjectTest>(
+                new ParamsCollection
             {
                 {"num2", 100},
                 {"num1", 50},
-            }, 100, new Params
+            }, 100, new ParamsCollection
             {
                 {"num2", 500},
                 {"num1", 4000},
@@ -1916,7 +1916,7 @@ namespace CatLib.Tests.Stl
 
             ExceptionAssert.Throws<UnresolvableException>(() =>
             {
-                var result = container.Make<ParamsTypeInjectTest>(new Params
+                var result = container.Make<ParamsTypeInjectTest>(new ParamsCollection
                 {
                     {"num2", 100},
                     {"num1", "helloworld"},
@@ -1945,7 +1945,7 @@ namespace CatLib.Tests.Stl
 
             ExceptionAssert.Throws<UnresolvableException>(() =>
             {
-                container.Make<ParamsTypeInjectTest>(new Params
+                container.Make<ParamsTypeInjectTest>(new ParamsCollection
                 {
                     {"num2", 100},
                     {"num1", "helloworld"},
@@ -1960,6 +1960,7 @@ namespace CatLib.Tests.Stl
             public RuntimeException rex { get; set; }
 
             public UnresolvableException ex;
+
             public TestResloveAttrClassSpeculationService(UnresolvableException ex)
             {
                 this.ex = ex;
@@ -1998,6 +1999,7 @@ namespace CatLib.Tests.Stl
         public class VariantModel
         {
             public int num;
+
             public VariantModel(int num)
             {
                 this.num = num;
@@ -2012,6 +2014,7 @@ namespace CatLib.Tests.Stl
         {
             public long code;
             public VariantModel model;
+
             public VariantFather(long code, VariantModel model)
             {
                 this.code = code;
@@ -2020,7 +2023,7 @@ namespace CatLib.Tests.Stl
         }
 
         /// <summary>
-        /// 测试类型变换
+        /// 测试类型变换.
         /// </summary>
         [TestMethod]
         public void TestVariant()
@@ -2057,7 +2060,7 @@ namespace CatLib.Tests.Stl
 
             ExceptionAssert.Throws<UnresolvableException>(() =>
             {
-                container.Make<VariantFather>(10, new Params {{"model", null}});
+                container.Make<VariantFather>(10, new ParamsCollection {{"model", null}});
             });
         }
 
@@ -2071,7 +2074,8 @@ namespace CatLib.Tests.Stl
         {
             var container = new Container();
             var isCall = false;
-            container.Call((CallInjectClass cls) =>
+            container.Call(
+                (CallInjectClass cls) =>
             {
                 Assert.AreEqual("100", cls.Value);
                 isCall = true;
@@ -2084,11 +2088,11 @@ namespace CatLib.Tests.Stl
             public string Value { get; set; }
 
             /// <summary>
-            /// 获取一个参数
+            /// 获取一个参数.
             /// </summary>
-            /// <param name="key">参数名</param>
-            /// <param name="value">参数值</param>
-            /// <returns>是否成功获取</returns>
+            /// <param name="key">参数名.</param>
+            /// <param name="value">参数值.</param>
+            /// <returns>是否成功获取.</returns>
             public bool TryGetValue(string key, out object value)
             {
                 value = null;
@@ -2101,7 +2105,8 @@ namespace CatLib.Tests.Stl
         {
             var container = new Container();
             var isCall = false;
-            container.Call((CallInjectClassCurrent cls) =>
+            container.Call(
+                (CallInjectClassCurrent cls) =>
             {
                 Assert.AreEqual("100", cls.Value);
                 isCall = true;
@@ -2150,7 +2155,6 @@ namespace CatLib.Tests.Stl
             var container = new Container();
             container.OnRebound("123", (_) =>
             {
-
             });
         }
 
@@ -2163,12 +2167,10 @@ namespace CatLib.Tests.Stl
 
         public interface ITaggedRelease
         {
-            
         }
 
         public class TaggedRelease : ITaggedRelease
         {
-            
         }
 
         [TestMethod]
@@ -2193,7 +2195,7 @@ namespace CatLib.Tests.Stl
         }
 
         /// <summary>
-        /// 测试基础容器调用
+        /// 测试基础容器调用.
         /// </summary>
         /// <param name="num"></param>
         public int TestContainerCall(int num)
@@ -2204,6 +2206,7 @@ namespace CatLib.Tests.Stl
         public class TestNullableValue
         {
             public int? Nullable1 { get; set; }
+
             public byte? Nullable2 { get; set; }
 
             [Inject]
@@ -2238,7 +2241,6 @@ namespace CatLib.Tests.Stl
             Assert.AreEqual(false, v.Nullable4.HasValue);
         }
 
-        #region Rebound
         [TestMethod]
         public void TestOnRebound()
         {
@@ -2322,7 +2324,7 @@ namespace CatLib.Tests.Stl
         {
             var container = new Application();
             container.Instance<Application>(container);
-            
+
             Assert.AreEqual(true, container.IsResolved<Application>());
             Assert.AreEqual(false, container.IsResolved<IBindData>());
         }
@@ -2353,14 +2355,12 @@ namespace CatLib.Tests.Stl
 
         public class TestFlushOrderDependencyClass
         {
-            
         }
 
         public class TestFlushOrderClass
         {
             public TestFlushOrderClass(TestFlushOrderDependencyClass cls)
             {
-                
             }
         }
 
@@ -2456,7 +2456,6 @@ namespace CatLib.Tests.Stl
         [TestMethod]
         public void TestCannotWatch()
         {
-            
         }
 
         [TestMethod]
@@ -2548,7 +2547,6 @@ namespace CatLib.Tests.Stl
         {
             public TestExtendGivenMismatchedTypeClass(IContainer container)
             {
-                
             }
         }
 
@@ -2745,12 +2743,11 @@ namespace CatLib.Tests.Stl
             container.Bind("ccc", (c, p) => 1, false);
             container.Alias("abc", "ccc");
         }
-        #endregion
 
         /// <summary>
-        /// 生成容器
+        /// 生成容器.
         /// </summary>
-        /// <returns>容器</returns>
+        /// <returns>容器.</returns>
         private Container MakeContainer()
         {
             var container = new Container();

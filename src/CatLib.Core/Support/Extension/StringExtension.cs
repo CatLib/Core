@@ -20,7 +20,7 @@ namespace CatLib
     public static class StringExtension
     {
         /// <summary>
-        /// Convert the specified string to a stream
+        /// Convert the specified string to a stream.
         /// </summary>
         /// <param name="str">The specified string.</param>
         /// <param name="encoding">The string encoding.</param>

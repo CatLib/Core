@@ -19,7 +19,7 @@ namespace CatLib
     public interface IServiceProviderType
     {
         /// <summary>
-        /// The Type To be treated as specified service providers.
+        /// Gets the Type to be treated as specified service providers.
         /// </summary>
         Type BaseType { get; }
     }

@@ -46,8 +46,10 @@ namespace CatLib.Tests
                 {
                     break;
                 }
+
                 exception = exception.InnerException;
-            } while (exception != null);
+            }
+            while (exception != null);
 
             Assert.IsInstanceOfType(exception, expectedExceptionType, "Wrong type of exception was thrown.");
 

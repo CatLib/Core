@@ -22,6 +22,24 @@ namespace CatLib
     public class WrapperStream : Stream
     {
         /// <summary>
+        /// Initializes a new instance of the <see cref="WrapperStream"/> class.
+        /// </summary>
+        public WrapperStream()
+        {
+            BaseStream = this;
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="WrapperStream"/> class.
+        /// </summary>
+        /// <param name="stream">The base stream.</param>
+        public WrapperStream(Stream stream)
+        {
+            Guard.Requires<ArgumentNullException>(stream != null);
+            BaseStream = stream;
+        }
+
+        /// <summary>
         /// Gets the base stream.
         /// </summary>
         public Stream BaseStream { get; }
@@ -44,24 +62,6 @@ namespace CatLib
 
         /// <inheritdoc />
         public override long Length => BaseStream.Length;
-
-        /// <summary>
-        /// Initialize an new <see cref="WrapperStream"/> stream instance.
-        /// </summary>
-        public WrapperStream()
-        {
-            BaseStream = this;
-        }
-
-        /// <summary>
-        /// Initialize an new <see cref="WrapperStream"/> stream instance.
-        /// </summary>
-        /// <param name="stream">The base stream.</param>
-        public WrapperStream(Stream stream)
-        {
-            Guard.Requires<ArgumentNullException>(stream != null);
-            BaseStream = stream;
-        }
 
         /// <inheritdoc />
         public override long Seek(long offset, SeekOrigin origin)

@@ -19,27 +19,28 @@ namespace CatLib
     public class RuntimeException : Exception
     {
         /// <summary>
-        /// Initialize a new <see cref="RuntimeException"/> instnace.
+        /// Initializes a new instance of the <see cref="RuntimeException"/> class.
         /// </summary>
         public RuntimeException()
         {
-
         }
 
         /// <summary>
-        /// Initialize a new <see cref="RuntimeException"/> instnace.
+        /// Initializes a new instance of the <see cref="RuntimeException"/> class.
         /// </summary>
         /// <param name="message">The exception message.</param>
-        public RuntimeException(string message) : base(message)
+        public RuntimeException(string message)
+            : base(message)
         {
         }
 
         /// <summary>
-        /// Initialize a new <see cref="RuntimeException"/> instnace.
+        /// Initializes a new instance of the <see cref="RuntimeException"/> class.
         /// </summary>
         /// <param name="message">The exception message.</param>
         /// <param name="innerException">The inner exception.</param>
-        public RuntimeException(string message, Exception innerException) : base(message, innerException)
+        public RuntimeException(string message, Exception innerException)
+            : base(message, innerException)
         {
         }
     }
