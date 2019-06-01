@@ -14,7 +14,7 @@ using System;
 namespace CatLib
 {
     /// <summary>
-    /// Int extension function
+    /// Int extension function.
     /// </summary>
     public static class IntExtension
     {
@@ -34,6 +34,7 @@ namespace CatLib
                 {
                     continue;
                 }
+
                 result = i;
                 break;
             }

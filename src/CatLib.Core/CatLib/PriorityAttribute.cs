@@ -20,17 +20,17 @@ namespace CatLib
     public class PriorityAttribute : Attribute
     {
         /// <summary>
-        /// The priority.
+        /// Initializes a new instance of the <see cref="PriorityAttribute"/> class.
         /// </summary>
-        public int Priorities { get; }
-
-        /// <summary>
-        /// Create a new priority instance.
-        /// </summary>
-        /// <param name="priority">The priority(0 is the highest priority)</param>
+        /// <param name="priority">The priority(0 is the highest priority).</param>
         public PriorityAttribute(int priority = int.MaxValue)
         {
             Priorities = Math.Max(priority, 0);
         }
+
+        /// <summary>
+        /// Gets the priority.
+        /// </summary>
+        public int Priorities { get; }
     }
 }

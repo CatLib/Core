@@ -16,37 +16,32 @@ using System.Text.RegularExpressions;
 namespace CatLib
 {
     /// <summary>
-    /// 事件调度器
+    /// 事件调度器.
     /// </summary>
     public class Dispatcher : IDispatcher
     {
         /// <summary>
-        /// 分组映射
+        /// 分组映射.
         /// </summary>
         private readonly Dictionary<object, List<IEvent>> groupMapping;
 
         /// <summary>
-        /// 普通事件列表
+        /// 普通事件列表.
         /// </summary>
         private readonly Dictionary<string, List<IEvent>> listeners;
 
         /// <summary>
-        /// 通配符事件列表
+        /// 通配符事件列表.
         /// </summary>
         private readonly Dictionary<string, KeyValuePair<Regex, List<IEvent>>> wildcardListeners;
 
         /// <summary>
-        /// 同步锁
+        /// 同步锁.
         /// </summary>
         private readonly object syncRoot;
 
         /// <summary>
-        /// 跳出标记
-        /// </summary>
-        protected virtual object BreakFlag => false;
-
-        /// <summary>
-        /// 构建一个事件调度器
+        /// Initializes a new instance of the <see cref="Dispatcher"/> class.
         /// </summary>
         public Dispatcher()
         {
@@ -57,14 +52,19 @@ namespace CatLib
         }
 
         /// <summary>
-        /// 判断给定事件是否存在事件监听器
+        /// Gets 跳出标记.
         /// </summary>
-        /// <param name="eventName">事件名</param>
+        protected virtual object BreakFlag => false;
+
+        /// <summary>
+        /// 判断给定事件是否存在事件监听器.
+        /// </summary>
+        /// <param name="eventName">事件名.</param>
         /// <param name="strict">
-        /// 严格模式
-        /// <para>启用严格模式则不使用正则来进行匹配事件监听器</para>
+        /// 严格模式.
+        /// <para>启用严格模式则不使用正则来进行匹配事件监听器.</para>
         /// </param>
-        /// <returns>是否存在事件监听器</returns>
+        /// <returns>是否存在事件监听器.</returns>
         public bool HasListeners(string eventName, bool strict = false)
         {
             eventName = FormatEventName(eventName);
@@ -94,34 +94,34 @@ namespace CatLib
         }
 
         /// <summary>
-        /// 触发一个事件,并获取事件监听器的返回结果
+        /// 触发一个事件,并获取事件监听器的返回结果.
         /// </summary>
-        /// <param name="eventName">事件名称</param>
-        /// <param name="payloads">载荷</param>
-        /// <returns>事件结果</returns>
+        /// <param name="eventName">事件名称.</param>
+        /// <param name="payloads">载荷.</param>
+        /// <returns>事件结果.</returns>
         public object[] Trigger(string eventName, params object[] payloads)
         {
             return Dispatch(false, eventName, payloads) as object[];
         }
 
         /// <summary>
-        /// 触发一个事件,并获取事件监听器的返回结果
+        /// 触发一个事件,并获取事件监听器的返回结果.
         /// </summary>
-        /// <param name="eventName">事件名称</param>
-        /// <param name="payloads">载荷</param>
-        /// <returns>事件结果</returns>
+        /// <param name="eventName">事件名称.</param>
+        /// <param name="payloads">载荷.</param>
+        /// <returns>事件结果.</returns>
         public object TriggerHalt(string eventName, params object[] payloads)
         {
             return Dispatch(true, eventName, payloads);
         }
 
         /// <summary>
-        /// 注册一个事件监听器
+        /// 注册一个事件监听器.
         /// </summary>
-        /// <param name="eventName">事件名称</param>
-        /// <param name="execution">执行方法</param>
-        /// <param name="group">事件分组，如果为<code>Null</code>则不进行分组</param>
-        /// <returns>事件对象</returns>
+        /// <param name="eventName">事件名称.</param>
+        /// <param name="execution">执行方法.</param>
+        /// <param name="group">事件分组，如果为.<code>Null</code>则不进行分组.</param>
+        /// <returns>事件对象.</returns>
         public IEvent On(string eventName, Func<string, object[], object> execution, object group = null)
         {
             Guard.NotEmptyOrNull(eventName, nameof(eventName));
@@ -144,6 +144,7 @@ namespace CatLib
                 {
                     groupMapping[group] = listener = new List<IEvent>();
                 }
+
                 listener.Add(result);
 
                 return result;
@@ -151,13 +152,13 @@ namespace CatLib
         }
 
         /// <summary>
-        /// 解除注册的事件监听器
+        /// 解除注册的事件监听器.
         /// </summary>
         /// <param name="target">
-        /// 事件解除目标
-        /// <para>如果传入的是字符串(<code>string</code>)将会解除对应事件名的所有事件</para>
-        /// <para>如果传入的是事件对象(<code>IEvent</code>)那么解除对应事件</para>
-        /// <para>如果传入的是分组(<code>object</code>)会解除该分组下的所有事件</para>
+        /// 事件解除目标.
+        /// <para>如果传入的是字符串(.<code>string</code>)将会解除对应事件名的所有事件.</para>
+        /// <para>如果传入的是事件对象(.<code>IEvent</code>)那么解除对应事件.</para>
+        /// <para>如果传入的是分组(.<code>object</code>)会解除该分组下的所有事件.</para>
         /// </param>
         public void Off(object target)
         {
@@ -189,23 +190,24 @@ namespace CatLib
         }
 
         /// <summary>
-        /// 生成事件
+        /// 生成事件.
         /// </summary>
-        /// <param name="eventName">事件名</param>
-        /// <param name="execution">事件执行方法</param>
-        /// <param name="group">事件分组</param>
-        /// <param name="isWildcard">是否是通配符事件</param>
+        /// <param name="eventName">事件名.</param>
+        /// <param name="execution">事件执行方法.</param>
+        /// <param name="group">事件分组.</param>
+        /// <param name="isWildcard">是否是通配符事件.</param>
+        /// <returns>todo:1.</returns>
         protected virtual IEvent MakeEvent(string eventName, Func<string, object[], object> execution, object group, bool isWildcard = false)
         {
             return new Event(eventName, group, MakeListener(execution, isWildcard));
         }
 
         /// <summary>
-        /// 创建事件监听器
+        /// 创建事件监听器.
         /// </summary>
-        /// <param name="execution">事件执行器</param>
-        /// <param name="isWildcard">是否是通配符方法</param>
-        /// <returns>事件监听器</returns>
+        /// <param name="execution">事件执行器.</param>
+        /// <param name="isWildcard">是否是通配符方法.</param>
+        /// <returns>事件监听器.</returns>
         protected virtual Func<string, object[], object> MakeListener(Func<string, object[], object> execution, bool isWildcard = false)
         {
             return (eventName, payloads) => execution(eventName, isWildcard
@@ -214,32 +216,32 @@ namespace CatLib
         }
 
         /// <summary>
-        /// 格式化事件名
+        /// 格式化事件名.
         /// </summary>
-        /// <param name="eventName">事件名</param>
-        /// <returns>格式化后的事件名</returns>
+        /// <param name="eventName">事件名.</param>
+        /// <returns>格式化后的事件名.</returns>
         protected virtual string FormatEventName(string eventName)
         {
             return eventName;
         }
 
         /// <summary>
-        /// 是否是通配符事件
+        /// 是否是通配符事件.
         /// </summary>
-        /// <param name="eventName">事件名</param>
-        /// <returns>是否是通配符事件</returns>
-        private bool IsWildcard(string eventName)
+        /// <param name="eventName">事件名.</param>
+        /// <returns>表示是否是通配符事件.</returns>
+        private static bool IsWildcard(string eventName)
         {
             return eventName.IndexOf('*') != -1;
         }
 
         /// <summary>
-        /// 调度事件
+        /// 调度事件.
         /// </summary>
-        /// <param name="halt">遇到第一个事件存在处理结果后终止</param>
-        /// <param name="eventName">事件名</param>
-        /// <param name="payload">载荷</param>
-        /// <returns>处理结果</returns>
+        /// <param name="halt">遇到第一个事件存在处理结果后终止.</param>
+        /// <param name="eventName">事件名.</param>
+        /// <param name="payload">载荷.</param>
+        /// <returns>处理结果.</returns>
         private object Dispatch(bool halt, string eventName, params object[] payload)
         {
             Guard.Requires<ArgumentNullException>(eventName != null);
@@ -273,10 +275,10 @@ namespace CatLib
         }
 
         /// <summary>
-        /// 获取指定事件的事件列表
+        /// 获取指定事件的事件列表.
         /// </summary>
-        /// <param name="eventName">事件名</param>
-        /// <returns>事件列表</returns>
+        /// <param name="eventName">事件名.</param>
+        /// <returns>事件列表.</returns>
         private IEnumerable<IEvent> GetListeners(string eventName)
         {
             var outputs = new List<IEvent>();
@@ -298,9 +300,9 @@ namespace CatLib
         }
 
         /// <summary>
-        /// 根据普通事件解除相关事件
+        /// 根据普通事件解除相关事件.
         /// </summary>
-        /// <param name="eventName">事件名</param>
+        /// <param name="eventName">事件名.</param>
         private void DismissEventName(string eventName)
         {
             if (!listeners.TryGetValue(eventName, out List<IEvent> events))
@@ -315,9 +317,9 @@ namespace CatLib
         }
 
         /// <summary>
-        /// 根据通配符事件解除相关事件
+        /// 根据通配符事件解除相关事件.
         /// </summary>
-        /// <param name="eventName">事件名</param>
+        /// <param name="eventName">事件名.</param>
         private void DismissWildcardEventName(string eventName)
         {
             if (!wildcardListeners.TryGetValue(eventName, out KeyValuePair<Regex, List<IEvent>> events))
@@ -332,9 +334,9 @@ namespace CatLib
         }
 
         /// <summary>
-        /// 根据Object解除事件
+        /// 根据Object解除事件.
         /// </summary>
-        /// <param name="target">事件解除目标</param>
+        /// <param name="target">事件解除目标.</param>
         private void DismissTargetObject(object target)
         {
             if (!groupMapping.TryGetValue(target, out List<IEvent> events))
@@ -349,9 +351,9 @@ namespace CatLib
         }
 
         /// <summary>
-        /// 从事件调度器中移除指定的事件监听器
+        /// 从事件调度器中移除指定的事件监听器.
         /// </summary>
-        /// <param name="target">事件监听器</param>
+        /// <param name="target">事件监听器.</param>
         private void Forget(IEvent target)
         {
             lock (syncRoot)
@@ -377,9 +379,9 @@ namespace CatLib
         }
 
         /// <summary>
-        /// 销毁普通事件
+        /// 销毁普通事件.
         /// </summary>
-        /// <param name="target">事件对象</param>
+        /// <param name="target">事件对象.</param>
         private void ForgetListen(IEvent target)
         {
             if (!listeners.TryGetValue(target.Name, out List<IEvent> events))
@@ -395,9 +397,9 @@ namespace CatLib
         }
 
         /// <summary>
-        /// 销毁通配符事件
+        /// 销毁通配符事件.
         /// </summary>
-        /// <param name="target">事件对象</param>
+        /// <param name="target">事件对象.</param>
         private void ForgetWildcardListen(IEvent target)
         {
             if (!wildcardListeners.TryGetValue(target.Name, out KeyValuePair<Regex, List<IEvent>> wildcardEvents))
@@ -413,12 +415,12 @@ namespace CatLib
         }
 
         /// <summary>
-        /// 设定普通事件
+        /// 设定普通事件.
         /// </summary>
-        /// <param name="eventName">事件名</param>
-        /// <param name="execution">事件调用方法</param>
-        /// <param name="group">事件分组</param>
-        /// <returns>监听事件</returns>
+        /// <param name="eventName">事件名.</param>
+        /// <param name="execution">事件调用方法.</param>
+        /// <param name="group">事件分组.</param>
+        /// <returns>监听事件.</returns>
         private IEvent SetupListen(string eventName, Func<string, object[], object> execution, object group)
         {
             if (!listeners.TryGetValue(eventName, out List<IEvent> listener))
@@ -432,12 +434,12 @@ namespace CatLib
         }
 
         /// <summary>
-        /// 设定通配符事件
+        /// 设定通配符事件.
         /// </summary>
-        /// <param name="eventName">事件名</param>
-        /// <param name="execution">事件调用方法</param>
-        /// <param name="group">事件分组</param>
-        /// <returns>监听事件</returns>
+        /// <param name="eventName">事件名.</param>
+        /// <param name="execution">事件调用方法.</param>
+        /// <param name="group">事件分组.</param>
+        /// <returns>监听事件.</returns>
         private IEvent SetupWildcardListen(string eventName, Func<string, object[], object> execution, object group)
         {
             if (!wildcardListeners.TryGetValue(eventName, out KeyValuePair<Regex, List<IEvent>> listener))

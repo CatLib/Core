@@ -19,6 +19,16 @@ namespace CatLib
     public interface IApplication : IContainer, IDispatcher
     {
         /// <summary>
+        /// Gets a value indicating whether true if we're on the main thread.
+        /// </summary>
+        bool IsMainThread { get; }
+
+        /// <summary>
+        /// Gets or sets the debug level.
+        /// </summary>
+        DebugLevel DebugLevel { get; set; }
+
+        /// <summary>
         /// Register a service provider with the application.
         /// </summary>
         /// <param name="provider">The service provider.</param>
@@ -39,11 +49,6 @@ namespace CatLib
         long GetRuntimeId();
 
         /// <summary>
-        /// True if we're on the main thread.
-        /// </summary>
-        bool IsMainThread { get; }
-
-        /// <summary>
         /// Gets the prioirty. If there exists a method priority definition then returns it.
         /// Otherwise, returns <c>int.MaxValue</c>.
         /// </summary>
@@ -51,11 +56,6 @@ namespace CatLib
         /// <param name="method">The method via which to get the prioirty.</param>
         /// <returns>Prioirty of the given type.</returns>
         int GetPriority(Type type, string method = null);
-
-        /// <summary>
-        /// Gets or sets the debug level.
-        /// </summary>
-        DebugLevels DebugLevel { get; set; }
 
         /// <summary>
         /// Terminates the <see cref="IApplication"/>.

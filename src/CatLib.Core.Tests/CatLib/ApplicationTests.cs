@@ -15,6 +15,9 @@ using System.Diagnostics;
 using System.Reflection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
+#pragma warning disable CA1034
+#pragma warning disable CA1051
+
 namespace CatLib.Tests
 {
     [TestClass]
@@ -23,26 +26,24 @@ namespace CatLib.Tests
         public class TestBaseServiceProvider : IServiceProvider
         {
             /// <summary>
-            /// 服务提供者初始化
+            /// 服务提供者初始化.
             /// </summary>
             public void Init()
             {
-                
             }
 
             /// <summary>
-            /// 当注册服务提供者
+            /// 当注册服务提供者.
             /// </summary>
             public void Register()
             {
-                
             }
         }
 
         public class TestServiceProvider : IServiceProvider, IServiceProviderType
         {
             /// <summary>
-            /// 提供者基础类型
+            /// 提供者基础类型.
             /// </summary>
             public Type BaseType
             {
@@ -50,7 +51,7 @@ namespace CatLib.Tests
             }
 
             /// <summary>
-            /// 服务提供者初始化
+            /// 服务提供者初始化.
             /// </summary>
             public void Init()
             {
@@ -58,17 +59,17 @@ namespace CatLib.Tests
             }
 
             /// <summary>
-            /// 当注册服务提供者
+            /// 当注册服务提供者.
             /// </summary>
             public void Register()
             {
-
             }
         }
 
         public class TestYieldProvider : ServiceProvider
         {
             public bool IsDone;
+
             public override IEnumerator CoroutineInit()
             {
                 IsDone = true;
@@ -81,7 +82,8 @@ namespace CatLib.Tests
         [TestMethod]
         public void TestGetFileVersion()
         {
-            Assert.AreEqual(FileVersionInfo.GetVersionInfo(Assembly.GetExecutingAssembly().Location).FileVersion,
+            Assert.AreEqual(
+                FileVersionInfo.GetVersionInfo(Assembly.GetExecutingAssembly().Location).FileVersion,
                 Application.Version);
         }
 
@@ -128,7 +130,7 @@ namespace CatLib.Tests
         }
 
         /// <summary>
-        /// 未经引导的初始化
+        /// 未经引导的初始化.
         /// </summary>
         [TestMethod]
         public void NoBootstrapInit()
@@ -145,6 +147,7 @@ namespace CatLib.Tests
         {
             public string value = string.Empty;
             public bool stop = false;
+
             public void Bootstrap()
             {
                 value = "bootstrap";
@@ -163,6 +166,7 @@ namespace CatLib.Tests
                   {
                       return false;
                   }
+
                   return null;
               });
             application.Bootstrap(bootstrapStopped, bootstrapNotStopped);
@@ -174,10 +178,12 @@ namespace CatLib.Tests
         {
             public string value = string.Empty;
             public bool stop = false;
+
             public void Register()
             {
                 value = "register";
             }
+
             public void Init()
             {
             }
@@ -196,6 +202,7 @@ namespace CatLib.Tests
                 {
                     return false;
                 }
+
                 return null;
             });
             application.Register(providerStopped);
@@ -234,7 +241,7 @@ namespace CatLib.Tests
         }
 
         /// <summary>
-        /// 测试终止程序
+        /// 测试终止程序.
         /// </summary>
         [TestMethod]
         public void TestTerminate()
@@ -251,21 +258,12 @@ namespace CatLib.Tests
                 Assert.AreEqual(1, num++);
             });
             App.Terminate();
-            var isCall = false;
-            try
-            {
-                Assert.AreNotEqual(oldApp, App.Handler);
-            }
-            catch (LogicException)
-            {
-                isCall = true;
-            }
-            Assert.AreEqual(true, isCall);
+            Assert.AreEqual(null, App.Handler);
             Assert.AreEqual(2, num);
         }
 
         /// <summary>
-        /// 获取版本号测试
+        /// 获取版本号测试.
         /// </summary>
         [TestMethod]
         public void GetVersionTest()
@@ -294,7 +292,7 @@ namespace CatLib.Tests
         }
 
         /// <summary>
-        /// 获取当前启动流程
+        /// 获取当前启动流程.
         /// </summary>
         [TestMethod]
         public void GetCurrentProcess()
@@ -306,12 +304,12 @@ namespace CatLib.Tests
         [TestMethod]
         public void TestDebugLevel()
         {
-            App.DebugLevel = DebugLevels.Development;
-            Assert.AreEqual(DebugLevels.Development, App.DebugLevel);
+            App.DebugLevel = DebugLevel.Development;
+            Assert.AreEqual(DebugLevel.Development, App.DebugLevel);
         }
 
         /// <summary>
-        /// 重复的引导测试
+        /// 重复的引导测试.
         /// </summary>
         [TestMethod]
         [ExpectedException(typeof(CodeStandardException))]
@@ -324,7 +322,7 @@ namespace CatLib.Tests
         }
 
         /// <summary>
-        /// 注册非法类型测试
+        /// 注册非法类型测试.
         /// </summary>
         [TestMethod]
         public void RegisteredIllegalType()
@@ -338,7 +336,7 @@ namespace CatLib.Tests
         }
 
         /// <summary>
-        /// 重复的注册
+        /// 重复的注册.
         /// </summary>
         [TestMethod]
         public void RepeatRegister()
@@ -353,7 +351,7 @@ namespace CatLib.Tests
         }
 
         /// <summary>
-        /// 获取运行时唯一Id
+        /// 获取运行时唯一Id.
         /// </summary>
         [TestMethod]
         public void GetRuntimeId()
@@ -374,7 +372,6 @@ namespace CatLib.Tests
 
             public void Register()
             {
-
             }
         }
 
@@ -388,12 +385,11 @@ namespace CatLib.Tests
 
             public void Register()
             {
-
             }
         }
 
         /// <summary>
-        /// 优先级测试
+        /// 优先级测试.
         /// </summary>
         [TestMethod]
         public void ProvidersPrioritiesTest()
@@ -411,7 +407,7 @@ namespace CatLib.Tests
         }
 
         /// <summary>
-        /// 无效的引导
+        /// 无效的引导.
         /// </summary>
         [TestMethod]
         public void IllegalBootstrap()
@@ -425,7 +421,7 @@ namespace CatLib.Tests
         }
 
         /// <summary>
-        /// 初始化后再注册
+        /// 初始化后再注册.
         /// </summary>
         [TestMethod]
         public void InitedAfterRegister()
@@ -504,7 +500,6 @@ namespace CatLib.Tests
         {
             public void Bootstrap()
             {
-                
             }
         }
 
@@ -522,6 +517,7 @@ namespace CatLib.Tests
         public class OrderAssertClass : IBootstrap, IServiceProvider
         {
             private readonly int assert;
+
             public OrderAssertClass(int assert)
             {
                 this.assert = assert;
@@ -533,7 +529,7 @@ namespace CatLib.Tests
             }
 
             /// <summary>
-            /// 服务提供者初始化
+            /// 服务提供者初始化.
             /// </summary>
             public void Init()
             {
@@ -541,11 +537,10 @@ namespace CatLib.Tests
             }
 
             /// <summary>
-            /// 当注册服务提供者
+            /// 当注册服务提供者.
             /// </summary>
             public void Register()
             {
-                
             }
         }
 
@@ -554,7 +549,6 @@ namespace CatLib.Tests
             public OrderAssertClassSub(int assert)
                 :base(assert)
             {
-
             }
         }
 
@@ -567,7 +561,7 @@ namespace CatLib.Tests
             }
 
             /// <summary>
-            /// 服务提供者初始化
+            /// 服务提供者初始化.
             /// </summary>
             public void Init()
             {
@@ -575,11 +569,10 @@ namespace CatLib.Tests
             }
 
             /// <summary>
-            /// 当注册服务提供者
+            /// 当注册服务提供者.
             /// </summary>
             public void Register()
             {
-
             }
         }
 

@@ -14,7 +14,7 @@ namespace CatLib
     /// <summary>
     /// Framework debug level.
     /// </summary>
-    public enum DebugLevels
+    public enum DebugLevel
     {
         /// <summary>
         /// Production environment

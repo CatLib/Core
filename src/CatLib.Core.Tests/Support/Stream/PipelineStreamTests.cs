@@ -15,6 +15,8 @@ using System.Text;
 using System.Threading;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
+#pragma warning disable CA1720
+
 namespace CatLib.Core.Tests.Support.Stream
 {
     [TestClass]
@@ -43,6 +45,7 @@ namespace CatLib.Core.Tests.Support.Stream
                 actual.Append(str);
                 Thread.Sleep(rand.Next(1, 5));
             }
+
             stream.Dispose();
 
             var expected = new StringBuilder();
@@ -50,7 +53,7 @@ namespace CatLib.Core.Tests.Support.Stream
             {
                 expected.Append("0123456789");
             }
-           
+
             Assert.AreEqual(expected.ToString(), actual.ToString());
             Assert.AreEqual(true, readed);
         }
@@ -62,6 +65,7 @@ namespace CatLib.Core.Tests.Support.Stream
             {
                 stream.Write(data, 0, data.Length);
             }
+
             stream.Close();
         }
 

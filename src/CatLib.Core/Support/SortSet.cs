@@ -17,183 +17,25 @@ using System.Diagnostics;
 namespace CatLib
 {
     /// <summary>
-    /// Ordered set
+    /// Represents an ordered set, implemented by a jump list.
     /// </summary>
+    /// <typeparam name="TElement">The element type.</typeparam>
+    /// <typeparam name="TScore">The score type.</typeparam>
     [DebuggerDisplay("Count = {" + nameof(Count) + "}")]
+#pragma warning disable CA1710
     public sealed class SortSet<TElement, TScore> : IEnumerable<TElement>
         where TScore : IComparable<TScore>
+#pragma warning restore CA1710
     {
-        /// <summary>
-        /// Represents a skip node.
-        /// </summary>
-        private class SkipNode
-        {
-            internal struct SkipNodeLevel
-            {
-                /// <summary>
-                /// The next skip node.
-                /// </summary>
-                internal SkipNode Forward;
-
-                /// <summary>
-                /// The number represents how many nodes are crossed with the next node.
-                /// </summary>
-                internal int Span;
-            }
-
-            /// <summary>
-            /// The element.
-            /// </summary>
-            internal TElement Element;
-
-            /// <summary>
-            /// The score.
-            /// </summary>
-            internal TScore Score;
-
-            /// <summary>
-            /// Whether was deleted.
-            /// </summary>
-            internal bool IsDeleted;
-
-            /// <summary>
-            /// The previous node
-            /// </summary>
-            internal SkipNode Backward;
-
-            /// <summary>
-            /// The skip node levels.
-            /// </summary>
-            internal SkipNodeLevel[] Level;
-        }
-
-        /// <summary>
-        /// The default enumerator.
-        /// </summary>
-        public struct Enumerator : IEnumerator<TElement>
-        {
-            /// <summary>
-            /// The sorset instance.
-            /// </summary>
-            private readonly SortSet<TElement, TScore> sortSet;
-
-            /// <summary>
-            /// Whether to traverse from the forward.
-            /// </summary>
-            private readonly bool forward;
-
-            /// <summary>
-            /// The current node.
-            /// </summary>
-            private SkipNode current;
-
-            /// <summary>
-            /// Create a new Enumerator instance.
-            /// </summary>
-            /// <param name="sortSet">The sortset instnace.</param>
-            /// <param name="forward">Whether to traverse from the forward.</param>
-            internal Enumerator(SortSet<TElement, TScore> sortSet, bool forward)
-            {
-                this.sortSet = sortSet;
-                this.forward = forward;
-                current = forward ? sortSet.header : null;
-            }
-
-            /// <inheritdoc />
-            public bool MoveNext()
-            {
-                if (forward)
-                {
-                    do
-                    {
-                        current = current.Level[0].Forward;
-                    } while (current != null && current.IsDeleted);
-                    return current != null;
-                }
-
-                if (current == null)
-                {
-                    do
-                    {
-                        current = sortSet.tail;
-                    } while (current != null && current.IsDeleted);
-                    return current != null;
-                }
-
-                do
-                {
-                    current = current.Backward;
-                } while (current != null && current.IsDeleted);
-                return current != null;
-            }
-
-            /// <inheritdoc />
-            public TElement Current
-            {
-                get
-                {
-                    if (current != null)
-                    {
-                        return current.Element;
-                    }
-                    throw new LogicException($"Can not get {nameof(current)} element");
-                }
-            }
-
-            /// <inheritdoc />
-            object IEnumerator.Current
-            {
-                get
-                {
-                    if (current != null)
-                    {
-                        return current.Element;
-                    }
-                    throw new LogicException($"Can not get {nameof(current)} element");
-                }
-            }
-
-            /// <inheritdoc />
-            void IEnumerator.Reset()
-            {
-                current = forward ? sortSet.header : null;
-            }
-
-            /// <inheritdoc />
-            public void Dispose()
-            {
-            }
-        }
-
-        /// <summary>
-        /// Whether to traverse from the forward.
-        /// </summary>
-        private bool forward;
-
         /// <summary>
         /// The max level.
         /// </summary>
         private readonly int maxLevel;
 
         /// <summary>
-        /// The element hash mapping.
-        /// </summary>
-        private readonly Dictionary<TElement, TScore> dict = new Dictionary<TElement, TScore>();
-
-        /// <summary>
-        /// The current max levevl.
-        /// </summary>
-        private int level;
-
-        /// <summary>
         /// The header node.
         /// </summary>
         private readonly SkipNode header;
-
-        /// <summary>
-        /// The tail node
-        /// </summary>
-        private SkipNode tail;
 
         /// <summary>
         /// Probability of possible number of level.
@@ -211,21 +53,31 @@ namespace CatLib
         private readonly IComparer<TScore> comparer;
 
         /// <summary>
-        /// The element count.
+        /// The element hash mapping.
         /// </summary>
-        public int Count { get; private set; }
+        private readonly Dictionary<TElement, TScore> dict = new Dictionary<TElement, TScore>();
 
         /// <summary>
-        /// The sync lock.
+        /// Whether to traverse from the forward.
         /// </summary>
-        public object SyncRoot { get; } = new object();
+        private bool forward;
 
         /// <summary>
-        /// Create a new sorset instance.
+        /// The current max levevl.
         /// </summary>
-        /// <param name="probable">Probability coefficient of possible number of level(0-1)</param>
+        private int level;
+
+        /// <summary>
+        /// The tail node.
+        /// </summary>
+        private SkipNode tail;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SortSet{TElement, TScore}"/> class.
+        /// </summary>
+        /// <param name="probable">Probability coefficient of possible number of level(0-1).</param>
         /// <param name="maxLevel">The max level.</param>
-        /// <exception cref="ArgumentOutOfRangeException"><paramref name="probable"/>或<paramref name="maxLevel"/>不是有效值时引发</exception>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="probable"/>或<paramref name="maxLevel"/>不是有效值时引发.</exception>
         public SortSet(double probable = 0.25, int maxLevel = 32)
         {
             Guard.Requires<ArgumentOutOfRangeException>(maxLevel > 0);
@@ -238,15 +90,15 @@ namespace CatLib
             level = 1;
             header = new SkipNode
             {
-                Level = new SkipNode.SkipNodeLevel[maxLevel]
+                Level = new SkipNode.SkipNodeLevel[maxLevel],
             };
         }
 
         /// <summary>
-        /// Create a new sorset instance.
+        /// Initializes a new instance of the <see cref="SortSet{TElement, TScore}"/> class.
         /// </summary>
         /// <param name="comparer">The comparer.</param>
-        /// <param name="probable">Probability coefficient of possible number of level(0-1)</param>
+        /// <param name="probable">Probability coefficient of possible number of level(0-1).</param>
         /// <param name="maxLevel">The max level.</param>
         public SortSet(IComparer<TScore> comparer, double probable = 0.25, int maxLevel = 32)
             : this(probable, maxLevel)
@@ -254,6 +106,23 @@ namespace CatLib
             Guard.Requires<ArgumentNullException>(comparer != null);
             this.comparer = comparer;
         }
+
+        /// <summary>
+        /// Gets the element count.
+        /// </summary>
+        public int Count { get; private set; }
+
+        /// <summary>
+        /// Gets the sync lock.
+        /// </summary>
+        public object SyncRoot { get; } = new object();
+
+        /// <summary>
+        /// Get the element of the specified ranking.
+        /// </summary>
+        /// <param name="rank">The ranking(0 is the bottom).</param>
+        /// <returns>The element.</returns>
+        public TElement this[int rank] => GetElementByRank(rank);
 
         /// <summary>
         /// Clear the sortset.
@@ -265,6 +134,7 @@ namespace CatLib
                 header.Level[i].Span = 0;
                 header.Level[i].Forward = null;
             }
+
             tail = null;
             level = 1;
             dict.Clear();
@@ -288,7 +158,10 @@ namespace CatLib
             this.forward = forward;
         }
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Gets the enumerator classes.
+        /// </summary>
+        /// <returns>Returns the enumerator classes.</returns>
         public Enumerator GetEnumerator()
         {
             return new Enumerator(this, forward);
@@ -320,6 +193,7 @@ namespace CatLib
                 elements[i++] = node.Forward.Element;
                 node = node.Forward.Level[0];
             }
+
             return elements;
         }
 
@@ -333,6 +207,7 @@ namespace CatLib
             {
                 return header.Level[0].Forward.Element;
             }
+
             throw new InvalidOperationException("SortSet is Null");
         }
 
@@ -346,6 +221,7 @@ namespace CatLib
             {
                 return tail.Element;
             }
+
             throw new InvalidOperationException("SortSet is Null");
         }
 
@@ -359,6 +235,7 @@ namespace CatLib
             {
                 throw new InvalidOperationException("SortSet is Null");
             }
+
             return result;
         }
 
@@ -372,15 +249,9 @@ namespace CatLib
             {
                 throw new InvalidOperationException("SortSet is Null");
             }
+
             return result;
         }
-
-        /// <summary>
-        /// Get the element of the specified ranking.
-        /// </summary>
-        /// <param name="rank">The ranking(0 is the bottom)</param>
-        /// <returns>The element.</returns>
-        public TElement this[int rank] => GetElementByRank(rank);
 
         /// <summary>
         /// Add a new record in sortset.
@@ -404,6 +275,7 @@ namespace CatLib
         /// Whether is contains the specided element.
         /// </summary>
         /// <param name="element">The element.</param>
+        /// <returns>True if contains the specided element.</returns>
         public bool Contains(TElement element)
         {
             Guard.Requires<ArgumentNullException>(element != null);
@@ -422,14 +294,15 @@ namespace CatLib
             {
                 throw new KeyNotFoundException();
             }
+
             return score;
         }
 
         /// <summary>
         /// Get the number of elements in the specified score range.
         /// </summary>
-        /// <param name="start">The start score.(contain)</param>
-        /// <param name="end">The end score.(contain)</param>
+        /// <param name="start">The start score.(contain).</param>
+        /// <param name="end">The end score.(contain).</param>
         /// <returns>The number of elements in the score range.</returns>
         public int GetRangeCount(TScore start, TScore end)
         {
@@ -447,9 +320,15 @@ namespace CatLib
             {
                 for (var i = level - 1; i >= 0; --i)
                 {
+#pragma warning disable S2589
+#pragma warning disable S2583
+#pragma warning disable S2259
                     while (cursor.Level[i].Forward != null &&
                            ((!isRight && Compare(cursor.Level[i].Forward.Score, start) < 0) ||
                             (isRight && Compare(cursor.Level[i].Forward.Score, end) <= 0)))
+#pragma warning disable S2589
+#pragma warning disable S2583
+#pragma warning disable S2259
                     {
                         rank += cursor.Level[i].Span;
                         cursor = cursor.Level[i].Forward;
@@ -472,9 +351,21 @@ namespace CatLib
                 }
 
                 cursor = leftCursor;
-                leftRank ^= (rank ^= leftRank);
-                rank ^= leftRank;
-            } while (isRight = !isRight);
+
+                var foo = rank;
+                rank = leftRank;
+                leftRank = foo;
+
+#pragma warning disable S125
+
+                // todo: removed it in new version.
+                // leftRank ^= (rank ^= leftRank);
+                // rank ^= leftRank;
+#pragma warning restore S125
+            }
+#pragma warning disable S1121
+            while (isRight = !isRight);
+#pragma warning restore S1121
 
             return Math.Max(0, rank - leftRank);
         }
@@ -494,8 +385,8 @@ namespace CatLib
         /// <summary>
         /// Remove elements from the rank range.
         /// </summary>
-        /// <param name="startRank">The start rank.(contains, 0 bottom)</param>
-        /// <param name="stopRank">The end rank.(contains, 0 bottom)</param>
+        /// <param name="startRank">The start rank.(contains, 0 bottom).</param>
+        /// <param name="stopRank">The end rank.(contains, 0 bottom).</param>
         /// <returns>Returns the removed elements count.</returns>
         public int RemoveRangeByRank(int startRank, int stopRank)
         {
@@ -513,6 +404,7 @@ namespace CatLib
                     traversed += cursor.Level[i].Span;
                     cursor = cursor.Level[i].Forward;
                 }
+
                 update[i] = cursor;
             }
 
@@ -535,8 +427,8 @@ namespace CatLib
         /// <summary>
         /// Remove elements from the score range.
         /// </summary>
-        /// <param name="startScore">The start score.（contains）</param>
-        /// <param name="stopScore">The end score.（contains）</param>
+        /// <param name="startScore">The start score.（contains）.</param>
+        /// <param name="stopScore">The end score.（contains）.</param>
         /// <returns>Returns removed elements count.</returns>
         public int RemoveRangeByScore(TScore startScore, TScore stopScore)
         {
@@ -554,6 +446,7 @@ namespace CatLib
                 {
                     cursor = cursor.Level[i].Forward;
                 }
+
                 update[i] = cursor;
             }
 
@@ -575,7 +468,7 @@ namespace CatLib
         /// <summary>
         /// Get specific element rank.
         /// </summary>
-        /// <param name="element">The specific element</param>
+        /// <param name="element">The specific element.</param>
         /// <returns>Returns the element rank(0 bottom) -1 means not found element.</returns>
         public int GetRank(TElement element)
         {
@@ -598,8 +491,8 @@ namespace CatLib
         /// <summary>
         /// Get the elements in the ranking range.
         /// </summary>
-        /// <param name="startRank">The start rank(contains)</param>
-        /// <param name="stopRank">The stop rank(contains)</param>
+        /// <param name="startRank">The start rank(contains).</param>
+        /// <param name="stopRank">The stop rank(contains).</param>
         /// <returns>An array of the elements.</returns>
         public TElement[] GetElementRangeByRank(int startRank, int stopRank)
         {
@@ -635,8 +528,8 @@ namespace CatLib
         /// <summary>
         /// Get the elements in the score range.
         /// </summary>
-        /// <param name="startScore">The start score（contains）</param>
-        /// <param name="stopScore">The end score（contains）</param>
+        /// <param name="startScore">The start score（contains）.</param>
+        /// <param name="stopScore">The end score（contains）.</param>
         /// <returns>An array of the elements.</returns>
         public TElement[] GetElementRangeByScore(TScore startScore, TScore stopScore)
         {
@@ -670,7 +563,7 @@ namespace CatLib
         /// <summary>
         /// Get element by rank.
         /// </summary>
-        /// <param name="rank">The rank(0 bottom)</param>
+        /// <param name="rank">The rank(0 bottom).</param>
         /// <returns>The element.</returns>
         public TElement GetElementByRank(int rank)
         {
@@ -704,7 +597,7 @@ namespace CatLib
         /// <summary>
         /// Get element by reverse rank.
         /// </summary>
-        /// <param name="rank">The rank.(0 bottom)</param>
+        /// <param name="rank">The rank.(0 bottom).</param>
         /// <returns>The element.</returns>
         public TElement GetElementByRevRank(int rank)
         {
@@ -724,6 +617,7 @@ namespace CatLib
             var update = new SkipNode[maxLevel];
             var cursor = header;
             var rank = new int[maxLevel];
+
             // Find from high to low skip level
             for (i = level - 1; i >= 0; --i)
             {
@@ -750,6 +644,7 @@ namespace CatLib
                     update[i] = header;
                     update[i].Level[i].Span = Count;
                 }
+
                 level = newLevel;
             }
 
@@ -758,7 +653,7 @@ namespace CatLib
             {
                 Element = element,
                 Score = score,
-                Level = new SkipNode.SkipNodeLevel[newLevel]
+                Level = new SkipNode.SkipNodeLevel[newLevel],
             };
 
             for (i = 0; i < newLevel; ++i)
@@ -801,12 +696,14 @@ namespace CatLib
                 element = default(TElement);
                 return false;
             }
+
             var result = node.Element;
             if (!Remove(node.Element, node.Score))
             {
                 element = default(TElement);
                 return false;
             }
+
             element = result;
             return true;
         }
@@ -883,7 +780,7 @@ namespace CatLib
         /// <summary>
         /// Determine if you need to find the next node.
         /// </summary>
-        /// <param name="node">The skip not</param>
+        /// <param name="node">The skip not.</param>
         /// <param name="element">The element.</param>
         /// <param name="score">The element score.</param>
         /// <param name="level">The level.</param>
@@ -901,9 +798,9 @@ namespace CatLib
                 return compare < 0;
             }
 
-            // If the level is greater than 0, it means that it is possible 
+            // If the level is greater than 0, it means that it is possible
             // to directly locate element 2, resulting in a bug.
-            // So we think that the level is greater than 0, then the value 
+            // So we think that the level is greater than 0, then the value
             // is equal and still returns the pre-order jump node.
             //
             // ----------------------------------------------------
@@ -936,6 +833,7 @@ namespace CatLib
                     update[i].Level[i].Span -= 1;
                 }
             }
+
             if (cursor.Level[0].Forward != null)
             {
                 cursor.Level[0].Forward.Backward = cursor.Backward;
@@ -944,10 +842,12 @@ namespace CatLib
             {
                 tail = cursor.Backward;
             }
+
             while (level > 1 && header.Level[level - 1].Forward == null)
             {
                 --level;
             }
+
             cursor.IsDeleted = true;
             --Count;
         }
@@ -963,11 +863,12 @@ namespace CatLib
             {
                 ++newLevel;
             }
+
             return (newLevel < maxLevel) ? newLevel : maxLevel;
         }
 
         /// <summary>
-        /// Compare left and right values
+        /// Compare left and right values.
         /// </summary>
         /// <param name="left">The left value.</param>
         /// <param name="right">The right value.</param>
@@ -975,6 +876,144 @@ namespace CatLib
         private int Compare(TScore left, TScore right)
         {
             return comparer?.Compare(left, right) ?? left.CompareTo(right);
+        }
+
+        /// <summary>
+        /// The default enumerator.
+        /// </summary>
+        public struct Enumerator : IEnumerator<TElement>
+        {
+            /// <summary>
+            /// The sorset instance.
+            /// </summary>
+            private readonly SortSet<TElement, TScore> sortSet;
+
+            /// <summary>
+            /// Whether to traverse from the forward.
+            /// </summary>
+            private readonly bool forward;
+
+            /// <summary>
+            /// The current node.
+            /// </summary>
+            private SkipNode current;
+
+            /// <summary>
+            /// Initializes a new instance of the <see cref="Enumerator"/> struct.
+            /// </summary>
+            /// <param name="sortSet">The sortset instnace.</param>
+            /// <param name="forward">Whether to traverse from the forward.</param>
+            internal Enumerator(SortSet<TElement, TScore> sortSet, bool forward)
+            {
+                this.sortSet = sortSet;
+                this.forward = forward;
+                current = forward ? sortSet.header : null;
+            }
+
+            /// <inheritdoc />
+            public TElement Current
+            {
+                get
+                {
+                    return current.Element;
+                }
+            }
+
+            /// <inheritdoc />
+            object IEnumerator.Current
+            {
+                get
+                {
+                    return current.Element;
+                }
+            }
+
+            /// <inheritdoc />
+            public void Dispose()
+            {
+                // ignore.
+            }
+
+            /// <inheritdoc />
+            public bool MoveNext()
+            {
+                if (forward)
+                {
+                    do
+                    {
+                        current = current.Level[0].Forward;
+                    }
+                    while (current != null && current.IsDeleted);
+                    return current != null;
+                }
+
+                if (current == null)
+                {
+                    do
+                    {
+                        current = sortSet.tail;
+                    }
+                    while (current != null && current.IsDeleted);
+                    return current != null;
+                }
+
+                do
+                {
+                    current = current.Backward;
+                }
+                while (current != null && current.IsDeleted);
+                return current != null;
+            }
+
+            /// <inheritdoc />
+            void IEnumerator.Reset()
+            {
+                current = forward ? sortSet.header : null;
+            }
+        }
+
+        /// <summary>
+        /// Represents a skip node.
+        /// </summary>
+        private class SkipNode
+        {
+            /// <summary>
+            /// Gets or sets the element.
+            /// </summary>
+            public TElement Element { get; set; }
+
+            /// <summary>
+            /// Gets or sets the score.
+            /// </summary>
+            public TScore Score { get; set; }
+
+            /// <summary>
+            /// Gets or sets a value indicating whether was deleted.
+            /// </summary>
+            public bool IsDeleted { get; set; }
+
+            /// <summary>
+            /// Gets or sets the previous node.
+            /// </summary>
+            public SkipNode Backward { get; set; }
+
+            /// <summary>
+            /// Gets or sets the skip node levels.
+            /// </summary>
+            public SkipNodeLevel[] Level { get; set; }
+
+            internal struct SkipNodeLevel
+            {
+                /// <summary>
+                /// The next skip node.
+                /// </summary>
+                internal SkipNode Forward;
+
+                /// <summary>
+                /// The number represents how many nodes are crossed with the next node.
+                /// </summary>
+                internal int Span;
+            }
         }
     }
 }

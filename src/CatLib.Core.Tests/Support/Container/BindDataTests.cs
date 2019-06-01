@@ -15,14 +15,13 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace CatLib.Tests.Stl
 {
     /// <summary>
-    /// 绑定数据测试用例
+    /// 绑定数据测试用例.
     /// </summary>
     [TestClass]
     public class BindDataTest
     {
-        #region Needs
         /// <summary>
-        /// 需要什么样的数据不为空
+        /// 需要什么样的数据不为空.
         /// </summary>
         [TestMethod]
         public void CheckNeedsIsNotNull()
@@ -38,7 +37,7 @@ namespace CatLib.Tests.Stl
         }
 
         /// <summary>
-        /// 检测当需求什么方法时传入无效参数
+        /// 检测当需求什么方法时传入无效参数.
         /// </summary>
         [TestMethod]
         public void CheckNeedsIllegalValue()
@@ -58,7 +57,7 @@ namespace CatLib.Tests.Stl
         }
 
         /// <summary>
-        /// 是否可以取得关系上下文
+        /// 是否可以取得关系上下文.
         /// </summary>
         [TestMethod]
         public void CanGetContextual()
@@ -73,11 +72,9 @@ namespace CatLib.Tests.Stl
             Assert.AreEqual(container.Type2Service(typeof(BindDataTest)), bindData.GetContextual("need2"));
             Assert.AreEqual(null, bindData.GetContextual("empty"));
         }
-        #endregion
 
-        #region Alias
         /// <summary>
-        /// 是否能够增加别名
+        /// 是否能够增加别名.
         /// </summary>
         [TestMethod]
         public void CanAddAlias()
@@ -97,7 +94,7 @@ namespace CatLib.Tests.Stl
         }
 
         /// <summary>
-        /// 检测无效的别名
+        /// 检测无效的别名.
         /// </summary>
         [TestMethod]
         public void CheckIllegalAlias()
@@ -114,11 +111,9 @@ namespace CatLib.Tests.Stl
                 bindData.Alias(string.Empty);
             });
         }
-        #endregion
 
-        #region Tag
         /// <summary>
-        /// 是否能增加标签
+        /// 是否能增加标签.
         /// </summary>
         [TestMethod]
         public void CanAddTag()
@@ -136,11 +131,9 @@ namespace CatLib.Tests.Stl
             Assert.AreEqual(1, data.Length);
             Assert.AreEqual("hello world", data[0]);
         }
-        #endregion
 
-        #region OnRelease
         /// <summary>
-        /// 是否能追加到释放事件
+        /// 是否能追加到释放事件.
         /// </summary>
         [TestMethod]
         public void CanOnRelease()
@@ -170,8 +163,9 @@ namespace CatLib.Tests.Stl
             container.Release("CanAddOnRelease");
             Assert.AreEqual(true, isCall);
         }
+
         /// <summary>
-        /// 检查无效的解决事件传入参数
+        /// 检查无效的解决事件传入参数.
         /// </summary>
         [TestMethod]
         public void CheckIllegalRelease()
@@ -196,10 +190,6 @@ namespace CatLib.Tests.Stl
                 container.Release("CheckIllegalRelease");
             });
         }
-
-        #endregion
-
-        #region OnResolving
 
         [TestMethod]
         public void TestAddOnResolvingWithExtend()
@@ -227,7 +217,7 @@ namespace CatLib.Tests.Stl
         }
 
         /// <summary>
-        /// 检查无效的解决事件传入参数
+        /// 检查无效的解决事件传入参数.
         /// </summary>
         [TestMethod]
         public void CheckIllegalResolving()
@@ -304,11 +294,9 @@ namespace CatLib.Tests.Stl
 
             Assert.AreEqual(2, count);
         }
-        #endregion
 
-        #region Unbind
         /// <summary>
-        /// 能够正常解除绑定
+        /// 能够正常解除绑定.
         /// </summary>
         [TestMethod]
         public void CanUnBind()
@@ -326,7 +314,7 @@ namespace CatLib.Tests.Stl
         }
 
         /// <summary>
-        /// 能够正常解除绑定
+        /// 能够正常解除绑定.
         /// </summary>
         [TestMethod]
         public void CheckIllegalUnBindInput()
@@ -340,12 +328,10 @@ namespace CatLib.Tests.Stl
                 bindData.Alias("hello");
             });
         }
-        #endregion
 
-        #region AddContextual
 
         /// <summary>
-        /// 重复写入上下文
+        /// 重复写入上下文.
         /// </summary>
         [TestMethod]
         public void AddContextualRepeat()
@@ -359,7 +345,5 @@ namespace CatLib.Tests.Stl
                 bindData.AddContextual("service", "service given");
             });
         }
-
-        #endregion
     }
 }

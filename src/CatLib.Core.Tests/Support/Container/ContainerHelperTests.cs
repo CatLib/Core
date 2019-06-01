@@ -12,13 +12,16 @@
 using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
+#pragma warning disable CA1034
+#pragma warning disable CA1051
+
 namespace CatLib.Tests
 {
     [TestClass]
     public class ContainerHelperTests
     {
         /// <summary>
-        /// 生成服务和转为目标
+        /// 生成服务和转为目标.
         /// </summary>
         [TestMethod]
         public void MakeTConvert()
@@ -29,7 +32,7 @@ namespace CatLib.Tests
         }
 
         /// <summary>
-        /// 生成服务和转为目标
+        /// 生成服务和转为目标.
         /// </summary>
         [TestMethod]
         public void MakeTService()
@@ -48,7 +51,7 @@ namespace CatLib.Tests
         }
 
         /// <summary>
-        /// 以单例形式绑定
+        /// 以单例形式绑定.
         /// </summary>
         [TestMethod]
         public void BindSingleton()
@@ -64,21 +67,18 @@ namespace CatLib.Tests
 
         public interface IContainerHelperTestClass
         {
-            
         }
 
         public class ContainerHelperTestClass : IContainerHelperTestClass
         {
-
         }
 
         public class TestClassService
         {
-
         }
 
         /// <summary>
-        /// 以单列形式绑定
+        /// 以单列形式绑定.
         /// </summary>
         [TestMethod]
         public void BindSingletonTServiceTConcrete()
@@ -90,7 +90,7 @@ namespace CatLib.Tests
         }
 
         /// <summary>
-        /// 以单列形式绑定
+        /// 以单列形式绑定.
         /// </summary>
         [TestMethod]
         public void SingletonTService()
@@ -129,6 +129,7 @@ namespace CatLib.Tests
 
             Assert.AreSame(obj, container.Make<TestClassService>());
             container.Release<TestClassService>();
+
             // 因为被释放后容器会容器会自动推测出所需类的实例
             Assert.AreSame(obj.GetType(), container.Make<TestClassService>().GetType());
         }
@@ -253,10 +254,12 @@ namespace CatLib.Tests
         public class TestData : IWatchTest
         {
             private int val;
+
             public TestData(int val)
             {
                 this.val = val;
             }
+
             public int getValue()
             {
                 return val;
@@ -308,7 +311,7 @@ namespace CatLib.Tests
             object[] data = null;
             Assert.AreEqual(true, container.Release(ref data));
 
-            data = new object[0];
+            data = Array.Empty<object>();
             Assert.AreEqual(true, container.Release(ref data));
 
             data = new object[] {"abc", 10};
@@ -347,9 +350,9 @@ namespace CatLib.Tests
         public class TestOnResolvingClass
         {
             public string Name;
+
             public TestOnResolvingClass()
             {
-                
             }
         }
 
@@ -445,12 +448,10 @@ namespace CatLib.Tests
 
         public interface ITypeMatchInterface
         {
-            
         }
 
         public class TestTypeMatchOnResolvingClass : ITypeMatchInterface
         {
-            
         }
 
         [TestMethod]
@@ -573,9 +574,9 @@ namespace CatLib.Tests
         }
 
         /// <summary>
-        /// 生成容器
+        /// 生成容器.
         /// </summary>
-        /// <returns>容器</returns>
+        /// <returns>容器.</returns>
         private Container MakeContainer()
         {
             var container = new Container();

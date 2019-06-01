@@ -11,13 +11,15 @@
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
+#pragma warning disable CA1034
+
 namespace CatLib.Tests.Events
 {
     [TestClass]
     public class DispatcherTests
     {
         /// <summary>
-        /// 生成测试环境
+        /// 生成测试环境.
         /// </summary>
         /// <returns></returns>
         private IContainer MakeEnv()
@@ -63,7 +65,6 @@ namespace CatLib.Tests.Events
 
         public void SimpleCallFunctionVoid(object payload)
         {
-            
         }
 
         [TestMethod]

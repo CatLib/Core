@@ -9,6 +9,8 @@
  * Document: https://catlib.io/
  */
 
+#pragma warning disable SA1402
+
 namespace CatLib
 {
     /// <summary>
@@ -17,12 +19,12 @@ namespace CatLib
     public interface IBindable
     {
         /// <summary>
-        /// The service name.
+        /// Gets the service name.
         /// </summary>
         string Service { get; }
 
         /// <summary>
-        /// The container to which the service belongs.
+        /// Gets the container to which the service belongs.
         /// </summary>
         IContainer Container { get; }
 
@@ -30,7 +32,7 @@ namespace CatLib
         /// Unbind the service from the container.
         /// </summary>
         /// <remarks>
-        /// If the service is a singletoned instance, then the singleton instance 
+        /// If the service is a singletoned instance, then the singleton instance
         /// that has been built will be automatically released.
         /// </remarks>
         void Unbind();

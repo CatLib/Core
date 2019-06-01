@@ -23,13 +23,18 @@ namespace CatLib
     public class Container : IContainer
     {
         /// <summary>
+        /// Characters not allowed in the service name.
+        /// </summary>
+        private static readonly char[] ServiceBanChars = { '@', ':', '$' };
+
+        /// <summary>
         /// The container's bindings.
         /// </summary>
         private readonly Dictionary<string, BindData> bindings;
 
-        ///<summary>
+        /// <summary>
         /// The container's singleton(static) instances.
-        ///</summary>
+        /// </summary>
         private readonly Dictionary<string, object> instances;
 
         /// <summary>
@@ -37,9 +42,9 @@ namespace CatLib
         /// </summary>
         private readonly Dictionary<object, string> instancesReverse;
 
-        ///<summary>
+        /// <summary>
         /// The registered aliases with service.
-        ///</summary>
+        /// </summary>
         private readonly Dictionary<string, string> aliases;
 
         /// <summary>
@@ -103,7 +108,7 @@ namespace CatLib
         private readonly MethodContainer methodContainer;
 
         /// <summary>
-        /// Synchronous locking object
+        /// Synchronous locking object.
         /// </summary>
         private readonly object syncRoot = new object();
 
@@ -111,16 +116,6 @@ namespace CatLib
         /// The reflected injection marker type.
         /// </summary>
         private readonly Type injectTarget;
-
-        /// <summary>
-        /// The stack of concretions currently being built.
-        /// </summary>
-        protected Stack<string> BuildStack { get; }
-
-        /// <summary>
-        /// The stack of the user params being built.
-        /// </summary>
-        protected Stack<object[]> UserParamsStack { get; }
 
         /// <summary>
         /// Whether the container is flushing.
@@ -133,12 +128,7 @@ namespace CatLib
         private int instanceId;
 
         /// <summary>
-        /// Characters not allowed in the service name.
-        /// </summary>
-        private static readonly char[] ServiceBanChars = { '@', ':', '$' };
-
-        /// <summary>
-        /// Create a new container instance.
+        /// Initializes a new instance of the <see cref="Container"/> class.
         /// </summary>
         /// <param name="prime">The estimated number of services.</param>
         public Container(int prime = 64)
@@ -169,6 +159,35 @@ namespace CatLib
             instanceId = 0;
         }
 
+        /// <summary>
+        /// Gets the stack of concretions currently being built.
+        /// </summary>
+        protected Stack<string> BuildStack { get; }
+
+        /// <summary>
+        /// Gets the stack of the user params being built.
+        /// </summary>
+        protected Stack<object[]> UserParamsStack { get; }
+
+        /// <inheritdoc />
+        public object this[string service]
+        {
+            get => Make(service);
+            set
+            {
+                lock (syncRoot)
+                {
+                    var bind = GetBind(service);
+                    if (bind != null)
+                    {
+                        Unbind(bind);
+                    }
+
+                    Bind(service, (_, __) => value, false);
+                }
+            }
+        }
+
         /// <inheritdoc />
         public void Tag(string tag, params string[] service)
         {
@@ -184,6 +203,7 @@ namespace CatLib
                 {
                     tags[tag] = list = new List<string>();
                 }
+
                 list.AddRange(service);
             }
         }
@@ -319,6 +339,7 @@ namespace CatLib
                 {
                     aliasesReverse[service] = serviceList = new List<string>();
                 }
+
                 serviceList.Add(alias);
             }
 
@@ -334,6 +355,7 @@ namespace CatLib
                 bindData = null;
                 return false;
             }
+
             bindData = bind ?? Bind(service, concrete, isStatic);
             return bind == null;
         }
@@ -359,6 +381,7 @@ namespace CatLib
             {
                 throw new LogicException($"Bind type [{concrete}] can not built");
             }
+
             service = FormatService(service);
             return Bind(service, WrapperTypeBuilder(service, concrete), isStatic);
         }
@@ -414,11 +437,11 @@ namespace CatLib
         }
 
         /// <inheritdoc />
-        public IMethodBind BindMethod(string method, object target, MethodInfo call)
+        public IMethodBind BindMethod(string method, object target, MethodInfo called)
         {
             GuardFlushing();
             GuardMethodName(method);
-            return methodContainer.Bind(method, target, call);
+            return methodContainer.Bind(method, target, called);
         }
 
         /// <inheritdoc />
@@ -442,6 +465,7 @@ namespace CatLib
             {
                 Guard.Requires<ArgumentNullException>(target != null);
             }
+
             GuardConstruct(nameof(Call));
 
             var parameter = methodInfo.GetParameters();
@@ -449,7 +473,7 @@ namespace CatLib
             lock (syncRoot)
             {
                 var bindData = GetBindFillable(target != null ? Type2Service(target.GetType()) : null);
-                userParams = GetDependencies(bindData, parameter, userParams) ?? new object[] { };
+                userParams = GetDependencies(bindData, parameter, userParams) ?? Array.Empty<object>();
                 return methodInfo.Invoke(target, userParams);
             }
         }
@@ -459,24 +483,6 @@ namespace CatLib
         {
             GuardConstruct(nameof(Make));
             return Resolve(service, userParams);
-        }
-
-        /// <inheritdoc />
-        public object this[string service]
-        {
-            get => Make(service);
-            set
-            {
-                lock (syncRoot)
-                {
-                    var bind = GetBind(service);
-                    if (bind != null)
-                    {
-                        Unbind(bind);
-                    }
-                    Bind(service, (_, __) => value, false);
-                }
-            }
         }
 
         /// <inheritdoc />
@@ -490,7 +496,7 @@ namespace CatLib
 
                 service = string.IsNullOrEmpty(service) ? string.Empty : AliasToService(service);
 
-                if (service != string.Empty && instances.TryGetValue(service, out object instance))
+                if (!string.IsNullOrEmpty(service) && instances.TryGetValue(service, out object instance))
                 {
                     // If the instance already exists then apply the extension.
                     // Extensions will no longer be added to the permanent extension list.
@@ -514,7 +520,7 @@ namespace CatLib
 
                 extender.Add(closure);
 
-                if (service != string.Empty && IsResolved(service))
+                if (!string.IsNullOrEmpty(service) && IsResolved(service))
                 {
                     TriggerOnRebound(service);
                 }
@@ -655,14 +661,15 @@ namespace CatLib
         }
 
         /// <inheritdoc />
-        public IContainer OnFindType(Func<string, Type> finder, int priority = int.MaxValue)
+        public IContainer OnFindType(Func<string, Type> func, int priority = int.MaxValue)
         {
-            Guard.NotNull(finder, nameof(finder));
+            Guard.NotNull(func, nameof(func));
             lock (syncRoot)
             {
                 GuardFlushing();
-                findType.Add(finder, priority);
+                findType.Add(func, priority);
             }
+
             return this;
         }
 
@@ -709,6 +716,7 @@ namespace CatLib
 
                 list.Add(callback);
             }
+
             return this;
         }
 
@@ -767,6 +775,28 @@ namespace CatLib
         }
 
         /// <summary>
+        /// Trigger all callbacks in specified list.
+        /// </summary>
+        /// <param name="bindData">The bind data for <see cref="Make"/> service.</param>
+        /// <param name="instance">The service instance.</param>
+        /// <param name="list">The specified list.</param>
+        /// <returns>The decorated service instance.</returns>
+        internal static object Trigger(IBindData bindData, object instance, List<Action<IBindData, object>> list)
+        {
+            if (list == null)
+            {
+                return instance;
+            }
+
+            foreach (var closure in list)
+            {
+                closure(bindData, instance);
+            }
+
+            return instance;
+        }
+
+        /// <summary>
         /// Unbind the service from the container.
         /// </summary>
         /// <param name="bindable">The bindable instance.</param>
@@ -782,10 +812,90 @@ namespace CatLib
                     {
                         aliases.Remove(alias);
                     }
+
                     aliasesReverse.Remove(bindable.Service);
                 }
+
                 bindings.Remove(bindable.Service);
             }
+        }
+
+        /// <summary>
+        /// Gets an array of resolved instances for dependent parameters.
+        /// </summary>
+        /// <param name="makeServiceBindData">The bind data for <see cref="Make"/> service.</param>
+        /// <param name="baseParams">The dependent parameters array for <see cref="Make"/> service.</param>
+        /// <param name="userParams">An array for the user parameter.</param>
+        /// <returns>An array of resolved instances for dependent parameters.</returns>
+        protected internal virtual object[] GetDependencies(Bindable makeServiceBindData, ParameterInfo[] baseParams, object[] userParams)
+        {
+            if (baseParams.Length <= 0)
+            {
+                return Array.Empty<object>();
+            }
+
+            var results = new object[baseParams.Length];
+
+            // Gets a parameter matcher for filtering parameters
+            var matcher = GetParamsMatcher(ref userParams);
+
+            for (var i = 0; i < baseParams.Length; i++)
+            {
+                var baseParam = baseParams[i];
+
+                // Parameter matching is used to match the parameters.
+                // The parameter matchers are the first to perform because their
+                // matching accuracy is the most accurate.
+                var param = matcher?.Invoke(baseParam);
+
+                // When the container finds that the developer uses object or object[] as
+                // the dependency parameter type, we try to compact inject the user parameters.
+                param = param ?? GetCompactInjectUserParams(baseParam, ref userParams);
+
+                // Select the appropriate parameters from the user parameters and inject
+                // them in the relative order.
+                param = param ?? GetDependenciesFromUserParams(baseParam, ref userParams);
+
+                string needService = null;
+
+                if (param == null)
+                {
+                    // Try to generate the required parameters through the dependency
+                    // injection container.
+                    needService = GetParamNeedsService(baseParam);
+
+                    if (baseParam.ParameterType.IsClass
+                        || baseParam.ParameterType.IsInterface)
+                    {
+                        param = ResloveClass(makeServiceBindData, needService, baseParam);
+                    }
+                    else
+                    {
+                        param = ResolvePrimitive(makeServiceBindData, needService, baseParam);
+                    }
+                }
+
+                // Perform dependency injection checking on the obtained injection instance.
+                if (!CanInject(baseParam.ParameterType, param))
+                {
+                    var error =
+                        $"[{makeServiceBindData.Service}] Params inject type must be [{baseParam.ParameterType}] , But instance is [{param?.GetType()}]";
+                    if (needService == null)
+                    {
+                        error += " Inject params from user incoming parameters.";
+                    }
+                    else
+                    {
+                        error += $" Make service is [{needService}].";
+                    }
+
+                    throw new UnresolvableException(error);
+                }
+
+                results[i] = param;
+            }
+
+            return results;
         }
 
         /// <summary>
@@ -859,6 +969,7 @@ namespace CatLib
         /// <returns>True if the conversion was successful, otherwise false.</returns>
         protected virtual bool ChangeType(ref object result, Type conversionType)
         {
+#pragma warning disable CA1031
             try
             {
                 if (result == null || conversionType.IsInstanceOfType(result))
@@ -891,6 +1002,7 @@ namespace CatLib
                 // ignored
                 // when throw exception then stop inject
             }
+#pragma warning restore CA1031
 
             return false;
         }
@@ -898,11 +1010,11 @@ namespace CatLib
         /// <summary>
         /// Convert <see cref="PropertyInfo"/> to the service name.
         /// </summary>
-        /// <param name="property">The property.</param>
+        /// <param name="propertyInfo">The property.</param>
         /// <returns>The service name.</returns>
-        protected virtual string GetPropertyNeedsService(PropertyInfo property)
+        protected virtual string GetPropertyNeedsService(PropertyInfo propertyInfo)
         {
-            return Type2Service(property.PropertyType);
+            return Type2Service(propertyInfo.PropertyType);
         }
 
         /// <summary>
@@ -989,13 +1101,15 @@ namespace CatLib
         protected virtual bool ResloveFromContextual(Bindable makeServiceBindData, string service, string paramName,
             Type paramType, out object output)
         {
-            if (MakeFromContextualClosure(GetContextualClosure(makeServiceBindData, service, paramName),
+            if (MakeFromContextualClosure(
+                GetContextualClosure(makeServiceBindData, service, paramName),
                 paramType, out output))
             {
                 return true;
             }
 
-            return MakeFromContextualService(GetContextualService(makeServiceBindData, service, paramName),
+            return MakeFromContextualService(
+                GetContextualService(makeServiceBindData, service, paramName),
                 paramType, out output);
         }
 
@@ -1064,7 +1178,8 @@ namespace CatLib
                 return null;
             }
 
-            throw MakeUnresolvableException(baseParam.Name,
+            throw MakeUnresolvableException(
+                baseParam.Name,
                 baseParam.Member != null ? baseParam.Member.DeclaringType : null);
         }
 
@@ -1085,9 +1200,10 @@ namespace CatLib
                 return baseParam.DefaultValue;
             }
 
-            // baseParam.Member maybe empty and may occur when some underlying 
+            // baseParam.Member maybe empty and may occur when some underlying
             // development overwrites ParameterInfo class.
-            throw MakeUnresolvableException(baseParam.Name,
+            throw MakeUnresolvableException(
+                baseParam.Name,
                 baseParam.Member != null ? baseParam.Member.DeclaringType : null);
         }
 
@@ -1147,8 +1263,10 @@ namespace CatLib
                 {
                     stack.Append(", ");
                 }
+
                 stack.Append(innerException);
-            } while ((innerException = innerException.InnerException) != null);
+            }
+            while ((innerException = innerException.InnerException) != null);
             return $" InnerException message stack: [{stack}]";
         }
 
@@ -1223,7 +1341,7 @@ namespace CatLib
         }
 
         /// <summary>
-        /// Speculative service type based on specified service name
+        /// Speculative service type based on specified service name.
         /// </summary>
         /// <param name="service">The specified service name.</param>
         /// <returns>The speculative service type.</returns>
@@ -1352,84 +1470,6 @@ namespace CatLib
         }
 
         /// <summary>
-        /// Gets an array of resolved instances for dependent parameters.
-        /// </summary>
-        /// <param name="makeServiceBindData">The bind data for <see cref="Make"/> service.</param>
-        /// <param name="baseParams">The dependent parameters array for <see cref="Make"/> service.</param>
-        /// <param name="userParams">An array for the user parameter.</param>
-        /// <returns>An array of resolved instances for dependent parameters.</returns>
-        protected internal virtual object[] GetDependencies(Bindable makeServiceBindData, ParameterInfo[] baseParams, object[] userParams)
-        {
-            if (baseParams.Length <= 0)
-            {
-                return null;
-            }
-
-            var results = new object[baseParams.Length];
-
-            // Gets a parameter matcher for filtering parameters
-            var matcher = GetParamsMatcher(ref userParams);
-
-            for (var i = 0; i < baseParams.Length; i++)
-            {
-                var baseParam = baseParams[i];
-
-                // Parameter matching is used to match the parameters.
-                // The parameter matchers are the first to perform because their 
-                // matching accuracy is the most accurate.
-                var param = matcher?.Invoke(baseParam);
-
-                // When the container finds that the developer uses object or object[] as 
-                // the dependency parameter type, we try to compact inject the user parameters.
-                param = param ?? GetCompactInjectUserParams(baseParam, ref userParams);
-
-                // Select the appropriate parameters from the user parameters and inject
-                // them in the relative order.
-                param = param ?? GetDependenciesFromUserParams(baseParam, ref userParams);
-
-                string needService = null;
-
-                if (param == null)
-                {
-                    // Try to generate the required parameters through the dependency 
-                    // injection container.
-                    needService = GetParamNeedsService(baseParam);
-
-                    if (baseParam.ParameterType.IsClass
-                        || baseParam.ParameterType.IsInterface)
-                    {
-                        param = ResloveClass(makeServiceBindData, needService, baseParam);
-                    }
-                    else
-                    {
-                        param = ResolvePrimitive(makeServiceBindData, needService, baseParam);
-                    }
-                }
-
-                // Perform dependency injection checking on the obtained injection instance.
-                if (!CanInject(baseParam.ParameterType, param))
-                {
-                    var error =
-                        $"[{makeServiceBindData.Service}] Params inject type must be [{baseParam.ParameterType}] , But instance is [{param?.GetType()}]";
-                    if (needService == null)
-                    {
-                        error += " Inject params from user incoming parameters.";
-                    }
-                    else
-                    {
-                        error += $" Make service is [{needService}].";
-                    }
-
-                    throw new UnresolvableException(error);
-                }
-
-                results[i] = param;
-            }
-
-            return results;
-        }
-
-        /// <summary>
         /// Select the appropriate constructor and get the corresponding array of parameter instances.
         /// </summary>
         /// <param name="makeServiceBindData">The bind data for <see cref="Make"/> service.</param>
@@ -1441,7 +1481,7 @@ namespace CatLib
             var constructors = makeServiceType.GetConstructors();
             if (constructors.Length <= 0)
             {
-                return null;
+                return Array.Empty<object>();
             }
 
             ExceptionDispatchInfo exceptionDispatchInfo = null;
@@ -1451,6 +1491,7 @@ namespace CatLib
                 {
                     return GetDependencies(makeServiceBindData, constructor.GetParameters(), userParams);
                 }
+#pragma warning disable CA1031
                 catch (Exception ex)
                 {
                     if (exceptionDispatchInfo == null)
@@ -1458,6 +1499,7 @@ namespace CatLib
                         exceptionDispatchInfo = ExceptionDispatchInfo.Capture(ex);
                     }
                 }
+#pragma warning restore CA1031
             }
 
             exceptionDispatchInfo?.Throw();
@@ -1468,7 +1510,7 @@ namespace CatLib
         /// Get the service name of the specified instance.
         /// </summary>
         /// <param name="instance">The specified instance.</param>
-        /// <returns>Returns the service name, or null if not found</returns>
+        /// <returns>Returns the service name, or null if not found.</returns>
         protected string GetServiceWithInstanceObject(object instance)
         {
             return instancesReverse.TryGetValue(instance, out string origin)
@@ -1506,7 +1548,138 @@ namespace CatLib
         /// <param name="method">The method name.</param>
         protected virtual void GuardMethodName(string method)
         {
+        }
 
+        /// <summary>
+        /// Build an empty bound data.
+        /// </summary>
+        /// <param name="service">The service name.</param>
+        /// <returns>The bound data.</returns>
+        protected virtual BindData MakeEmptyBindData(string service)
+        {
+            return new BindData(this, service, null, false);
+        }
+
+        /// <summary>
+        /// Resolve the specified service(Will not perform <see cref="GuardConstruct"/> check).
+        /// </summary>
+        /// <param name="service">The service name or alias.</param>
+        /// <param name="userParams">An array for the user parameter.</param>
+        /// <returns>The service instance.</returns>
+        protected object Resolve(string service, params object[] userParams)
+        {
+            Guard.NotEmptyOrNull(service, nameof(service));
+            lock (syncRoot)
+            {
+                service = AliasToService(service);
+
+                if (instances.TryGetValue(service, out object instance))
+                {
+                    return instance;
+                }
+
+                if (BuildStack.Contains(service))
+                {
+                    throw MakeCircularDependencyException(service);
+                }
+
+                BuildStack.Push(service);
+                UserParamsStack.Push(userParams);
+                try
+                {
+                    var bindData = GetBindFillable(service);
+
+                    // We will start building a service instance，
+                    // For the built service we will try to do dependency injection。
+                    instance = Build(bindData, userParams);
+
+                    // If we define an extender for the specified service, then we need
+                    // to execute the expander in turn，And allow the extender to modify
+                    // or overwrite the original service。
+                    instance = Extend(service, instance);
+
+                    instance = bindData.IsStatic
+                        ? Instance(bindData.Service, instance)
+                        : TriggerOnResolving(bindData, instance);
+
+                    resolved.Add(bindData.Service);
+                    return instance;
+                }
+                finally
+                {
+                    UserParamsStack.Pop();
+                    BuildStack.Pop();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Build the specified service.
+        /// </summary>
+        /// <param name="makeServiceBindData">The bind data for the <see cref="Make"/> service.</param>
+        /// <param name="userParams">An array for the user parameter.</param>
+        /// <returns>The service instance.</returns>
+        protected virtual object Build(BindData makeServiceBindData, object[] userParams)
+        {
+            var instance = makeServiceBindData.Concrete != null
+                ? makeServiceBindData.Concrete(this, userParams)
+                : CreateInstance(makeServiceBindData, SpeculatedServiceType(makeServiceBindData.Service),
+                    userParams);
+
+            return Inject(makeServiceBindData, instance);
+        }
+
+        /// <summary>
+        /// Create the specified service instance.
+        /// </summary>
+        /// <param name="makeServiceBindData">The bind data for the <see cref="Make"/> service.</param>
+        /// <param name="makeServiceType">The type for the <see cref="Make"/> service.</param>
+        /// <param name="userParams">An array for the user parameter.</param>
+        /// <returns>The service instance.</returns>
+        protected virtual object CreateInstance(Bindable makeServiceBindData, Type makeServiceType, object[] userParams)
+        {
+            if (IsUnableType(makeServiceType))
+            {
+                return null;
+            }
+
+            userParams = GetConstructorsInjectParams(makeServiceBindData, makeServiceType, userParams);
+
+            try
+            {
+                return CreateInstance(makeServiceType, userParams);
+            }
+#pragma warning disable CA1031
+            catch (Exception ex)
+            {
+                throw MakeBuildFaildException(makeServiceBindData.Service, makeServiceType, ex);
+            }
+#pragma warning restore CA1031
+        }
+
+        /// <inheritdoc cref="CreateInstance(Bindable, Type, object[])"/>
+        protected virtual object CreateInstance(Type makeServiceType, object[] userParams)
+        {
+            // If the parameter does not exist then you can get better
+            // performance without writing parameters when reflecting.
+            if (userParams == null || userParams.Length <= 0)
+            {
+                return Activator.CreateInstance(makeServiceType);
+            }
+
+            return Activator.CreateInstance(makeServiceType, userParams);
+        }
+
+        /// <summary>
+        /// Get the service binding data, fill the data if the data is null.
+        /// </summary>
+        /// <param name="service">The service name.</param>
+        /// <returns>The bind data for the service.</returns>
+        protected BindData GetBindFillable(string service)
+        {
+            return service != null && bindings.TryGetValue(service, out BindData bindData)
+                ? bindData
+                : MakeEmptyBindData(service);
         }
 
         /// <summary>
@@ -1521,7 +1694,7 @@ namespace CatLib
         }
 
         /// <summary>
-        /// Convert an alias to a service name
+        /// Convert an alias to a service name.
         /// </summary>
         /// <param name="name">The service name or alias.</param>
         /// <returns>The service name.</returns>
@@ -1558,31 +1731,9 @@ namespace CatLib
         /// <summary>
         /// Trigger all of the release callbacks.
         /// </summary>
-        private object TriggerOnRelease(IBindData bindData, object instance)
+        private void TriggerOnRelease(IBindData bindData, object instance)
         {
-            return Trigger(bindData, instance, release);
-        }
-
-        /// <summary>
-        /// Trigger all callbacks in specified list.
-        /// </summary>
-        /// <param name="bindData">The bind data for <see cref="Make"/> service.</param>
-        /// <param name="instance">The service instance.</param>
-        /// <param name="list">The specified list.</param>
-        /// <returns>The decorated service instance.</returns>
-        internal object Trigger(IBindData bindData, object instance, List<Action<IBindData, object>> list)
-        {
-            if (list == null)
-            {
-                return instance;
-            }
-
-            foreach (var closure in list)
-            {
-                closure(bindData, instance);
-            }
-
-            return instance;
+            Trigger(bindData, instance, release);
         }
 
         /// <summary>
@@ -1590,7 +1741,7 @@ namespace CatLib
         /// </summary>
         /// <param name="service">The specified service name.</param>
         /// <param name="instance">
-        /// The specified service instance. 
+        /// The specified service instance.
         /// Build from the container by service name if a null value is passed in.
         /// </param>
         private void TriggerOnRebound(string service, object instance = null)
@@ -1607,6 +1758,7 @@ namespace CatLib
             for (var index = 0; index < callbacks.Count; index++)
             {
                 callbacks[index](instance);
+
                 // If it is a not singleton(static) binding then each callback is given a separate instance.
                 if (index + 1 < callbacks.Count && (bind == null || !bind.IsStatic))
                 {
@@ -1616,7 +1768,7 @@ namespace CatLib
         }
 
         /// <summary>
-        /// Release the specified instance via <see cref="IDisposable"/>
+        /// Release the specified instance via <see cref="IDisposable"/>.
         /// </summary>
         /// <param name="instance">The specified instance.</param>
         private void DisposeInstance(object instance)
@@ -1646,69 +1798,6 @@ namespace CatLib
         {
             var result = GetOnReboundCallbacks(service);
             return result != null && result.Count > 0;
-        }
-
-        /// <summary>
-        /// Build an empty bound data.
-        /// </summary>
-        /// <param name="service">The service name.</param>
-        /// <returns>The bound data.</returns>
-        protected virtual BindData MakeEmptyBindData(string service)
-        {
-            return new BindData(this, service, null, false);
-        }
-
-        /// <summary>
-        /// Resolve the specified service(Will not perform <see cref="GuardConstruct"/> check)
-        /// </summary>
-        /// <param name="service">The service name or alias.</param>
-        /// <param name="userParams">An array for the user parameter.</param>
-        /// <returns>The service instance.</returns>
-        protected object Resolve(string service, params object[] userParams)
-        {
-            Guard.NotEmptyOrNull(service, nameof(service));
-            lock (syncRoot)
-            {
-                service = AliasToService(service);
-
-                if (instances.TryGetValue(service, out object instance))
-                {
-                    return instance;
-                }
-
-                if (BuildStack.Contains(service))
-                {
-                    throw MakeCircularDependencyException(service);
-                }
-
-                BuildStack.Push(service);
-                UserParamsStack.Push(userParams);
-                try
-                {
-                    var bindData = GetBindFillable(service);
-
-                    // We will start building a service instance，
-                    // For the built service we will try to do dependency injection。
-                    instance = Build(bindData, userParams);
-
-                    // If we define an extender for the specified service, then we need 
-                    // to execute the expander in turn，And allow the extender to modify 
-                    // or overwrite the original service。
-                    instance = Extend(service, instance);
-
-                    instance = bindData.IsStatic
-                        ? Instance(bindData.Service, instance)
-                        : TriggerOnResolving(bindData, instance);
-
-                    resolved.Add(bindData.Service);
-                    return instance;
-                }
-                finally
-                {
-                    UserParamsStack.Pop();
-                    BuildStack.Pop();
-                }
-            }
         }
 
         /// <summary>
@@ -1756,79 +1845,13 @@ namespace CatLib
         }
 
         /// <summary>
-        /// Build the specified service.
-        /// </summary>
-        /// <param name="makeServiceBindData">The bind data for the <see cref="Make"/> service.</param>
-        /// <param name="userParams">An array for the user parameter.</param>
-        /// <returns>The service instance.</returns>
-        protected virtual object Build(BindData makeServiceBindData, object[] userParams)
-        {
-            var instance = makeServiceBindData.Concrete != null
-                ? makeServiceBindData.Concrete(this, userParams)
-                : CreateInstance(makeServiceBindData, SpeculatedServiceType(makeServiceBindData.Service),
-                    userParams);
-
-            return Inject(makeServiceBindData, instance);
-        }
-
-        /// <summary>
-        /// Create the specified service instance.
-        /// </summary>
-        /// <param name="makeServiceBindData">The bind data for the <see cref="Make"/> service.</param>
-        /// <param name="makeServiceType">The type for the <see cref="Make"/> service.</param>
-        /// <param name="userParams">An array for the user parameter.</param>
-        /// <returns>The service instance.</returns>
-        protected virtual object CreateInstance(Bindable makeServiceBindData, Type makeServiceType, object[] userParams)
-        {
-            if (IsUnableType(makeServiceType))
-            {
-                return null;
-            }
-
-            userParams = GetConstructorsInjectParams(makeServiceBindData, makeServiceType, userParams);
-
-            try
-            {
-                return CreateInstance(makeServiceType, userParams);
-            }
-            catch (Exception ex)
-            {
-                throw MakeBuildFaildException(makeServiceBindData.Service, makeServiceType, ex);
-            }
-        }
-
-        /// <inheritdoc cref="CreateInstance(Bindable, Type, object[])"/>
-        protected virtual object CreateInstance(Type makeServiceType, object[] userParams)
-        {
-            // If the parameter does not exist then you can get better 
-            // performance without writing parameters when reflecting.
-            if (userParams == null || userParams.Length <= 0)
-            {
-                return Activator.CreateInstance(makeServiceType);
-            }
-            return Activator.CreateInstance(makeServiceType, userParams);
-        }
-
-        /// <summary>
-        /// Get the service binding data, fill the data if the data is null.
-        /// </summary>
-        /// <param name="service">The service name.</param>
-        /// <returns>The bind data for the service.</returns>
-        protected BindData GetBindFillable(string service)
-        {
-            return service != null && bindings.TryGetValue(service, out BindData bindData)
-                ? bindData
-                : MakeEmptyBindData(service);
-        }
-
-        /// <summary>
-        /// Get the variable of type <see cref="IParams"/> from <paramref name="userParams"/>
+        /// Get the variable of type <see cref="IParams"/> from <paramref name="userParams"/>.
         /// </summary>
         /// <param name="userParams">An array for the user parameter.</param>
         /// <returns>An array of <see cref="IParams"/> parameters.</returns>
         private IParams[] GetParamsTypeInUserParams(ref object[] userParams)
         {
-            // Filter is used here without using Remove because 
+            // Filter is used here without using Remove because
             // the IParams is also one of the types that you might want to inject.
             var elements = Arr.Filter(userParams, value => value is IParams);
             var results = new IParams[elements.Length];
@@ -1836,6 +1859,7 @@ namespace CatLib
             {
                 results[i] = (IParams)elements[i];
             }
+
             return results;
         }
 
@@ -1846,10 +1870,10 @@ namespace CatLib
         /// <returns>The default parameter matcher.</returns>
         private Func<ParameterInfo, object> MakeParamsMatcher(IParams[] tables)
         {
-            // The default matcher policy will match the parameter name 
+            // The default matcher policy will match the parameter name
             // with the parameter name of the parameter table.
 
-            // The first valid valid parameter value will be returned 
+            // The first valid valid parameter value will be returned
             // as the return value
             return parameterInfo =>
             {

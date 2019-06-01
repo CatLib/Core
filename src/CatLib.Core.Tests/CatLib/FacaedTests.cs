@@ -9,6 +9,8 @@
  * Document: https://catlib.io/
  */
 
+#pragma warning disable CA1034
+
 using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -24,14 +26,13 @@ namespace CatLib.Tests
         public interface IFacaedTestClass
         {
         }
+
         public class TestClassFacade : Facade<IFacaedTestClass>
         {
-
         }
 
         public class TestClassFacadeError : Facade<FacaedTestClass>
         {
-            
         }
 
         [TestMethod]
@@ -80,11 +81,12 @@ namespace CatLib.Tests
             {
                 isError = true;
             }
+
             Assert.AreEqual(true, isError);
         }
 
         /// <summary>
-        /// 门面测试
+        /// 门面测试.
         /// </summary>
         [TestMethod]
         public void FacadeTest()
@@ -98,6 +100,7 @@ namespace CatLib.Tests
             }).Alias<IFacaedTestClass>();
 
             Assert.AreSame(obj, TestClassFacade.Instance);
+
             //double run
             Assert.AreSame(obj, TestClassFacade.Instance);
             Assert.AreSame(obj, TestClassFacade.Instance);
@@ -171,7 +174,7 @@ namespace CatLib.Tests
 
             var data = TestClassFacade.Instance;
             Assert.AreSame(data, TestClassFacade.Instance);
-            
+
             app.Release<IFacaedTestClass>();
 
             var isError = false;
@@ -183,6 +186,7 @@ namespace CatLib.Tests
             {
                 isError = true;
             }
+
             Assert.AreEqual(true, isError);
         }
 

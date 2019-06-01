@@ -11,10 +11,12 @@
 
 namespace CatLib
 {
+    // todo: removed when add new event system.
+
     /// <summary>
     /// Contains all events dispatched by an Application.
     /// </summary>
-    public sealed class ApplicationEvents
+    public static class ApplicationEvents
     {
         /// <summary>
         /// Before the <see cref="Application.Bootstrap"/> call.

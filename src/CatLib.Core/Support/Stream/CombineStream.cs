@@ -20,6 +20,16 @@ namespace CatLib
     public class CombineStream : WrapperStream
     {
         /// <summary>
+        /// An array of multiple streams.
+        /// </summary>
+        private readonly Stream[] streams;
+
+        /// <summary>
+        /// Whether to close the sub stream when closing the combined stream.
+        /// </summary>
+        private readonly bool autoClosed;
+
+        /// <summary>
         /// Indicates the position of the current cursor.
         /// </summary>
         private long globalPosition;
@@ -30,17 +40,36 @@ namespace CatLib
         private int index;
 
         /// <summary>
-        /// An array of multiple streams.
-        /// </summary>
-        private readonly Stream[] streams;
-
-        /// <summary>
         /// The length of the <see cref="CombineStream"/>.
         /// </summary>
         private long length;
 
         /// <summary>
-        /// The length of the <see cref="CombineStream"/>.
+        /// Initializes a new instance of the <see cref="CombineStream"/> class.
+        /// </summary>
+        /// <param name="left">The left stream.</param>
+        /// <param name="right">The right stream.</param>
+        /// <param name="closed">Whether to close the sub stream when closing the combined stream.</param>
+        public CombineStream(Stream left, Stream right, bool closed = false)
+            : this(new[] { left, right }, closed)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="CombineStream"/> class.
+        /// </summary>
+        /// <param name="source">An array of the sub stream.</param>
+        /// <param name="closed">Whether to close the sub stream when closing the combined stream.</param>
+        public CombineStream(Stream[] source, bool closed = false)
+        {
+            index = 0;
+            streams = source;
+            length = -1;
+            autoClosed = closed;
+        }
+
+        /// <summary>
+        /// Gets the length of the <see cref="CombineStream"/>.
         /// </summary>
         public override long Length
         {
@@ -56,6 +85,7 @@ namespace CatLib
                 {
                     length += stream.Length;
                 }
+
                 return length;
             }
         }
@@ -72,6 +102,7 @@ namespace CatLib
                         return false;
                     }
                 }
+
                 return true;
             }
         }
@@ -95,41 +126,13 @@ namespace CatLib
                         return false;
                     }
                 }
+
                 return true;
-            }   
+            }
         }
 
         /// <inheritdoc />
         public override bool CanWrite => false;
-
-        /// <summary>
-        /// Whether to close the sub stream when closing the combined stream
-        /// </summary>
-        private readonly bool autoClosed;
-
-        /// <summary>
-        /// Initialize an new <see cref="CombineStream"/> instance.
-        /// </summary>
-        /// <param name="left">The left stream.</param>
-        /// <param name="right">The right stream.</param>
-        /// <param name="closed">Whether to close the sub stream when closing the combined stream.</param>
-        public CombineStream(Stream left, Stream right, bool closed = false)
-            : this(new[] { left, right }, closed)
-        {
-        }
-
-        /// <summary>
-        /// Initialize an new <see cref="CombineStream"/> instance.
-        /// </summary>
-        /// <param name="source">An array of the sub stream.</param>
-        /// <param name="closed">Whether to close the sub stream when closing the combined stream.</param>
-        public CombineStream(Stream[] source, bool closed = false)
-        {
-            index = 0;
-            streams = source;
-            length = -1;
-            autoClosed = closed;
-        }
 
         /// <inheritdoc />
         public override long Seek(long offset, SeekOrigin origin)
@@ -172,29 +175,6 @@ namespace CatLib
             return globalPosition = newGloablPosition;
         }
 
-        /// <summary>
-        /// Calculate sub stream index and relative positions
-        /// </summary>
-        /// <param name="globalPosition">The position of the current cursor.</param>
-        /// <param name="localPosition">The relative position.</param>
-        protected int CalculatedIndex(long globalPosition, ref long localPosition)
-        {
-            long length = 0;
-            for (var i = 0; i < streams.Length; i++)
-            {
-                length += streams[i].Length;
-                if (globalPosition > length)
-                {
-                    continue;
-                }
-
-                localPosition = streams[i].Length - (length - globalPosition);
-                return i;
-            }
-
-            throw new AssertException($"Failed to determine {nameof(localPosition)}");
-        }
-
         /// <inheritdoc />
         public override int Read(byte[] buffer, int offset, int count)
         {
@@ -222,7 +202,8 @@ namespace CatLib
                 offset += read;
                 globalPosition += read;
                 result += read;
-            } while (count > 0);
+            }
+            while (count > 0);
 
             return result;
         }
@@ -243,6 +224,30 @@ namespace CatLib
         public override void Flush()
         {
             throw new NotSupportedException($"{nameof(CombineStream)} not supported {nameof(Flush)}.");
+        }
+
+        /// <summary>
+        /// Calculate sub stream index and relative positions.
+        /// </summary>
+        /// <param name="globalPosition">The position of the current cursor.</param>
+        /// <param name="localPosition">The relative position.</param>
+        /// <returns>The index of the stream array.</returns>
+        protected int CalculatedIndex(long globalPosition, ref long localPosition)
+        {
+            long len = 0;
+            for (var i = 0; i < streams.Length; i++)
+            {
+                len += streams[i].Length;
+                if (globalPosition > len)
+                {
+                    continue;
+                }
+
+                localPosition = streams[i].Length - (len - globalPosition);
+                return i;
+            }
+
+            throw new AssertException($"Failed to determine {nameof(localPosition)}");
         }
 
         /// <inheritdoc />

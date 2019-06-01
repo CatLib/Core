@@ -9,15 +9,16 @@
  * Document: https://catlib.io/
  */
 
+// todo: removed with new event system.
 namespace CatLib
 {
     /// <summary>
-    /// 原始调度器
+    /// 原始调度器.
     /// </summary>
     internal interface IOriginalDispatcher
     {
         /// <summary>
-        /// 原始调度器
+        /// Gets 原始调度器.
         /// </summary>
         IDispatcher Dispatcher { get; }
     }

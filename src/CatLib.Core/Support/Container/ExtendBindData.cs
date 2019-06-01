@@ -13,8 +13,8 @@ using System;
 
 namespace CatLib
 {
-    ///<summary>
-    /// 绑定数据拓展
+    /// <summary>
+    /// 绑定数据拓展.
     /// </summary>
     public static class ExtendBindData
     {

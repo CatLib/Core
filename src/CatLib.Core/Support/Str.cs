@@ -21,9 +21,14 @@ namespace CatLib
     public static class Str
     {
         /// <summary>
+        /// The space string.
+        /// </summary>
+        public const string Space = " ";
+
+        /// <summary>
         /// Fill types.
         /// </summary>
-        public enum PadTypes
+        public enum PadType
         {
             /// <summary>
             /// Fill both sides of the string. If it is not even, the right side gets extra padding.
@@ -38,16 +43,11 @@ namespace CatLib
             /// <summary>
             /// Fill the right side of the string.
             /// </summary>
-            Right
+            Right,
         }
 
         /// <summary>
-        /// The space string.
-        /// </summary>
-        public const string Space = " ";
-
-        /// <summary>
-        /// 编码
+        /// Gets or sets string encoding.
         /// </summary>
         public static Encoding Encoding { get; set; } = Encoding.UTF8;
 
@@ -85,11 +85,12 @@ namespace CatLib
 
             for (var i = count - 1; i >= 0; i--)
             {
-                if ((chars[i] >= '0' && chars[i] <= '9'))
+                if (chars[i] >= '0' && chars[i] <= '9')
                 {
                     count--;
                     continue;
                 }
+
                 break;
             }
 
@@ -103,7 +104,7 @@ namespace CatLib
         /// Translate the specified string into an asterisk match expression and test.
         /// </summary>
         /// <param name="pattern">The match pattern.</param>
-        /// <param name="value">The </param>
+        /// <param name="value">The. </param>
         /// <returns>True if matches.</returns>
         public static bool Is(string pattern, string value)
         {
@@ -157,7 +158,7 @@ namespace CatLib
         {
             Guard.Requires<ArgumentNullException>(str != null);
             Guard.Requires<ArgumentOutOfRangeException>(length > 0);
-            var requested = new string[str.Length / length + (str.Length % length == 0 ? 0 : 1)];
+            var requested = new string[(str.Length / length) + (str.Length % length == 0 ? 0 : 1)];
 
             for (var i = 0; i < str.Length; i += length)
             {
@@ -188,6 +189,7 @@ namespace CatLib
             {
                 requested.Append(str);
             }
+
             return requested.ToString();
         }
 
@@ -215,9 +217,11 @@ namespace CatLib
                     continue;
                 }
 
+#pragma warning disable S4143
                 var temp = requested[i];
                 requested[i] = requested[index];
                 requested[index] = temp;
+#pragma warning restore S4143
             }
 
             return Arr.Reduce(requested, (v1, v2) => v1 + v2, string.Empty);
@@ -248,6 +252,7 @@ namespace CatLib
                 {
                     break;
                 }
+
                 count++;
                 length -= index + subStr.Length - start;
                 start = index + subStr.Length;
@@ -277,13 +282,13 @@ namespace CatLib
         /// <param name="padStr">A string to be used for padding. The default is blank.</param>
         /// <param name="type">
         /// Fill in which side of the string.
-        /// <para><see cref="PadTypes.Both"/>Fill both sides of the string. If not even, get extra padding on the right side.</para>
-        /// <para><see cref="PadTypes.Left"/>Fill the left side of the string.</para>
-        /// <para><see cref="PadTypes.Right"/>Fill the right side of the string.</para>
+        /// <para><see cref="PadType.Both"/>Fill both sides of the string. If not even, get extra padding on the right side.</para>
+        /// <para><see cref="PadType.Left"/>Fill the left side of the string.</para>
+        /// <para><see cref="PadType.Right"/>Fill the right side of the string.</para>
         /// </param>
         /// <returns>Returns filled string.</returns>
         [Obsolete("The overload method wile be remove in 2.0 version.")]
-        public static string Pad(string str, int length, string padStr = null, PadTypes type = PadTypes.Right)
+        public static string Pad(string str, int length, string padStr = null, PadType type = PadType.Right)
         {
             return Pad(length, str, padStr, type);
         }
@@ -291,17 +296,17 @@ namespace CatLib
         /// <summary>
         /// Fill the string with the new length.
         /// </summary>
-        /// <param name="str">The string to be filled.</param>
         /// <param name="length">The new string length. If the value is less than the original length of the string, no action is taken.</param>
+        /// <param name="str">The string to be filled.</param>
         /// <param name="padStr">A string to be used for padding. The default is blank.</param>
         /// <param name="type">
         /// Fill in which side of the string.
-        /// <para><see cref="PadTypes.Both"/>Fill both sides of the string. If not even, get extra padding on the right side.</para>
-        /// <para><see cref="PadTypes.Left"/>Fill the left side of the string.</para>
-        /// <para><see cref="PadTypes.Right"/>Fill the right side of the string.</para>
+        /// <para><see cref="PadType.Both"/>Fill both sides of the string. If not even, get extra padding on the right side.</para>
+        /// <para><see cref="PadType.Left"/>Fill the left side of the string.</para>
+        /// <para><see cref="PadType.Right"/>Fill the right side of the string.</para>
         /// </param>
         /// <returns>Returns filled string.</returns>
-        public static string Pad(int length, string str = null, string padStr = null, PadTypes type = PadTypes.Right)
+        public static string Pad(int length, string str = null, string padStr = null, PadType type = PadType.Right)
         {
             str = str ?? string.Empty;
 
@@ -314,12 +319,12 @@ namespace CatLib
             int rightPadding;
             var leftPadding = rightPadding = 0;
 
-            if (type == PadTypes.Both)
+            if (type == PadType.Both)
             {
                 leftPadding = needPadding >> 1;
                 rightPadding = (needPadding >> 1) + (needPadding % 2 == 0 ? 0 : 1);
             }
-            else if (type == PadTypes.Right)
+            else if (type == PadType.Right)
             {
                 rightPadding = needPadding;
             }
@@ -331,8 +336,8 @@ namespace CatLib
             padStr = padStr ?? Space;
             padStr = padStr.Length <= 0 ? Space : padStr;
 
-            var leftPadCount = leftPadding / padStr.Length + (leftPadding % padStr.Length == 0 ? 0 : 1);
-            var rightPadCount = rightPadding / padStr.Length + (rightPadding % padStr.Length == 0 ? 0 : 1);
+            var leftPadCount = (leftPadding / padStr.Length) + (leftPadding % padStr.Length == 0 ? 0 : 1);
+            var rightPadCount = (rightPadding / padStr.Length) + (rightPadding % padStr.Length == 0 ? 0 : 1);
 
             return Repeat(padStr, leftPadCount).Substring(0, leftPadding) + str +
                    Repeat(padStr, rightPadCount).Substring(0, rightPadding);
@@ -395,6 +400,7 @@ namespace CatLib
             {
                 str = str.Replace(match, replace);
             }
+
             return str;
         }
 
@@ -444,7 +450,7 @@ namespace CatLib
         {
             Guard.Requires<ArgumentOutOfRangeException>(length > 0);
 
-            var requested = string.Empty;
+            var requested = new StringBuilder();
             var random = Helper.MakeRandom(seed);
             for (int len; (len = requested.Length) < length;)
             {
@@ -453,10 +459,10 @@ namespace CatLib
                 random.NextBytes(bytes);
 
                 var code = Replace(new[] { "/", "+", "=" }, string.Empty, Convert.ToBase64String(bytes));
-                requested += code.Substring(0, Math.Min(size, code.Length));
+                requested.Append(code.Substring(0, Math.Min(size, code.Length)));
             }
 
-            return requested;
+            return requested.ToString();
         }
 
         /// <summary>
@@ -517,13 +523,13 @@ namespace CatLib
         }
 
         /// <summary>
-        /// Calculate Levenshtein distance between two strings
+        /// Calculate Levenshtein distance between two strings.
         /// </summary>
         /// <param name="str1">The string 1.</param>
         /// <param name="str2">The string 2.</param>
         /// <returns>
-        /// This function returns the Levenshtein-Distance between the two argument 
-        /// strings or -1, if one of the argument strings is longer than the limit 
+        /// This function returns the Levenshtein-Distance between the two argument
+        /// strings or -1, if one of the argument strings is longer than the limit
         /// of 255 characters.
         /// </returns>
         public static int Levenshtein(string str1, string str2)
@@ -556,10 +562,12 @@ namespace CatLib
                 {
                     min = num2;
                 }
+
                 if (min > num3)
                 {
                     min = num3;
                 }
+
                 return min;
             }
 
@@ -588,9 +596,9 @@ namespace CatLib
         /// <remarks>
         /// v[0] = "hello"
         /// v[1] = "world"
-        /// var result = Str.JoinList(v, "/"); 
+        /// var result = Str.JoinList(v, "/");
         /// result[0] == "hello";
-        /// result[1] == "hello/world";
+        /// result[1] == "hello/world";.
         /// </remarks>
         /// <param name="source">The source array.</param>
         /// <param name="separator">The separator.</param>
@@ -606,10 +614,12 @@ namespace CatLib
                 {
                     builder.Append(separator);
                 }
+
                 builder.Append(source[index]);
                 source[index] = builder.ToString();
                 builder.Remove(0, source[index].Length);
             }
+
             return source;
         }
 
@@ -620,4 +630,3 @@ namespace CatLib
         }
     }
 }
-

@@ -15,13 +15,13 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace CatLib.Tests.Stl
 {
     /// <summary>
-    /// 给与数据测试用例
+    /// 给与数据测试用例.
     /// </summary>
     [TestClass]
     public class GivenDataTest
     {
         /// <summary>
-        /// 可以给与数据
+        /// 可以给与数据.
         /// </summary>
         [TestMethod]
         public void CanGiven()
@@ -40,7 +40,7 @@ namespace CatLib.Tests.Stl
         }
 
         /// <summary>
-        /// 检查给与的无效值
+        /// 检查给与的无效值.
         /// </summary>
         [TestMethod]
         public void CheckGivenIllegalValue()
@@ -60,7 +60,9 @@ namespace CatLib.Tests.Stl
         private class TestGivenClosureClass
         {
             public string Name { get; set; }
+
             public int Value { get; set; }
+
             public TestGivenClosureClass(string name, int value = 0)
             {
                 Name = name;

@@ -19,27 +19,12 @@ namespace CatLib
     internal sealed class MethodBind : Bindable<IMethodBind>, IMethodBind
     {
         /// <summary>
-        /// The method info.
-        /// </summary>
-        public MethodInfo MethodInfo { get; }
-
-        /// <summary>
-        /// The instance on which to call the method.
-        /// </summary>
-        public object Target { get; }
-
-        /// <summary>
-        /// An array of the method parameters.
-        /// </summary>
-        public ParameterInfo[] ParameterInfos { get; }
-
-        /// <summary>
         /// The <see cref="MethodContainer"/> instance.
         /// </summary>
         private readonly MethodContainer methodContainer;
 
         /// <summary>
-        /// Initialize a new one <see cref="MethodBind"/> instance.
+        /// Initializes a new instance of the <see cref="MethodBind"/> class.
         /// </summary>
         /// <param name="methodContainer">The <see cref="MethodContainer"/> instance.</param>
         /// <param name="container">The <see cref="Container"/> instance.</param>
@@ -54,6 +39,21 @@ namespace CatLib
             MethodInfo = call;
             ParameterInfos = call.GetParameters();
         }
+
+        /// <summary>
+        /// Gets the method info.
+        /// </summary>
+        public MethodInfo MethodInfo { get; }
+
+        /// <summary>
+        /// Gets the instance on which to call the method.
+        /// </summary>
+        public object Target { get; }
+
+        /// <summary>
+        /// Gets an array of the method parameters.
+        /// </summary>
+        public ParameterInfo[] ParameterInfos { get; }
 
         /// <summary>
         /// Unbinds a method from the container.

@@ -36,7 +36,7 @@ namespace CatLib
 
         /// <summary>
         /// Trigger an event, terminate after encountering the first event
-        /// , and get the return result of the listener
+        /// , and get the return result of the listener.
         /// </summary>
         /// <param name="eventName">The event name.</param>
         /// <param name="payloads">The object passed to the listener.</param>
@@ -49,14 +49,16 @@ namespace CatLib
         /// <param name="eventName">The event name.</param>
         /// <param name="execution">The event listener.</param>
         /// <param name="group">The event group，If it is null, it will not be grouped.</param>
-        /// <returns>事件对象</returns>
+        /// <returns>事件对象.</returns>
+#pragma warning disable CA1716
         IEvent On(string eventName, Func<string, object[], object> execution, object group = null);
+#pragma warning restore CA1716
 
         /// <summary>
         /// Remove a set of listeners from the dispatcher.
         /// </summary>
         /// <param name="target">
-        /// <para>If the <see cref="string"/> is passed in, all events corresponding 
+        /// <para>If the <see cref="string"/> is passed in, all events corresponding
         /// to the event name will be removed.</para>
         /// <para>If the event object (IEvent) is passed, the corresponding event is released.</para>
         /// <para>If the incoming object is an object, all events under the group will be released.</para>

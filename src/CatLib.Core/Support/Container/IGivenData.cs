@@ -24,7 +24,7 @@ namespace CatLib
         /// Give the specified service.
         /// </summary>
         /// <param name="service">The service name or alias.</param>
-        /// <returns>The instance of the <see cref="IBindData"/></returns>
+        /// <returns>The instance of the <see cref="IBindData"/>.</returns>
         TReturn Given(string service);
 
         /// <inheritdoc cref="Given(string)"/>

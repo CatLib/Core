@@ -13,6 +13,8 @@ using System;
 using System.Collections.Generic;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
+#pragma warning disable CA1031
+
 namespace CatLib.Tests.Support.Util
 {
     [TestClass]
@@ -31,13 +33,14 @@ namespace CatLib.Tests.Support.Util
             {
                 Assert.AreEqual((++i).ToString(), result);
             }
+
             Assert.AreEqual(3, newArr.Length);
         }
 
         [TestMethod]
         public void TestMergeAllEmpty()
         {
-            var newArr = Arr.Merge(new int[0], new int[0]);
+            var newArr = Arr.Merge(Array.Empty<int>(), Array.Empty<int>());
             Assert.AreEqual(0, newArr.Length);
         }
 
@@ -60,7 +63,7 @@ namespace CatLib.Tests.Support.Util
         public void TestMergeEmpty()
         {
             var arr1 = new[] { "1", "2" };
-            var arr2 = new string[0];
+            var arr2 = Array.Empty<string>();
             var arr3 = new[] { "3" };
             var newArr = Arr.Merge(arr1, arr2, arr3);
             Assert.AreEqual(3, newArr.Length);
@@ -702,6 +705,7 @@ namespace CatLib.Tests.Support.Util
             {
                 ex = true;
             }
+
             Assert.AreEqual(true, ex);
 
             result = Arr.RemoveAt(ref data, 0);
@@ -744,7 +748,7 @@ namespace CatLib.Tests.Support.Util
             Assert.AreEqual("b", result);
             Assert.AreEqual(0, data.Length);
 
-            data = new string[] { };
+            data = Array.Empty<string>();
             result = Arr.RemoveAt(ref data, -1);
             Assert.AreEqual(null, result);
             Assert.AreEqual(0, data.Length);
@@ -778,7 +782,7 @@ namespace CatLib.Tests.Support.Util
             Assert.AreEqual(2, data.Length);
             char[] obj = null;
             Arr.Cut(ref obj, 100);
-            obj = new char[0];
+            obj = Array.Empty<char>();
             Arr.Cut(ref obj, 100);
         }
 
@@ -802,7 +806,7 @@ namespace CatLib.Tests.Support.Util
             Assert.AreEqual(3, data2[1]);
             Assert.AreEqual(5, data2[2]);
 
-            var data3 = new int[0];
+            var data3 = Array.Empty<int>();
             var result3 = Arr.Remove(ref data3, (c) => c % 2 == 0);
             Assert.AreEqual(0, result3.Length);
             Assert.AreEqual(0, data3.Length);

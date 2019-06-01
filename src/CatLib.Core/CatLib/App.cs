@@ -10,9 +10,10 @@
  */
 
 using System;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
+
+#pragma warning disable CA1030
 
 namespace CatLib
 {
@@ -20,13 +21,14 @@ namespace CatLib
     /// The <see cref="IApplication"/> static facade.
     /// </summary>
     [ExcludeFromCodeCoverage]
+#pragma warning disable S1118
     public abstract class App
+#pragma warning restore S1118
     {
-        #region Original
         /// <summary>
-        /// Callback when a new <see cref="IApplication"/> instance is created.
+        /// The <see cref="IApplication"/> instance.
         /// </summary>
-        private static event Action<IApplication> onNewApplication;
+        private static IApplication instance;
 
         /// <summary>
         /// Callback when a new <see cref="IApplication"/> instance is created.
@@ -35,19 +37,19 @@ namespace CatLib
         {
             add
             {
-                onNewApplication += value;
+                RaiseOnNewApplication += value;
                 if (instance != null)
                 {
                     value?.Invoke(instance);
                 }
             }
-            remove => onNewApplication -= value;
+            remove => RaiseOnNewApplication -= value;
         }
 
         /// <summary>
-        /// The <see cref="IApplication"/> instance.
+        /// Callback when a new <see cref="IApplication"/> instance is created.
         /// </summary>
-        private static IApplication instance;
+        private static event Action<IApplication> RaiseOnNewApplication;
 
         /// <summary>
         /// Gets or Sets the <see cref="IApplication"/> instance.
@@ -56,26 +58,34 @@ namespace CatLib
         {
             get
             {
-                if (instance == null)
-                {
-                    throw new LogicException("The Application does not created, please call new Application() first.");
-                }
                 return instance;
             }
+
             set
             {
                 instance = value;
-                onNewApplication?.Invoke(instance);
+                RaiseOnNewApplication?.Invoke(instance);
             }
         }
 
         /// <summary>
-        /// True if the <see cref="IApplication"/> instance exists.
+        /// Gets a value indicating whether true if the <see cref="IApplication"/> instance exists.
         /// </summary>
         public static bool HasHandler => instance != null;
-        #endregion
 
-        #region Application API
+        /// <inheritdoc cref="IApplication.IsMainThread"/>
+        public static bool IsMainThread => Handler.IsMainThread;
+
+        /// <inheritdoc cref="Application.Version"/>
+        public static string Version => Application.Version;
+
+        /// <inheritdoc cref="IApplication.DebugLevel"/>
+        public static DebugLevel DebugLevel
+        {
+            get => Handler.DebugLevel;
+            set => Handler.DebugLevel = value;
+        }
+
         /// <inheritdoc cref="IApplication.Terminate"/>
         public static void Terminate()
         {
@@ -100,27 +110,12 @@ namespace CatLib
             return Handler.GetRuntimeId();
         }
 
-        /// <inheritdoc cref="IApplication.IsMainThread"/>
-        public static bool IsMainThread => Handler.IsMainThread;
-
-        /// <inheritdoc cref="Application.Version"/>
-        public static string Version => Application.Version;
-
         /// <inheritdoc cref="IApplication.GetPriority"/>
         public static int GetPriority(Type type, string method = null)
         {
             return Handler.GetPriority(type, method);
         }
 
-        /// <inheritdoc cref="IApplication.DebugLevel"/>
-        public static DebugLevels DebugLevel
-        {
-            get => Handler.DebugLevel;
-            set => Handler.DebugLevel = value;
-        }
-        #endregion
-
-        #region Dispatcher API
         /// <inheritdoc cref="IDispatcher.HasListeners"/>
         public static bool HasListeners(string eventName, bool strict = false)
         {
@@ -175,50 +170,45 @@ namespace CatLib
             return Handler.On(eventName, method, group);
         }
 
-        /// <inheritdoc />
+        // todo: removed with new event system.
+#pragma warning disable SA1600
         public static IEvent Listen(string eventName, Func<string, object[], object> execution, object group = null)
         {
             return Handler.On(eventName, execution, group);
         }
 
-        /// <inheritdoc />
         public static IEvent Listen<TResult>(string eventName, Func<TResult> method, object group = null)
         {
             return Handler.Listen(eventName, method, group);
         }
 
-        /// <inheritdoc />
         public static IEvent Listen<T1, TResult>(string eventName, Func<T1, TResult> method, object group = null)
         {
             return Handler.Listen(eventName, method, group);
         }
 
-        /// <inheritdoc />
         public static IEvent Listen<T1, T2, TResult>(string eventName, Func<T1, T2, TResult> method, object group = null)
         {
             return Handler.Listen(eventName, method, group);
         }
 
-        /// <inheritdoc />
         public static IEvent Listen<T1, T2, T3, TResult>(string eventName, Func<T1, T2, T3, TResult> method, object group = null)
         {
             return Handler.Listen(eventName, method, group);
         }
 
-        /// <inheritdoc />
         public static IEvent Listen<T1, T2, T3, T4, TResult>(string eventName, Func<T1, T2, T3, T4, TResult> method, object group = null)
         {
             return Handler.Listen(eventName, method, group);
         }
+#pragma warning restore SA1600
 
         /// <inheritdoc cref="IDispatcher.Off"/>
         public static void Off(object target)
         {
             Handler.Off(target);
         }
-        #endregion
 
-        #region Container API
         /// <inheritdoc cref="IContainer.GetBind"/>
         public static IBindData GetBind(string service)
         {
@@ -392,9 +382,7 @@ namespace CatLib
         {
             return Handler.Type2Service(type);
         }
-        #endregion
 
-        #region Container Extend API
         /// <inheritdoc cref="ExtendContainer.Factory(IContainer, string, object[])"/>
         public static Func<object> Factory(string service, params object[] userParams)
         {
@@ -841,6 +829,5 @@ namespace CatLib
         {
             return Handler.Type2Service<TService>();
         }
-        #endregion
     }
 }

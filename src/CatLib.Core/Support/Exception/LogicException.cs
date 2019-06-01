@@ -21,27 +21,28 @@ namespace CatLib
     public class LogicException : RuntimeException
     {
         /// <summary>
-        /// Initialize a new <see cref="LogicException"/> instnace.
+        /// Initializes a new instance of the <see cref="LogicException"/> class.
         /// </summary>
         public LogicException()
         {
-
         }
 
         /// <summary>
-        /// Initialize a new <see cref="LogicException"/> instnace.
+        /// Initializes a new instance of the <see cref="LogicException"/> class.
         /// </summary>
         /// <param name="message">The exception message.</param>
-        public LogicException(string message) : base(message)
+        public LogicException(string message)
+            : base(message)
         {
         }
 
         /// <summary>
-        /// Initialize a new <see cref="LogicException"/> instnace.
+        /// Initializes a new instance of the <see cref="LogicException"/> class.
         /// </summary>
         /// <param name="message">The exception message.</param>
         /// <param name="innerException">The inner exception.</param>
-        public LogicException(string message, Exception innerException) : base(message, innerException)
+        public LogicException(string message, Exception innerException)
+            : base(message, innerException)
         {
         }
     }

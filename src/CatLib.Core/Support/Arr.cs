@@ -25,7 +25,9 @@ namespace CatLib
         /// <typeparam name="T">The type of array.</typeparam>
         /// <param name="sources">The specified array.</param>
         /// <returns>Returns an merged array.</returns>
+#pragma warning disable S2368
         public static T[] Merge<T>(params T[][] sources)
+#pragma warning restore S2368
         {
             Guard.Requires<ArgumentNullException>(sources != null);
             var length = 0;
@@ -35,12 +37,13 @@ namespace CatLib
                 {
                     continue;
                 }
+
                 length += source.Length;
             }
 
             if (length <= 0)
             {
-                return new T[0];
+                return Array.Empty<T>();
             }
 
             var merge = new T[length];
@@ -51,6 +54,7 @@ namespace CatLib
                 {
                     continue;
                 }
+
                 Array.Copy(source, 0, merge, current, source.Length);
                 current += source.Length;
             }
@@ -78,6 +82,7 @@ namespace CatLib
                 {
                     break;
                 }
+
                 requested[i++] = result;
             }
 
@@ -105,6 +110,7 @@ namespace CatLib
                 {
                     continue;
                 }
+
                 var temp = requested[i];
                 requested[i] = requested[index];
                 requested[index] = temp;
@@ -114,8 +120,8 @@ namespace CatLib
         }
 
         /// <summary>
-        /// Removes an element of the specified length from the array. If 
-        /// the <paramref name="replSource"/> parameter is given, the new 
+        /// Removes an element of the specified length from the array. If
+        /// the <paramref name="replSource"/> parameter is given, the new
         /// element is inserted from the <paramref name="start"/> position.
         /// </summary>
         /// <typeparam name="T">The type of array.</typeparam>
@@ -127,7 +133,7 @@ namespace CatLib
         /// </param>
         /// <param name="length">
         /// Number of deleted elements.
-        /// <para>If the value is set to a positive number, then the number of elements is returned。</para>
+        /// <para>If the value is set to a positive number, then the number of elements is returned。.</para>
         /// <para>If the value is set to a negative number, then remove the <paramref name="length"/> absolute position from the back to the front to delete.</para>
         /// <para>If the value is not set, then all elements from the position set by the <paramref name="start"/> parameter to the end of the array are returned.</para>
         /// </param>
@@ -144,7 +150,7 @@ namespace CatLib
             if (length.Value == source.Length)
             {
                 Array.Copy(source, requested, source.Length);
-                source = replSource ?? new T[] { };
+                source = replSource ?? Array.Empty<T>();
                 return requested;
             }
 
@@ -197,6 +203,7 @@ namespace CatLib
                 {
                     Array.Resize(ref source, 0);
                 }
+
                 return;
             }
 
@@ -214,7 +221,7 @@ namespace CatLib
 
         /// <summary>
         /// Divide an array into new array blocks.
-        /// <para>The number of cells in each array is determined by 
+        /// <para>The number of cells in each array is determined by
         /// the <paramref name="size"/> parameter. The number of cells in the last array may be a few.</para>
         /// </summary>
         /// <typeparam name="T">The type of array.</typeparam>
@@ -225,7 +232,7 @@ namespace CatLib
         {
             Guard.Requires<ArgumentNullException>(source != null);
             size = Math.Max(1, size);
-            var requested = new T[source.Length / size + (source.Length % size == 0 ? 0 : 1)][];
+            var requested = new T[(source.Length / size) + (source.Length % size == 0 ? 0 : 1)][];
 
             T[] chunk = null;
             for (var i = 0; i < source.Length; i++)
@@ -237,10 +244,18 @@ namespace CatLib
                     {
                         requested[pos - 1] = chunk;
                     }
+
                     chunk = new T[(i + size) <= source.Length ? size : source.Length - i];
                 }
+
+                if (chunk == null)
+                {
+                    throw new AssertException("Unexpected exception");
+                }
+
                 chunk[i - (pos * size)] = source[i];
             }
+
             requested[requested.Length - 1] = chunk;
 
             return requested;
@@ -283,7 +298,7 @@ namespace CatLib
         /// <summary>
         /// Pass each value of the array to the callback function, if the callback
         /// function returns true, remove the corresponding element in the array
-        /// and return the removed element
+        /// and return the removed element.
         /// </summary>
         /// <typeparam name="T">The type of array.</typeparam>
         /// <param name="source">The specified array.</param>
@@ -296,7 +311,7 @@ namespace CatLib
 
             if (source.Length <= 0)
             {
-                return new T[] { };
+                return Array.Empty<T>();
             }
 
             var results = new T[source.Length];
@@ -307,6 +322,7 @@ namespace CatLib
                 {
                     continue;
                 }
+
                 results[n++] = source[i];
                 RemoveAt(ref source, i);
             }
@@ -317,8 +333,8 @@ namespace CatLib
         }
 
         /// <summary>
-        /// Each value in the source array is passed to the callback function. 
-        /// If the callback function is equal to the <paramref name="expected"/> 
+        /// Each value in the source array is passed to the callback function.
+        /// If the callback function is equal to the <paramref name="expected"/>
         /// value, the current value in the input array is added to the result array.
         /// </summary>
         /// <typeparam name="T">The type of array.</typeparam>
@@ -346,8 +362,8 @@ namespace CatLib
         }
 
         /// <summary>
-        /// Each value in the source array is passed to the callback function. 
-        /// If the callback function is equal to the <paramref name="expected"/> 
+        /// Each value in the source array is passed to the callback function.
+        /// If the callback function is equal to the <paramref name="expected"/>
         /// value, the current value in the input array is added to the result array.
         /// </summary>
         /// <typeparam name="T">The type of array.</typeparam>
@@ -374,7 +390,7 @@ namespace CatLib
 
         /// <summary>
         /// Pass the array value into the callback function, the value returned
-        /// by the custom function as the new array value
+        /// by the custom function as the new array value.
         /// </summary>
         /// <typeparam name="T">The type of array.</typeparam>
         /// <typeparam name="TReturn">The type of return value.</typeparam>
@@ -387,7 +403,7 @@ namespace CatLib
 
             if (source == null)
             {
-                return new TReturn[0];
+                return Array.Empty<TReturn>();
             }
 
             var requested = new TReturn[source.Length];
@@ -414,7 +430,7 @@ namespace CatLib
 
             if (source == null)
             {
-                return new TReturn[0];
+                return Array.Empty<TReturn>();
             }
 
             var requested = new List<TReturn>();
@@ -444,7 +460,7 @@ namespace CatLib
         }
 
         /// <summary>
-        /// Add one or more elements to the end of the array
+        /// Add one or more elements to the end of the array.
         /// </summary>
         /// <typeparam name="T">The type of array.</typeparam>
         /// <param name="source">The specified array.</param>
@@ -482,6 +498,7 @@ namespace CatLib
             {
                 requested = callback.Invoke(requested, segments);
             }
+
             return requested?.ToString();
         }
 
@@ -497,7 +514,7 @@ namespace CatLib
         /// </param>
         /// <param name="length">
         /// Returns the length of the array.
-        /// <para>If the value is set to a positive number, then the number of elements is returned。</para>
+        /// <para>If the value is set to a positive number, then the number of elements is returned。.</para>
         /// <para>If the value is set to a negative number, then remove the <paramref name="length"/> absolute position from the back to the front to delete.</para>
         /// <para>If the value is not set, then all elements from the position set by the <paramref name="start"/> parameter to the end of the array are returned.</para>
         /// </param>
@@ -567,11 +584,11 @@ namespace CatLib
         /// <para>If the value is set to a negative number, the <paramref name="start"/> absolute value is taken from the back.</para></param>
         /// <param name="length">
         /// Returns the length of the array.
-        /// <para>If the value is set to a positive number, then the number of elements is returned。</para>
+        /// <para>If the value is set to a positive number, then the number of elements is returned。.</para>
         /// <para>If the value is set to a negative number, then remove the <paramref name="length"/> absolute position from the back to the front to delete.</para>
         /// <para>If the value is not set, then all elements from the position set by the <paramref name="start"/> parameter to the end of the array are returned.</para>
         /// </param>
-        /// <returns>反转的数组</returns>
+        /// <returns>反转的数组.</returns>
         public static T[] Reverse<T>(T[] source, int start = 0, int? length = null)
         {
             Guard.Requires<ArgumentNullException>(source != null);
@@ -613,6 +630,7 @@ namespace CatLib
                 {
                     continue;
                 }
+
                 var isFinded = true;
 
                 for (var n = 0; n < match.Length; n++)
@@ -622,6 +640,7 @@ namespace CatLib
                     {
                         continue;
                     }
+
                     isFinded = false;
                     break;
                 }
@@ -689,6 +708,7 @@ namespace CatLib
                         return false;
                     }
                 }
+
                 return true;
             });
         }
@@ -746,7 +766,7 @@ namespace CatLib
         {
             Guard.Requires<ArgumentNullException>(predicate != null);
 
-            source = source ?? new T[] { };
+            source = source ?? Array.Empty<T>();
 
             for (var index = 0; index < source.Length; index++)
             {
