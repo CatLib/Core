@@ -42,13 +42,7 @@ namespace CatLib.EventDispatcher
         public T Dispatch<T>(T eventArgs)
             where T : EventArgs
         {
-            var type = eventArgs.GetType();
-            do
-            {
-                CallListener(type, eventArgs);
-                type = type.BaseType;
-            }
-            while (inheritancePropagation && type.BaseType != null);
+            DoDispatch(eventArgs);
             return eventArgs;
         }
 
@@ -61,7 +55,7 @@ namespace CatLib.EventDispatcher
                 return Array.Empty<Action<T>>();
             }
 
-            return Arr.Map(collection.ToArray(), (wrappedListener) => ((WrappedListener<T>)wrappedListener).GetAction());
+            return Arr.Map(collection, (wrappedListener) => ((WrappedListener<T>)wrappedListener).GetAction());
         }
 
         /// <inheritdoc />
@@ -77,6 +71,17 @@ namespace CatLib.EventDispatcher
         {
             DoRemoveListener(typeof(T), listener == null ?
                 null : new WrappedListener<T>(listener));
+        }
+
+        private void DoDispatch(EventArgs eventArgs)
+        {
+            var eventType = eventArgs.GetType();
+            do
+            {
+                CallListener(eventType, eventArgs);
+                eventType = eventType.BaseType;
+            }
+            while (inheritancePropagation && eventType.BaseType != null);
         }
 
         private void DoAddListener(Type eventType, WrappedListener wrappedListener, int priority)
@@ -141,33 +146,33 @@ namespace CatLib.EventDispatcher
         private sealed class WrappedListener<T> : WrappedListener
             where T : EventArgs
         {
-            private readonly Action<T> action;
+            private readonly Action<T> listener;
 
-            public WrappedListener(Action<T> action)
+            public WrappedListener(Action<T> listener)
             {
-                this.action = action;
+                this.listener = listener;
             }
 
             public Action<T> GetAction()
             {
-                return action;
+                return listener;
             }
 
             public override void Invoke(EventArgs eventArgs)
             {
-                action.Invoke((T)eventArgs);
+                listener.Invoke((T)eventArgs);
             }
 
             public override int GetHashCode()
             {
-                return action.GetHashCode();
+                return listener.GetHashCode();
             }
 
             public override bool Equals(object obj)
             {
                 if (obj is WrappedListener<T> wrappedListener)
                 {
-                    return action.Equals(wrappedListener.action);
+                    return listener.Equals(wrappedListener.listener);
                 }
 
                 return false;
@@ -175,7 +180,7 @@ namespace CatLib.EventDispatcher
 
             public override string ToString()
             {
-                return action.ToString();
+                return listener.ToString();
             }
         }
     }
