@@ -13,6 +13,8 @@ using System;
 using System.Collections;
 using System.Diagnostics;
 using System.Reflection;
+using CatLib.EventDispatcher;
+using CatLib.Events;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 #pragma warning disable CA1034
@@ -160,14 +162,12 @@ namespace CatLib.Tests
             var bootstrapStopped = new StopBootstrap() { stop = true };
             var bootstrapNotStopped = new StopBootstrap();
             var application = Application.New();
-            application.Listen<IBootstrap, object>(ApplicationEvents.Bootstrapping, (b) =>
+            application.Make<IEventDispatcher>().AddListener<BootingEventArgs>(args =>
               {
-                  if (((StopBootstrap)b).stop)
+                  if (((StopBootstrap)args.GetBootstrap()).stop)
                   {
-                      return false;
+                      args.Skip();
                   }
-
-                  return null;
               });
             application.Bootstrap(bootstrapStopped, bootstrapNotStopped);
             Assert.AreEqual(string.Empty, bootstrapStopped.value);
@@ -196,14 +196,13 @@ namespace CatLib.Tests
             var providerNotStopped = new StopProvider();
 
             var application = Application.New();
-            application.Listen<IServiceProvider, object>(ApplicationEvents.OnRegisterProvider, (b) =>
+            application.Make<IEventDispatcher>()
+                .AddListener<RegisterProviderEventArgs>((args) =>
             {
-                if (((StopProvider)b).stop)
+                if (((StopProvider)args.GetServiceProvider()).stop)
                 {
-                    return false;
+                    args.Skip();
                 }
-
-                return null;
             });
             application.Register(providerStopped);
             application.Register(providerNotStopped);
@@ -217,7 +216,8 @@ namespace CatLib.Tests
         {
             var application = Application.New();
             application.Register(new StopProvider());
-            application.On<IServiceProvider>(ApplicationEvents.OnProviderInit, (b) =>
+            application.Make<IEventDispatcher>()
+                .AddListener<InitProviderEventArgs>((args) =>
             {
                 application.Register(new TestServiceProvider());
             });
@@ -231,7 +231,8 @@ namespace CatLib.Tests
         {
             var application = Application.New();
             application.Register(new StopProvider());
-            application.On(ApplicationEvents.OnTerminate, () =>
+            application.Make<IEventDispatcher>()
+                .AddListener<BeforeTerminateEventArgs>((args) =>
             {
                 application.Register(new TestServiceProvider());
             });
@@ -249,12 +250,14 @@ namespace CatLib.Tests
             var app = new Application();
             var oldApp = App.Handler;
             var num = 0;
-            oldApp.On(ApplicationEvents.OnTerminate, () =>
+            oldApp.Make<IEventDispatcher>()
+                .AddListener<BeforeTerminateEventArgs>((args) =>
             {
                 Assert.AreEqual(0, num++);
             });
-            oldApp.On(ApplicationEvents.OnTerminated, () =>
-            {
+            oldApp.Make<IEventDispatcher>()
+                .AddListener<AfterTerminateEventArgs>((args) =>
+            { 
                 Assert.AreEqual(1, num++);
             });
             App.Terminate();
@@ -279,16 +282,6 @@ namespace CatLib.Tests
             var sortSet = app.Make<SortSet<string, string>>();
 
             Assert.AreNotEqual(null, sortSet);
-        }
-
-        [TestMethod]
-        public void TestOn()
-        {
-            var app = new Application();
-            ExceptionAssert.DoesNotThrow(() =>
-            {
-                app.On("hello", () => { });
-            });
         }
 
         /// <summary>
@@ -456,21 +449,6 @@ namespace CatLib.Tests
             {
                 app.Register(new ProviderTest1());
             });
-        }
-
-        [TestMethod]
-        public void TestOnDispatcher()
-        {
-            var app = MakeApplication();
-
-            app.Listen("testevent", (object payload) =>
-            {
-                Assert.AreEqual("abc", payload);
-                return 123;
-            });
-
-            var result = app.TriggerHalt("testevent", "abc");
-            Assert.AreEqual(123, result);
         }
 
         [TestMethod]
