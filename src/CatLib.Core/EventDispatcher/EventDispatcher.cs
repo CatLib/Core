@@ -35,18 +35,7 @@ namespace CatLib.EventDispatcher
             where T : EventArgs
         {
             Guard.Requires<ArgumentNullException>(listener != null);
-
-            var wrappedListener = new WrappedListener<T>(listener);
-            if (!listeners.TryGetValue(typeof(T), out SortSet<WrappedListener, int> set))
-            {
-                listeners[typeof(T)] = set = new SortSet<WrappedListener, int>();
-            }
-            else if (set.Contains(wrappedListener))
-            {
-                throw new RuntimeException($"Unable to add multiple times to the same listener: \"{listener}\"");
-            }
-
-            set.Add(wrappedListener, priority);
+            DoAddListener(typeof(T), new WrappedListener<T>(listener), priority);
         }
 
         /// <inheritdoc />
@@ -86,28 +75,48 @@ namespace CatLib.EventDispatcher
         public void RemoveListener<T>(Action<T> listener = null)
              where T : EventArgs
         {
-            if (listener == null)
+            DoRemoveListener(typeof(T), listener == null ?
+                null : new WrappedListener<T>(listener));
+        }
+
+        private void DoAddListener(Type eventType, WrappedListener wrappedListener, int priority)
+        {
+            if (!listeners.TryGetValue(eventType, out SortSet<WrappedListener, int> set))
             {
-                listeners.Remove(typeof(T));
+                listeners[eventType] = set = new SortSet<WrappedListener, int>();
+            }
+            else if (set.Contains(wrappedListener))
+            {
+                throw new RuntimeException($"Unable to add multiple times to the same listener: \"{wrappedListener}\"");
+            }
+
+            set.Add(wrappedListener, priority);
+        }
+
+        private void DoRemoveListener(Type eventType, WrappedListener wrappedListener)
+        {
+            if (wrappedListener == null)
+            {
+                listeners.Remove(eventType);
                 return;
             }
 
-            if (!listeners.TryGetValue(typeof(T), out SortSet<WrappedListener, int> set))
+            if (!listeners.TryGetValue(eventType, out SortSet<WrappedListener, int> set))
             {
                 return;
             }
 
-            set.Remove(new WrappedListener<T>(listener));
+            set.Remove(wrappedListener);
 
             if (set.Count <= 0)
             {
-                listeners.Remove(typeof(T));
+                listeners.Remove(eventType);
             }
         }
 
-        private void CallListener(Type type, EventArgs eventArgs)
+        private void CallListener(Type eventType, EventArgs eventArgs)
         {
-            if (!listeners.TryGetValue(type, out SortSet<WrappedListener, int> set))
+            if (!listeners.TryGetValue(eventType, out SortSet<WrappedListener, int> set))
             {
                 return;
             }
