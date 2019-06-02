@@ -56,12 +56,12 @@ namespace CatLib.EventDispatcher
         public IEnumerable<Action<T>> GetListeners<T>()
             where T : EventArgs
         {
-            if (!listeners.TryGetValue(typeof(T), out SortSet<WrappedListener, int> set))
+            if (!listeners.TryGetValue(typeof(T), out SortSet<WrappedListener, int> collection))
             {
                 return Array.Empty<Action<T>>();
             }
 
-            return Arr.Map(set.ToArray(), (wrappedListener) => ((WrappedListener<T>)wrappedListener).GetAction());
+            return Arr.Map(collection.ToArray(), (wrappedListener) => ((WrappedListener<T>)wrappedListener).GetAction());
         }
 
         /// <inheritdoc />
@@ -81,16 +81,16 @@ namespace CatLib.EventDispatcher
 
         private void DoAddListener(Type eventType, WrappedListener wrappedListener, int priority)
         {
-            if (!listeners.TryGetValue(eventType, out SortSet<WrappedListener, int> set))
+            if (!listeners.TryGetValue(eventType, out SortSet<WrappedListener, int> collection))
             {
-                listeners[eventType] = set = new SortSet<WrappedListener, int>();
+                listeners[eventType] = collection = new SortSet<WrappedListener, int>();
             }
-            else if (set.Contains(wrappedListener))
+            else if (collection.Contains(wrappedListener))
             {
                 throw new RuntimeException($"Unable to add multiple times to the same listener: \"{wrappedListener}\"");
             }
 
-            set.Add(wrappedListener, priority);
+            collection.Add(wrappedListener, priority);
         }
 
         private void DoRemoveListener(Type eventType, WrappedListener wrappedListener)
@@ -101,14 +101,14 @@ namespace CatLib.EventDispatcher
                 return;
             }
 
-            if (!listeners.TryGetValue(eventType, out SortSet<WrappedListener, int> set))
+            if (!listeners.TryGetValue(eventType, out SortSet<WrappedListener, int> collection))
             {
                 return;
             }
 
-            set.Remove(wrappedListener);
+            collection.Remove(wrappedListener);
 
-            if (set.Count <= 0)
+            if (collection.Count <= 0)
             {
                 listeners.Remove(eventType);
             }
@@ -116,12 +116,12 @@ namespace CatLib.EventDispatcher
 
         private void CallListener(Type eventType, EventArgs eventArgs)
         {
-            if (!listeners.TryGetValue(eventType, out SortSet<WrappedListener, int> set))
+            if (!listeners.TryGetValue(eventType, out SortSet<WrappedListener, int> collection))
             {
                 return;
             }
 
-            foreach (var listener in set)
+            foreach (var listener in collection)
             {
                 if (eventArgs is IStoppableEvent stoppableEvent
                     && stoppableEvent.IsPropagationStopped())
