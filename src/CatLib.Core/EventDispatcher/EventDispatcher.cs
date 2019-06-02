@@ -47,7 +47,7 @@ namespace CatLib.EventDispatcher
         }
 
         /// <inheritdoc />
-        public IEnumerable<Action<T>> GetListeners<T>()
+        public Action<T>[] GetListeners<T>()
             where T : EventArgs
         {
             if (!listeners.TryGetValue(typeof(T), out SortSet<WrappedListener, int> collection))

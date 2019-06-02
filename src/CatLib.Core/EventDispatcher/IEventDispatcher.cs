@@ -41,7 +41,7 @@ namespace CatLib.EventDispatcher
         /// </summary>
         /// <typeparam name="T">The specified events type.</typeparam>
         /// <returns>The event listeners for the specified event.</returns>
-        IEnumerable<Action<T>> GetListeners<T>()
+        Action<T>[] GetListeners<T>()
              where T : EventArgs;
 
         /// <summary>
