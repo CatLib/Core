@@ -55,7 +55,8 @@ namespace CatLib.EventDispatcher
                 return Array.Empty<Action<T>>();
             }
 
-            return Arr.Map(collection, (wrappedListener) => ((WrappedListener<T>)wrappedListener).GetAction());
+            return Arr.Map(collection, (wrappedListener) =>
+                ((WrappedListener<T>)wrappedListener).GetAction());
         }
 
         /// <inheritdoc />
