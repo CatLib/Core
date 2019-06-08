@@ -16,7 +16,7 @@ namespace CatLib
     /// <summary>
     /// <see cref="IApplication"/> is the interface implemented by all application classes.
     /// </summary>
-    public interface IApplication : IContainer, IDispatcher
+    public interface IApplication : IContainer
     {
         /// <summary>
         /// Gets a value indicating whether true if we're on the main thread.

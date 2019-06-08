@@ -9,6 +9,8 @@
  * Document: https://catlib.io/
  */
 
+using CatLib.EventDispatcher;
+using CatLib.Events;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -21,7 +23,7 @@ namespace CatLib
     /// <summary>
     /// The CatLib <see cref="Application"/> instance.
     /// </summary>
-    public class Application : Container, IApplication, IOriginalDispatcher
+    public class Application : Container, IApplication
     {
         /// <summary>
         /// The version of the framework application.
@@ -65,14 +67,10 @@ namespace CatLib
         private long incrementId;
 
         /// <summary>
-        /// The global event dispatcher.
-        /// </summary>
-        private IDispatcher dispatcher;
-
-        /// <summary>
         /// The debug level.
         /// </summary>
         private DebugLevel debugLevel;
+        private IEventDispatcher dispatcher;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Application"/> class.
@@ -81,8 +79,7 @@ namespace CatLib
         public Application(bool global = true)
         {
             mainThreadId = Thread.CurrentThread.ManagedThreadId;
-            RegisterCoreAlias();
-            RegisterCoreService();
+            RegisterBaseBindings();
 
             // We use closures to save the current context state
             // Do not change to: OnFindType(Type.GetType) This
@@ -175,9 +172,6 @@ namespace CatLib
         /// </summary>
         public StartProcess Process { get; private set; }
 
-        /// <inheritdoc cref="dispatcher"/>
-        public IDispatcher Dispatcher => dispatcher ?? (dispatcher = Resolve<IDispatcher>());
-
         /// <inheritdoc />
         public bool IsMainThread => mainThreadId == Thread.CurrentThread.ManagedThreadId;
 
@@ -199,11 +193,21 @@ namespace CatLib
             return new Application(global);
         }
 
+        /// <summary>
+        /// Sets the event dispatcher.
+        /// </summary>
+        /// <param name="dispatcher">The event dispatcher instance.</param>
+        public void SetDispatcher(IEventDispatcher dispatcher)
+        {
+            this.dispatcher = dispatcher;
+            this.Instance<IEventDispatcher>(dispatcher);
+        }
+
         /// <inheritdoc />
         public virtual void Terminate()
         {
             Process = StartProcess.Terminate;
-            Trigger(ApplicationEvents.OnTerminate, this);
+            Dispatch(new BeforeTerminateEventArgs(this));
             Process = StartProcess.Terminating;
             Flush();
             if (App.HasHandler && App.Handler == this)
@@ -212,7 +216,7 @@ namespace CatLib
             }
 
             Process = StartProcess.Terminated;
-            Trigger(ApplicationEvents.OnTerminated);
+            Dispatch(new AfterTerminateEventArgs(this));
         }
 
         /// <summary>
@@ -229,7 +233,8 @@ namespace CatLib
             }
 
             Process = StartProcess.Bootstrap;
-            Trigger(ApplicationEvents.OnBootstrap, this);
+            bootstraps = Dispatch(new BeforeBootEventArgs(bootstraps, this))
+                            .GetBootstraps();
             Process = StartProcess.Bootstrapping;
 
             var sorting = new SortedList<int, List<IBootstrap>>();
@@ -255,8 +260,14 @@ namespace CatLib
             {
                 foreach (var bootstrap in sorted.Value)
                 {
-                    var allow = TriggerHalt(ApplicationEvents.Bootstrapping, bootstrap) == null;
-                    if (bootstrap != null && allow)
+                    if (bootstrap == null)
+                    {
+                        continue;
+                    }
+
+                    var skipped = Dispatch(new BootingEventArgs(bootstrap, this))
+                                    .IsSkip;
+                    if (!skipped)
                     {
                         bootstrap.Bootstrap();
                     }
@@ -265,7 +276,7 @@ namespace CatLib
 
             Process = StartProcess.Bootstraped;
             bootstrapped = true;
-            Trigger(ApplicationEvents.OnBootstraped, this);
+            Dispatch(new AfterBootEventArgs(this));
         }
 
         /// <summary>
@@ -317,36 +328,6 @@ namespace CatLib
             return currentPriority;
         }
 
-        /// <inheritdoc />
-        public object[] Trigger(string eventName, params object[] payloads)
-        {
-            return Dispatcher.Trigger(eventName, payloads);
-        }
-
-        /// <inheritdoc />
-        public object TriggerHalt(string eventName, params object[] payloads)
-        {
-            return Dispatcher.TriggerHalt(eventName, payloads);
-        }
-
-        /// <inheritdoc />
-        public bool HasListeners(string eventName, bool strict = false)
-        {
-            return Dispatcher.HasListeners(eventName, strict);
-        }
-
-        /// <inheritdoc />
-        public IEvent On(string eventName, Func<string, object[], object> execution, object group = null)
-        {
-            return Dispatcher.On(eventName, execution, group);
-        }
-
-        /// <inheritdoc />
-        public void Off(object target)
-        {
-            Dispatcher.Off(target);
-        }
-
         /// <summary>
         /// Call the iterator with the default coroutine.
         /// </summary>
@@ -387,7 +368,7 @@ namespace CatLib
             }
 
             Process = StartProcess.Init;
-            Trigger(ApplicationEvents.OnInit, this);
+            Dispatch(new BeforeInitEventArgs(this));
             Process = StartProcess.Initing;
 
             foreach (var sorted in serviceProviders)
@@ -400,10 +381,10 @@ namespace CatLib
 
             inited = true;
             Process = StartProcess.Inited;
-            Trigger(ApplicationEvents.OnInited, this);
+            Dispatch(new AfterInitEventArgs(this));
 
             Process = StartProcess.Running;
-            Trigger(ApplicationEvents.OnStartCompleted, this);
+            Dispatch(new StartCompletedEventArgs(this));
         }
 
         /// <inheritdoc cref="IApplication.Register"/>
@@ -433,8 +414,9 @@ namespace CatLib
                 throw new CodeStandardException($"Unable to {nameof(Terminate)} in-process registration service provider");
             }
 
-            var allow = TriggerHalt(ApplicationEvents.OnRegisterProvider, provider) == null;
-            if (!allow)
+            var skipped = Dispatch(new RegisterProviderEventArgs(provider, this))
+                            .IsSkip;
+            if (skipped)
             {
                 yield break;
             }
@@ -486,15 +468,12 @@ namespace CatLib
         /// <returns>Indicate the initialization progress.</returns>
         protected virtual IEnumerator InitProvider(IServiceProvider provider)
         {
-            Trigger(ApplicationEvents.OnProviderInit, provider);
-
+            Dispatch(new InitProviderEventArgs(provider, this));
             provider.Init();
             if (provider is ICoroutineInit coroutine)
             {
                 yield return coroutine.CoroutineInit();
             }
-
-            Trigger(ApplicationEvents.OnProviderInited, provider);
         }
 
         /// <inheritdoc />
@@ -506,28 +485,7 @@ namespace CatLib
                     $"It is not allowed to make services or dependency injection in the {nameof(Register)} process, method:{method}");
             }
 
-            // todo: rebuild event system.
-#pragma warning disable S125 // Sections of code should not be commented out
-            /*
-            if (Process < StartProcess.Bootstraped)
-            {
-                throw new CodeStandardException(
-                    $"It is not allowed to make services or dependency injection before {nameof(Bootstrap)} process, method:{method}");
-            }*/
-
             base.GuardConstruct(method);
-#pragma warning restore S125 // Sections of code should not be commented out
-        }
-
-        /// <summary>
-        /// Resolve the given type from the container.(Will not perform <see cref="GuardConstruct"/> check).
-        /// </summary>
-        /// <typeparam name="TService">The service type(name).</typeparam>
-        /// <returns>The resolved service instance.</returns>
-        protected TService Resolve<TService>()
-        {
-            // todo: rebuild event system.
-            return (TService)Resolve(Type2Service(typeof(TService)));
         }
 
         /// <summary>
@@ -537,28 +495,22 @@ namespace CatLib
         /// <returns>Base type for service provider.</returns>
         private static Type GetProviderBaseType(IServiceProvider provider)
         {
-            var providerType = provider as IServiceProviderType;
-            return providerType == null ? provider.GetType() : providerType.BaseType;
+            return !(provider is IServiceProviderType providerType) ? provider.GetType() : providerType.BaseType;
         }
 
         /// <summary>
         /// Register the core service aliases.
         /// </summary>
-        private void RegisterCoreAlias()
+        private void RegisterBaseBindings()
         {
-            this.Singleton<IApplication>(() => this)
-                .Alias<Application>()
-                .Alias<IContainer>();
+            this.Singleton<IApplication>(() => this).Alias<Application>().Alias<IContainer>();
+            SetDispatcher(new EventDispatcher.EventDispatcher());
         }
 
-        /// <summary>
-        /// Register the core services.
-        /// </summary>
-        private void RegisterCoreService()
+        private T Dispatch<T>(T eventArgs)
+            where T : EventArgs
         {
-            var bindable = new BindData(this, null, null, false);
-            this.Singleton<IDispatcher>(() => new GlobalDispatcher(
-                (paramInfos, userParams) => GetDependencies(bindable, paramInfos, userParams)));
+            return dispatcher?.Dispatch(eventArgs) ?? eventArgs;
         }
     }
 }
