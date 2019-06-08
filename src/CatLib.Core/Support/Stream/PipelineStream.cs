@@ -22,6 +22,8 @@ namespace CatLib
     public class PipelineStream : WrapperStream
 #pragma warning restore S3881
     {
+        private readonly object locker;
+
         /// <summary>
         /// The stream capacity.
         /// </summary>
@@ -35,7 +37,7 @@ namespace CatLib
         /// <summary>
         /// The <see cref="RingBuffer"/> instance.
         /// </summary>
-        private readonly RingBuffer ringBuffer;
+        private readonly RingBufferStream ringBuffer;
 
         /// <summary>
         /// The count can be read.
@@ -71,7 +73,8 @@ namespace CatLib
         {
             this.capacity = capacity.ToPrime();
             this.sleep = Math.Max(0, sleep);
-            ringBuffer = new RingBuffer(this.capacity, false);
+            ringBuffer = new RingBufferStream(this.capacity, false);
+            locker = new object();
         }
 
         /// <summary>
@@ -139,7 +142,7 @@ namespace CatLib
 
                 AssertDisabled();
 
-                lock (ringBuffer.SyncRoot)
+                lock (locker)
                 {
                     AssertDisabled();
                     if (this.count <= 0)
@@ -186,7 +189,7 @@ namespace CatLib
                 AssertDisabled();
                 AssertClosed();
 
-                lock (ringBuffer.SyncRoot)
+                lock (locker)
                 {
                     AssertDisabled();
                     AssertClosed();
@@ -196,7 +199,7 @@ namespace CatLib
                         continue;
                     }
 
-                    Guard.Requires<AssertException>(ringBuffer.Write(buffer, offset, count) == count);
+                    ringBuffer.Write(buffer, offset, count);
                     this.count += count;
                     return;
                 }
@@ -211,7 +214,7 @@ namespace CatLib
                 return;
             }
 
-            lock (ringBuffer.SyncRoot)
+            lock (locker)
             {
                 closed = true;
             }
@@ -247,7 +250,7 @@ namespace CatLib
                 return;
             }
 
-            lock (ringBuffer.SyncRoot)
+            lock (locker)
             {
                 if (disabled)
                 {
