@@ -12,7 +12,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace CatLib
+namespace CatLib.Support
 {
     /// <summary>
     /// Guard the code.

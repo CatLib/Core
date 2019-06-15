@@ -11,7 +11,7 @@
 
 using CatLib.EventDispatcher;
 
-namespace CatLib.Events
+namespace CatLib
 {
     /// <summary>
     /// Indicates a boot class that is booting.

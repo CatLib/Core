@@ -13,8 +13,9 @@ using System;
 using System.Collections;
 using System.Diagnostics;
 using System.Reflection;
+using CatLib.Container;
 using CatLib.EventDispatcher;
-using CatLib.Events;
+using CatLib.Support;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 #pragma warning disable CA1034

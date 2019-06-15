@@ -11,7 +11,7 @@
 
 #pragma warning disable CA1034
 
-using System;
+using CatLib.Container;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace CatLib.Tests

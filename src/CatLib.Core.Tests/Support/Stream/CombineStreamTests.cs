@@ -15,7 +15,7 @@ using System.IO;
 
 #pragma warning disable CA1034
 
-namespace CatLib
+namespace CatLib.Support.Tests
 {
     [TestClass]
     public class CombineStreamTests

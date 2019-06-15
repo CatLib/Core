@@ -9,6 +9,7 @@
  * Document: https://catlib.io/
  */
 
+using CatLib.Container;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;

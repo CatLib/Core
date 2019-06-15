@@ -14,7 +14,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 
-namespace CatLib
+namespace CatLib.Support
 {
     /// <summary>
     /// Represents an ordered set, implemented by a jump list.

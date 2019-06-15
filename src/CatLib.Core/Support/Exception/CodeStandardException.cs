@@ -12,7 +12,7 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
 
-namespace CatLib
+namespace CatLib.Support
 {
     /// <summary>
     /// Represents a code specification exception that raises this exception due to incorrect use of the framework.

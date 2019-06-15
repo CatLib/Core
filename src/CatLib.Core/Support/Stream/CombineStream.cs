@@ -12,7 +12,7 @@
 using System;
 using System.IO;
 
-namespace CatLib
+namespace CatLib.Support
 {
     /// <summary>
     /// <see cref="CombineStream"/> allow multiple different streams to be combined into one stream.

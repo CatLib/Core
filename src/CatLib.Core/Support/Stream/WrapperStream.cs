@@ -13,7 +13,7 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 
-namespace CatLib
+namespace CatLib.Support
 {
     /// <summary>
     /// The wrapper stream.

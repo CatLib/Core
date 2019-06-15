@@ -13,7 +13,7 @@ using System;
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace CatLib
+namespace CatLib.Support
 {
     /// <summary>
     /// String helper.

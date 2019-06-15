@@ -9,15 +9,15 @@
  * Document: https://catlib.io/
  */
 
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.IO;
 using System.Text;
 using System.Threading;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 #pragma warning disable CA1720
 
-namespace CatLib.Core.Tests.Support.Stream
+namespace CatLib.Support.Tests
 {
     [TestClass]
     public class PipelineStreamTests

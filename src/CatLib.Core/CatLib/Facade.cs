@@ -14,6 +14,8 @@
 #pragma warning disable S2743
 #pragma warning disable S1118
 
+using CatLib.Container;
+
 namespace CatLib
 {
     /// <summary>
