@@ -249,7 +249,7 @@ namespace CatLib.Tests
         public void TestTerminate()
         {
             var app = new Application();
-            var oldApp = App.Handler;
+            var oldApp = App.That;
             var num = 0;
             oldApp.Make<IEventDispatcher>()
                 .AddListener<BeforeTerminateEventArgs>((args) =>
@@ -262,7 +262,7 @@ namespace CatLib.Tests
                 Assert.AreEqual(1, num++);
             });
             App.Terminate();
-            Assert.AreEqual(null, App.Handler);
+            Assert.AreEqual(null, App.That);
             Assert.AreEqual(2, num);
         }
 

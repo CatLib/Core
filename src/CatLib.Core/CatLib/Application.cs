@@ -93,7 +93,7 @@ namespace CatLib
 
             if (global)
             {
-                App.Handler = this;
+                App.That = this;
             }
         }
 
@@ -212,9 +212,9 @@ namespace CatLib
             Dispatch(new BeforeTerminateEventArgs(this));
             Process = StartProcess.Terminating;
             Flush();
-            if (App.HasHandler && App.Handler == this)
+            if (App.That == this)
             {
-                App.Handler = null;
+                App.That = null;
             }
 
             Process = StartProcess.Terminated;

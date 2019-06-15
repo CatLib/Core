@@ -168,7 +168,7 @@ namespace CatLib.Container.Tests
             var bind1 = App.BindMethod("Helloworld.Func1", cls);
             var bind2 = App.BindMethod("Helloworld.Func2", cls);
 
-            App.Handler.Flush();
+            App.That.Flush();
 
             ExceptionAssert.Throws<RuntimeException>(() =>
             {
