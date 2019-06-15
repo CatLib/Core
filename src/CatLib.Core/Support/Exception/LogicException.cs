@@ -12,7 +12,7 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
 
-namespace CatLib
+namespace CatLib.Support
 {
     /// <summary>
     /// Represents a logical exception encountered during execution.

@@ -9,21 +9,23 @@
  * Document: https://catlib.io/
  */
 
+using CatLib.Container;
 using CatLib.EventDispatcher;
-using CatLib.Events;
+using CatLib.Support;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Reflection;
 using System.Threading;
-using IEnumerator = System.Collections.IEnumerator;
+using CatLibContainer = CatLib.Container.Container;
 
 namespace CatLib
 {
     /// <summary>
     /// The CatLib <see cref="Application"/> instance.
     /// </summary>
-    public class Application : Container, IApplication
+    public class Application : CatLibContainer, IApplication
     {
         /// <summary>
         /// The version of the framework application.

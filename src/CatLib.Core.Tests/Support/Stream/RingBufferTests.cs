@@ -9,10 +9,11 @@
  * Document: https://catlib.io/
  */
 
+using CatLib.Tests;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 
-namespace CatLib.Tests.Support.Stream
+namespace CatLib.Support.Tests
 {
     [TestClass]
     public class RingBufferTests

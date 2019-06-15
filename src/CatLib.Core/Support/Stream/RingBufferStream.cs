@@ -12,7 +12,7 @@
 using System;
 using System.IO;
 
-namespace CatLib
+namespace CatLib.Support
 {
     /// <summary>
     /// Represents a ring buffer.

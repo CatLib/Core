@@ -11,7 +11,7 @@
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace CatLib.Core.Tests
+namespace CatLib.Tests
 {
     [TestClass]
     public class TypeExtendTests

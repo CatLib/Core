@@ -11,7 +11,7 @@
 
 using System;
 
-namespace CatLib
+namespace CatLib.Support
 {
     /// <summary>
     /// 通用支持.

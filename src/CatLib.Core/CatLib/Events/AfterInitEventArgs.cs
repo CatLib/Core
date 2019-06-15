@@ -9,7 +9,7 @@
  * Document: https://catlib.io/
  */
 
-namespace CatLib.Events
+namespace CatLib
 {
     /// <summary>
     /// Indicates that all the <see cref="IServiceProvider.Init"/> has been called.

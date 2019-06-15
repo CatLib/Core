@@ -13,7 +13,7 @@ using System;
 using System.IO;
 using System.Threading;
 
-namespace CatLib
+namespace CatLib.Support
 {
     /// <summary>
     /// The pipeline stream.
