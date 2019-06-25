@@ -19,17 +19,11 @@ namespace CatLib
     /// for all concrete ServiceProvider classes.
     /// </summary>
     [ExcludeFromCodeCoverage]
-    public abstract class ServiceProvider : IServiceProvider, ICoroutineInit
+    public abstract class ServiceProvider : IServiceProvider
     {
         /// <inheritdoc />
         public virtual void Init()
         {
-        }
-
-        /// <inheritdoc />
-        public virtual IEnumerator CoroutineInit()
-        {
-            yield break;
         }
 
         /// <inheritdoc />

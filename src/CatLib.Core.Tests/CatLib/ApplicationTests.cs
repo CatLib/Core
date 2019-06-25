@@ -69,37 +69,12 @@ namespace CatLib.Tests
             }
         }
 
-        public class TestYieldProvider : ServiceProvider
-        {
-            public bool IsDone;
-
-            public override IEnumerator CoroutineInit()
-            {
-                IsDone = true;
-                yield return 1;
-                yield return 2;
-                yield return base.CoroutineInit();
-            }
-        }
-
         [TestMethod]
         public void TestGetFileVersion()
         {
             Assert.AreEqual(
                 FileVersionInfo.GetVersionInfo(Assembly.GetExecutingAssembly().Location).FileVersion,
                 Application.Version);
-        }
-
-        [TestMethod]
-        public void TestYieldProviderTest()
-        {
-            var app = new Application();
-            app.Bootstrap();
-            var test = new TestYieldProvider();
-            app.Register(test);
-            app.Init();
-
-            Assert.AreEqual(true, test.IsDone);
         }
 
         [TestMethod]

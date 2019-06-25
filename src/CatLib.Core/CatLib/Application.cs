@@ -286,13 +286,85 @@ namespace CatLib
         /// </summary>
         public virtual void Init()
         {
-            StartCoroutine(CoroutineInit());
+            if (!bootstrapped)
+            {
+                throw new CodeStandardException($"You must call {nameof(Bootstrap)}() first.");
+            }
+
+            if (inited || Process != StartProcess.Bootstraped)
+            {
+                throw new CodeStandardException($"Cannot repeatedly trigger the {nameof(Init)}()");
+            }
+
+            Process = StartProcess.Init;
+            Dispatch(new BeforeInitEventArgs(this));
+            Process = StartProcess.Initing;
+
+            foreach (var sorted in serviceProviders)
+            {
+                foreach (var provider in sorted.Value)
+                {
+                    InitProvider(provider);
+                }
+            }
+
+            inited = true;
+            Process = StartProcess.Inited;
+            Dispatch(new AfterInitEventArgs(this));
+
+            Process = StartProcess.Running;
+            Dispatch(new StartCompletedEventArgs(this));
         }
 
         /// <inheritdoc />
         public virtual void Register(IServiceProvider provider, bool force = false)
         {
-            StartCoroutine(CoroutineRegister(provider, force));
+            Guard.Requires<ArgumentNullException>(provider != null);
+
+            if (IsRegistered(provider))
+            {
+                if (!force)
+                {
+                    throw new LogicException($"Provider [{provider.GetType()}] is already register.");
+                }
+
+                loadedProviders.Remove(GetProviderBaseType(provider));
+            }
+
+            if (Process == StartProcess.Initing)
+            {
+                throw new CodeStandardException($"Unable to add service provider during {nameof(StartProcess.Initing)}");
+            }
+
+            if (Process > StartProcess.Running)
+            {
+                throw new CodeStandardException($"Unable to {nameof(Terminate)} in-process registration service provider");
+            }
+
+            var skipped = Dispatch(new RegisterProviderEventArgs(provider, this))
+                            .IsSkip;
+            if (skipped)
+            {
+                return;
+            }
+
+            try
+            {
+                registering = true;
+                provider.Register();
+            }
+            finally
+            {
+                registering = false;
+            }
+
+            AddSortedList(serviceProviders, provider, nameof(IServiceProvider.Init));
+            loadedProviders.Add(GetProviderBaseType(provider));
+
+            if (inited)
+            {
+                InitProvider(provider);
+            }
         }
 
         /// <inheritdoc />
@@ -355,93 +427,6 @@ namespace CatLib
             while (stack.Count > 0);
         }
 
-        /// <inheritdoc cref="Init"/>
-        /// <returns>Indicate the initialization progress.</returns>
-        protected IEnumerator CoroutineInit()
-        {
-            if (!bootstrapped)
-            {
-                throw new CodeStandardException($"You must call {nameof(Bootstrap)}() first.");
-            }
-
-            if (inited || Process != StartProcess.Bootstraped)
-            {
-                throw new CodeStandardException($"Cannot repeatedly trigger the {nameof(Init)}()");
-            }
-
-            Process = StartProcess.Init;
-            Dispatch(new BeforeInitEventArgs(this));
-            Process = StartProcess.Initing;
-
-            foreach (var sorted in serviceProviders)
-            {
-                foreach (var provider in sorted.Value)
-                {
-                    yield return InitProvider(provider);
-                }
-            }
-
-            inited = true;
-            Process = StartProcess.Inited;
-            Dispatch(new AfterInitEventArgs(this));
-
-            Process = StartProcess.Running;
-            Dispatch(new StartCompletedEventArgs(this));
-        }
-
-        /// <inheritdoc cref="IApplication.Register"/>
-        /// <returns>Indicates the initialization progress if the
-        /// application has initialized, otherwise it makes no sense.</returns>
-        protected IEnumerator CoroutineRegister(IServiceProvider provider, bool force = false)
-        {
-            Guard.Requires<ArgumentNullException>(provider != null);
-
-            if (IsRegistered(provider))
-            {
-                if (!force)
-                {
-                    throw new LogicException($"Provider [{provider.GetType()}] is already register.");
-                }
-
-                loadedProviders.Remove(GetProviderBaseType(provider));
-            }
-
-            if (Process == StartProcess.Initing)
-            {
-                throw new CodeStandardException($"Unable to add service provider during {nameof(StartProcess.Initing)}");
-            }
-
-            if (Process > StartProcess.Running)
-            {
-                throw new CodeStandardException($"Unable to {nameof(Terminate)} in-process registration service provider");
-            }
-
-            var skipped = Dispatch(new RegisterProviderEventArgs(provider, this))
-                            .IsSkip;
-            if (skipped)
-            {
-                yield break;
-            }
-
-            try
-            {
-                registering = true;
-                provider.Register();
-            }
-            finally
-            {
-                registering = false;
-            }
-
-            AddSortedList(serviceProviders, provider, nameof(IServiceProvider.Init));
-            loadedProviders.Add(GetProviderBaseType(provider));
-
-            if (inited)
-            {
-                yield return InitProvider(provider);
-            }
-        }
-
         /// <summary>
         /// Add the specified element to the sorted list.
         /// </summary>
@@ -467,15 +452,10 @@ namespace CatLib
         /// Initialize the specified service provider.
         /// </summary>
         /// <param name="provider">The specified service provider.</param>
-        /// <returns>Indicate the initialization progress.</returns>
-        protected virtual IEnumerator InitProvider(IServiceProvider provider)
+        protected virtual void InitProvider(IServiceProvider provider)
         {
             Dispatch(new InitProviderEventArgs(provider, this));
             provider.Init();
-            if (provider is ICoroutineInit coroutine)
-            {
-                yield return coroutine.CoroutineInit();
-            }
         }
 
         /// <inheritdoc />
