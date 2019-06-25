@@ -35,13 +35,12 @@ namespace CatLib
         /// <summary>
         /// All of the registered service providers.
         /// </summary>
-        private readonly SortedList<int, List<IServiceProvider>> serviceProviders
-            = new SortedList<int, List<IServiceProvider>>();
+        private readonly List<IServiceProvider> serviceProviders;
 
         /// <summary>
         /// The types of the loaded service providers.
         /// </summary>
-        private readonly HashSet<Type> loadedProviders = new HashSet<Type>();
+        private readonly HashSet<Type> loadedProviders;
 
         /// <summary>
         /// The main thread id.
@@ -80,6 +79,9 @@ namespace CatLib
         /// <param name="global">True if sets the instance to <see cref="App"/> facade.</param>
         public Application(bool global = true)
         {
+            serviceProviders = new List<IServiceProvider>();
+            loadedProviders = new HashSet<Type>();
+
             mainThreadId = Thread.CurrentThread.ManagedThreadId;
             RegisterBaseBindings();
 
@@ -239,7 +241,6 @@ namespace CatLib
                             .GetBootstraps();
             Process = StartProcess.Bootstrapping;
 
-            var sorting = new SortedList<int, List<IBootstrap>>();
             var existed = new HashSet<IBootstrap>();
 
             foreach (var bootstrap in bootstraps)
@@ -255,24 +256,12 @@ namespace CatLib
                 }
 
                 existed.Add(bootstrap);
-                AddSortedList(sorting, bootstrap, nameof(IBootstrap.Bootstrap));
-            }
 
-            foreach (var sorted in sorting)
-            {
-                foreach (var bootstrap in sorted.Value)
+                var skipped = Dispatch(new BootingEventArgs(bootstrap, this))
+                                .IsSkip;
+                if (!skipped)
                 {
-                    if (bootstrap == null)
-                    {
-                        continue;
-                    }
-
-                    var skipped = Dispatch(new BootingEventArgs(bootstrap, this))
-                                    .IsSkip;
-                    if (!skipped)
-                    {
-                        bootstrap.Bootstrap();
-                    }
+                    bootstrap.Bootstrap();
                 }
             }
 
@@ -300,12 +289,9 @@ namespace CatLib
             Dispatch(new BeforeInitEventArgs(this));
             Process = StartProcess.Initing;
 
-            foreach (var sorted in serviceProviders)
+            foreach (var provider in serviceProviders)
             {
-                foreach (var provider in sorted.Value)
-                {
-                    InitProvider(provider);
-                }
+                InitProvider(provider);
             }
 
             inited = true;
@@ -358,7 +344,7 @@ namespace CatLib
                 registering = false;
             }
 
-            AddSortedList(serviceProviders, provider, nameof(IServiceProvider.Init));
+            serviceProviders.Add(provider);
             loadedProviders.Add(GetProviderBaseType(provider));
 
             if (inited)
@@ -378,28 +364,6 @@ namespace CatLib
         public long GetRuntimeId()
         {
             return Interlocked.Increment(ref incrementId);
-        }
-
-        /// <inheritdoc />
-        public int GetPriority(Type type, string method = null)
-        {
-            Guard.Requires<ArgumentNullException>(type != null);
-            var priority = typeof(PriorityAttribute);
-            var currentPriority = int.MaxValue;
-
-            MethodInfo methodInfo;
-            if (method != null &&
-                (methodInfo = type.GetMethod(method)) != null &&
-                methodInfo.IsDefined(priority, false))
-            {
-                currentPriority = ((PriorityAttribute)methodInfo.GetCustomAttributes(priority, false)[0]).Priorities;
-            }
-            else if (type.IsDefined(priority, false))
-            {
-                currentPriority = ((PriorityAttribute)type.GetCustomAttributes(priority, false)[0]).Priorities;
-            }
-
-            return currentPriority;
         }
 
         /// <summary>
@@ -425,27 +389,6 @@ namespace CatLib
                 }
             }
             while (stack.Count > 0);
-        }
-
-        /// <summary>
-        /// Add the specified element to the sorted list.
-        /// </summary>
-        /// <typeparam name="T">The type of the element.</typeparam>
-        /// <param name="list">The sorted list.</param>
-        /// <param name="insert">The specified element.</param>
-        /// <param name="priorityMethod">Specify a method name, the priority will
-        /// be obtained from this method.</param>
-        protected void AddSortedList<T>(IDictionary<int, List<T>> list, T insert, string priorityMethod)
-        {
-            var priority = GetPriority(insert.GetType(), priorityMethod);
-
-            if (!list.TryGetValue(priority, out List<T> providers))
-            {
-                providers = new List<T>();
-                list.Add(priority, providers);
-            }
-
-            providers.Add(insert);
         }
 
         /// <summary>
