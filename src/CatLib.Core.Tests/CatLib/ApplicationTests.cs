@@ -43,16 +43,8 @@ namespace CatLib.Tests
             }
         }
 
-        public class TestServiceProvider : IServiceProvider, IServiceProviderType
+        public class TestServiceProvider : IServiceProvider
         {
-            /// <summary>
-            /// 提供者基础类型.
-            /// </summary>
-            public Type BaseType
-            {
-                get { return typeof(TestBaseServiceProvider); }
-            }
-
             /// <summary>
             /// 服务提供者初始化.
             /// </summary>
@@ -84,27 +76,6 @@ namespace CatLib.Tests
             var app = MakeApplication();
 
             app.Init();
-        }
-
-        [TestMethod]
-        public void TestBaseTypeProvider()
-        {
-            var app = new Application();
-            app.Bootstrap();
-            app.Register(new TestServiceProvider());
-
-            RuntimeException ex = null;
-            try
-            {
-                app.Init();
-            }
-            catch (RuntimeException e)
-            {
-                ex = e;
-            }
-
-            Assert.AreNotEqual(null, ex);
-            Assert.AreEqual("TestServiceProvider", ex.Message);
         }
 
         /// <summary>
@@ -311,11 +282,12 @@ namespace CatLib.Tests
         public void RepeatRegister()
         {
             var app = MakeApplication();
-            app.Register(new ProviderTest1());
+            var provider = new ProviderTest1();
+            app.Register(provider);
 
             ExceptionAssert.Throws<RuntimeException>(() =>
             {
-                app.Register(new ProviderTest1());
+                app.Register(provider);
             });
         }
 
@@ -399,11 +371,12 @@ namespace CatLib.Tests
             });
 
             app.Bootstrap();
-            app.Register(new ProviderTest1());
+            var provider = new ProviderTest1();
+            app.Register(provider);
 
             ExceptionAssert.Throws<RuntimeException>(() =>
             {
-                app.Register(new ProviderTest1());
+                app.Register(provider);
             });
         }
 

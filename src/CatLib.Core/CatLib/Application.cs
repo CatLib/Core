@@ -33,14 +33,9 @@ namespace CatLib
         private static string version;
 
         /// <summary>
-        /// All of the registered service providers.
-        /// </summary>
-        private readonly List<IServiceProvider> serviceProviders;
-
-        /// <summary>
         /// The types of the loaded service providers.
         /// </summary>
-        private readonly HashSet<Type> loadedProviders;
+        private readonly List<IServiceProvider> loadedProviders;
 
         /// <summary>
         /// The main thread id.
@@ -79,8 +74,7 @@ namespace CatLib
         /// <param name="global">True if sets the instance to <see cref="App"/> facade.</param>
         public Application(bool global = true)
         {
-            serviceProviders = new List<IServiceProvider>();
-            loadedProviders = new HashSet<Type>();
+            loadedProviders = new List<IServiceProvider>();
 
             mainThreadId = Thread.CurrentThread.ManagedThreadId;
             RegisterBaseBindings();
@@ -289,7 +283,7 @@ namespace CatLib
             Dispatch(new BeforeInitEventArgs(this));
             Process = StartProcess.Initing;
 
-            foreach (var provider in serviceProviders)
+            foreach (var provider in loadedProviders)
             {
                 InitProvider(provider);
             }
@@ -314,7 +308,7 @@ namespace CatLib
                     throw new LogicException($"Provider [{provider.GetType()}] is already register.");
                 }
 
-                loadedProviders.Remove(GetProviderBaseType(provider));
+                loadedProviders.Remove(provider);
             }
 
             if (Process == StartProcess.Initing)
@@ -344,8 +338,7 @@ namespace CatLib
                 registering = false;
             }
 
-            serviceProviders.Add(provider);
-            loadedProviders.Add(GetProviderBaseType(provider));
+            loadedProviders.Add(provider);
 
             if (inited)
             {
@@ -357,7 +350,7 @@ namespace CatLib
         public bool IsRegistered(IServiceProvider provider)
         {
             Guard.Requires<ArgumentNullException>(provider != null);
-            return loadedProviders.Contains(GetProviderBaseType(provider));
+            return loadedProviders.Contains(provider);
         }
 
         /// <inheritdoc />
@@ -411,16 +404,6 @@ namespace CatLib
             }
 
             base.GuardConstruct(method);
-        }
-
-        /// <summary>
-        /// Get the base type from service provider.
-        /// </summary>
-        /// <param name="provider">The service provider.</param>
-        /// <returns>Base type for service provider.</returns>
-        private static Type GetProviderBaseType(IServiceProvider provider)
-        {
-            return !(provider is IServiceProviderType providerType) ? provider.GetType() : providerType.BaseType;
         }
 
         /// <summary>
