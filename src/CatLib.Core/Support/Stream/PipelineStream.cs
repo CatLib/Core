@@ -19,7 +19,7 @@ namespace CatLib.Support
     /// The pipeline stream.
     /// </summary>
 #pragma warning disable S3881
-    public class PipelineStream : WrapperStream
+    public class PipelineStream : Stream
 #pragma warning restore S3881
     {
         private readonly object locker;

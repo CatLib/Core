@@ -17,7 +17,7 @@ namespace CatLib.Support
     /// <summary>
     /// <see cref="CombineStream"/> allow multiple different streams to be combined into one stream.
     /// </summary>
-    public class CombineStream : WrapperStream
+    public class CombineStream : Stream
     {
         /// <summary>
         /// An array of multiple streams.
