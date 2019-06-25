@@ -12,6 +12,7 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.IO;
+using System.Text;
 
 #pragma warning disable CA1034
 
@@ -20,6 +21,8 @@ namespace CatLib.Support.Tests
     [TestClass]
     public class CombineStreamTests
     {
+        public Encoding Encoding => Encoding.Default;
+
         [TestMethod]
         public void TestCombineStream()
         {
@@ -39,9 +42,9 @@ namespace CatLib.Support.Tests
 
             var buffer = new byte[5];
             Assert.AreEqual(5, stream.Read(buffer, 0, 5));
-            Assert.AreEqual("hello", Str.Encoding.GetString(buffer));
+            Assert.AreEqual("hello", Encoding.GetString(buffer));
             Assert.AreEqual(5, stream.Read(buffer, 0, 5));
-            Assert.AreEqual("world", Str.Encoding.GetString(buffer));
+            Assert.AreEqual("world", Encoding.GetString(buffer));
         }
 
         [TestMethod]
@@ -53,20 +56,20 @@ namespace CatLib.Support.Tests
 
             var buffer = new byte[5];
             Assert.AreEqual(5, stream.Read(buffer, 0, 5));
-            Assert.AreEqual("hello", Str.Encoding.GetString(buffer));
+            Assert.AreEqual("hello", Encoding.GetString(buffer));
             Assert.AreEqual(5, stream.Read(buffer, 0, 5));
-            Assert.AreEqual("world", Str.Encoding.GetString(buffer));
+            Assert.AreEqual("world", Encoding.GetString(buffer));
 
             stream.Seek(5, SeekOrigin.Begin);
             Assert.AreEqual(5, stream.Read(buffer, 0, 5));
-            Assert.AreEqual("world", Str.Encoding.GetString(buffer));
+            Assert.AreEqual("world", Encoding.GetString(buffer));
 
             stream.Seek(4, SeekOrigin.Begin);
             Assert.AreEqual(5, stream.Read(buffer, 0, 5));
-            Assert.AreEqual("oworl", Str.Encoding.GetString(buffer));
+            Assert.AreEqual("oworl", Encoding.GetString(buffer));
             stream.Seek(6, SeekOrigin.Begin);
             Assert.AreEqual(4, stream.Read(buffer, 0, 5));
-            Assert.AreEqual("orld", Str.Encoding.GetString(buffer, 0, 4));
+            Assert.AreEqual("orld", Encoding.GetString(buffer, 0, 4));
             stream.Seek(10, SeekOrigin.Begin);
             Assert.AreEqual(0, stream.Read(buffer, 0, 5));
             Assert.AreEqual(0, stream.Read(buffer, 0, 5));
@@ -81,13 +84,13 @@ namespace CatLib.Support.Tests
 
             var buffer = new byte[5];
             Assert.AreEqual(5, stream.Read(buffer, 0, 5));
-            Assert.AreEqual("hello", Str.Encoding.GetString(buffer));
+            Assert.AreEqual("hello", Encoding.GetString(buffer));
             stream.Seek(2, SeekOrigin.Current);
             Assert.AreEqual(3, stream.Read(buffer, 0, 5));
-            Assert.AreEqual("rld", Str.Encoding.GetString(buffer, 0, 3));
+            Assert.AreEqual("rld", Encoding.GetString(buffer, 0, 3));
             stream.Seek(-3, SeekOrigin.End);
             Assert.AreEqual(3, stream.Read(buffer, 0, 5));
-            Assert.AreEqual("rld", Str.Encoding.GetString(buffer, 0, 3));
+            Assert.AreEqual("rld", Encoding.GetString(buffer, 0, 3));
         }
 
         [TestMethod]
@@ -99,12 +102,12 @@ namespace CatLib.Support.Tests
 
             var buffer = new byte[5];
             Assert.AreEqual(5, stream.Read(buffer, 0, 5));
-            Assert.AreEqual("hello", Str.Encoding.GetString(buffer));
+            Assert.AreEqual("hello", Encoding.GetString(buffer));
 
             Assert.AreEqual(5, stream.Position);
             stream.Position = 0;
             Assert.AreEqual(5, stream.Read(buffer, 0, 5));
-            Assert.AreEqual("hello", Str.Encoding.GetString(buffer));
+            Assert.AreEqual("hello", Encoding.GetString(buffer));
         }
 
         [TestMethod]
