@@ -333,7 +333,6 @@ namespace CatLib.Tests
 
         private class ProviderTest1 : IServiceProvider
         {
-            [Priority(10)]
             public void Init()
             {
                 prioritiesTest = true;
@@ -344,7 +343,6 @@ namespace CatLib.Tests
             }
         }
 
-        [Priority(5)]
         private class ProviderTest2 : IServiceProvider
         {
             public void Init()
@@ -355,24 +353,6 @@ namespace CatLib.Tests
             public void Register()
             {
             }
-        }
-
-        /// <summary>
-        /// 优先级测试.
-        /// </summary>
-        [TestMethod]
-        public void ProvidersPrioritiesTest()
-        {
-            var app = new Application();
-            app.OnFindType((t) =>
-            {
-                return Type.GetType(t);
-            });
-            app.Bootstrap();
-            App.Register(new ProviderTest1());
-            App.Register(new ProviderTest2());
-            app.Init();
-            Assert.AreEqual(true, prioritiesTest);
         }
 
         /// <summary>
@@ -506,7 +486,6 @@ namespace CatLib.Tests
             }
         }
 
-        [Priority(0)]
         public class OrderFirstClass : IBootstrap, IServiceProvider
         {
             public void Bootstrap()
@@ -535,7 +514,7 @@ namespace CatLib.Tests
         {
             assertValue = 0;
             var app = new Application();
-            app.Bootstrap(new OrderAssertClass(0), new OrderFirstClass(), new OrderAssertClass(1));
+            app.Bootstrap(new OrderFirstClass(), new OrderAssertClass(0), new OrderAssertClass(1));
             Assert.AreEqual(2, assertValue);
         }
 
@@ -545,8 +524,8 @@ namespace CatLib.Tests
             assertValue = 0;
             var app = new Application();
             app.Bootstrap();
-            app.Register(new OrderAssertClass(0));
             app.Register(new OrderFirstClass());
+            app.Register(new OrderAssertClass(0));
             app.Register(new OrderAssertClassSub(1));
             app.Init();
             Assert.AreEqual(2, assertValue);

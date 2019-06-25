@@ -10,7 +10,6 @@
  */
 
 using CatLib.Container;
-using System;
 
 namespace CatLib
 {
@@ -48,15 +47,6 @@ namespace CatLib
         /// </summary>
         /// <returns>The unique runtime id.</returns>
         long GetRuntimeId();
-
-        /// <summary>
-        /// Gets the prioirty. If there exists a method priority definition then returns it.
-        /// Otherwise, returns <c>int.MaxValue</c>.
-        /// </summary>
-        /// <param name="type">The type of priority to get.</param>
-        /// <param name="method">The method via which to get the prioirty.</param>
-        /// <returns>Prioirty of the given type.</returns>
-        int GetPriority(Type type, string method = null);
 
         /// <summary>
         /// Terminates the <see cref="IApplication"/>.

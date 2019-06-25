@@ -106,12 +106,6 @@ namespace CatLib
             return That.GetRuntimeId();
         }
 
-        /// <inheritdoc cref="IApplication.GetPriority"/>
-        public static int GetPriority(Type type, string method = null)
-        {
-            return That.GetPriority(type, method);
-        }
-
         /// <inheritdoc cref="IContainer.GetBind"/>
         public static IBindData GetBind(string service)
         {
