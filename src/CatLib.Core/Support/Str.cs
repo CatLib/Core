@@ -47,11 +47,6 @@ namespace CatLib.Support
         }
 
         /// <summary>
-        /// Gets or sets string encoding.
-        /// </summary>
-        public static Encoding Encoding { get; set; } = Encoding.UTF8;
-
-        /// <summary>
         /// Get the function name expressed by the string.
         /// </summary>
         /// <param name="pattern">The string.</param>

@@ -27,7 +27,7 @@ namespace CatLib.Support
         /// <returns>The stream instance.</returns>
         public static Stream ToStream(this string str, Encoding encoding = null)
         {
-            return new MemoryStream((encoding ?? Str.Encoding).GetBytes(str));
+            return new MemoryStream((encoding ?? Encoding.Default).GetBytes(str));
         }
     }
 }

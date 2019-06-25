@@ -12,12 +12,15 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.IO;
+using System.Text;
 
 namespace CatLib.Support.Tests
 {
     [TestClass]
     public class SegmentStreamTests
     {
+        public Encoding Encoding => Encoding.Default;
+
         [TestMethod]
         public void TestRead()
         {
@@ -101,7 +104,7 @@ namespace CatLib.Support.Tests
             var segmentStream = new SegmentStream(baseStream, 11);
             var buffer = new byte[255];
             Assert.AreEqual(11, segmentStream.Read(buffer, 0, 255));
-            Assert.AreEqual("hello world", Str.Encoding.GetString(buffer, 0, 11));
+            Assert.AreEqual("hello world", Encoding.GetString(buffer, 0, 11));
         }
 
         [TestMethod]
@@ -111,7 +114,7 @@ namespace CatLib.Support.Tests
             var segmentStream = new SegmentStream(baseStream, 11);
             var buffer = new byte[255];
             Assert.AreEqual(11, segmentStream.Read(buffer, 0, 255));
-            Assert.AreEqual("hello world", Str.Encoding.GetString(buffer, 0, 11));
+            Assert.AreEqual("hello world", Encoding.GetString(buffer, 0, 11));
             Assert.AreEqual(0, segmentStream.Read(buffer, 0, 255));
         }
 
@@ -122,7 +125,7 @@ namespace CatLib.Support.Tests
             var segmentStream = new SegmentStream(baseStream, 11);
             var buffer = new byte[5];
             Assert.AreEqual(5, segmentStream.Read(buffer, 0, 5));
-            Assert.AreEqual("hello", Str.Encoding.GetString(buffer, 0, 5));
+            Assert.AreEqual("hello", Encoding.GetString(buffer, 0, 5));
         }
 
         [TestMethod]
@@ -140,7 +143,7 @@ namespace CatLib.Support.Tests
         {
             var baseStream = "hello world , my name is miaomiao".ToStream();
             var segmentStream = new SegmentStream(baseStream, 11);
-            var buffer = Str.Encoding.GetBytes("hello world");
+            var buffer = Encoding.GetBytes("hello world");
 
             segmentStream.Write(buffer, 0, buffer.Length);
         }

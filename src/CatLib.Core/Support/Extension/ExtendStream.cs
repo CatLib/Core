@@ -87,7 +87,7 @@ namespace CatLib.Support
                     throw new LogicException($"Can not read stream, {nameof(source.CanRead)} == false");
                 }
 
-                encoding = encoding ?? Str.Encoding;
+                encoding = encoding ?? Encoding.Default;
                 var memoryStream = source as MemoryStream;
                 if (memoryStream != null)
                 {
