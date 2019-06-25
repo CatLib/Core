@@ -20,9 +20,6 @@ namespace CatLib.Container
     [ExcludeFromCodeCoverage]
     public sealed class ParamsCollection : IParams, IEnumerable<KeyValuePair<string, object>>
     {
-        /// <summary>
-        /// The parameter mapping.
-        /// </summary>
         private readonly IDictionary<string, object> table;
 
         /// <summary>

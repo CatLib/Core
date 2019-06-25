@@ -20,27 +20,9 @@ namespace CatLib.Container
     /// </summary>
     public abstract class Bindable : IBindable
     {
-        /// <summary>
-        /// Synchronize locking object.
-        /// </summary>
-        private readonly object locker = new object();
-
-        /// <inheritdoc cref="Container"/>
         private readonly Container container;
-
-        /// <summary>
-        /// The mapping of the service context.
-        /// </summary>
         private Dictionary<string, string> contextual;
-
-        /// <summary>
-        /// The closure mapping of the service context.
-        /// </summary>
         private Dictionary<string, Func<object>> contextualClosure;
-
-        /// <summary>
-        /// Whether the bindable data is destroyed.
-        /// </summary>
         private bool isDestroy;
 
         /// <summary>
@@ -66,12 +48,12 @@ namespace CatLib.Container
         /// <summary>
         /// Gets synchronize locking object.
         /// </summary>
-        protected object Locker => locker;
+        protected object Locker { get; } = new object();
 
         /// <inheritdoc />
         public void Unbind()
         {
-            lock (locker)
+            lock (Locker)
             {
                 isDestroy = true;
                 ReleaseBind();
@@ -85,7 +67,7 @@ namespace CatLib.Container
         /// <param name="given">Given speified service or alias.</param>
         internal void AddContextual(string needs, string given)
         {
-            lock (locker)
+            lock (Locker)
             {
                 AssertDestroyed();
                 if (contextual == null)
@@ -107,7 +89,7 @@ namespace CatLib.Container
         /// <param name="given">The closure return the given service instance.</param>
         internal void AddContextual(string needs, Func<object> given)
         {
-            lock (locker)
+            lock (Locker)
             {
                 AssertDestroyed();
                 if (contextualClosure == null)

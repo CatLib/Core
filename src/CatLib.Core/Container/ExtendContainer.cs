@@ -17,7 +17,7 @@ using System;
 namespace CatLib.Container
 {
     /// <summary>
-    /// The container extension function.
+    /// An extension function for <see cref="Container"/>.
     /// </summary>
     public static class ExtendContainer
     {

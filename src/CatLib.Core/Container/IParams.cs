@@ -17,7 +17,7 @@ namespace CatLib.Container
     public interface IParams
     {
         /// <summary>
-        /// Get a parameter.
+        /// Get parameters by name.
         /// </summary>
         /// <param name="key">The parameter name.</param>
         /// <param name="value">The parameter value.</param>

@@ -588,7 +588,7 @@ namespace CatLib.Support
         /// <para>If the value is set to a negative number, then remove the <paramref name="length"/> absolute position from the back to the front to delete.</para>
         /// <para>If the value is not set, then all elements from the position set by the <paramref name="start"/> parameter to the end of the array are returned.</para>
         /// </param>
-        /// <returns>反转的数组.</returns>
+        /// <returns>Returns inverted array.</returns>
         public static T[] Reverse<T>(T[] source, int start = 0, int? length = null)
         {
             Guard.Requires<ArgumentNullException>(source != null);

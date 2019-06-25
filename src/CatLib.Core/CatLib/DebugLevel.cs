@@ -12,7 +12,7 @@
 namespace CatLib
 {
     /// <summary>
-    /// Framework debug level.
+    /// Indicates the framework debug level.
     /// </summary>
     public enum DebugLevel
     {

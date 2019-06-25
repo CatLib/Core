@@ -18,9 +18,6 @@ namespace CatLib.Container
     /// </summary>
     internal sealed class MethodBind : Bindable<IMethodBind>, IMethodBind
     {
-        /// <summary>
-        /// The <see cref="MethodContainer"/> instance.
-        /// </summary>
         private readonly MethodContainer methodContainer;
 
         /// <summary>

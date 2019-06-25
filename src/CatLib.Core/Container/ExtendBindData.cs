@@ -15,7 +15,7 @@ using System;
 namespace CatLib.Container
 {
     /// <summary>
-    /// 绑定数据拓展.
+    /// An extension function for <see cref="BindData"/>.
     /// </summary>
     public static class ExtendBindData
     {
