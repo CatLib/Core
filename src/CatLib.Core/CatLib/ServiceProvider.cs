@@ -9,7 +9,6 @@
  * Document: https://catlib.io/
  */
 
-using System.Collections;
 using System.Diagnostics.CodeAnalysis;
 
 namespace CatLib

@@ -27,29 +27,10 @@ namespace CatLib
     /// </remarks>
     public abstract class Facade<TService>
     {
-        /// <summary>
-        /// The service name.
-        /// </summary>
         private static readonly string Service;
-
-        /// <summary>
-        /// The resolved object instance.
-        /// </summary>
         private static TService instance;
-
-        /// <summary>
-        /// The resolved object bind data.
-        /// </summary>
         private static IBindData binder;
-
-        /// <summary>
-        /// Whether the facade has been initialized.
-        /// </summary>
         private static bool inited;
-
-        /// <summary>
-        /// Whether the resolved object has been released.
-        /// </summary>
         private static bool released;
 
         /// <summary>

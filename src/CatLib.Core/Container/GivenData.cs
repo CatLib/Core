@@ -18,17 +18,8 @@ namespace CatLib.Container
     internal sealed class GivenData<TReturn> : IGivenData<TReturn>
         where TReturn : class, IBindable<TReturn>
     {
-        /// <inheritdoc cref="BindData"/>
         private readonly Bindable<TReturn> bindable;
-
-        /// <summary>
-        /// The container to which the service belongs.
-        /// </summary>
         private readonly Container container;
-
-        /// <summary>
-        /// The demand service.
-        /// </summary>
         private string needs;
 
         /// <summary>

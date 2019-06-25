@@ -21,24 +21,9 @@ namespace CatLib.Container
     /// </summary>
     internal sealed class MethodContainer
     {
-        /// <summary>
-        /// Call method target map to method names.
-        /// </summary>
         private readonly Dictionary<object, List<string>> targetToMethodsMappings;
-
-        /// <summary>
-        /// An map of the method bing data.
-        /// </summary>
         private readonly Dictionary<string, MethodBind> methodMappings;
-
-        /// <summary>
-        /// The <see cref="Container"/> instnace.
-        /// </summary>
         private readonly Container container;
-
-        /// <summary>
-        /// The sync lock.
-        /// </summary>
         private readonly object syncRoot;
 
         /// <summary>
@@ -133,9 +118,7 @@ namespace CatLib.Container
 
             lock (syncRoot)
             {
-                var methodBind = target as MethodBind;
-
-                if (methodBind != null)
+                if (target is MethodBind methodBind)
                 {
                     methodBind.Unbind();
                     return;
@@ -200,7 +183,6 @@ namespace CatLib.Container
         /// <summary>
         /// Create a method without not found exception.
         /// </summary>
-        /// <param name="method">The method name.</param>
         private static LogicException MakeMethodNotFoundException(string method)
         {
             return new LogicException($"Method [{method}] is not found.");
@@ -209,7 +191,6 @@ namespace CatLib.Container
         /// <summary>
         /// Remove all methods bound to the object.
         /// </summary>
-        /// <param name="target">The object.</param>
         private void UnbindWithObject(object target)
         {
             if (!targetToMethodsMappings.TryGetValue(target, out List<string> methods))

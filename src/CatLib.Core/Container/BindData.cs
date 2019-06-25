@@ -41,7 +41,7 @@ namespace CatLib.Container
         /// <param name="service">The service name.</param>
         /// <param name="concrete">The service concrete.</param>
         /// <param name="isStatic">Whether the service is singleton(static).</param>
-        public BindData(Container container, string service, Func<IContainer, object[], object> concrete, bool isStatic)
+        public BindData(CatLibContainer container, string service, Func<IContainer, object[], object> concrete, bool isStatic)
             : base(container, service)
         {
             Concrete = concrete;
@@ -105,29 +105,16 @@ namespace CatLib.Container
             return this;
         }
 
-        /// <summary>
-        /// Trigger all of the local resolving callbacks.
-        /// </summary>
-        /// <param name="instance">The service instance.</param>
-        /// <returns>The decorated service instance.</returns>
         internal object TriggerResolving(object instance)
         {
             return CatLibContainer.Trigger(this, instance, resolving);
         }
 
-        /// <inheritdoc cref="TriggerResolving"/>
-        /// <summary>
-        /// Trigger all of the local after resolving callbacks.
-        /// </summary>
         internal object TriggerAfterResolving(object instance)
         {
             return CatLibContainer.Trigger(this, instance, afterResolving);
         }
 
-        /// <inheritdoc cref="TriggerResolving"/>
-        /// <summary>
-        /// Trigger all of the local release callbacks.
-        /// </summary>
         internal object TriggerRelease(object instance)
         {
             return CatLibContainer.Trigger(this, instance, release);
@@ -136,14 +123,9 @@ namespace CatLib.Container
         /// <inheritdoc />
         protected override void ReleaseBind()
         {
-            ((Container)Container).Unbind(this);
+            ((CatLibContainer)Container).Unbind(this);
         }
 
-        /// <summary>
-        /// Register a new callback in specified list.
-        /// </summary>
-        /// <param name="closure">The callback.</param>
-        /// <param name="list">The specified list.</param>
         private void AddClosure(Action<IBindData, object> closure, ref List<Action<IBindData, object>> list)
         {
             Guard.NotNull(closure, nameof(closure));

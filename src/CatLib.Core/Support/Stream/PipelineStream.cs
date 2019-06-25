@@ -23,45 +23,13 @@ namespace CatLib.Support
 #pragma warning restore S3881
     {
         private readonly object locker;
-
-        /// <summary>
-        /// The stream capacity.
-        /// </summary>
         private readonly int capacity;
-
-        /// <summary>
-        /// The thread sleep millisecond.
-        /// </summary>
         private readonly int sleep;
-
-        /// <summary>
-        /// The <see cref="RingBuffer"/> instance.
-        /// </summary>
         private readonly RingBufferStream ringBuffer;
-
-        /// <summary>
-        /// The count can be read.
-        /// </summary>
         private volatile int count;
-
-        /// <summary>
-        /// Whether the stream is disabled.
-        /// </summary>
         private volatile bool disabled;
-
-        /// <summary>
-        /// Whether the stream is closed.
-        /// </summary>
         private volatile bool closed;
-
-        /// <summary>
-        /// The stream position.
-        /// </summary>
         private long position;
-
-        /// <summary>
-        /// The stream length.
-        /// </summary>
         private long length;
 
         /// <summary>

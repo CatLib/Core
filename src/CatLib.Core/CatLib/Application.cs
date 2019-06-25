@@ -13,7 +13,6 @@ using CatLib.Container;
 using CatLib.EventDispatcher;
 using CatLib.Support;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Reflection;
@@ -27,44 +26,13 @@ namespace CatLib
     /// </summary>
     public class Application : CatLibContainer, IApplication
     {
-        /// <summary>
-        /// The version of the framework application.
-        /// </summary>
         private static string version;
-
-        /// <summary>
-        /// The types of the loaded service providers.
-        /// </summary>
         private readonly List<IServiceProvider> loadedProviders;
-
-        /// <summary>
-        /// The main thread id.
-        /// </summary>
         private readonly int mainThreadId;
-
-        /// <summary>
-        /// True if the application has been bootstrapped.
-        /// </summary>
         private bool bootstrapped;
-
-        /// <summary>
-        /// True if the application has been initialized.
-        /// </summary>
         private bool inited;
-
-        /// <summary>
-        /// True if the <see cref="Register"/> is being executed.
-        /// </summary>
         private bool registering;
-
-        /// <summary>
-        /// The unique runtime id.
-        /// </summary>
         private long incrementId;
-
-        /// <summary>
-        /// The debug level.
-        /// </summary>
         private DebugLevel debugLevel;
         private IEventDispatcher dispatcher;
 
@@ -360,31 +328,6 @@ namespace CatLib
         }
 
         /// <summary>
-        /// Call the iterator with the default coroutine.
-        /// </summary>
-        /// <param name="iterator">The iterator.</param>
-        protected static void StartCoroutine(IEnumerator iterator)
-        {
-            var stack = new Stack<IEnumerator>();
-            stack.Push(iterator);
-            do
-            {
-                iterator = stack.Pop();
-                while (iterator.MoveNext())
-                {
-                    if (!(iterator.Current is IEnumerator nextCoroutine))
-                    {
-                        continue;
-                    }
-
-                    stack.Push(iterator);
-                    iterator = nextCoroutine;
-                }
-            }
-            while (stack.Count > 0);
-        }
-
-        /// <summary>
         /// Initialize the specified service provider.
         /// </summary>
         /// <param name="provider">The specified service provider.</param>
@@ -406,9 +349,6 @@ namespace CatLib
             base.GuardConstruct(method);
         }
 
-        /// <summary>
-        /// Register the core service aliases.
-        /// </summary>
         private void RegisterBaseBindings()
         {
             this.Singleton<IApplication>(() => this).Alias<Application>().Alias<IContainer>();

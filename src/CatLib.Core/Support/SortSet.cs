@@ -27,49 +27,14 @@ namespace CatLib.Support
         where TScore : IComparable<TScore>
 #pragma warning restore CA1710
     {
-        /// <summary>
-        /// The max level.
-        /// </summary>
         private readonly int maxLevel;
-
-        /// <summary>
-        /// The header node.
-        /// </summary>
         private readonly SkipNode header;
-
-        /// <summary>
-        /// Probability of possible number of level.
-        /// </summary>
         private readonly double probability;
-
-        /// <summary>
-        /// The random.
-        /// </summary>
         private readonly System.Random random = new System.Random();
-
-        /// <summary>
-        /// Comparator is used to compare element score order.
-        /// </summary>
         private readonly IComparer<TScore> comparer;
-
-        /// <summary>
-        /// The element hash mapping.
-        /// </summary>
-        private readonly Dictionary<TElement, TScore> dict = new Dictionary<TElement, TScore>();
-
-        /// <summary>
-        /// Whether to traverse from the forward.
-        /// </summary>
+        private readonly Dictionary<TElement, TScore> elementMapping = new Dictionary<TElement, TScore>();
         private bool forward;
-
-        /// <summary>
-        /// The current max levevl.
-        /// </summary>
         private int level;
-
-        /// <summary>
-        /// The tail node.
-        /// </summary>
         private SkipNode tail;
 
         /// <summary>
@@ -137,7 +102,7 @@ namespace CatLib.Support
 
             tail = null;
             level = 1;
-            dict.Clear();
+            elementMapping.Clear();
             Count = 0;
         }
 
@@ -263,7 +228,7 @@ namespace CatLib.Support
             Guard.Requires<ArgumentNullException>(element != null);
             Guard.Requires<ArgumentNullException>(score != null);
 
-            if (dict.TryGetValue(element, out TScore dictScore))
+            if (elementMapping.TryGetValue(element, out TScore dictScore))
             {
                 Remove(element, dictScore);
             }
@@ -279,7 +244,7 @@ namespace CatLib.Support
         public bool Contains(TElement element)
         {
             Guard.Requires<ArgumentNullException>(element != null);
-            return dict.ContainsKey(element);
+            return elementMapping.ContainsKey(element);
         }
 
         /// <summary>
@@ -290,7 +255,7 @@ namespace CatLib.Support
         public TScore GetScore(TElement element)
         {
             Guard.Requires<ArgumentNullException>(element != null);
-            if (!dict.TryGetValue(element, out TScore score))
+            if (!elementMapping.TryGetValue(element, out TScore score))
             {
                 throw new KeyNotFoundException();
             }
@@ -379,7 +344,7 @@ namespace CatLib.Support
         {
             Guard.Requires<ArgumentNullException>(element != null);
 
-            return dict.TryGetValue(element, out TScore dictScore) && Remove(element, dictScore);
+            return elementMapping.TryGetValue(element, out TScore dictScore) && Remove(element, dictScore);
         }
 
         /// <summary>
@@ -414,7 +379,7 @@ namespace CatLib.Support
                     traversed <= stopRank)
             {
                 var next = cursor.Level[0].Forward;
-                dict.Remove(cursor.Element);
+                elementMapping.Remove(cursor.Element);
                 DeleteNode(cursor, update);
                 ++removed;
                 ++traversed;
@@ -456,7 +421,7 @@ namespace CatLib.Support
                    Compare(cursor.Score, stopScore) <= 0)
             {
                 var next = cursor.Level[0].Forward;
-                dict.Remove(cursor.Element);
+                elementMapping.Remove(cursor.Element);
                 DeleteNode(cursor, update);
                 ++removed;
                 cursor = next;
@@ -473,7 +438,7 @@ namespace CatLib.Support
         public int GetRank(TElement element)
         {
             Guard.Requires<ArgumentNullException>(element != null);
-            return dict.TryGetValue(element, out TScore dictScore) ? GetRank(element, dictScore) : -1;
+            return elementMapping.TryGetValue(element, out TScore dictScore) ? GetRank(element, dictScore) : -1;
         }
 
         /// <summary>
@@ -612,7 +577,7 @@ namespace CatLib.Support
         private void AddElement(TElement element, TScore score)
         {
             int i;
-            dict.Add(element, score);
+            elementMapping.Add(element, score);
 
             var update = new SkipNode[maxLevel];
             var cursor = header;
@@ -741,7 +706,7 @@ namespace CatLib.Support
                 return false;
             }
 
-            dict.Remove(element);
+            elementMapping.Remove(element);
             DeleteNode(cursor, update);
             return true;
         }
