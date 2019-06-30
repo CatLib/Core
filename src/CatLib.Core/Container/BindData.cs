@@ -128,7 +128,7 @@ namespace CatLib.Container
 
         private void AddClosure(Action<IBindData, object> closure, ref List<Action<IBindData, object>> list)
         {
-            Guard.NotNull(closure, nameof(closure));
+            Guard.Requires<ArgumentNullException>(closure != null);
 
             lock (Locker)
             {
