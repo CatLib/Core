@@ -193,9 +193,10 @@ namespace CatLib.Container
         public void Tag(string tag, params string[] service)
         {
             Guard.NotEmptyOrNull(tag, nameof(tag));
-            Guard.NotNull(service, nameof(service));
-            Guard.CountGreaterZero(service, nameof(service));
-            Guard.ElementNotEmptyOrNull(service, nameof(service));
+            Guard.Requires<ArgumentNullException>(service != null);
+            Guard.Requires<ArgumentNullException>(service.Length > 0);
+            Guard.Requires<ArgumentNullException>(
+                !Array.Exists(service, (s) => string.IsNullOrEmpty(s)));
 
             lock (syncRoot)
             {
@@ -377,7 +378,8 @@ namespace CatLib.Container
         /// <inheritdoc />
         public IBindData Bind(string service, Type concrete, bool isStatic)
         {
-            Guard.NotNull(concrete, nameof(concrete));
+            Guard.Requires<ArgumentNullException>(concrete != null);
+
             if (IsUnableType(concrete))
             {
                 throw new LogicException($"Bind type [{concrete}] can not built");
@@ -391,7 +393,7 @@ namespace CatLib.Container
         public IBindData Bind(string service, Func<IContainer, object[], object> concrete, bool isStatic)
         {
             Guard.NotEmptyOrNull(service, nameof(service));
-            Guard.NotNull(concrete, nameof(concrete));
+            Guard.Requires<ArgumentNullException>(concrete != null);
             GuardServiceName(service);
 
             service = FormatService(service);
@@ -664,7 +666,8 @@ namespace CatLib.Container
         /// <inheritdoc />
         public IContainer OnFindType(Func<string, Type> func, int priority = int.MaxValue)
         {
-            Guard.NotNull(func, nameof(func));
+            Guard.Requires<ArgumentNullException>(func != null);
+
             lock (syncRoot)
             {
                 GuardFlushing();
@@ -698,7 +701,8 @@ namespace CatLib.Container
         /// <inheritdoc />
         public IContainer OnRebound(string service, Action<object> callback)
         {
-            Guard.NotNull(callback, nameof(callback));
+            Guard.Requires<ArgumentNullException>(callback != null);
+
             lock (syncRoot)
             {
                 GuardFlushing();
@@ -1902,7 +1906,7 @@ namespace CatLib.Container
         /// <param name="list">The specified list.</param>
         private void AddClosure(Action<IBindData, object> closure, List<Action<IBindData, object>> list)
         {
-            Guard.NotNull(closure, nameof(closure));
+            Guard.Requires<ArgumentNullException>(closure != null);
 
             lock (syncRoot)
             {

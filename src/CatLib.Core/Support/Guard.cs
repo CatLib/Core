@@ -11,6 +11,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 
 namespace CatLib.Support
 {
@@ -20,6 +21,7 @@ namespace CatLib.Support
     public sealed class Guard
     {
         private static Guard that;
+        private static IDictionary<Type, Func<string, Exception, object, Exception>> exceptionFactory;
 
         /// <summary>
         /// Gets the singleton instance of the Guard functionality.
@@ -43,16 +45,33 @@ namespace CatLib.Support
         /// </summary>
         /// <typeparam name="TException">Exception triggered when validation fails.</typeparam>
         /// <param name="condition">The condition of the contract.</param>
+        /// <param name="message">The error message that explains the reason for the exception.</param>
+        /// <param name="innerException">The exception that is the cause of the current exception, or a null reference.</param>
+        /// <param name="state">State will be passed to the registered exception build factory.</param>
         [System.Diagnostics.DebuggerNonUserCode]
-        public static void Requires<TException>(bool condition)
+        public static void Requires<TException>(bool condition, string message = null, Exception innerException = null, object state = null)
             where TException : Exception, new()
+        {
+            Requires(typeof(TException), condition, message, innerException, state);
+        }
+
+        /// <summary>
+        /// Verifies a condition and throws an exception if the condition of the contract fails.
+        /// </summary>
+        /// <param name="exception">Exception triggered when validation fails.</param>
+        /// <param name="condition">The condition of the contract.</param>
+        /// <param name="message">The error message that explains the reason for the exception.</param>
+        /// <param name="innerException">The exception that is the cause of the current exception, or a null reference.</param>
+        /// <param name="state">State will be passed to the registered exception build factory.</param>
+        [System.Diagnostics.DebuggerNonUserCode]
+        public static void Requires(Type exception, bool condition, string message = null, Exception innerException = null, object state = null)
         {
             if (condition)
             {
                 return;
             }
 
-            throw new TException();
+            throw CreateExceptionInstance(exception, message, innerException, state);
         }
 
         /// <summary>
@@ -60,58 +79,95 @@ namespace CatLib.Support
         /// </summary>
         /// <param name="argumentValue">The parameter value.</param>
         /// <param name="argumentName">The parameter name.</param>
+        /// <param name="message">The error message that explains the reason for the exception.</param>
+        /// <param name="innerException">The exception that is the cause of the current exception, or a null reference.</param>
         [System.Diagnostics.DebuggerNonUserCode]
-        public static void NotEmptyOrNull(string argumentValue, string argumentName)
+        public static void NotEmptyOrNull(string argumentValue, string argumentName = null, string message = null, Exception innerException = null)
         {
-            if (string.IsNullOrEmpty(argumentValue))
+            if (!string.IsNullOrEmpty(argumentValue))
             {
-                throw new ArgumentNullException(argumentName);
+                return;
             }
+
+            var exception = new ArgumentNullException(argumentName, message);
+
+            if (innerException != null)
+            {
+                SetField(exception, "_innerException", innerException);
+            }
+
+            throw exception;
         }
 
         /// <summary>
-        /// Verifies the length is greater than 0.
+        /// Extend an exception generation factory.
         /// </summary>
-        /// <typeparam name="T">The type of parameter.</typeparam>
-        /// <param name="argumentValue">The parameter value.</param>
-        /// <param name="argumentName">The parameter name.</param>
+        /// <typeparam name="T">The type of exception.</typeparam>
+        /// <param name="factory">The exception factory.</param>
         [System.Diagnostics.DebuggerNonUserCode]
-        public static void CountGreaterZero<T>(IList<T> argumentValue, string argumentName)
+        public static void Extend<T>(Func<string, Exception, object, Exception> factory)
         {
-            if (argumentValue.Count <= 0)
-            {
-                throw new ArgumentNullException(argumentName);
-            }
+            Extend(typeof(T), factory);
         }
 
         /// <summary>
-        /// Verifies the element not empty or null.
+        /// Extend an exception generation factory.
         /// </summary>
-        /// <param name="argumentValue">The parameter value.</param>
-        /// <param name="argumentName">The parameter name.</param>
+        /// <param name="exception">The type of exception.</param>
+        /// <param name="factory">The exception factory.</param>
         [System.Diagnostics.DebuggerNonUserCode]
-        public static void ElementNotEmptyOrNull(IList<string> argumentValue, string argumentName)
+        public static void Extend(Type exception, Func<string, Exception, object, Exception> factory)
         {
-            foreach (var val in argumentValue)
+            VerfiyExceptionFactory();
+            exceptionFactory[exception] = factory;
+        }
+
+        private static Exception CreateExceptionInstance(Type exceptionType, string message, Exception innerException, object state)
+        {
+            if (!typeof(Exception).IsAssignableFrom(exceptionType))
             {
-                if (string.IsNullOrEmpty(val))
-                {
-                    throw new ArgumentNullException(argumentName, $"Argument element can not be {nameof(string.Empty)} or null.");
-                }
+                throw new ArgumentException(
+                    $"Type: {exceptionType} must be inherited from: {typeof(Exception)}.",
+                    nameof(exceptionType));
+            }
+
+            VerfiyExceptionFactory();
+
+            if (exceptionFactory.TryGetValue(exceptionType, out Func<string, Exception, object, Exception> factory))
+            {
+                return factory(message, innerException, state);
+            }
+
+            var exception = Activator.CreateInstance(exceptionType);
+            if (!string.IsNullOrEmpty(message))
+            {
+                SetField(exception, "_message", message);
+            }
+
+            if (innerException != null)
+            {
+                SetField(exception, "_innerException", innerException);
+            }
+
+            return (Exception)exception;
+        }
+
+        private static void VerfiyExceptionFactory()
+        {
+            if (exceptionFactory == null)
+            {
+                exceptionFactory = new Dictionary<Type, Func<string, Exception, object, Exception>>();
             }
         }
 
-        /// <summary>
-        /// Verifies the parameter not null.
-        /// </summary>
-        /// <param name="argumentValue">The parameter value.</param>
-        /// <param name="argumentName">The parameter name.</param>
-        [System.Diagnostics.DebuggerNonUserCode]
-        public static void NotNull(object argumentValue, string argumentName)
+        private static void SetField(object obj, string field, object value)
         {
-            if (argumentValue == null)
+            var flag = BindingFlags.Instance | BindingFlags.NonPublic;
+            var fieldInfo = obj.GetType().GetField(field, flag);
+
+            if (fieldInfo != null)
             {
-                throw new ArgumentNullException(argumentName);
+                fieldInfo.SetValue(obj, value);
             }
         }
     }
