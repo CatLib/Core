@@ -744,6 +744,45 @@ namespace CatLib.Container.Tests
         }
 
         [TestMethod]
+        [ExpectedException(typeof(CodeStandardException))]
+        public void TestFlushInstanceService()
+        {
+            container.Bind("foo", typeof(Foo), true)
+                     .OnRelease((binder, instance)=>
+                     {
+                         container.Instance("bar", "bar");
+                     });
+
+            container.Make("foo");
+            container.Flush();
+        }
+
+        [TestMethod]
+        public void TestFlushOrder()
+        {
+            var foo = container.Type2Service(typeof(Foo));
+            var bar = container.Type2Service(typeof(Bar));
+            container.Bind(foo, typeof(Foo), true);
+            container.Bind(bar, typeof(Bar), true);
+            container.Bind("foobar", typeof(FooBar), true);
+
+            var actual = new List<Type>();
+            container.OnRelease((binder, instance) =>
+            {
+                actual.Add(instance.GetType());
+            });
+
+            container.Make("foobar");
+            container.Flush();
+
+            CollectionAssert.AreEqual(new[] {
+                    typeof(FooBar),
+                    typeof(Bar),
+                    typeof(Foo),
+                }, actual);
+        }
+
+        [TestMethod]
         public void TestVariant()
         {
             container.Bind("foo", typeof(Variant), false);
@@ -785,9 +824,162 @@ namespace CatLib.Container.Tests
         }
 
         [TestMethod]
+        public void TestRebound()
+        {
+            var count = 0;
+            var binder = container.Bind("foo", (container, args) => "foo");
+            container.OnRebound("foo", (instance) =>
+            {
+                Assert.AreEqual("bar", instance);
+                count++;
+            });
+
+            binder.Unbind();
+
+            // first built don't trigger OnRebound.
+            binder = container.Bind("foo", (c, p) => "boo");
+            container.Make("foo");
+            binder.Unbind();
+
+            container.Bind("foo", (c, p) => "bar");
+
+            Assert.AreEqual(1, count);
+        }
+
+        [TestMethod]
+        public void TestReboundWithInstance()
+        {
+            var count = 0;
+            container.Instance("foo", "foo");
+            container.OnRebound("foo", (instance) =>
+            {
+                Assert.AreEqual("bar", instance);
+                count++;
+            });
+            container.Instance("foo", "bar");
+            Assert.AreEqual(1, count);
+        }
+
+        [TestMethod]
         public void TestUnbindNotExistsService()
         {
             container.Unbind("service not exists");
+        }
+
+        [TestMethod]
+        public void TestHasInstance()
+        {
+            container.Instance("foo", "foo");
+
+            Assert.IsTrue(container.HasInstance("foo"));
+            Assert.IsFalse(container.HasInstance("bar"));
+        }
+
+        [TestMethod]
+        public void TestIsResolved()
+        {
+            container.Instance("foo", "foo");
+
+            Assert.IsTrue(container.IsResolved("foo"));
+            Assert.IsFalse(container.IsResolved("bar"));
+
+            container.Bind("bar", typeof(Bar), true);
+            Assert.IsFalse(container.IsResolved("bar"));
+
+            container.Make("bar");
+            Assert.IsTrue(container.IsResolved("bar"));
+        }
+
+        [TestMethod]
+        public void TestExtend()
+        {
+            container.Bind("foo", (container, args) => "foo", false);
+            container.Extend("foo", (instance, container) => instance + "bar");
+
+            Assert.AreEqual("foobar", container["foo"]);
+        }
+
+        [TestMethod]
+        public void TestExtendMult()
+        {
+            container.Bind("foo", (container, args) => "foo", false);
+            container.Extend("foo", (instance, container) => instance + "bar");
+            container.Extend("foo", (instance, container) => instance + "baz");
+
+            Assert.AreEqual("foobarbaz", container["foo"]);
+        }
+
+        [TestMethod]
+        public void TestExtendSingle()
+        {
+            container.Bind("foo", (container, args) => "foo", true);
+            container.Extend("foo", (instance, container) => instance + "bar");
+
+            Assert.AreEqual("foobar", container["foo"]);
+
+            // Existing instances are only valid if they are extended.
+            container.Extend("foo", (instance, container) => instance + "baz");
+            Assert.AreEqual("foobarbaz", container["foo"]);
+
+            container.Release("foo");
+            Assert.AreEqual("foobar", container["foo"]);
+        }
+
+        [TestMethod]
+        public void TestExtendAndRebound()
+        {
+            container.Bind("foo", (container, args) => "foo", false);
+
+            // marked resolved.
+            container.Make("foo");
+            container.Release("foo");
+
+            var actual = string.Empty;
+            container.OnRebound("foo", (instance) =>
+            {
+                actual = instance.ToString();
+            });
+
+            container.Extend("foo", (instance, container) => instance + "bar");
+
+            Assert.AreEqual("foobar", actual);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(UnresolvableException))]
+        public void TestExtendGivenMismatchedType()
+        {
+            var service = container.Type2Service(typeof(Foo));
+            container.Bind(service, typeof(Foo), true);
+            container.Bind("foobar", typeof(FooBar), true);
+
+            container.Extend(service, (instance, container) => "mismatched type");
+            container.Make("foobar");
+        }
+
+        [TestMethod]
+        public void TestClearExtend()
+        {
+            if (!(container is Container catlibContainer))
+            {
+                return;
+            }
+
+            container.Bind("foo", (container, args) => "foo", false);
+            container.Extend("foo", (instance, container) => instance + "bar");
+            container.Extend("foo", (instance, container) => instance + "baz");
+
+            container.Bind("bar", (container, args) => "bar", false);
+            container.Extend("bar", (instance, container) => instance + "foo");
+            container.Extend("bar", (instance, container) => instance + "baz");
+
+            Assert.AreEqual("foobarbaz", container["foo"]);
+            Assert.AreEqual("barfoobaz", container["bar"]);
+
+            catlibContainer.ClearExtenders("foo");
+
+            Assert.AreEqual("foo", container["foo"]);
+            Assert.AreEqual("barfoobaz", container["bar"]);
         }
 
         protected virtual IContainer CreateContainer()
@@ -796,326 +988,6 @@ namespace CatLib.Container.Tests
         }
 
         // todo: rebuild .....
-
-        [TestMethod]
-        public void TestOnRebound()
-        {
-            var container = new Container();
-            var callRebound = false;
-
-            var temp = container.Bind("TestService", (c, p) => 100);
-            container.OnRebound("TestService", (instance) =>
-            {
-                Assert.AreEqual(300, instance);
-                callRebound = true;
-            });
-            temp.Unbind();
-            var bind = container.Bind("TestService", (c, p) => 200);
-            container.Make("TestService");
-            bind.Unbind();
-            container.Bind("TestService", (c, p) => 300);
-
-            Assert.AreEqual(true, callRebound);
-        }
-
-        [TestMethod]
-        public void TestOnReboundWithInstance()
-        {
-            var container = new Container();
-            var callRebound = false;
-
-            container.Instance("TestService", 100);
-            container.OnRebound("TestService", (instance) =>
-            {
-                Assert.AreEqual(300, instance);
-                callRebound = true;
-            });
-            container.Instance("TestService", 300);
-
-            Assert.AreEqual(true, callRebound);
-        }
-
-        public class TestWatchCLass
-        {
-            public int value;
-
-            public IContainer container;
-
-            public void OnChange(int instance, IContainer container)
-            {
-                value = instance;
-                this.container = container;
-            }
-        }
-
-        [TestMethod]
-        public void TestInstanceAndDecorator()
-        {
-            var container = new Container();
-            var oldObject = new object();
-            object newObject = null;
-            container.Extend("Hello", (instance, c) =>
-            {
-                Console.WriteLine("new");
-                return newObject = new object();
-            });
-
-            container.Bind("Hello", (_, __) => oldObject);
-            var ins = container["Hello"];
-            Assert.AreSame(newObject, ins);
-        }
-
-        [TestMethod]
-        public void TestHasInstance()
-        {
-            var container = new Application();
-            container.Instance<Application>(container);
-
-            Assert.AreEqual(true, container.HasInstance<Application>());
-            Assert.AreEqual(false, container.HasInstance<IBindData>());
-        }
-
-        [TestMethod]
-        public void TestIsResolved()
-        {
-            var container = new Application();
-            container.Instance<Application>(container);
-
-            Assert.AreEqual(true, container.IsResolved<Application>());
-            Assert.AreEqual(false, container.IsResolved<IBindData>());
-        }
-
-        [TestMethod]
-        public void TestFlushAndInstance()
-        {
-            var container = new Application();
-            container.Instance<Application>(container);
-
-            container.OnRelease((__) =>
-            {
-                container.Instance<Application>(container);
-            });
-
-            var isError = false;
-            try
-            {
-                container.Flush();
-            }
-            catch (RuntimeException)
-            {
-                isError = true;
-            }
-
-            Assert.AreEqual(true, isError);
-        }
-
-        public class TestFlushOrderDependencyClass
-        {
-        }
-
-        public class TestFlushOrderClass
-        {
-            public TestFlushOrderClass(TestFlushOrderDependencyClass cls)
-            {
-            }
-        }
-
-        [TestMethod]
-        public void TestFlushOrder()
-        {
-            var container = new Container();
-            container.Instance<Container>(container);
-
-            var list = new List<object>();
-
-            container.OnRelease((_) =>
-            {
-                list.Add(_);
-            });
-
-            container.Singleton<TestFlushOrderDependencyClass>();
-            container.Singleton<TestFlushOrderClass>();
-
-            container.Make<TestFlushOrderClass>();
-
-            container.Flush();
-
-            Assert.AreEqual(3, list.Count);
-            Assert.AreEqual(typeof(TestFlushOrderClass), list[0].GetType());
-            Assert.AreEqual(typeof(TestFlushOrderDependencyClass), list[1].GetType());
-            Assert.AreEqual(typeof(Container), list[2].GetType());
-        }
-
-        [TestMethod]
-        public void TestRebuildAndFlush()
-        {
-            var container = new Application();
-            container.Bootstrap();
-            container.Make<IApplication>();
-            var list = new List<object>();
-
-            container.Singleton<TestFlushOrderDependencyClass>();
-            container.Singleton<TestFlushOrderClass>();
-
-            container.Make<TestFlushOrderClass>();
-            var temp = Facade<TestFlushOrderDependencyClass>.Instance;
-            container.Release<TestFlushOrderDependencyClass>();
-
-            container.OnRelease((_) =>
-            {
-                if(typeof(TestFlushOrderDependencyClass) ==  _.GetType()
-                   || typeof(Application) == _.GetType()
-                   || typeof(TestFlushOrderClass) == _.GetType())
-                list.Add(_);
-            });
-            container.Instance<TestFlushOrderDependencyClass>(new TestFlushOrderDependencyClass());
-
-            container.Flush();
-
-            Assert.AreEqual(3, list.Count);
-            Assert.AreEqual(typeof(TestFlushOrderClass), list[0].GetType());
-            Assert.AreEqual(typeof(TestFlushOrderDependencyClass), list[1].GetType());
-            Assert.AreEqual(typeof(Application), list[2].GetType());
-        }
-
-        [TestMethod]
-        public void TestRebuildAndFlushNotWatch()
-        {
-            var container = new Application();
-            container.Bootstrap();
-            container.Make<IApplication>();
-            var list = new List<object>();
-
-            container.Singleton<TestFlushOrderDependencyClass>();
-            container.Singleton<TestFlushOrderClass>();
-
-            container.Make<TestFlushOrderClass>();
-            container.Release<TestFlushOrderDependencyClass>();
-
-            container.OnRelease((_) =>
-            {
-                if (typeof(TestFlushOrderDependencyClass) == _.GetType()
-                    || typeof(Application) == _.GetType()
-                    || typeof(TestFlushOrderClass) == _.GetType())
-                    list.Add(_);
-            });
-            container.Instance<TestFlushOrderDependencyClass>(new TestFlushOrderDependencyClass());
-
-            container.Flush();
-
-            Assert.AreEqual(3, list.Count);
-            Assert.AreEqual(typeof(TestFlushOrderDependencyClass), list[0].GetType());
-            Assert.AreEqual(typeof(TestFlushOrderClass), list[1].GetType());
-            Assert.AreEqual(typeof(Application), list[2].GetType());
-        }
-
-        [TestMethod]
-        public void TestCannotWatch()
-        {
-        }
-
-        [TestMethod]
-        public void TestExtend()
-        {
-            var container = new Container();
-            container.Bind("hello", (_, __) => "hello");
-            container.Extend("hello", (instance, c) => instance + " world");
-
-            Assert.AreEqual("hello world", container["hello"]);
-        }
-
-        [TestMethod]
-        public void TestMultExtend()
-        {
-            var container = new Container();
-            container.Bind("hello", (_, __) => "hello");
-            container.Extend("hello", (instance, c) => instance + " world");
-            container.Extend("hello", (instance, c) => instance + " miaomiao");
-
-            Assert.AreEqual("hello world miaomiao", container["hello"]);
-        }
-
-        [TestMethod]
-        public void TestClearExtend()
-        {
-            var container = new Container();
-            container.Bind("hello", (_, __) => "hello");
-            container.Extend("hello", (instance, c) => instance + " world");
-            container.Extend("hello", (instance, c) => instance + " miaomiao");
-
-            container.Bind("world", (_, __) => "hello");
-            container.Extend("world", (instance, c) => instance + " world");
-            container.Extend("world", (instance, c) => instance + " miaomiao");
-
-            Assert.AreEqual("hello world miaomiao", container["hello"]);
-            Assert.AreEqual("hello world miaomiao", container["world"]);
-
-            container.ClearExtenders("hello");
-
-            Assert.AreEqual("hello", container["hello"]);
-            Assert.AreEqual("hello world miaomiao", container["world"]);
-        }
-
-        [TestMethod]
-        public void TestClearExtendNotUse()
-        {
-            var container = new Container();
-            container.Bind("hello", (_, __) => "hello");
-            container.Extend("hello", (instance, c) => instance + " world");
-            container.Extend("hello", (instance, c) => instance + " miaomiao");
-            container.ClearExtenders("hello");
-            Assert.AreEqual("hello", container["hello"]);
-        }
-
-        [TestMethod]
-        public void TestExtendSingle()
-        {
-            var container = new Container();
-            container.Singleton("hello", (_, __) => "hello");
-            container.Extend("hello", (instance, c) => instance + " world");
-            Assert.AreEqual("hello world", container["hello"]);
-            container.Extend("hello", (instance, c) => instance + " miaomiao");
-            Assert.AreEqual("hello world miaomiao", container["hello"]);
-
-            container.Release("hello");
-            Assert.AreEqual("hello world", container["hello"]);
-        }
-
-        [TestMethod]
-        public void TestIsResolvedExtend()
-        {
-            var container = new Container();
-            container.Singleton("hello", (_, __) => "hello");
-            container.Make("hello");
-            container.Release("hello");
-
-            var data = "";
-            container.OnRebound("hello", (instance) =>
-            {
-                data = instance.ToString();
-            });
-            container.Extend("hello", (instance, c) => instance + " world");
-
-            Assert.AreEqual("hello world", data);
-        }
-
-        public class TestExtendGivenMismatchedTypeClass
-        {
-            public TestExtendGivenMismatchedTypeClass(IContainer container)
-            {
-            }
-        }
-
-        [TestMethod]
-        [ExpectedException(typeof(UnresolvableException))]
-        public void TestExtendGivenMismatchedType()
-        {
-            var container = new Container();
-            container.Singleton<IContainer>(() => container);
-            container.Singleton<TestExtendGivenMismatchedTypeClass>();
-            container.Extend<IContainer>((instance) => "123");
-            container.Make<TestExtendGivenMismatchedTypeClass>();
-        }
 
         [TestMethod]
         public void TestThisSet()
@@ -1298,16 +1170,6 @@ namespace CatLib.Container.Tests
             container.Bind("abc", (c, p) => 1, false);
             container.Bind("ccc", (c, p) => 1, false);
             container.Alias("abc", "ccc");
-        }
-
-        /// <summary>
-        /// 生成容器.
-        /// </summary>
-        /// <returns>容器.</returns>
-        private Container MakeContainer()
-        {
-            var container = new Container();
-            return container;
         }
     }
 }
