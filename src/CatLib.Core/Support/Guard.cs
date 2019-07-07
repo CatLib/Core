@@ -75,20 +75,21 @@ namespace CatLib.Support
         }
 
         /// <summary>
-        /// Verifies is not empty or null.
+        /// The verification parameter is not Null.
         /// </summary>
         /// <param name="argumentValue">The parameter value.</param>
         /// <param name="argumentName">The parameter name.</param>
         /// <param name="message">The error message that explains the reason for the exception.</param>
         /// <param name="innerException">The exception that is the cause of the current exception, or a null reference.</param>
         [System.Diagnostics.DebuggerNonUserCode]
-        public static void NotEmptyOrNull(string argumentValue, string argumentName = null, string message = null, Exception innerException = null)
+        public static void ParameterNotNull(object argumentValue, string argumentName, string message = null, Exception innerException = null)
         {
-            if (!string.IsNullOrEmpty(argumentValue))
+            if (argumentValue != null)
             {
                 return;
             }
 
+            message = message ?? $"Parameter {argumentName} not allowed for null. please check the function input.";
             var exception = new ArgumentNullException(argumentName, message);
 
             if (innerException != null)

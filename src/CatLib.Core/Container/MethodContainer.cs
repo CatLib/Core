@@ -47,8 +47,8 @@ namespace CatLib.Container
         /// <returns>The method binding data.</returns>
         public IMethodBind Bind(string method, object target, MethodInfo methodInfo)
         {
-            Guard.NotEmptyOrNull(method, nameof(method));
-            Guard.Requires<ArgumentNullException>(methodInfo != null);
+            Guard.ParameterNotNull(method, nameof(method));
+            Guard.ParameterNotNull(methodInfo, nameof(methodInfo));
 
             if (!methodInfo.IsStatic)
             {
@@ -88,7 +88,7 @@ namespace CatLib.Container
         /// <returns>The return value of method.</returns>
         public object Invoke(string method, params object[] userParams)
         {
-            Guard.NotEmptyOrNull(method, nameof(method));
+            Guard.ParameterNotNull(method, nameof(method));
 
             lock (syncRoot)
             {

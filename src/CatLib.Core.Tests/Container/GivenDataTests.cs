@@ -41,24 +41,6 @@ namespace CatLib.Container.Tests
             Assert.AreEqual(container.Type2Service(typeof(GivenDataTest)), bindData.GetContextual("needs2"));
         }
 
-        /// <summary>
-        /// 检查给与的无效值.
-        /// </summary>
-        [TestMethod]
-        public void CheckGivenIllegalValue()
-        {
-            var container = new Container();
-            var bindData = new BindData(container, "CanGiven", (app, param) => "hello world", false);
-            var givenData = new GivenData<IBindData>(container, bindData);
-            givenData.Needs("needs");
-
-            ExceptionAssert.Throws<ArgumentNullException>(() =>
-            {
-                givenData.Given(string.Empty);
-            });
-        }
-
-
         private class TestGivenClosureClass
         {
             public string Name { get; set; }

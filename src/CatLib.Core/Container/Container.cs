@@ -114,9 +114,9 @@ namespace CatLib.Container
         private readonly object syncRoot = new object();
 
         /// <summary>
-        /// The reflected injection marker type.
+        /// Represents a skipped object to skip some dependency injection.
         /// </summary>
-        private readonly Type injectTarget;
+        private readonly object skipped;
 
         /// <summary>
         /// Whether the container is flushing.
@@ -153,8 +153,7 @@ namespace CatLib.Container
             instanceTiming.ReverseIterator(false);
             BuildStack = new Stack<string>(32);
             UserParamsStack = new Stack<object[]>(32);
-
-            injectTarget = typeof(InjectAttribute);
+            skipped = new object();
             methodContainer = new MethodContainer(this);
             flushing = false;
             instanceId = 0;
@@ -178,67 +177,69 @@ namespace CatLib.Container
             {
                 lock (syncRoot)
                 {
-                    var bind = GetBind(service);
-                    if (bind != null)
-                    {
-                        Unbind(bind);
-                    }
-
-                    Bind(service, (_, __) => value, false);
+                    GetBind(service)?.Unbind();
+                    Bind(service, (container, args) => value, false);
                 }
             }
         }
 
         /// <inheritdoc />
-        public void Tag(string tag, params string[] service)
+        public void Tag(string tag, params string[] services)
         {
-            Guard.NotEmptyOrNull(tag, nameof(tag));
-            Guard.Requires<ArgumentNullException>(service != null);
-            Guard.Requires<ArgumentNullException>(service.Length > 0);
-            Guard.Requires<ArgumentNullException>(
-                !Array.Exists(service, (s) => string.IsNullOrEmpty(s)));
+            Guard.ParameterNotNull(tag, nameof(tag));
+
+            services = services ?? Array.Empty<string>();
 
             lock (syncRoot)
             {
                 GuardFlushing();
-                if (!tags.TryGetValue(tag, out List<string> list))
+
+                if (!tags.TryGetValue(tag, out List<string> collection))
                 {
-                    tags[tag] = list = new List<string>();
+                    tags[tag] = collection = new List<string>();
                 }
 
-                list.AddRange(service);
+                foreach (var service in services)
+                {
+                    if (string.IsNullOrEmpty(service))
+                    {
+                        continue;
+                    }
+
+                    collection.Add(service);
+                }
             }
         }
 
         /// <inheritdoc />
         public object[] Tagged(string tag)
         {
-            Guard.NotEmptyOrNull(tag, nameof(tag));
+            Guard.ParameterNotNull(tag, nameof(tag));
+
             lock (syncRoot)
             {
                 if (!tags.TryGetValue(tag, out List<string> services))
                 {
-                    throw new LogicException($"Tag [{tag}] is not exist.");
+                    throw new LogicException($"Tag \"{tag}\" is not exist.");
                 }
 
-                var result = new object[services.Count];
-                for (var i = 0; i < services.Count; i++)
-                {
-                    result[i] = Make(services[i]);
-                }
-
-                return result;
+                return Arr.Map(services, (service) => Make(service));
             }
         }
 
         /// <inheritdoc />
         public IBindData GetBind(string service)
         {
-            Guard.NotEmptyOrNull(service, nameof(service));
+            if (string.IsNullOrEmpty(service))
+            {
+                return null;
+            }
+
             lock (syncRoot)
             {
                 service = AliasToService(service);
-                return bindings.TryGetValue(service, out BindData bindData) ? bindData : null;
+                return bindings.TryGetValue(service, out BindData bindData)
+                    ? bindData : null;
             }
         }
 
@@ -251,7 +252,8 @@ namespace CatLib.Container
         /// <inheritdoc />
         public bool HasInstance(string service)
         {
-            Guard.NotEmptyOrNull(service, nameof(service));
+            Guard.ParameterNotNull(service, nameof(service));
+
             lock (syncRoot)
             {
                 service = AliasToService(service);
@@ -262,7 +264,8 @@ namespace CatLib.Container
         /// <inheritdoc />
         public bool IsResolved(string service)
         {
-            Guard.NotEmptyOrNull(service, nameof(service));
+            Guard.ParameterNotNull(service, nameof(service));
+
             lock (syncRoot)
             {
                 service = AliasToService(service);
@@ -273,7 +276,8 @@ namespace CatLib.Container
         /// <inheritdoc />
         public bool CanMake(string service)
         {
-            Guard.NotEmptyOrNull(service, nameof(service));
+            Guard.ParameterNotNull(service, nameof(service));
+
             lock (syncRoot)
             {
                 service = AliasToService(service);
@@ -305,12 +309,12 @@ namespace CatLib.Container
         /// <inheritdoc />
         public IContainer Alias(string alias, string service)
         {
-            Guard.NotEmptyOrNull(alias, nameof(alias));
-            Guard.NotEmptyOrNull(service, nameof(service));
+            Guard.ParameterNotNull(alias, nameof(alias));
+            Guard.ParameterNotNull(service, nameof(service));
 
             if (alias == service)
             {
-                throw new LogicException($"Alias is same as service name: [{alias}].");
+                throw new LogicException($"Alias is same as service: \"{alias}\".");
             }
 
             alias = FormatService(alias);
@@ -319,30 +323,31 @@ namespace CatLib.Container
             lock (syncRoot)
             {
                 GuardFlushing();
+
                 if (aliases.ContainsKey(alias))
                 {
-                    throw new LogicException($"Alias [{alias}] is already exists.");
+                    throw new LogicException($"Alias \"{alias}\" is already exists.");
                 }
 
                 if (bindings.ContainsKey(alias))
                 {
-                    throw new LogicException($"Alias [{alias}] has been used for service name.");
+                    throw new LogicException($"Alias \"{alias}\" has been used for service name.");
                 }
 
                 if (!bindings.ContainsKey(service) && !instances.ContainsKey(service))
                 {
                     throw new CodeStandardException(
-                        $"You must {nameof(Bind)}() or {nameof(Instance)}() serivce before you can call {nameof(Alias)}().");
+                        $"You must {nameof(Bind)}() or {nameof(Instance)}() serivce before and you be able to called {nameof(Alias)}().");
                 }
 
                 aliases.Add(alias, service);
 
-                if (!aliasesReverse.TryGetValue(service, out List<string> serviceList))
+                if (!aliasesReverse.TryGetValue(service, out List<string> collection))
                 {
-                    aliasesReverse[service] = serviceList = new List<string>();
+                    aliasesReverse[service] = collection = new List<string>();
                 }
 
-                serviceList.Add(alias);
+                collection.Add(alias);
             }
 
             return this;
@@ -378,11 +383,11 @@ namespace CatLib.Container
         /// <inheritdoc />
         public IBindData Bind(string service, Type concrete, bool isStatic)
         {
-            Guard.Requires<ArgumentNullException>(concrete != null);
+            Guard.Requires<ArgumentNullException>(concrete != null, $"Parameter {nameof(concrete)} can not be null.");
 
             if (IsUnableType(concrete))
             {
-                throw new LogicException($"Bind type [{concrete}] can not built");
+                throw new LogicException($"Type \"{concrete}\" can not bind. please check if there is a list of types that cannot be built.");
             }
 
             service = FormatService(service);
@@ -392,8 +397,8 @@ namespace CatLib.Container
         /// <inheritdoc />
         public IBindData Bind(string service, Func<IContainer, object[], object> concrete, bool isStatic)
         {
-            Guard.NotEmptyOrNull(service, nameof(service));
-            Guard.Requires<ArgumentNullException>(concrete != null);
+            Guard.ParameterNotNull(service, nameof(service));
+            Guard.ParameterNotNull(concrete, nameof(concrete));
             GuardServiceName(service);
 
             service = FormatService(service);
@@ -555,7 +560,7 @@ namespace CatLib.Container
         /// <inheritdoc />
         public object Instance(string service, object instance)
         {
-            Guard.NotEmptyOrNull(service, nameof(service));
+            Guard.ParameterNotNull(service, nameof(service));
 
             lock (syncRoot)
             {
@@ -920,7 +925,8 @@ namespace CatLib.Container
         /// <returns>True if the specified type is cannot built. otherwise false.</returns>
         protected virtual bool IsUnableType(Type type)
         {
-            return type == null || type.IsAbstract || type.IsInterface || type.IsArray || type.IsEnum;
+            return type == null || type.IsAbstract || type.IsInterface || type.IsArray || type.IsEnum
+                || (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>));
         }
 
         /// <summary>
@@ -1139,6 +1145,12 @@ namespace CatLib.Container
                 return null;
             }
 
+            var inject = (InjectAttribute)baseParam.GetCustomAttribute(typeof(InjectAttribute));
+            if (inject != null && !inject.Required)
+            {
+                return skipped;
+            }
+
             throw MakeUnresolvableException(baseParam.Name, baseParam.DeclaringType);
         }
 
@@ -1152,6 +1164,12 @@ namespace CatLib.Container
                 out object instance))
             {
                 return instance;
+            }
+
+            var inject = (InjectAttribute)baseParam.GetCustomAttribute(typeof(InjectAttribute));
+            if (inject != null && !inject.Required)
+            {
+                return skipped;
             }
 
             throw MakeUnresolvableException(baseParam.Name, baseParam.DeclaringType);
@@ -1328,7 +1346,7 @@ namespace CatLib.Container
         {
             if (count > 255)
             {
-                throw new LogicException("Too many parameters , must be less or equal than 255");
+                throw new LogicException($"Too many parameters , must be less or equal than 255 or override the {nameof(GuardUserParamsCount)} method.");
             }
         }
 
@@ -1384,7 +1402,7 @@ namespace CatLib.Container
             foreach (var property in makeServiceInstance.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance))
             {
                 if (!property.CanWrite
-                    || !property.IsDefined(injectTarget, false))
+                    || !property.IsDefined(typeof(InjectAttribute), false))
                 {
                     continue;
                 }
@@ -1400,6 +1418,11 @@ namespace CatLib.Container
                 else
                 {
                     instance = ResolveAttrPrimitive(makeServiceBindData, needService, property);
+                }
+
+                if (ReferenceEquals(instance, skipped))
+                {
+                    continue;
                 }
 
                 if (!CanInject(property.PropertyType, instance))
@@ -1573,7 +1596,8 @@ namespace CatLib.Container
         /// <returns>The service instance.</returns>
         protected object Resolve(string service, params object[] userParams)
         {
-            Guard.NotEmptyOrNull(service, nameof(service));
+            Guard.ParameterNotNull(service, nameof(service));
+
             lock (syncRoot)
             {
                 service = AliasToService(service);
