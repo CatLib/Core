@@ -9,15 +9,16 @@
  * Document: https://catlib.io/
  */
 
+using CatLib.Container;
 using CatLib.Support;
-using CatLib.Tests;
 using CatLib.Tests.Fixture;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using CContainer = CatLib.Container.Container;
 
-namespace CatLib.Container.Tests
+namespace CatLib.Tests.Container
 {
     [TestClass]
     public class TestsContainer
@@ -814,8 +815,7 @@ namespace CatLib.Container.Tests
         [ExpectedException(typeof(CodeStandardException))]
         public void TestReboundNotExistsService()
         {
-            var container = new Container();
-            container.OnRebound("foo", (instance) =>
+            container.OnRebound("foobar", (instance) =>
             {
             });
         }
@@ -957,7 +957,7 @@ namespace CatLib.Container.Tests
         [TestMethod]
         public void TestClearExtend()
         {
-            if (!(container is Container catlibContainer))
+            if (!(container is CContainer catlibContainer))
             {
                 return;
             }
@@ -1053,7 +1053,7 @@ namespace CatLib.Container.Tests
 
         protected virtual IContainer CreateContainer()
         {
-            return new Container();
+            return new CContainer();
         }
     }
 }

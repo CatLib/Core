@@ -13,6 +13,7 @@ using CatLib.Container;
 using CatLib.Support;
 using CatLib.Tests.Fixture;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
 using CContainer = CatLib.Container.Container;
 
 namespace CatLib.Tests.Container
@@ -27,11 +28,124 @@ namespace CatLib.Tests.Container
         {
             container = new CContainer();
             container.Singleton<IContainer>(() => container);
+            container.Bind<IFoo, Foo>()
+                .Alias<Foo>()
+                .Alias("foo-alias");
+        }
+
+        [TestMethod]
+        public void TestMake()
+        {
+            Assert.AreSame(container, container.Make<IContainer>());
+            Assert.AreNotEqual(null, container.Make<Foo>("foo-alias"));
+
+            var bar = container.Make(typeof(Bar));
+            Assert.AreNotEqual(null, bar);
+        }
+
+        [TestMethod]
+        public void TestInstance()
+        {
+            container.Instance<Bar>(new Bar());
+
+            var bar = container.Make<Bar>();
+            Assert.AreNotEqual(null, bar);
+        }
+
+        [TestMethod]
+        public void TestRelease()
+        {
+            container.Release<IContainer>();
+            Assert.IsFalse(container.HasInstance<IContainer>());
+        }
+
+        [TestMethod]
+        public void TestAlias()
+        {
+            container.Alias<CContainer, IContainer>();
+            Assert.IsTrue(container.IsAlias<CContainer>());
+        }
+
+        [TestMethod]
+        public void TestReleaseWithObject()
+        {
+            container.Instance<string>("foo");
+            container.Instance<int>(10);
+            object[] data = null;
+            Assert.AreEqual(true, container.Release(ref data));
+
+            data = Array.Empty<object>();
+            Assert.AreEqual(true, container.Release(ref data));
+
+            data = new object[] { "foo", 10 };
+            Assert.AreEqual(true, container.Release(ref data));
+            Assert.AreEqual(true, data.Length == 0);
+
+            data = new object[] { "foo", 10, 100 };
+            Assert.AreEqual(false, container.Release(ref data));
+            Assert.AreEqual(true, data.Length == 3);
+
+            container.Instance<int>(10);
+            data = new object[] { "foo", 10, 100 };
+            Assert.AreEqual(false, container.Release(ref data, false));
+            Assert.AreEqual(true, data.Length == 2);
+            CollectionAssert.AreEqual(new object[] { "foo", 100 }, data);
+
+            container.Instance<string>("foo");
+            data = new object[] { 10, "foo", 100 };
+            Assert.AreEqual(false, container.Release(ref data));
+            Assert.AreEqual(true, data.Length == 2);
+            CollectionAssert.AreEqual(new object[] { 10, 100 }, data);
+        }
+
+        [TestMethod]
+        public void TestBindIf()
+        {
+            Assert.IsFalse(container.BindIf("foo-alias", (container, args) => new Foo(), true, out _));
+            Assert.IsFalse(container.BindIf<IFoo, Foo>(out _));
+            Assert.IsTrue(container.BindIf<Bar>(out _));
+        }
+
+        [TestMethod]
+        public void TestSingletonIf()
+        {
+            Assert.IsFalse(container.SingletonIf("foo-alias", (container, args) => new Foo(), out _));
+            Assert.IsFalse(container.SingletonIf<IFoo, Foo>(out _));
+            Assert.IsTrue(container.SingletonIf<Bar>(out _));
+        }
+
+        [TestMethod]
+        public void TestGetBind()
+        {
+            Assert.AreNotEqual(null, container.GetBind<IFoo>());
+        }
+
+        [TestMethod]
+        public void TestCanMake()
+        {
+            Assert.IsTrue(container.CanMake<IContainer>());
+            Assert.IsFalse(container.CanMake<int>());
+        }
+        
+        [TestMethod]
+        public void TestIsStatic()
+        {
+            Assert.IsTrue(container.IsStatic<IContainer>());
+            Assert.IsFalse(container.IsStatic<IFoo>());
+        }
+
+        [TestMethod]
+        public void TestIsAlias()
+        {
+            Assert.IsFalse(container.IsAlias<IFoo>());
+            Assert.IsTrue(container.IsAlias<Foo>());
+            Assert.IsFalse(container.IsAlias<IContainer>());
         }
 
         [TestMethod]
         public void TestWrap()
         {
+            container = new CContainer();
             container.Singleton<IFoo, Foo>().Alias<Foo>();
             var expected = container.Make<IFoo>();
             var count = 0;
@@ -76,6 +190,7 @@ namespace CatLib.Tests.Container
         [TestMethod]
         public void TestCall()
         {
+            var container = new CContainer();
             container.Singleton<IFoo, Foo>().Alias<Foo>();
             var expected = container.Make<IFoo>();
             var count = 0;
@@ -114,21 +229,104 @@ namespace CatLib.Tests.Container
         }
 
         [TestMethod]
+        public void TestOnResolving()
+        {
+            var count = 0;
+            container.OnResolving<IFoo>((foo) =>
+            {
+                Assert.AreNotEqual(null, foo);
+                count++;
+            });
+
+            container.OnResolving<Foo>((binder, foo) =>
+            {
+                Assert.AreNotEqual(null, foo);
+                count++;
+            });
+
+            container.OnResolving<IContainer>((binder, foo) =>
+            {
+                Assert.AreNotEqual(null, foo);
+                count++;
+            });
+
+            container.Make<IFoo>();
+
+            Assert.AreEqual(2, count);
+        }
+
+        [TestMethod]
+        public void TestOnAfterResolving()
+        {
+            var count = 0;
+            container.OnAfterResolving<IFoo>((foo) =>
+            {
+                Assert.AreNotEqual(null, foo);
+                count++;
+            });
+
+            container.OnAfterResolving<Foo>((binder, foo) =>
+            {
+                Assert.AreNotEqual(null, foo);
+                count++;
+            });
+
+            container.OnAfterResolving<IContainer>((binder, foo) =>
+            {
+                Assert.AreNotEqual(null, foo);
+                count++;
+            });
+
+            container.Make<IFoo>();
+
+            Assert.AreEqual(2, count);
+        }
+
+        [TestMethod]
+        public void TestOnRelease()
+        {
+            container.Unbind<IFoo>();
+            container.Singleton<IFoo, Foo>();
+
+            var count = 0;
+            container.OnRelease<IFoo>((foo) =>
+            {
+                Assert.AreNotEqual(null, foo);
+                count++;
+            });
+
+            container.OnRelease<Foo>((binder, foo) =>
+            {
+                Assert.AreNotEqual(null, foo);
+                count++;
+            });
+
+            container.OnRelease<IContainer>((binder, foo) =>
+            {
+                Assert.AreNotEqual(null, foo);
+                count++;
+            });
+
+            container.Make<IFoo>();
+            Assert.AreEqual(0, count);
+
+            container.Release<IFoo>();
+            Assert.AreEqual(2, count);
+        }
+
+        [TestMethod]
         [ExpectedExceptionAndMessage(typeof(LogicException),
             "Function \"method-is-not-found\" not found.")]
         public void TestCallIllegal()
         {
-            container.Bind<Foo>();
-            container.Bind<Bar>();
-
             var foobar = FooBar.New();
-
             container.Call(foobar, "method-is-not-found");
         }
 
         [TestMethod]
         public void TestFactory()
         {
+            container.Flush();
             container.Instance<IFoo>(new Foo());
             container.Instance("bar", "bar");
 
@@ -143,18 +341,7 @@ namespace CatLib.Tests.Container
         [TestMethod]
         public void TestHasBind()
         {
-            container.Bind("foo", (container, args) => "foo")
-                     .Alias<IFoo>();
             Assert.IsTrue(container.HasBind<IFoo>());
-        }
-
-        [TestMethod]
-        public void TestIsAlias()
-        {
-            container.Bind("foo", (container, args) => "foo", false)
-                     .Alias<IFoo>();
-
-            Assert.IsTrue(container.IsAlias<IFoo>());
         }
 
         [TestMethod]
@@ -211,6 +398,17 @@ namespace CatLib.Tests.Container
 
             var instances = container.Tagged("foobar");
             Assert.AreEqual(true, container.Release(ref instances));
+        }
+
+        [TestMethod]
+        public void TestExtend()
+        {
+            container.Bind<string>(() => "foo");
+            container.Bind<object>(() => "baz");
+            container.Extend<string>((instance) => instance + "bar");
+
+            Assert.AreEqual("foobar", container.Make<string>());
+            Assert.AreEqual("bazbar", container.Make<object>());
         }
 
         [TestMethod]
@@ -293,9 +491,9 @@ namespace CatLib.Tests.Container
         public void TestContainerMethodContextual()
         {
             var foo = new Foo();
-            App.BindMethod("Foo.EchoInt", foo).Needs("$input").Given(() => 200);
-            Assert.AreEqual(100, App.Invoke("Foo.EchoInt", 100));
-            Assert.AreEqual(200, App.Invoke("Foo.EchoInt"));
+            container.BindMethod("Foo.EchoInt", foo).Needs("$input").Given(() => 200);
+            Assert.AreEqual(100, container.Invoke("Foo.EchoInt", 100));
+            Assert.AreEqual(200, container.Invoke("Foo.EchoInt"));
         }
     }
 }
