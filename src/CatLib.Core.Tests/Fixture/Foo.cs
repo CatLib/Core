@@ -13,6 +13,21 @@ namespace CatLib.Tests.Fixture
 {
     public class Foo : IFoo
     {
+        public static string Echo(string input)
+        {
+            return input;
+        }
+
+        public int EchoInt(int input)
+        {
+            return input;
+        }
+
+        public float EchoFloat(float input)
+        {
+            return input;
+        }
+
         public override string ToString()
         {
             return "foo";

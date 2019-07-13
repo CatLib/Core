@@ -26,6 +26,7 @@ namespace CatLib.Tests.Container
         public void Initialize()
         {
             container = new CContainer();
+            container.Singleton<IContainer>(() => container);
         }
 
         [TestMethod]
@@ -212,5 +213,89 @@ namespace CatLib.Tests.Container
             Assert.AreEqual(true, container.Release(ref instances));
         }
 
+        [TestMethod]
+        public void TestBindMethod()
+        {
+            container.BindMethod("foo", () => "foo");
+            Assert.AreEqual("foo", container.Invoke("foo"));
+
+            container.BindMethod("bar", (IContainer container)
+                => container != null);
+            Assert.IsTrue((bool)container.Invoke("bar"));
+
+            container.BindMethod("echo", (string input) =>
+            {
+                return input;
+            });
+            Assert.AreEqual("foobar", container.Invoke("echo", "foobar"));
+        }
+
+        [TestMethod]
+        public void TestUnbindMethodWithMethodName()
+        {
+            container.BindMethod("foo", () => "foo");
+            container.BindMethod("bar", () => "bar");
+
+            container.UnbindMethod("foo");
+
+            ExceptionAssert.Throws<LogicException>(() =>
+            {
+                container.Invoke("foo");
+            });
+
+            Assert.AreEqual("bar", container.Invoke("bar"));
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(LogicException))]
+        public void TestBindMethodExists()
+        {
+            container.BindMethod("foo", () => "foo");
+            container.BindMethod("foo", () => "bar");
+        }
+
+        [TestMethod]
+        public void TestBindMethodStatic()
+        {
+            container.BindMethod<string>("echo", Foo.Echo);
+            Assert.AreEqual("foo", container.Invoke("echo", "foo"));
+        }
+
+        [TestMethod]
+        public void TestUnbindWithObject()
+        {
+            var foo1 = new Foo();
+            container.BindMethod("Foo1.EchoInt", foo1);
+            container.BindMethod("Foo1.EchoFloat", foo1);
+
+            var foo2 = new Foo();
+            container.BindMethod("Foo2.EchoInt", foo2);
+            container.BindMethod("Foo2.EchoFloat", foo2);
+
+            container.UnbindMethod(foo1);
+            container.UnbindMethod("unknow-method");
+
+            ExceptionAssert.Throws<LogicException>(() =>
+            {
+                container.Invoke("Foo1.EchoInt", 100);
+            });
+
+            ExceptionAssert.Throws<LogicException>(() =>
+            {
+                container.Invoke("Foo1.EchoFloat", 0.5f);
+            });
+
+            Assert.AreEqual(100, container.Invoke("Foo2.EchoInt", 100));
+            Assert.AreEqual(0.5f, container.Invoke("Foo2.EchoFloat", 0.5f));
+        }
+
+        [TestMethod]
+        public void TestContainerMethodContextual()
+        {
+            var foo = new Foo();
+            App.BindMethod("Foo.EchoInt", foo).Needs("$input").Given(() => 200);
+            Assert.AreEqual(100, App.Invoke("Foo.EchoInt", 100));
+            Assert.AreEqual(200, App.Invoke("Foo.EchoInt"));
+        }
     }
 }

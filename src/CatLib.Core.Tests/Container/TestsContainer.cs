@@ -16,11 +16,6 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
-
-#pragma warning disable CA1034
-#pragma warning disable CA1031
-#pragma warning disable CA1051
 
 namespace CatLib.Container.Tests
 {
@@ -254,7 +249,9 @@ namespace CatLib.Container.Tests
             {
                 Assert.Fail($"Expected throw an exception: {expected}, actual throw: {ex}");
             }
+#pragma warning disable CA1031
             catch (Exception)
+#pragma warning restore CA1031
             {
                 // test passed.
             }
@@ -982,194 +979,81 @@ namespace CatLib.Container.Tests
             Assert.AreEqual("barfoobaz", container["bar"]);
         }
 
-        protected virtual IContainer CreateContainer()
-        {
-            return new Container();
-        }
-
-        // todo: rebuild .....
-
         [TestMethod]
-        public void TestThisSet()
+        public void TestIndexer()
         {
-            var container = new Container();
-            container["hello"] = "world";
-            Assert.AreEqual("world", container.Make("hello"));
+            container["foo"] = "bar";
+            Assert.AreEqual("bar", container["foo"]);
         }
 
         [TestMethod]
-        public void TestMultThisSet()
+        public void TestIndexerOverride()
         {
-            var container = new Container();
-            container["hello"] = "world";
-            container["world"] = "hello";
-            Assert.AreEqual("world", container.Make("hello"));
-            Assert.AreEqual("hello", container.Make("world"));
-        }
+            container["foo"] = "bar";
+            Assert.AreEqual("bar", container["foo"]);
 
-        [TestMethod]
-        public void TestExistsThisSet()
-        {
-            var container = new Container();
-            container["hello"] = "world";
-            Assert.AreEqual("world", container.Make("hello"));
-            container["hello"] = 123;
-            Assert.AreEqual(123, container.Make("hello"));
+            container["foo"] = "baz";
+            Assert.AreEqual("baz", container["foo"]);
         }
 
         [TestMethod]
         public void TestOnAfterResolving()
         {
-            var container = new Container();
-            var val = 0;
-            container.OnAfterResolving((_) =>
+            var step = 0;
+            container.OnAfterResolving((binder, instance) =>
             {
-                Assert.AreEqual(10, val);
-                val = 20;
+                Assert.AreEqual(1, step);
+                step = 2;
             });
-            container.OnAfterResolving((_,__) =>
+            container.OnAfterResolving((binder, instance) =>
             {
-                Assert.AreEqual(20, val);
-                val = 30;
+                Assert.AreEqual(2, step);
+                step = 3;
             });
-            container.OnResolving((_, __) =>
+            container.OnResolving((binder, instance) =>
             {
-                Assert.AreEqual(0, val);
-                val = 10;
+                Assert.AreEqual(0, step);
+                step = 1;
             });
 
-            container["hello"] = "hello";
-            Assert.AreEqual("hello", container["hello"]);
-            Assert.AreEqual(30, val);
+            container["foo"] = "bar";
+            Assert.AreEqual("bar", container["foo"]);
+            Assert.AreEqual(3, step);
         }
 
         [TestMethod]
         public void TestOnAfterResolvingLocal()
         {
-            var container = new Container();
-            var val = 0;
-            container.Bind("hello", (_, __) => "world").OnAfterResolving(() =>
+            var step = 0;
+            container.Bind("foo", (binder, instance) => "bar")
+                .OnAfterResolving(() =>
             {
-                Assert.AreEqual(10, val);
-                val = 20;
+                Assert.AreEqual(1, step);
+                step = 2;
             }).OnAfterResolving((_) =>
             {
-                Assert.AreEqual(20, val);
-                val = 30;
+                Assert.AreEqual(2, step);
+                step = 3;
             }).OnResolving(() =>
             {
-                Assert.AreEqual(0, val);
-                val = 10;
+                Assert.AreEqual(0, step);
+                step = 1;
             });
 
-            Assert.AreEqual("world", container["hello"]);
-            Assert.AreEqual(30, val);
-        }
-
-        public class TestNeedGivenWithParamNameClass
-        {
-            public int MyParam { get; set; }
-
-            public TestNeedGivenWithParamNameClass(int myParam)
-            {
-                MyParam = myParam;
-            }
-        }
-
-        [TestMethod]
-        public void TestNeedGivenWithParamName()
-        {
-            var container = new Container();
-            container.Bind<TestNeedGivenWithParamNameClass>()
-                .Needs("$myParam").Given(() => 100);
-
-            Assert.AreEqual(100, container.Make<TestNeedGivenWithParamNameClass>().MyParam);
-
-            container = new Container();
-            container.Bind<TestNeedGivenWithParamNameClass>()
-                .Needs("$myParam").Given<int>();
-            container.Bind<int>(() => 200);
-
-            Assert.AreEqual(200, container.Make<TestNeedGivenWithParamNameClass>().MyParam);
+            Assert.AreEqual("bar", container["foo"]);
+            Assert.AreEqual(3, step);
         }
 
         [TestMethod]
         public void TestNullRelease()
         {
-            var container = new Container();
             Assert.AreEqual(false, container.Release(null));
         }
 
-        public class TestGivenInvalidTypeClass
-        {
-            public TestGivenInvalidTypeClass(Container container)
-            {
-                Assert.Fail();
-            }
-        }
 
-        [TestMethod]
-        [ExpectedException(typeof(UnresolvableException))]
-        public void TestGivenInvalidType()
+        protected virtual IContainer CreateContainer()
         {
-            var container = new Container();
-            container.Bind<TestGivenInvalidTypeClass>()
-                .Needs("$container").Given(() => 123);
-            container.Make<TestGivenInvalidTypeClass>();
-        }
-
-        public class TestGivenInvalidTypeAttrClass
-        {
-            [Inject]
-            public Container container { get; set; }
-        }
-
-        [TestMethod]
-        [ExpectedException(typeof(UnresolvableException))]
-        public void TestGivenInvalidTypeAttr()
-        {
-            var container = new Container();
-            container.Bind<TestGivenInvalidTypeAttrClass>()
-                .Needs("$container").Given(() => 123);
-            container.Make<TestGivenInvalidTypeAttrClass>();
-        }
-
-        public class NotSupportNullInject : Container
-        {
-            protected override bool CanInject(Type type, object instance)
-            {
-                return instance != null;
-            }
-        }
-
-        [TestMethod]
-        [ExpectedException(typeof(UnresolvableException))]
-        public void TestGivenInvalidTypeAttrNotSupportNullInject()
-        {
-            var container = new NotSupportNullInject();
-            container.Bind<TestGivenInvalidTypeAttrClass>()
-                .Needs("$container").Given(() => null);
-            container.Make<TestGivenInvalidTypeAttrClass>();
-        }
-
-        [TestMethod]
-        [ExpectedException(typeof(UnresolvableException))]
-        public void TestGivenInvalidTypeNotSupportNullInject()
-        {
-            var container = new NotSupportNullInject();
-            container.Bind<TestGivenInvalidTypeClass>()
-                .Needs("$container").Given(() => null);
-            container.Make<TestGivenInvalidTypeClass>();
-        }
-
-        [TestMethod]
-        [ExpectedException(typeof(LogicException))]
-        public void TestSetAliasIsService()
-        {
-            var container = new Container();
-            container.Bind("abc", (c, p) => 1, false);
-            container.Bind("ccc", (c, p) => 1, false);
-            container.Alias("abc", "ccc");
+            return new Container();
         }
     }
 }
