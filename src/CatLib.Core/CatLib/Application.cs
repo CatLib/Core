@@ -27,7 +27,7 @@ namespace CatLib
     public class Application : CatLibContainer, IApplication
     {
         private static string version;
-        private readonly List<IServiceProvider> loadedProviders;
+        private readonly IList<IServiceProvider> loadedProviders;
         private readonly int mainThreadId;
         private bool bootstrapped;
         private bool inited;
@@ -267,7 +267,7 @@ namespace CatLib
         /// <inheritdoc />
         public virtual void Register(IServiceProvider provider, bool force = false)
         {
-            Guard.Requires<ArgumentNullException>(provider != null);
+            Guard.Requires<ArgumentNullException>(provider != null, $"Parameter \"{nameof(provider)}\" can not be null.");
 
             if (IsRegistered(provider))
             {

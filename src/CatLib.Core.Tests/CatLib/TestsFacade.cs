@@ -17,7 +17,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace CatLib.Tests
 {
     [TestClass]
-    public class FacaedTests
+    public class TestsFacade
     {
         public class FacaedTestClass : IFacaedTestClass
         {

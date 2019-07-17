@@ -9,17 +9,19 @@
  * Document: https://catlib.io/
  */
 
+using CatLib.Support;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace CatLib.Support.Tests
+namespace CatLib.Tests.Support
 {
     [TestClass]
-    public class StringExtensionTests
+    public class TestsStringExtension
     {
         [TestMethod]
         public void TestToStream()
         {
-            Assert.AreNotEqual(null, "hello world".ToStream());
+            var stream = "foo".ToStream();
+            Assert.AreEqual("foo", stream.ToText());
         }
     }
 }
