@@ -20,7 +20,7 @@ namespace CatLib.Tests.Fixture
 
         public VariantModel(int id)
         {
-            if(id == -1)
+            if (id == -1)
             {
                 throw new TestException("VariantModel");
             }
@@ -29,7 +29,7 @@ namespace CatLib.Tests.Fixture
             {
                 Name = "iron man";
             }
-            else if(id == 2)
+            else if (id == 2)
             {
                 Name = "black window";
             }

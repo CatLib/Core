@@ -14,14 +14,9 @@ using CatLib.EventDispatcher;
 using CatLib.Support;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
-using System;
 using System.Diagnostics;
 using System.Reflection;
-using System.Threading;
 using System.Threading.Tasks;
-
-#pragma warning disable CA1034
-#pragma warning disable CA1051
 
 namespace CatLib.Tests
 {
@@ -250,7 +245,7 @@ namespace CatLib.Tests
             var count = 0;
             foo.Setup((o) => o.Bootstrap()).Callback(() =>
             {
-                 Assert.AreEqual(0, count++);
+                Assert.AreEqual(0, count++);
             });
 
             bar.Setup((o) => o.Bootstrap()).Callback(() =>

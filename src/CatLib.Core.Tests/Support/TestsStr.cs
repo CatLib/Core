@@ -42,7 +42,7 @@ namespace CatLib.Tests.Support
         public void TestSplit()
         {
             var actual = Str.Split("foobaro", 2);
-            Assert.AreEqual("fo" , actual[0]);
+            Assert.AreEqual("fo", actual[0]);
             Assert.AreEqual("ob", actual[1]);
             Assert.AreEqual("ar", actual[2]);
             Assert.AreEqual("o", actual[3]);
@@ -92,7 +92,7 @@ namespace CatLib.Tests.Support
         public void TestSubstringCount()
         {
             var count = Str.SubstringCount("foobarbaz", "ba");
-            Assert.AreEqual(2 , count);
+            Assert.AreEqual(2, count);
 
             count = Str.SubstringCount("foobar", "o");
             Assert.AreEqual(2, count);
@@ -134,7 +134,7 @@ namespace CatLib.Tests.Support
             actual = Str.Pad(10, "foo", "barbaz");
             Assert.AreEqual("foobarbazb", actual);
 
-            actual = Str.Pad(10, "foo", "barbaz" , Str.PadType.Left);
+            actual = Str.Pad(10, "foo", "barbaz", Str.PadType.Left);
             Assert.AreEqual("barbazbfoo", actual);
 
             actual = Str.Pad(3, "foo", "barbaz", Str.PadType.Left);
@@ -242,7 +242,7 @@ namespace CatLib.Tests.Support
             Assert.AreEqual("hello world...", actual);
 
             actual = Str.Truncate("hello world sun sname", 15, Str.Space);
-            Assert.AreEqual("hello world..." , actual);
+            Assert.AreEqual("hello world...", actual);
 
             var regex = new Regex("orl");
             actual = Str.Truncate("hello worldrldddorl sun sname", 15, regex);

@@ -49,7 +49,7 @@ namespace CatLib.Tests.Container
             container.Tag("tag", service);
             container.Tag("tag", "baz", "bar");
 
-            CollectionAssert.AreEqual(new object [] { foo, 100, 200 },
+            CollectionAssert.AreEqual(new object[] { foo, 100, 200 },
                 container.Tagged("tag"));
         }
 
@@ -190,7 +190,7 @@ namespace CatLib.Tests.Container
             {
                 container.Bind("$foo", (container, args) => "Illegal placeholder", false);
             });
-           
+
         }
 
         [TestMethod]
@@ -246,7 +246,7 @@ namespace CatLib.Tests.Container
                 container.Alias(alias, service);
                 Assert.Fail(reason);
             }
-            catch (Exception ex) when(ex.GetType() != expected)
+            catch (Exception ex) when (ex.GetType() != expected)
             {
                 Assert.Fail($"Expected throw an exception: {expected}, actual throw: {ex}");
             }
@@ -695,7 +695,7 @@ namespace CatLib.Tests.Container
         {
             var count = 0;
             container.Bind("foo", typeof(Foo), true)
-                     .OnRelease((binder, instance)=>
+                     .OnRelease((binder, instance) =>
                      {
                          Assert.AreEqual(typeof(Foo), instance.GetType());
                          count++;
@@ -746,7 +746,7 @@ namespace CatLib.Tests.Container
         public void TestFlushInstanceService()
         {
             container.Bind("foo", typeof(Foo), true)
-                     .OnRelease((binder, instance)=>
+                     .OnRelease((binder, instance) =>
                      {
                          container.Instance("bar", "bar");
                      });

@@ -93,7 +93,7 @@ namespace CatLib.Support.Tests
         {
             var baseStream = "hello world , my name is miaomiao".ToStream();
             baseStream.Seek(2, SeekOrigin.Begin);
-            var segmentStream = new SegmentStream(baseStream, 9) {Position = 4};
+            var segmentStream = new SegmentStream(baseStream, 9) { Position = 4 };
             Assert.AreEqual(4, segmentStream.Position);
         }
 
@@ -154,7 +154,7 @@ namespace CatLib.Support.Tests
         {
             var baseStream = "hello world , my name is miaomiao".ToStream();
             var segmentStream = new SegmentStream(baseStream, 11);
-            segmentStream.Seek(0, (SeekOrigin) 100);
+            segmentStream.Seek(0, (SeekOrigin)100);
         }
 
         [TestMethod]

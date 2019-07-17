@@ -9,13 +9,12 @@
  * Document: https://catlib.io/
  */
 
-using CatLib.EventDispatcher;
-using Dispatcher = CatLib.EventDispatcher.EventDispatcher;
+using CatLib.Support;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Moq;
 using System;
 using System.Linq;
-using Moq;
-using CatLib.Support;
+using Dispatcher = CatLib.EventDispatcher.EventDispatcher;
 
 namespace CatLib.EventDispatcher.Tests
 {
@@ -59,7 +58,7 @@ namespace CatLib.EventDispatcher.Tests
             eventDispatcher.AddListener<TestEventArgs>(third.Object.Foo);
 
             CollectionAssert.AreEqual(
-                new Action<TestEventArgs>[] 
+                new Action<TestEventArgs>[]
                 {
                     second.Object.Foo, third.Object.Foo, first.Object.Foo
                 },

@@ -10,9 +10,9 @@
  */
 
 using CatLib.Tests;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 #pragma warning disable CA1031
 
@@ -90,7 +90,7 @@ namespace CatLib.Support.Tests
                 }
             }
 
-            Assert.AreEqual("1" , arr[0]);
+            Assert.AreEqual("1", arr[0]);
             Assert.AreEqual("2", arr[1]);
             Assert.AreEqual("3", arr[2]);
             Assert.AreEqual("4", arr[3]);
@@ -308,7 +308,7 @@ namespace CatLib.Support.Tests
         [TestMethod]
         public void TestFillWithSource()
         {
-            var data = new[] {"dog", "cat", "white", "red", "world"};
+            var data = new[] { "dog", "cat", "white", "red", "world" };
             var result = Arr.Fill(2, 3, "aaa", data);
             Assert.AreEqual("dog", result[0]);
             Assert.AreEqual("cat", result[1]);
@@ -319,7 +319,7 @@ namespace CatLib.Support.Tests
             Assert.AreEqual("red", result[6]);
             Assert.AreEqual("world", result[7]);
 
-            Assert.AreEqual("dog" , data[0]);
+            Assert.AreEqual("dog", data[0]);
             Assert.AreEqual("cat", data[1]);
             Assert.AreEqual("white", data[2]);
             Assert.AreEqual("red", data[3]);
@@ -386,7 +386,7 @@ namespace CatLib.Support.Tests
         [TestMethod]
         public void TestFilter()
         {
-            var result = Arr.Filter(new [] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 0 }, (i) => i % 2 == 0);
+            var result = Arr.Filter(new[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 0 }, (i) => i % 2 == 0);
             Assert.AreEqual(2, result[0]);
             Assert.AreEqual(4, result[1]);
             Assert.AreEqual(6, result[2]);
@@ -398,7 +398,7 @@ namespace CatLib.Support.Tests
         [TestMethod]
         public void TestFilterExpected()
         {
-            var result = Arr.Filter(new[] {1, 2, 3, 4, 5, 6, 7, 8, 9, 0}, (i) => i % 2 == 0, false);
+            var result = Arr.Filter(new[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 0 }, (i) => i % 2 == 0, false);
             Assert.AreEqual(1, result[0]);
             Assert.AreEqual(3, result[1]);
             Assert.AreEqual(5, result[2]);
@@ -422,7 +422,7 @@ namespace CatLib.Support.Tests
         [TestMethod]
         public void TestMap()
         {
-            var data = new[] {1, 2, 3};
+            var data = new[] { 1, 2, 3 };
             var result = Arr.Map(data, (i) => i * 2);
             Assert.AreEqual(2, result[0]);
             Assert.AreEqual(4, result[1]);
@@ -551,7 +551,7 @@ namespace CatLib.Support.Tests
             Assert.AreEqual("b", data[1]);
             Assert.AreEqual("c", data[2]);
 
-            data = new[] {"a"};
+            data = new[] { "a" };
             result = Arr.Reverse(data);
 
             Assert.AreEqual(1, result.Length);
@@ -597,7 +597,7 @@ namespace CatLib.Support.Tests
         public void TestIndexOfString2()
         {
             var data = new[] { "a", "b", "c", "d", "e" };
-            var result = Arr.IndexOf(data, new[] { "d"});
+            var result = Arr.IndexOf(data, new[] { "d" });
 
             Assert.AreEqual(3, result);
         }
@@ -605,7 +605,7 @@ namespace CatLib.Support.Tests
         [TestMethod]
         public void TestIndexOfNull()
         {
-            Assert.AreEqual(-1, Arr.IndexOf(null, new[] {"d", "e"}));
+            Assert.AreEqual(-1, Arr.IndexOf(null, new[] { "d", "e" }));
         }
 
         [TestMethod]
@@ -621,7 +621,7 @@ namespace CatLib.Support.Tests
         public void TestIndexOfAny()
         {
             var data = new[] { 'a', 'b', 'c', 'd', 'e' };
-            var result = Arr.IndexOfAny(data, new[] { 'e', 'd' , 'b' });
+            var result = Arr.IndexOfAny(data, new[] { 'e', 'd', 'b' });
 
             Assert.AreEqual(1, result);
         }
@@ -651,7 +651,7 @@ namespace CatLib.Support.Tests
         public void TestDifference()
         {
             var data = new[] { "a", "b", "c", "d", "e" };
-            var result = Arr.Difference(data, new[] {"e", "d"});
+            var result = Arr.Difference(data, new[] { "e", "d" });
 
             Assert.AreEqual(3, result.Length);
             Assert.AreEqual("a", result[0]);
@@ -830,7 +830,7 @@ namespace CatLib.Support.Tests
         [TestMethod]
         public void TestSetReplace()
         {
-            var set = new[] {"a", "ab", "abc", "abcd", "abcdef"};
+            var set = new[] { "a", "ab", "abc", "abcd", "abcdef" };
 
             Arr.Set(ref set, (element) => element == "abc", "hello");
             Assert.AreEqual("a", set[0]);
@@ -843,7 +843,7 @@ namespace CatLib.Support.Tests
         [TestMethod]
         public void TestSetPush()
         {
-            var set = new [] { "a", "ab", "abc", "abcd", "abcdef" };
+            var set = new[] { "a", "ab", "abc", "abcd", "abcdef" };
 
             Arr.Set(ref set, (element) => element == "none", "hello");
             Assert.AreEqual("a", set[0]);

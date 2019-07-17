@@ -9,12 +9,12 @@
  * Document: https://catlib.io/
  */
 
-using CContainer = CatLib.Container.Container;
 using CatLib.Container;
 using CatLib.Support;
 using CatLib.Tests.Fixture;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
+using CContainer = CatLib.Container.Container;
 
 namespace CatLib.Tests.Container
 {
@@ -99,7 +99,7 @@ namespace CatLib.Tests.Container
                 count++;
             });
 
-            bindData.OnRelease(()=>
+            bindData.OnRelease(() =>
             {
                 count++;
             });

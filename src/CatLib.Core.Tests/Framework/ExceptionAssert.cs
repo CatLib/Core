@@ -9,8 +9,8 @@
  * Document: https://catlib.io/
  */
 
-using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
 
 #pragma warning disable CA1031
 

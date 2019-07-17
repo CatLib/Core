@@ -126,7 +126,7 @@ namespace CatLib.Tests.Container
             Assert.IsTrue(container.CanMake<IContainer>());
             Assert.IsFalse(container.CanMake<int>());
         }
-        
+
         [TestMethod]
         public void TestIsStatic()
         {
