@@ -980,7 +980,6 @@ namespace CatLib.Container
         /// <returns>True if the conversion was successful, otherwise false.</returns>
         protected virtual bool ChangeType(ref object result, Type conversionType)
         {
-#pragma warning disable CA1031
             try
             {
                 if (result == null || conversionType.IsInstanceOfType(result))
@@ -995,7 +994,9 @@ namespace CatLib.Container
                         result = Make(Type2Service(conversionType), result);
                         return true;
                     }
+#pragma warning disable CA1031
                     catch (Exception)
+#pragma warning restore CA1031
                     {
                         // ignored
                         // when throw exception then stop inject
@@ -1008,12 +1009,13 @@ namespace CatLib.Container
                     return true;
                 }
             }
+#pragma warning disable CA1031
             catch (Exception)
+#pragma warning restore CA1031
             {
                 // ignored
                 // when throw exception then stop inject
             }
-#pragma warning restore CA1031
 
             return false;
         }
@@ -1203,7 +1205,7 @@ namespace CatLib.Container
 
             throw MakeUnresolvableException(
                 baseParam.Name,
-                baseParam.Member != null ? baseParam.Member.DeclaringType : null);
+                baseParam.Member?.DeclaringType);
         }
 
         /// <inheritdoc cref="ResolvePrimitive"/>
@@ -1227,7 +1229,7 @@ namespace CatLib.Container
             // development overwrites ParameterInfo class.
             throw MakeUnresolvableException(
                 baseParam.Name,
-                baseParam.Member != null ? baseParam.Member.DeclaringType : null);
+                baseParam.Member?.DeclaringType);
         }
 
         /// <summary>
