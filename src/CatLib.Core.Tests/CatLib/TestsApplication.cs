@@ -170,7 +170,7 @@ namespace CatLib.Tests
         [TestMethod]
         public void TestGetProcess()
         {
-            Assert.AreEqual(Application.StartProcess.Construct, application.Process);
+            Assert.AreEqual(StartProcess.Construct, application.Process);
         }
 
         [TestMethod]
