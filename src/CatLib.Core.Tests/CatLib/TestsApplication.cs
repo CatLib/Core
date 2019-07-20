@@ -41,7 +41,7 @@ namespace CatLib.Tests
         }
 
         [TestMethod]
-        [ExpectedException(typeof(CodeStandardException))]
+        [ExpectedException(typeof(LogicException))]
         public void TestBootstrapRepeat()
         {
             application.Bootstrap();
@@ -50,7 +50,7 @@ namespace CatLib.Tests
         }
 
         [TestMethod]
-        [ExpectedException(typeof(CodeStandardException))]
+        [ExpectedException(typeof(LogicException))]
         public void TestInitRepeat()
         {
             application.Bootstrap();
@@ -59,7 +59,7 @@ namespace CatLib.Tests
         }
 
         [TestMethod]
-        [ExpectedException(typeof(CodeStandardException))]
+        [ExpectedException(typeof(LogicException))]
         public void TestInitNoBootstrap()
         {
             application.Init();
@@ -116,7 +116,7 @@ namespace CatLib.Tests
         }
 
         [TestMethod]
-        [ExpectedExceptionAndMessage(typeof(CodeStandardException))]
+        [ExpectedExceptionAndMessage(typeof(LogicException))]
         public void TestInitingRegister()
         {
             var foo = new Mock<IServiceProvider>();
@@ -133,7 +133,7 @@ namespace CatLib.Tests
         }
 
         [TestMethod]
-        [ExpectedExceptionAndMessage(typeof(CodeStandardException))]
+        [ExpectedExceptionAndMessage(typeof(LogicException))]
         public void TestTerminateRegister()
         {
             var foo = new Mock<IServiceProvider>();
@@ -214,7 +214,7 @@ namespace CatLib.Tests
         }
 
         [TestMethod]
-        [ExpectedException(typeof(CodeStandardException))]
+        [ExpectedException(typeof(LogicException))]
         public void TestRegistingMake()
         {
             var foo = new Mock<IServiceProvider>();

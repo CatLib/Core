@@ -189,7 +189,7 @@ namespace CatLib.Tests.Container
                 container.Bind(null, (container, args) => "invalid service name", false);
             });
 
-            Assert.ThrowsException<CodeStandardException>(() =>
+            Assert.ThrowsException<LogicException>(() =>
             {
                 container.Bind("$foo", (container, args) => "Illegal placeholder", false);
             });
@@ -234,7 +234,7 @@ namespace CatLib.Tests.Container
         }
 
         [TestMethod]
-        [DataRow("bar-alias", "bar", typeof(CodeStandardException), "Set an alias for a service that does not exist.")]
+        [DataRow("bar-alias", "bar", typeof(LogicException), "Set an alias for a service that does not exist.")]
         [DataRow(null, "bar", typeof(ArgumentNullException), "Alias name is null.")]
         [DataRow("baz", null, typeof(ArgumentNullException), "Service name is null.")]
         [DataRow("foo", "foo", typeof(LogicException), "Alias is same as service")]
@@ -652,7 +652,7 @@ namespace CatLib.Tests.Container
         }
 
         [TestMethod]
-        [ExpectedException(typeof(CodeStandardException))]
+        [ExpectedException(typeof(LogicException))]
         [DataRow("foo:bar")]
         [DataRow("$foo")]
         [DataRow("foo@bar")]
@@ -662,7 +662,7 @@ namespace CatLib.Tests.Container
         }
 
         [TestMethod]
-        [ExpectedException(typeof(CodeStandardException))]
+        [ExpectedException(typeof(LogicException))]
         public void TestInstanceNotAllowedSameObject()
         {
             var foo = new object();
@@ -750,7 +750,7 @@ namespace CatLib.Tests.Container
         }
 
         [TestMethod]
-        [ExpectedException(typeof(CodeStandardException))]
+        [ExpectedException(typeof(LogicException))]
         public void TestFlushInstanceService()
         {
             container.Bind("foo", typeof(Foo), true)
@@ -822,7 +822,7 @@ namespace CatLib.Tests.Container
         }
 
         [TestMethod]
-        [ExpectedException(typeof(CodeStandardException))]
+        [ExpectedException(typeof(LogicException))]
         public void TestReboundNotExistsService()
         {
             container.OnRebound("foobar", (instance) =>
