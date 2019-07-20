@@ -109,7 +109,7 @@ namespace CatLib
                 return;
             }
 
-            Facade<TService>.that = default(TService);
+            that = default(TService);
             released = true;
         }
 
