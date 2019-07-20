@@ -729,7 +729,7 @@ namespace CatLib.Support
             Guard.Requires<ArgumentException>(index < source.Length);
 
             var result = Splice(ref source, index, 1);
-            return result.Length > 0 ? result[0] : default(T);
+            return result.Length > 0 ? result[0] : default;
         }
 
         /// <summary>

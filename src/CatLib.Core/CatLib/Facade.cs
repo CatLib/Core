@@ -42,7 +42,7 @@ namespace CatLib
             Service = App.Type2Service(typeof(TService));
             App.OnNewApplication += app =>
             {
-                that = default(TService);
+                that = default;
                 binder = null;
                 inited = false;
                 released = false;
@@ -109,7 +109,7 @@ namespace CatLib
                 return;
             }
 
-            that = default(TService);
+            that = default;
             released = true;
         }
 
@@ -121,7 +121,7 @@ namespace CatLib
         {
             var newBinder = App.GetBind(Service);
             Rebind(newBinder);
-            that = (newBinder == null || !newBinder.IsStatic) ? default(TService) : newService;
+            that = (newBinder == null || !newBinder.IsStatic) ? default : newService;
         }
 
         /// <summary>

@@ -272,25 +272,6 @@ namespace CatLib.Support
         /// <summary>
         /// Fill the string with the new length.
         /// </summary>
-        /// <param name="str">The string to be filled.</param>
-        /// <param name="length">The new string length. If the value is less than the original length of the string, no action is taken.</param>
-        /// <param name="padStr">A string to be used for padding. The default is blank.</param>
-        /// <param name="type">
-        /// Fill in which side of the string.
-        /// <para><see cref="PadType.Both"/>Fill both sides of the string. If not even, get extra padding on the right side.</para>
-        /// <para><see cref="PadType.Left"/>Fill the left side of the string.</para>
-        /// <para><see cref="PadType.Right"/>Fill the right side of the string.</para>
-        /// </param>
-        /// <returns>Returns filled string.</returns>
-        [Obsolete("The overload method wile be remove in 2.0 version.")]
-        public static string Pad(string str, int length, string padStr = null, PadType type = PadType.Right)
-        {
-            return Pad(length, str, padStr, type);
-        }
-
-        /// <summary>
-        /// Fill the string with the new length.
-        /// </summary>
         /// <param name="length">The new string length. If the value is less than the original length of the string, no action is taken.</param>
         /// <param name="str">The string to be filled.</param>
         /// <param name="padStr">A string to be used for padding. The default is blank.</param>

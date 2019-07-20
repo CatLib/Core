@@ -658,14 +658,14 @@ namespace CatLib.Support
         {
             if (node == null)
             {
-                element = default(TElement);
+                element = default;
                 return false;
             }
 
             var result = node.Element;
             if (!Remove(node.Element, node.Score))
             {
-                element = default(TElement);
+                element = default;
                 return false;
             }
 

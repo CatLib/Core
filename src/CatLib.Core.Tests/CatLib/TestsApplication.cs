@@ -12,7 +12,6 @@
 using CatLib.Container;
 using CatLib.EventDispatcher;
 using CatLib.Exception;
-using CatLib.Support;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using System.Diagnostics;
