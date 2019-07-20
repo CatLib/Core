@@ -12,6 +12,7 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using SException = System.Exception;
 
 namespace CatLib.Support
 {
@@ -21,7 +22,7 @@ namespace CatLib.Support
     public sealed class Guard
     {
         private static Guard that;
-        private static IDictionary<Type, Func<string, Exception, object, Exception>> exceptionFactory;
+        private static IDictionary<Type, Func<string, SException, object, SException>> exceptionFactory;
 
         /// <summary>
         /// Gets the singleton instance of the Guard functionality.
@@ -49,8 +50,8 @@ namespace CatLib.Support
         /// <param name="innerException">The exception that is the cause of the current exception, or a null reference.</param>
         /// <param name="state">State will be passed to the registered exception build factory.</param>
         [System.Diagnostics.DebuggerNonUserCode]
-        public static void Requires<TException>(bool condition, string message = null, Exception innerException = null, object state = null)
-            where TException : Exception, new()
+        public static void Requires<TException>(bool condition, string message = null, SException innerException = null, object state = null)
+            where TException : SException, new()
         {
             Requires(typeof(TException), condition, message, innerException, state);
         }
@@ -64,7 +65,7 @@ namespace CatLib.Support
         /// <param name="innerException">The exception that is the cause of the current exception, or a null reference.</param>
         /// <param name="state">State will be passed to the registered exception build factory.</param>
         [System.Diagnostics.DebuggerNonUserCode]
-        public static void Requires(Type exception, bool condition, string message = null, Exception innerException = null, object state = null)
+        public static void Requires(Type exception, bool condition, string message = null, SException innerException = null, object state = null)
         {
             if (condition)
             {
@@ -82,7 +83,7 @@ namespace CatLib.Support
         /// <param name="message">The error message that explains the reason for the exception.</param>
         /// <param name="innerException">The exception that is the cause of the current exception, or a null reference.</param>
         [System.Diagnostics.DebuggerNonUserCode]
-        public static void ParameterNotNull(object argumentValue, string argumentName, string message = null, Exception innerException = null)
+        public static void ParameterNotNull(object argumentValue, string argumentName, string message = null, SException innerException = null)
         {
             if (argumentValue != null)
             {
@@ -106,7 +107,7 @@ namespace CatLib.Support
         /// <typeparam name="T">The type of exception.</typeparam>
         /// <param name="factory">The exception factory.</param>
         [System.Diagnostics.DebuggerNonUserCode]
-        public static void Extend<T>(Func<string, Exception, object, Exception> factory)
+        public static void Extend<T>(Func<string, SException, object, SException> factory)
         {
             Extend(typeof(T), factory);
         }
@@ -117,24 +118,24 @@ namespace CatLib.Support
         /// <param name="exception">The type of exception.</param>
         /// <param name="factory">The exception factory.</param>
         [System.Diagnostics.DebuggerNonUserCode]
-        public static void Extend(Type exception, Func<string, Exception, object, Exception> factory)
+        public static void Extend(Type exception, Func<string, SException, object, SException> factory)
         {
             VerfiyExceptionFactory();
             exceptionFactory[exception] = factory;
         }
 
-        private static Exception CreateExceptionInstance(Type exceptionType, string message, Exception innerException, object state)
+        private static SException CreateExceptionInstance(Type exceptionType, string message, SException innerException, object state)
         {
-            if (!typeof(Exception).IsAssignableFrom(exceptionType))
+            if (!typeof(SException).IsAssignableFrom(exceptionType))
             {
                 throw new ArgumentException(
-                    $"Type: {exceptionType} must be inherited from: {typeof(Exception)}.",
+                    $"Type: {exceptionType} must be inherited from: {typeof(SException)}.",
                     nameof(exceptionType));
             }
 
             VerfiyExceptionFactory();
 
-            if (exceptionFactory.TryGetValue(exceptionType, out Func<string, Exception, object, Exception> factory))
+            if (exceptionFactory.TryGetValue(exceptionType, out Func<string, SException, object, SException> factory))
             {
                 return factory(message, innerException, state);
             }
@@ -150,14 +151,14 @@ namespace CatLib.Support
                 SetField(exception, "_innerException", innerException);
             }
 
-            return (Exception)exception;
+            return (SException)exception;
         }
 
         private static void VerfiyExceptionFactory()
         {
             if (exceptionFactory == null)
             {
-                exceptionFactory = new Dictionary<Type, Func<string, Exception, object, Exception>>();
+                exceptionFactory = new Dictionary<Type, Func<string, SException, object, SException>>();
             }
         }
 

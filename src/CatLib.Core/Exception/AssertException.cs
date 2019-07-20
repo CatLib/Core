@@ -9,11 +9,11 @@
  * Document: https://catlib.io/
  */
 
-using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.Serialization;
+using SException = System.Exception;
 
-namespace CatLib.Support
+namespace CatLib.Exception
 {
     /// <summary>
     /// Represents an assertion exception.
@@ -42,7 +42,7 @@ namespace CatLib.Support
         /// </summary>
         /// <param name="message">The exception message.</param>
         /// <param name="innerException">The inner exception.</param>
-        public AssertException(string message, Exception innerException)
+        public AssertException(string message, SException innerException)
             : base(message, innerException)
         {
         }

@@ -11,10 +11,11 @@
 
 using System;
 using System.Runtime.Serialization;
+using SException = System.Exception;
 
 namespace CatLib.Tests
 {
-    public class TestException : Exception
+    public class TestException : SException
     {
         public TestException()
         {
@@ -25,7 +26,7 @@ namespace CatLib.Tests
         {
         }
 
-        public TestException(string message, Exception innerException)
+        public TestException(string message, SException innerException)
             : base(message, innerException)
         {
         }

@@ -9,12 +9,14 @@
  * Document: https://catlib.io/
  */
 
+using CatLib.Exception;
 using CatLib.Support;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Runtime.ExceptionServices;
 using System.Text;
+using SException = System.Exception;
 
 namespace CatLib.Container
 {
@@ -995,7 +997,7 @@ namespace CatLib.Container
                         return true;
                     }
 #pragma warning disable CA1031
-                    catch (Exception)
+                    catch (SException)
 #pragma warning restore CA1031
                     {
                         // ignored
@@ -1010,7 +1012,7 @@ namespace CatLib.Container
                 }
             }
 #pragma warning disable CA1031
-            catch (Exception)
+            catch (SException)
 #pragma warning restore CA1031
             {
                 // ignored
@@ -1258,7 +1260,7 @@ namespace CatLib.Container
         /// <param name="makeServiceType">The <see cref="Make"/> service type.</param>
         /// <param name="innerException">The inner exception.</param>
         /// <returns>The resolve failure exception instance.</returns>
-        protected virtual UnresolvableException MakeBuildFaildException(string makeService, Type makeServiceType, Exception innerException)
+        protected virtual UnresolvableException MakeBuildFaildException(string makeService, Type makeServiceType, SException innerException)
         {
             var message = makeServiceType != null
                 ? $"Class [{makeServiceType}] build faild. Service is [{makeService}]."
@@ -1274,7 +1276,7 @@ namespace CatLib.Container
         /// </summary>
         /// <param name="innerException">The inner exception.</param>
         /// <returns>The debug message.</returns>
-        protected virtual string GetInnerExceptionMessage(Exception innerException)
+        protected virtual string GetInnerExceptionMessage(SException innerException)
         {
             if (innerException == null)
             {
@@ -1522,7 +1524,7 @@ namespace CatLib.Container
                     return GetDependencies(makeServiceBindData, constructor.GetParameters(), userParams);
                 }
 #pragma warning disable CA1031
-                catch (Exception ex)
+                catch (SException ex)
                 {
                     if (exceptionDispatchInfo == null)
                     {
@@ -1681,11 +1683,11 @@ namespace CatLib.Container
                 return CreateInstance(makeServiceType, userParams);
             }
 #pragma warning disable CA1031
-            catch (Exception ex)
+            catch (SException ex)
+#pragma warning restore CA1031
             {
                 throw MakeBuildFaildException(makeServiceBindData.Service, makeServiceType, ex);
             }
-#pragma warning restore CA1031
         }
 
         /// <inheritdoc cref="CreateInstance(Bindable, Type, object[])"/>

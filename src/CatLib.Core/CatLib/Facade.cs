@@ -10,7 +10,6 @@
  */
 
 #pragma warning disable CA1000
-#pragma warning disable S3963
 #pragma warning disable S2743
 #pragma warning disable S1118
 
@@ -36,7 +35,9 @@ namespace CatLib
         /// <summary>
         /// Initializes static members of the <see cref="Facade{TService}"/> class.
         /// </summary>
+#pragma warning disable S3963
         static Facade()
+#pragma warning restore S3963
         {
             Service = App.Type2Service(typeof(TService));
             App.OnNewApplication += app =>

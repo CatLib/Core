@@ -10,6 +10,7 @@
  */
 
 using CatLib.Container;
+using CatLib.Exception;
 using CatLib.Support;
 using CatLib.Tests.Fixture;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
