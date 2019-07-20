@@ -67,43 +67,43 @@ namespace CatLib.Tests.Support
         [TestMethod]
         public void TestCustomComparer()
         {
-            var sortset = new SortSet<object, int>(new PriorityComparer());
+            var foo = new SortSet<object, int>(new PriorityComparer());
             for (var i = 0; i < 10; i++)
             {
-                sortset.Add(i, i);
+                foo.Add(i, i);
             }
 
             for (var i = 9; i >= 0; i--)
             {
-                Assert.AreEqual(i, sortset.Shift());
+                Assert.AreEqual(i, foo.Shift());
             }
 
-            sortset = new SortSet<object, int>();
+            foo = new SortSet<object, int>();
             for (var i = 0; i < 10; i++)
             {
-                sortset.Add(i, i);
+                foo.Add(i, i);
             }
 
             for (var i = 0; i < 10; i++)
             {
-                Assert.AreEqual(i, sortset.Shift());
+                Assert.AreEqual(i, foo.Shift());
             }
         }
 
         [TestMethod]
         public void TestAddObject()
         {
-            var sortset = new SortSet<object, int>();
+            var foo = new SortSet<object, int>();
             var collection = new List<object>();
 
             for (var i = 0; i < 10; i++)
             {
-                var foo = new object();
-                collection.Add(foo);
-                sortset.Add(foo, i);
+                var obj = new object();
+                collection.Add(obj);
+                foo.Add(obj, i);
             }
 
-            CollectionAssert.AreEqual(collection, sortset.ToArray());
+            CollectionAssert.AreEqual(collection, foo.ToArray());
         }
 
         [TestMethod]
@@ -369,14 +369,14 @@ namespace CatLib.Tests.Support
         [TestMethod]
         public void TestEmptyListForeach()
         {
-            foreach (var _ in sortset)
+            foreach (var item in sortset)
             {
                 Assert.Fail("Iteration is not allowed.");
             }
 
             sortset.ReverseIterator();
 
-            foreach (var _ in sortset)
+            foreach (var item in sortset)
             {
                 Assert.Fail("Iteration is not allowed.");
             }

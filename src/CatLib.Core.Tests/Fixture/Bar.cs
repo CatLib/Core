@@ -14,7 +14,7 @@ using System;
 
 namespace CatLib.Tests.Fixture
 {
-    public class Bar : IDisposable
+    public sealed class Bar : IDisposable
     {
         public Bar(int? num = null)
         {

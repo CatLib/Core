@@ -49,7 +49,8 @@ namespace CatLib.Tests.Container
             container.Tag("tag", service);
             container.Tag("tag", "baz", "bar");
 
-            CollectionAssert.AreEqual(new object[] { foo, 100, 200 },
+            CollectionAssert.AreEqual(
+                new object[] { foo, 100, 200 },
                 container.Tagged("tag"));
         }
 
@@ -62,7 +63,8 @@ namespace CatLib.Tests.Container
         }
 
         [TestMethod]
-        [ExpectedExceptionAndMessage(typeof(LogicException),
+        [ExpectedExceptionAndMessage(
+            typeof(LogicException),
             "Tag \"foo\" is not exist.")]
         public void TestTagNotExists()
         {
@@ -190,7 +192,6 @@ namespace CatLib.Tests.Container
             {
                 container.Bind("$foo", (container, args) => "Illegal placeholder", false);
             });
-
         }
 
         [TestMethod]
@@ -272,7 +273,6 @@ namespace CatLib.Tests.Container
             container.Bind("foo", (container, args) => "foo", false)
                      .Alias("foo-alias");
 
-
             Assert.IsTrue(container.IsAlias("foo-alias"));
             Assert.IsFalse(container.IsAlias("foo"));
         }
@@ -320,7 +320,8 @@ namespace CatLib.Tests.Container
         }
 
         [TestMethod]
-        [ExpectedExceptionAndMessage(typeof(LogicException),
+        [ExpectedExceptionAndMessage(
+            typeof(LogicException),
             "Too many parameters , must be less or equal than 255")]
         public void TestMakearameterOverflow()
         {
@@ -420,7 +421,8 @@ namespace CatLib.Tests.Container
         }
 
         [TestMethod]
-        [ExpectedException(typeof(UnresolvableException),
+        [ExpectedException(
+            typeof(UnresolvableException),
             "Unresolvable dependency , resolving [Name] in class")]
         public void TestMakeAttributeInjectFaild()
         {
@@ -431,7 +433,8 @@ namespace CatLib.Tests.Container
         }
 
         [TestMethod]
-        [ExpectedExceptionAndMessage(typeof(UnresolvableException),
+        [ExpectedExceptionAndMessage(
+            typeof(UnresolvableException),
             "Unresolvable dependency , resolving [Qux] in class")]
         public void TestMakeAttributeInjectFaildWithPrimitiveAttr()
         {
@@ -451,7 +454,7 @@ namespace CatLib.Tests.Container
         [TestMethod]
         public void TestMakeWithDefaultValue()
         {
-            var container = CreateContainer();
+            container = CreateContainer();
             container.Bind("fubar", typeof(Fubar), true);
 
             var fubar = (Fubar)container.Make("fubar");
@@ -466,7 +469,7 @@ namespace CatLib.Tests.Container
             container.Bind(service, (container, args) => new Position()
             {
                 X = 1,
-                Y = 2
+                Y = 2,
             });
 
             var fubar = (Fubar)container.Make("fubar");
@@ -484,13 +487,13 @@ namespace CatLib.Tests.Container
             container.Bind(service, (container, args) => new List<string>()
             {
                 "iron man",
-                "black window"
+                "black window",
             });
             service = container.Type2Service(typeof(IList<int>));
             container.Bind(service, (container, args) => new List<int>()
             {
                 25,
-                23
+                23,
             });
 
             var fubar = (Fubar)container.Make("fubar");
@@ -507,7 +510,8 @@ namespace CatLib.Tests.Container
         }
 
         [TestMethod]
-        [ExpectedExceptionAndMessage(typeof(LogicException),
+        [ExpectedExceptionAndMessage(
+            typeof(LogicException),
             "can not bind.")]
         public void TestMakeAbstractClass()
         {
@@ -523,7 +527,7 @@ namespace CatLib.Tests.Container
             container.Bind(service, (container, args) => new List<string>()
             {
                 "iron man",
-                "black window"
+                "black window",
             });
 
             var fubar = (Fubar)container.Make("fubar");
@@ -559,11 +563,12 @@ namespace CatLib.Tests.Container
 
             var foo = new Foo();
             var bar = new Bar();
-            var foobar = (FooBar)container.Make("foobar",
+            var foobar = (FooBar)container.Make(
+                "foobar",
                 new ParamsCollection
-            {
-                {"foo", foo},
-            }, bar);
+                {
+                    { "foo", foo },
+                }, bar);
 
             Assert.AreEqual("foobar", foobar.ToString());
             Assert.AreSame(foo, foobar.Foo);
@@ -580,11 +585,12 @@ namespace CatLib.Tests.Container
             var bar1 = new Bar();
             var foo2 = new Foo();
             var bar2 = new Bar();
-            var foobar = (FooBar)container.Make("foobar",
+            var foobar = (FooBar)container.Make(
+                "foobar",
                 new ParamsCollection
             {
                 { "foo", foo1 },
-                { "bar", bar1 }
+                { "bar", bar1 },
             }, new ParamsCollection
             {
                 { "foo", foo2 },
@@ -604,8 +610,8 @@ namespace CatLib.Tests.Container
 
             container.Make("foobar", new ParamsCollection
                 {
-                    {"foo", new Bar()},
-                    {"bar", new Foo()},
+                    { "foo", new Bar() },
+                    { "bar", new Foo() },
                 });
         }
 
@@ -671,8 +677,9 @@ namespace CatLib.Tests.Container
         }
 
         [TestMethod]
-        [ExpectedException(typeof(LogicException)
-            , "is not Singleton(Static) Bind.")]
+        [ExpectedException(
+            typeof(LogicException),
+            "is not Singleton(Static) Bind.")]
         public void TestInstanceIllegal()
         {
             container.Bind("foo", typeof(Foo), false);
@@ -773,7 +780,9 @@ namespace CatLib.Tests.Container
             container.Make("foobar");
             container.Flush();
 
-            CollectionAssert.AreEqual(new[] {
+            CollectionAssert.AreEqual(
+                new[]
+                {
                     typeof(FooBar),
                     typeof(Bar),
                     typeof(Foo),
@@ -807,7 +816,7 @@ namespace CatLib.Tests.Container
             container.Bind("foo", typeof(Variant), false);
             container.Make("foo", new ParamsCollection
                 {
-                    { "model", null }
+                    { "model", null },
                 });
         }
 
@@ -1049,7 +1058,6 @@ namespace CatLib.Tests.Container
         {
             Assert.AreEqual(false, container.Release(null));
         }
-
 
         protected virtual IContainer CreateContainer()
         {

@@ -11,7 +11,9 @@
 
 namespace CatLib.Tests.Fixture
 {
+#pragma warning disable CA1040
     public interface IFoo
+#pragma warning restore CA1040
     {
         // empty interface.
     }

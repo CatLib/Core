@@ -14,8 +14,15 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace CatLib.Tests.Fixture
 {
-    public class Baz
+    public sealed class Baz
     {
+        public Baz(Foo foo, int boo = 100)
+        {
+            Boo = boo;
+            Assert.AreNotEqual(null, foo);
+            Assert.AreNotEqual(null, boo);
+        }
+
         [Inject(Required = false)]
         public string Name { get; set; } = "baz";
 
@@ -26,11 +33,5 @@ namespace CatLib.Tests.Fixture
         public int Qux { get; set; }
 
         public int Boo { get; private set; }
-
-        public Baz(Foo foo, int boo = 100)
-        {
-            Boo = boo;
-            Assert.AreNotEqual(null, boo);
-        }
     }
 }

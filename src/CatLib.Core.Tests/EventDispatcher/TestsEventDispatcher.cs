@@ -21,6 +21,11 @@ namespace CatLib.EventDispatcher.Tests
     [TestClass]
     public class TestsEventDispatcher
     {
+        internal interface IResponse<T>
+        {
+            void Foo(T eventArgs);
+        }
+
         [TestMethod]
         public void TestDispatch()
         {
@@ -60,7 +65,7 @@ namespace CatLib.EventDispatcher.Tests
             CollectionAssert.AreEqual(
                 new Action<TestEventArgs>[]
                 {
-                    second.Object.Foo, third.Object.Foo, first.Object.Foo
+                    second.Object.Foo, third.Object.Foo, first.Object.Foo,
                 },
                 eventDispatcher.GetListeners<TestEventArgs>().ToList());
         }
@@ -212,11 +217,6 @@ namespace CatLib.EventDispatcher.Tests
 
             first.Verify((o) => o.Foo(expected), Times.Never);
             second.Verify((o) => o.Foo(expected));
-        }
-
-        internal interface IResponse<T>
-        {
-            void Foo(T eventArgs);
         }
 
         internal class BaseTestEventArgs : EventArgs

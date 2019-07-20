@@ -190,7 +190,7 @@ namespace CatLib.Tests.Container
         [TestMethod]
         public void TestCall()
         {
-            var container = new CContainer();
+            container = new CContainer();
             container.Singleton<IFoo, Foo>().Alias<Foo>();
             var expected = container.Make<IFoo>();
             var count = 0;
@@ -315,7 +315,8 @@ namespace CatLib.Tests.Container
         }
 
         [TestMethod]
-        [ExpectedExceptionAndMessage(typeof(LogicException),
+        [ExpectedExceptionAndMessage(
+            typeof(LogicException),
             "Function \"method-is-not-found\" not found.")]
         public void TestCallIllegal()
         {
@@ -365,7 +366,7 @@ namespace CatLib.Tests.Container
         [TestMethod]
         public void TestWatchInstanceOverride()
         {
-            var binder = container.Singleton<string>(() => "foo");
+            container.Singleton<string>(() => "foo");
             container.Make<string>();
 
             var actual1 = string.Empty;

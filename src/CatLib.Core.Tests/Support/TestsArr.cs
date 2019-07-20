@@ -36,6 +36,7 @@ namespace CatLib.Tests.Support
             foobarbar = new[] { "foo", "bar", "baz", "bar", "baz" };
             aux = null;
         }
+
         [TestMethod]
         public void TestMerge()
         {
@@ -82,9 +83,10 @@ namespace CatLib.Tests.Support
                 }
             }
 
-            CollectionAssert.AreEqual(new[]
+            CollectionAssert.AreEqual(
+                new[]
             {
-                "foo", "bar", "baz","aux"
+                "foo", "bar", "baz", "aux",
             }, source);
         }
 
@@ -94,9 +96,10 @@ namespace CatLib.Tests.Support
             var removed = Arr.Splice(ref foobar, 1, 1, bar);
 
             Assert.AreEqual("bar", removed[0]);
-            CollectionAssert.AreEqual(new[]
+            CollectionAssert.AreEqual(
+                new[]
             {
-                "foo", "bar", "baz", "baz"
+                "foo", "bar", "baz", "baz",
             }, foobar);
         }
 
@@ -106,9 +109,10 @@ namespace CatLib.Tests.Support
             var removed = Arr.Splice(ref foobar, -1, null, bar);
 
             Assert.AreEqual("baz", removed[0]);
-            CollectionAssert.AreEqual(new[]
+            CollectionAssert.AreEqual(
+                new[]
             {
-                "foo", "bar", "bar", "baz"
+                "foo", "bar", "bar", "baz",
             }, foobar);
         }
 
@@ -117,9 +121,10 @@ namespace CatLib.Tests.Support
         {
             var removed = Arr.Splice(ref foobar, 1);
 
-            CollectionAssert.AreEqual(new[]
+            CollectionAssert.AreEqual(
+                new[]
             {
-                "bar", "baz"
+                "bar", "baz",
             }, removed);
             CollectionAssert.AreEqual(new[] { "foo" }, foobar);
         }
@@ -130,9 +135,10 @@ namespace CatLib.Tests.Support
             var removed = Arr.Splice(ref foobar, -1);
 
             CollectionAssert.AreEqual(new[] { "baz" }, removed);
-            CollectionAssert.AreEqual(new[]
+            CollectionAssert.AreEqual(
+                new[]
             {
-                "foo", "bar"
+                "foo", "bar",
             }, foobar);
         }
 
@@ -141,9 +147,10 @@ namespace CatLib.Tests.Support
         {
             var removed = Arr.Splice(ref foobar, 0);
 
-            CollectionAssert.AreEqual(new[]
+            CollectionAssert.AreEqual(
+                new[]
             {
-                "foo", "bar", "baz"
+                "foo", "bar", "baz",
             }, removed);
 
             CollectionAssert.AreEqual(Array.Empty<string>(), foobar);
@@ -154,9 +161,10 @@ namespace CatLib.Tests.Support
         {
             var removed = Arr.Splice(ref foobar, -999);
 
-            CollectionAssert.AreEqual(new[]
+            CollectionAssert.AreEqual(
+                new[]
             {
-                "foo", "bar", "baz"
+                "foo", "bar", "baz",
             }, removed);
 
             CollectionAssert.AreEqual(Array.Empty<string>(), foobar);
@@ -168,9 +176,10 @@ namespace CatLib.Tests.Support
             var removed = Arr.Splice(ref foobar, 999);
 
             CollectionAssert.AreEqual(Array.Empty<string>(), removed);
-            CollectionAssert.AreEqual(new[]
+            CollectionAssert.AreEqual(
+                new[]
             {
-                "foo", "bar", "baz"
+                "foo", "bar", "baz",
             }, foobar);
         }
 
@@ -215,9 +224,10 @@ namespace CatLib.Tests.Support
         {
             var actual = Arr.Fill(1, 5, "foo");
 
-            CollectionAssert.AreEqual(new[]
+            CollectionAssert.AreEqual(
+                new[]
             {
-                null, "foo", "foo", "foo", "foo", "foo"
+                null, "foo", "foo", "foo", "foo", "foo",
             }, actual);
         }
 
@@ -225,9 +235,10 @@ namespace CatLib.Tests.Support
         public void TestFillZeroStart()
         {
             var actual = Arr.Fill(0, 5, "foo");
-            CollectionAssert.AreEqual(new[]
+            CollectionAssert.AreEqual(
+                new[]
             {
-                "foo", "foo", "foo", "foo", "foo"
+                "foo", "foo", "foo", "foo", "foo",
             }, actual);
         }
 
@@ -236,14 +247,16 @@ namespace CatLib.Tests.Support
         {
             var actual = Arr.Fill(2, 3, "foo", foobar);
 
-            CollectionAssert.AreEqual(new[]
+            CollectionAssert.AreEqual(
+                new[]
             {
-                "foo", "bar", "foo", "foo", "foo", "baz"
+                "foo", "bar", "foo", "foo", "foo", "baz",
             }, actual);
 
-            CollectionAssert.AreEqual(new[]
+            CollectionAssert.AreEqual(
+                new[]
             {
-                "foo", "bar", "baz"
+                "foo", "bar", "baz",
             }, foobar);
         }
 
@@ -251,9 +264,10 @@ namespace CatLib.Tests.Support
         public void TestFillBoundWithSource()
         {
             var actual = Arr.Fill(3, 3, "foo", foobar);
-            CollectionAssert.AreEqual(new[]
+            CollectionAssert.AreEqual(
+                new[]
             {
-                "foo", "bar", "baz", "foo", "foo", "foo"
+                "foo", "bar", "baz", "foo", "foo", "foo",
             }, actual);
         }
 
@@ -261,9 +275,10 @@ namespace CatLib.Tests.Support
         public void TestFillOutOfRangeWithSource()
         {
             var actual = Arr.Fill(4, 2, "foo", foobar);
-            CollectionAssert.AreEqual(new[]
+            CollectionAssert.AreEqual(
+                new[]
             {
-                "foo", "bar", "baz", null, "foo", "foo"
+                "foo", "bar", "baz", null, "foo", "foo",
             }, actual);
         }
 
@@ -271,9 +286,10 @@ namespace CatLib.Tests.Support
         public void TestFillZeroWithSource()
         {
             var actual = Arr.Fill(0, 3, "foo", foobar);
-            CollectionAssert.AreEqual(new[]
+            CollectionAssert.AreEqual(
+                new[]
             {
-                "foo", "foo", "foo", "foo", "bar", "baz"
+                "foo", "foo", "foo", "foo", "bar", "baz",
             }, actual);
         }
 
@@ -322,14 +338,16 @@ namespace CatLib.Tests.Support
         {
             var actual = Arr.Map(foobar, (o) => o + o);
 
-            CollectionAssert.AreEqual(new[]
+            CollectionAssert.AreEqual(
+                new[]
             {
-                "foofoo", "barbar", "bazbaz"
+                "foofoo", "barbar", "bazbaz",
             }, actual);
 
-            CollectionAssert.AreEqual(new[]
+            CollectionAssert.AreEqual(
+                new[]
             {
-                "foo", "bar", "baz"
+                "foo", "bar", "baz",
             }, foobar);
         }
 
@@ -339,14 +357,16 @@ namespace CatLib.Tests.Support
             var data = new List<string>(foobar);
             var actual = Arr.Map(data, (o) => o + o);
 
-            CollectionAssert.AreEqual(new[]
+            CollectionAssert.AreEqual(
+                new[]
             {
-                "foofoo", "barbar", "bazbaz"
+                "foofoo", "barbar", "bazbaz",
             }, actual);
 
-            CollectionAssert.AreEqual(new[]
+            CollectionAssert.AreEqual(
+                new[]
             {
-                "foo", "bar", "baz"
+                "foo", "bar", "baz",
             }, data);
         }
 
@@ -356,9 +376,10 @@ namespace CatLib.Tests.Support
             var actual = Arr.Pop(ref foobar);
 
             Assert.AreEqual("baz", actual);
-            CollectionAssert.AreEqual(new[]
+            CollectionAssert.AreEqual(
+                new[]
             {
-                "foo", "bar"
+                "foo", "bar",
             }, foobar);
         }
 
@@ -368,11 +389,11 @@ namespace CatLib.Tests.Support
             var actual = Arr.Push(ref foobar, "aux", "foobar");
             Assert.AreEqual(5, actual);
 
-            CollectionAssert.AreEqual(new[]
+            CollectionAssert.AreEqual(
+                new[]
             {
-                "foo", "bar", "baz", "aux", "foobar"
+                "foo", "bar", "baz", "aux", "foobar",
             }, foobar);
-
         }
 
         [TestMethod]
@@ -388,9 +409,10 @@ namespace CatLib.Tests.Support
         {
             var actual = Arr.Slice(foobar, 1, -1);
 
-            CollectionAssert.AreEqual(new[]
+            CollectionAssert.AreEqual(
+                new[]
             {
-                "bar"
+                "bar",
             }, actual);
         }
 
@@ -400,9 +422,10 @@ namespace CatLib.Tests.Support
             var actual = Arr.Shift(ref foobar);
 
             Assert.AreEqual("foo", actual);
-            CollectionAssert.AreEqual(new[]
+            CollectionAssert.AreEqual(
+                new[]
             {
-                "bar", "baz"
+                "bar", "baz",
             }, foobar);
         }
 
@@ -412,9 +435,10 @@ namespace CatLib.Tests.Support
             var actual = Arr.Unshift(ref foobar, "aux", "foobar");
 
             Assert.AreEqual(5, actual);
-            CollectionAssert.AreEqual(new[]
+            CollectionAssert.AreEqual(
+                new[]
             {
-                "aux", "foobar", "foo", "bar", "baz"
+                "aux", "foobar", "foo", "bar", "baz",
             }, foobar);
         }
 
@@ -423,14 +447,16 @@ namespace CatLib.Tests.Support
         {
             var actual = Arr.Reverse(foobar);
 
-            CollectionAssert.AreEqual(new[]
+            CollectionAssert.AreEqual(
+                new[]
             {
-                "baz", "bar", "foo"
+                "baz", "bar", "foo",
             }, actual);
 
-            CollectionAssert.AreEqual(new[]
+            CollectionAssert.AreEqual(
+                new[]
             {
-                "foo", "bar", "baz"
+                "foo", "bar", "baz",
             }, foobar);
         }
 
@@ -439,14 +465,16 @@ namespace CatLib.Tests.Support
         {
             var actual = Arr.Reverse(foobarbar, 1, 2);
 
-            CollectionAssert.AreEqual(new[]
+            CollectionAssert.AreEqual(
+                new[]
             {
-                "baz", "bar"
+                "baz", "bar",
             }, actual);
 
-            CollectionAssert.AreEqual(new[]
+            CollectionAssert.AreEqual(
+                new[]
             {
-                "foo", "bar", "baz", "bar", "baz"
+                "foo", "bar", "baz", "bar", "baz",
             }, foobarbar);
         }
 
@@ -503,9 +531,10 @@ namespace CatLib.Tests.Support
         {
             var actual = Arr.Difference(foobar, new[] { "bar", "baz" });
 
-            CollectionAssert.AreEqual(new[]
+            CollectionAssert.AreEqual(
+                new[]
             {
-                "foo"
+                "foo",
             }, actual);
         }
 
@@ -514,9 +543,10 @@ namespace CatLib.Tests.Support
         {
             var actual = Arr.Difference(foobar, null);
 
-            CollectionAssert.AreEqual(new[]
+            CollectionAssert.AreEqual(
+                new[]
             {
-                "foo", "bar", "baz"
+                "foo", "bar", "baz",
             }, actual);
         }
 
@@ -526,9 +556,10 @@ namespace CatLib.Tests.Support
             var actual = Arr.RemoveAt(ref foobar, 1);
 
             Assert.AreEqual("bar", actual);
-            CollectionAssert.AreEqual(new[]
+            CollectionAssert.AreEqual(
+                new[]
             {
-                "foo", "baz"
+                "foo", "baz",
             }, foobar);
         }
 
@@ -545,17 +576,19 @@ namespace CatLib.Tests.Support
             var actual = Arr.RemoveAt(ref foobar, -2);
 
             Assert.AreEqual("bar", actual);
-            CollectionAssert.AreEqual(new[]
+            CollectionAssert.AreEqual(
+                new[]
             {
-                "foo", "baz"
+                "foo", "baz",
             }, foobar);
 
             actual = Arr.RemoveAt(ref foobar, -999);
 
             Assert.AreEqual("foo", actual);
-            CollectionAssert.AreEqual(new[]
+            CollectionAssert.AreEqual(
+                new[]
             {
-                "baz"
+                "baz",
             }, foobar);
         }
 
@@ -563,21 +596,24 @@ namespace CatLib.Tests.Support
         public void TestCut()
         {
             Arr.Cut(ref foobar, 1);
-            CollectionAssert.AreEqual(new[]
+            CollectionAssert.AreEqual(
+                new[]
             {
-                "bar", "baz"
+                "bar", "baz",
             }, foobar);
 
             Arr.Cut(ref foobar, -1);
-            CollectionAssert.AreEqual(new[]
+            CollectionAssert.AreEqual(
+                new[]
             {
-                "bar"
+                "bar",
             }, foobar);
 
             Arr.Cut(ref foobar, 0);
-            CollectionAssert.AreEqual(new[]
+            CollectionAssert.AreEqual(
+                new[]
             {
-                "bar"
+                "bar",
             }, foobar);
 
             Arr.Cut(ref foobar, 999);
@@ -592,26 +628,30 @@ namespace CatLib.Tests.Support
         {
             var actual = Arr.Remove(ref foobar, (o) => o == "bar");
 
-            CollectionAssert.AreEqual(new[]
+            CollectionAssert.AreEqual(
+                new[]
             {
-                "bar"
+                "bar",
             }, actual);
 
-            CollectionAssert.AreEqual(new[]
+            CollectionAssert.AreEqual(
+                new[]
             {
-                "foo", "baz"
+                "foo", "baz",
             }, foobar);
 
             actual = Arr.Remove(ref foobarbar, (o) => o == "bar");
 
-            CollectionAssert.AreEqual(new[]
+            CollectionAssert.AreEqual(
+                new[]
             {
-                "bar", "bar"
+                "bar", "bar",
             }, actual);
 
-            CollectionAssert.AreEqual(new[]
+            CollectionAssert.AreEqual(
+                new[]
             {
-                "foo", "baz", "baz"
+                "foo", "baz", "baz",
             }, foobarbar);
         }
 
@@ -626,9 +666,10 @@ namespace CatLib.Tests.Support
         {
             Arr.Set(ref foobar, (o) => o == "bar", "aux");
 
-            CollectionAssert.AreEqual(new[]
+            CollectionAssert.AreEqual(
+                new[]
             {
-                "foo", "aux", "baz"
+                "foo", "aux", "baz",
             }, foobar);
         }
 
@@ -637,9 +678,10 @@ namespace CatLib.Tests.Support
         {
             Arr.Set(ref foobar, (o) => o == "not-found", "aux");
 
-            CollectionAssert.AreEqual(new[]
+            CollectionAssert.AreEqual(
+                new[]
             {
-                "foo", "bar", "baz", "aux"
+                "foo", "bar", "baz", "aux",
             }, foobar);
         }
     }

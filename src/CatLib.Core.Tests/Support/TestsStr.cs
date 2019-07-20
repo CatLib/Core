@@ -263,10 +263,10 @@ namespace CatLib.Tests.Support
             Assert.AreEqual("hello world...", actual);
 
             actual = Str.Truncate("hel", 2);
-            Assert.AreEqual(actual, "...");
+            Assert.AreEqual("...", actual);
 
-            actual = Str.Truncate("", -1);
-            Assert.AreEqual(actual, "...");
+            actual = Str.Truncate(string.Empty, -1);
+            Assert.AreEqual("...", actual);
 
             actual = Str.Truncate("喵h喵e越l来l越l漂o亮!了", 12, "l");
             Assert.AreEqual("喵h喵e越l来...", actual);
@@ -293,15 +293,17 @@ namespace CatLib.Tests.Support
         [TestMethod]
         public void TestIsArray()
         {
-            var actual = Arr.Filter(new string[]
+            var actual = Arr.Filter(
+                new string[]
             {
                 "CatLib.Core",
                 "CatLib.ILRuntime",
                 "CatLib.Route",
-                "Hello.World"
-            }, (assembly) => Str.Is(new string[]
+                "Hello.World",
+            }, (assembly) => Str.Is(
+                new string[]
             {
-                "CatLib.*"
+                "CatLib.*",
             }, assembly));
 
             CollectionAssert.AreEqual(
@@ -309,7 +311,7 @@ namespace CatLib.Tests.Support
                 {
                     "CatLib.Core",
                     "CatLib.ILRuntime",
-                    "CatLib.Route"
+                    "CatLib.Route",
                 }, actual);
         }
 

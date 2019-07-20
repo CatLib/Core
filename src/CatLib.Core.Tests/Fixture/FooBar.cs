@@ -9,6 +9,8 @@
  * Document: https://catlib.io/
  */
 
+#pragma warning disable CA1822
+
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace CatLib.Tests.Fixture
@@ -25,7 +27,13 @@ namespace CatLib.Tests.Fixture
         }
 
         public Foo Foo { get; private set; }
+
         public Bar Bar { get; private set; }
+
+        public static FooBar New()
+        {
+            return new FooBar(new Foo(), new Bar());
+        }
 
         public string GetName(Foo foo, Bar bar)
         {
@@ -35,11 +43,6 @@ namespace CatLib.Tests.Fixture
         public override string ToString()
         {
             return Foo.ToString() + Bar.ToString();
-        }
-
-        public static FooBar New()
-        {
-            return new FooBar(new Foo(), new Bar());
         }
     }
 }

@@ -9,6 +9,8 @@
  * Document: https://catlib.io/
  */
 
+#pragma warning disable CA2227
+
 using CatLib.Container;
 using System.Collections.Generic;
 
@@ -16,6 +18,12 @@ namespace CatLib.Tests.Fixture
 {
     public class Fubar
     {
+        public Fubar(Bar bar = null, IList<string> heros = null)
+        {
+            Bar = bar;
+            Heros = heros;
+        }
+
         public Bar Bar { get; private set; }
 
         [Inject(Required = false)]
@@ -25,11 +33,5 @@ namespace CatLib.Tests.Fixture
         public IList<int> Ages { get; set; }
 
         public IList<string> Heros { get; set; }
-
-        public Fubar(Bar bar = null, IList<string> heros = null)
-        {
-            Bar = bar;
-            Heros = heros;
-        }
     }
 }

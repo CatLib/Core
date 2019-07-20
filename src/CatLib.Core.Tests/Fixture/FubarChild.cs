@@ -19,7 +19,6 @@ namespace CatLib.Tests.Fixture
         public FubarChild(Bar bar = null, IList<string> heros = null)
             : base(bar, heros)
         {
-
         }
 
         [Inject(Required = false)]

@@ -9,12 +9,16 @@
  * Document: https://catlib.io/
  */
 
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+
 namespace CatLib.Tests.Fixture
 {
     public class CircularDependency
     {
         public CircularDependency(CircularDependency dependency)
         {
+            Assert.AreEqual(null, dependency);
+
             // This is a class that causes a circular
             // dependency call to occur in DI.
         }

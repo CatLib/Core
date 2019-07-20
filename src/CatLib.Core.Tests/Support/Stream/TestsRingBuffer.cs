@@ -25,9 +25,10 @@ namespace CatLib.Tests.Support
             ringBuffer.Write(new byte[] { 1, 2, 4, 5 }, 1, 2);
 
             var read = Read(ringBuffer);
-            CollectionAssert.AreEqual(new byte[]
+            CollectionAssert.AreEqual(
+                new byte[]
             {
-                2, 4
+                2, 4,
             }, read);
 
             ringBuffer = new RingBufferStream();
@@ -37,9 +38,10 @@ namespace CatLib.Tests.Support
             var count = ringBuffer.Read(actual, 2, actual.Length - 2);
 
             Assert.AreEqual(3, count);
-            CollectionAssert.AreEqual(new byte[]
+            CollectionAssert.AreEqual(
+                new byte[]
             {
-                0, 0, 3, 4, 5
+                0, 0, 3, 4, 5,
             }, actual);
         }
 
@@ -64,7 +66,7 @@ namespace CatLib.Tests.Support
         public void TestCanWrite()
         {
             // 16 cap
-            var ringBuffer = new RingBufferStream(12); 
+            var ringBuffer = new RingBufferStream(12);
             Assert.IsTrue(ringBuffer.WriteableCount >= 15);
             Assert.IsTrue(ringBuffer.WriteableCount >= 16);
             Assert.IsFalse(ringBuffer.WriteableCount >= 17);
@@ -84,31 +86,34 @@ namespace CatLib.Tests.Support
         public void TestPeek()
         {
             // 16 cap
-            var ringBuffer = new RingBufferStream(12); 
+            var ringBuffer = new RingBufferStream(12);
             var buffer = new byte[] { 1, 2, 3, 4, 5 };
             ringBuffer.Write(buffer, 0, buffer.Length);
 
             Assert.AreEqual(11, ringBuffer.WriteableCount);
             Assert.AreEqual(5, ringBuffer.ReadableCount);
-            CollectionAssert.AreEqual(new byte[]
+            CollectionAssert.AreEqual(
+                new byte[]
             {
-                1, 2, 3, 4, 5
+                1, 2, 3, 4, 5,
             }, Peek(ringBuffer));
 
             var actual = new byte[5];
             var read = ringBuffer.Peek(actual, 3, actual.Length - 3);
 
             Assert.AreEqual(2, read);
-            CollectionAssert.AreEqual(new byte[]
+            CollectionAssert.AreEqual(
+                new byte[]
             {
-                0, 0, 0, 1, 2
+                0, 0, 0, 1, 2,
             }, actual);
 
             read = ringBuffer.Peek(actual, 0, actual.Length);
             Assert.AreEqual(5, read);
-            CollectionAssert.AreEqual(new byte[]
+            CollectionAssert.AreEqual(
+                new byte[]
             {
-                1, 2, 3, 4, 5
+                1, 2, 3, 4, 5,
             }, actual);
 
             Assert.AreEqual(11, ringBuffer.WriteableCount);
@@ -190,7 +195,7 @@ namespace CatLib.Tests.Support
         public void TestCapacity()
         {
             // 32 cap
-            var ringBuffer = new RingBufferStream(18); 
+            var ringBuffer = new RingBufferStream(18);
             Assert.AreEqual(32, ringBuffer.Capacity);
         }
 
@@ -198,7 +203,7 @@ namespace CatLib.Tests.Support
         public void TestClear()
         {
             // 32 cap
-            var ringBuffer = new RingBufferStream(18); 
+            var ringBuffer = new RingBufferStream(18);
             var data = new byte[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
             ringBuffer.Write(data, 0, data.Length);
             ringBuffer.Clear();

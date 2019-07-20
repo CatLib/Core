@@ -137,7 +137,6 @@ namespace CatLib.Tests
         public void TestTerminateRegister()
         {
             var foo = new Mock<IServiceProvider>();
-            var bar = new Mock<IServiceProvider>();
 
             dispatcher.AddListener<BeforeTerminateEventArgs>((args) =>
             {

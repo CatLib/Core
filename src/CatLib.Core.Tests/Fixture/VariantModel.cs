@@ -16,8 +16,6 @@ namespace CatLib.Tests.Fixture
     [Variant]
     public class VariantModel
     {
-        public string Name { get; }
-
         public VariantModel(int id)
         {
             if (id == -1)
@@ -38,5 +36,7 @@ namespace CatLib.Tests.Fixture
                 Name = "Undefiend";
             }
         }
+
+        public string Name { get; }
     }
 }

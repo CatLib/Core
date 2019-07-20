@@ -93,7 +93,7 @@ namespace CatLib.Tests.Support
             foobarbaz.Seek(2, SeekOrigin.Begin);
             var segment = new SegmentStream(foobarbaz, 5)
             {
-                Position = 4
+                Position = 4,
             };
 
             Assert.AreEqual(4, segment.Position);

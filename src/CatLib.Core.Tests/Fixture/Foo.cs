@@ -9,6 +9,8 @@
  * Document: https://catlib.io/
  */
 
+#pragma warning disable CA1822
+
 namespace CatLib.Tests.Fixture
 {
     public class Foo : IFoo
