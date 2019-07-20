@@ -14,6 +14,7 @@
 using CatLib.Support;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
+using SException = System.Exception;
 
 namespace CatLib.Tests.Support
 {
@@ -23,14 +24,14 @@ namespace CatLib.Tests.Support
         [TestMethod]
         public void TestRequires()
         {
-            var innerException = new Exception("inner exception");
+            var innerException = new SException("inner exception");
 
             try
             {
-                Guard.Requires<Exception>(false, "foo", innerException);
+                Guard.Requires<SException>(false, "foo", innerException);
                 Assert.Fail();
             }
-            catch (Exception ex)
+            catch (SException ex)
             {
                 Assert.AreEqual("foo", ex.Message);
                 Assert.AreEqual("inner exception", ex.InnerException.Message);
@@ -40,7 +41,7 @@ namespace CatLib.Tests.Support
         [TestMethod]
         public void TestExtend()
         {
-            var innerException = new Exception("inner exception");
+            var innerException = new SException("inner exception");
 
             Guard.Extend<ArgumentNullException>((messgae, inner, state) =>
             {
@@ -52,7 +53,7 @@ namespace CatLib.Tests.Support
                 Guard.Requires<ArgumentNullException>(false, null, innerException);
                 Assert.Fail();
             }
-            catch (Exception ex)
+            catch (SException ex)
             {
                 Assert.AreEqual("foo", ex.Message);
                 Assert.AreEqual("inner exception", ex.InnerException.Message);
@@ -62,14 +63,14 @@ namespace CatLib.Tests.Support
         [TestMethod]
         public void TestRequireNotBaseException()
         {
-            var innerException = new Exception("inner exception");
+            var innerException = new SException("inner exception");
 
             try
             {
                 Guard.Requires<ArgumentNullException>(false, "foo", innerException);
                 Assert.Fail();
             }
-            catch (Exception ex)
+            catch (SException ex)
             {
                 Assert.AreEqual("foo", ex.Message);
                 Assert.AreEqual("inner exception", ex.InnerException.Message);

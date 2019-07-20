@@ -9,6 +9,7 @@
  * Document: https://catlib.io/
  */
 
+using CatLib.Exception;
 using System;
 using System.IO;
 

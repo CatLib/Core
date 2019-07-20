@@ -11,6 +11,7 @@
 
 #pragma warning disable SA1618
 
+using CatLib.Exception;
 using CatLib.Support;
 using System;
 

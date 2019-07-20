@@ -11,20 +11,20 @@
 
 using CatLib.Container;
 using CatLib.EventDispatcher;
+using CatLib.Exception;
 using CatLib.Support;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Reflection;
 using System.Threading;
-using CatLibContainer = CatLib.Container.Container;
 
 namespace CatLib
 {
     /// <summary>
     /// The CatLib <see cref="Application"/> instance.
     /// </summary>
-    public class Application : CatLibContainer, IApplication
+    public class Application : Container.Container, IApplication
     {
         private static string version;
         private readonly IList<IServiceProvider> loadedProviders;

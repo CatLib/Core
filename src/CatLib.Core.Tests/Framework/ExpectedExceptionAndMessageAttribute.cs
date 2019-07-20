@@ -11,6 +11,7 @@
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
+using SException = System.Exception;
 
 namespace CatLib.Tests
 {
@@ -36,7 +37,7 @@ namespace CatLib.Tests
             this.strict = strict;
         }
 
-        protected override void Verify(Exception exception)
+        protected override void Verify(SException exception)
         {
             Assert.IsNotNull(exception);
 

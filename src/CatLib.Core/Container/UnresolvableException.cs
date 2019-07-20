@@ -9,9 +9,9 @@
  * Document: https://catlib.io/
  */
 
-using CatLib.Support;
-using System;
+using CatLib.Exception;
 using System.Diagnostics.CodeAnalysis;
+using SException = System.Exception;
 
 namespace CatLib.Container
 {
@@ -42,7 +42,7 @@ namespace CatLib.Container
         /// </summary>
         /// <param name="message">The exception message.</param>
         /// <param name="innerException">The inner exception.</param>
-        public UnresolvableException(string message, Exception innerException)
+        public UnresolvableException(string message, SException innerException)
             : base(message, innerException)
         {
         }

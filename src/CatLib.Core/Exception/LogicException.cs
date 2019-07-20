@@ -9,48 +9,51 @@
  * Document: https://catlib.io/
  */
 
-using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.Serialization;
+using SException = System.Exception;
 
-namespace CatLib.Support
+namespace CatLib.Exception
 {
     /// <summary>
-    /// Represents a generic runtime exception.
+    /// Represents a logical exception encountered during execution.
     /// </summary>
-    public class RuntimeException : Exception
+    /// <remarks>Logical exceptions are caused by logical errors during runtime.</remarks>
+    [ExcludeFromCodeCoverage]
+    public class LogicException : RuntimeException
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="RuntimeException"/> class.
+        /// Initializes a new instance of the <see cref="LogicException"/> class.
         /// </summary>
-        public RuntimeException()
+        public LogicException()
         {
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="RuntimeException"/> class.
+        /// Initializes a new instance of the <see cref="LogicException"/> class.
         /// </summary>
         /// <param name="message">The exception message.</param>
-        public RuntimeException(string message)
+        public LogicException(string message)
             : base(message)
         {
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="RuntimeException"/> class.
+        /// Initializes a new instance of the <see cref="LogicException"/> class.
         /// </summary>
         /// <param name="message">The exception message.</param>
         /// <param name="innerException">The inner exception.</param>
-        public RuntimeException(string message, Exception innerException)
+        public LogicException(string message, SException innerException)
             : base(message, innerException)
         {
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="RuntimeException"/> class.
+        /// Initializes a new instance of the <see cref="LogicException"/> class.
         /// </summary>
         /// <param name="serializationInfo">The <see cref="SerializationInfo"/> that holds the serialized object data about the exception being thrown.</param>
         /// <param name="streamingContext">The <see cref="StreamingContext"/> that contains contextual information about the source or destination.</param>
-        protected RuntimeException(SerializationInfo serializationInfo, StreamingContext streamingContext)
+        protected LogicException(SerializationInfo serializationInfo, StreamingContext streamingContext)
             : base(serializationInfo, streamingContext)
         {
         }

@@ -9,6 +9,7 @@
  * Document: https://catlib.io/
  */
 
+using CatLib.Exception;
 using CatLib.Support;
 using System;
 using System.Collections.Generic;

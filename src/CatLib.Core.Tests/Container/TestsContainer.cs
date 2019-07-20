@@ -10,13 +10,14 @@
  */
 
 using CatLib.Container;
-using CatLib.Support;
+using CatLib.Exception;
 using CatLib.Tests.Fixture;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using CContainer = CatLib.Container.Container;
+using SException = System.Exception;
 
 namespace CatLib.Tests.Container
 {
@@ -248,12 +249,12 @@ namespace CatLib.Tests.Container
                 container.Alias(alias, service);
                 Assert.Fail(reason);
             }
-            catch (Exception ex) when (ex.GetType() != expected)
+            catch (SException ex) when (ex.GetType() != expected)
             {
                 Assert.Fail($"Expected throw an exception: {expected}, actual throw: {ex}");
             }
 #pragma warning disable CA1031
-            catch (Exception)
+            catch (SException)
 #pragma warning restore CA1031
             {
                 // test passed.
