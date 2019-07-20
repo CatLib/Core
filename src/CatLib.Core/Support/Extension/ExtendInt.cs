@@ -28,7 +28,7 @@ namespace CatLib.Support
             min = Math.Max(0, min);
 
             var result = 0;
-            for (var i = 2; i < int.MaxValue; i = i << 1)
+            for (var i = 2; i < int.MaxValue; i <<= 1)
             {
                 if (i < min)
                 {

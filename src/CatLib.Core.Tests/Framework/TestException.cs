@@ -9,7 +9,6 @@
  * Document: https://catlib.io/
  */
 
-using System;
 using System.Runtime.Serialization;
 using SException = System.Exception;
 

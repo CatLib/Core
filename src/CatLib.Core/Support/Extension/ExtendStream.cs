@@ -89,8 +89,7 @@ namespace CatLib.Support
                 }
 
                 encoding = encoding ?? Encoding.Default;
-                var memoryStream = source as MemoryStream;
-                if (memoryStream != null)
+                if (source is MemoryStream memoryStream)
                 {
                     byte[] internalBuffer;
                     try

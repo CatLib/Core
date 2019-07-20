@@ -18,9 +18,9 @@ namespace CatLib.Support
     /// </summary>
     internal static class Helper
     {
-        internal static System.Random MakeRandom(int? seed = null)
+        internal static Random MakeRandom(int? seed = null)
         {
-            return new System.Random(seed.GetValueOrDefault(MakeSeed()));
+            return new Random(seed.GetValueOrDefault(MakeSeed()));
         }
 
         internal static int MakeSeed()
