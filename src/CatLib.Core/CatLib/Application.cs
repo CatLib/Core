@@ -195,7 +195,7 @@ namespace CatLib
 
             if (bootstrapped || Process != StartProcess.Construct)
             {
-                throw new CodeStandardException($"Cannot repeatedly trigger the {nameof(Bootstrap)}()");
+                throw new LogicException($"Cannot repeatedly trigger the {nameof(Bootstrap)}()");
             }
 
             Process = StartProcess.Bootstrap;
@@ -239,12 +239,12 @@ namespace CatLib
         {
             if (!bootstrapped)
             {
-                throw new CodeStandardException($"You must call {nameof(Bootstrap)}() first.");
+                throw new LogicException($"You must call {nameof(Bootstrap)}() first.");
             }
 
             if (inited || Process != StartProcess.Bootstraped)
             {
-                throw new CodeStandardException($"Cannot repeatedly trigger the {nameof(Init)}()");
+                throw new LogicException($"Cannot repeatedly trigger the {nameof(Init)}()");
             }
 
             Process = StartProcess.Init;
@@ -281,12 +281,12 @@ namespace CatLib
 
             if (Process == StartProcess.Initing)
             {
-                throw new CodeStandardException($"Unable to add service provider during {nameof(StartProcess.Initing)}");
+                throw new LogicException($"Unable to add service provider during {nameof(StartProcess.Initing)}");
             }
 
             if (Process > StartProcess.Running)
             {
-                throw new CodeStandardException($"Unable to {nameof(Terminate)} in-process registration service provider");
+                throw new LogicException($"Unable to {nameof(Terminate)} in-process registration service provider");
             }
 
             var skipped = Dispatch(new RegisterProviderEventArgs(provider, this))
@@ -342,7 +342,7 @@ namespace CatLib
         {
             if (registering)
             {
-                throw new CodeStandardException(
+                throw new LogicException(
                     $"It is not allowed to make services or dependency injection in the {nameof(Register)} process, method:{method}");
             }
 

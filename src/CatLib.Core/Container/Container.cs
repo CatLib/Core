@@ -336,7 +336,7 @@ namespace CatLib.Container
 
                 if (!bindings.ContainsKey(service) && !instances.ContainsKey(service))
                 {
-                    throw new CodeStandardException(
+                    throw new LogicException(
                         $"You must {nameof(Bind)}() or {nameof(Instance)}() serivce before and you be able to called {nameof(Alias)}().");
                 }
 
@@ -588,7 +588,7 @@ namespace CatLib.Container
                     && instancesReverse.TryGetValue(instance, out string realService)
                     && realService != service)
                 {
-                    throw new CodeStandardException($"The instance has been registered as a singleton in {realService}");
+                    throw new LogicException($"The instance has been registered as a singleton in {realService}");
                 }
 
                 var isResolved = IsResolved(service);
@@ -715,7 +715,7 @@ namespace CatLib.Container
 
                 if (!IsResolved(service) && !CanMake(service))
                 {
-                    throw new CodeStandardException(
+                    throw new LogicException(
                         $"If you want use Rebound(Watch) , please {nameof(Bind)} or {nameof(Instance)} service first.");
                 }
 
@@ -1566,7 +1566,7 @@ namespace CatLib.Container
             {
                 if (service.IndexOf(c) >= 0)
                 {
-                    throw new CodeStandardException(
+                    throw new LogicException(
                         $"Service name {service} contains disabled characters : {c}. please use Alias replacement");
                 }
             }
@@ -1720,7 +1720,7 @@ namespace CatLib.Container
         {
             if (flushing)
             {
-                throw new CodeStandardException("Container is flushing can not do it");
+                throw new LogicException("Container is flushing can not do it");
             }
         }
 
