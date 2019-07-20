@@ -185,19 +185,19 @@ namespace CatLib.Support
         }
 
         /// <summary>
-        /// Cut the array.
+        /// Crop the array to the desired position.
         /// </summary>
         /// <typeparam name="T">The type of array.</typeparam>
         /// <param name="source">The source array.</param>
-        /// <param name="count">Crop range, negative numbers are trimmed from back to front.</param>
-        public static void Cut<T>(ref T[] source, int count)
+        /// <param name="position">Crop range, negative numbers are trimmed from back to front.</param>
+        public static void Cut<T>(ref T[] source, int position)
         {
-            if (source == null || source.Length <= 0 || count == 0)
+            if (source == null || source.Length <= 0 || position == 0)
             {
                 return;
             }
 
-            if (Math.Abs(count) >= source.Length)
+            if (Math.Abs(position) >= source.Length)
             {
                 if (source.Length > 0)
                 {
@@ -207,15 +207,15 @@ namespace CatLib.Support
                 return;
             }
 
-            if (count > 0)
+            if (position > 0)
             {
-                var size = source.Length - count;
-                Array.Copy(source, count, source, 0, size);
+                var size = source.Length - position;
+                Array.Copy(source, position, source, 0, size);
                 Array.Resize(ref source, size);
             }
             else
             {
-                Array.Resize(ref source, source.Length - Math.Abs(count));
+                Array.Resize(ref source, source.Length - Math.Abs(position));
             }
         }
 
@@ -274,8 +274,9 @@ namespace CatLib.Support
         {
             Guard.Requires<ArgumentOutOfRangeException>(start >= 0);
             Guard.Requires<ArgumentOutOfRangeException>(length > 0);
+
             var count = start + length;
-            var requested = new T[source?.Length + count ?? count];
+            var requested = new T[Math.Max(source?.Length + length ?? count, count)];
 
             if (start > 0 && source != null)
             {
@@ -724,7 +725,7 @@ namespace CatLib.Support
         public static T RemoveAt<T>(ref T[] source, int index)
         {
             Guard.Requires<ArgumentNullException>(source != null);
-            Guard.Requires<ArgumentNullException>(index < source.Length);
+            Guard.Requires<ArgumentException>(index < source.Length);
 
             var result = Splice(ref source, index, 1);
             return result.Length > 0 ? result[0] : default(T);

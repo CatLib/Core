@@ -16,9 +16,12 @@ namespace CatLib.Container
     /// <summary>
     /// The injection attribute.
     /// </summary>
-    [AttributeUsage(AttributeTargets.Interface |
-                    AttributeTargets.Property)]
+    [AttributeUsage(AttributeTargets.Property)]
     public class InjectAttribute : Attribute
     {
+        /// <summary>
+        /// Gets or sets a value indicating whether the property is required.
+        /// </summary>
+        public bool Required { get; set; } = true;
     }
 }

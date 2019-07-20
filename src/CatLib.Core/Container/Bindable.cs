@@ -173,7 +173,8 @@ namespace CatLib.Container
         /// <inheritdoc />
         public IGivenData<TReturn> Needs(string service)
         {
-            Guard.NotEmptyOrNull(service, nameof(service));
+            Guard.ParameterNotNull(service, nameof(service));
+
             lock (Locker)
             {
                 AssertDestroyed();

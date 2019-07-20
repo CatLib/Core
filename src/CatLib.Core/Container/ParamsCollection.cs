@@ -20,23 +20,23 @@ namespace CatLib.Container
     [ExcludeFromCodeCoverage]
     public sealed class ParamsCollection : IParams, IEnumerable<KeyValuePair<string, object>>
     {
-        private readonly IDictionary<string, object> table;
+        private readonly IDictionary<string, object> collection;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ParamsCollection"/> class.
         /// </summary>
         public ParamsCollection()
         {
-            table = new Dictionary<string, object>();
+            collection = new Dictionary<string, object>();
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ParamsCollection"/> class.
         /// </summary>
-        /// <param name="args">The parameters mapping.</param>
-        public ParamsCollection(IDictionary<string, object> args)
+        /// <param name="mapping">The parameters mapping.</param>
+        public ParamsCollection(IDictionary<string, object> mapping)
         {
-            table = args;
+            collection = mapping;
         }
 
         /// <summary>
@@ -46,8 +46,8 @@ namespace CatLib.Container
         /// <returns>The parameter value.</returns>
         public object this[string key]
         {
-            get => table[key];
-            set => table[key] = value;
+            get => collection[key];
+            set => collection[key] = value;
         }
 
         /// <summary>
@@ -56,7 +56,7 @@ namespace CatLib.Container
         /// <returns>Return the iterator.</returns>
         System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
         {
-            return table.GetEnumerator();
+            return collection.GetEnumerator();
         }
 
         /// <summary>
@@ -65,7 +65,7 @@ namespace CatLib.Container
         /// <returns>Return the iterator.</returns>
         IEnumerator<KeyValuePair<string, object>> IEnumerable<KeyValuePair<string, object>>.GetEnumerator()
         {
-            return table.GetEnumerator();
+            return collection.GetEnumerator();
         }
 
         /// <summary>
@@ -75,7 +75,7 @@ namespace CatLib.Container
         /// <param name="value">The parameter value.</param>
         public void Add(string key, object value)
         {
-            table.Add(key, value);
+            collection.Add(key, value);
         }
 
         /// <summary>
@@ -85,7 +85,7 @@ namespace CatLib.Container
         /// <returns>True if the removed.</returns>
         public bool Remove(string key)
         {
-            return table.Remove(key);
+            return collection.Remove(key);
         }
 
         /// <summary>
@@ -96,7 +96,7 @@ namespace CatLib.Container
         /// <returns>True if the parameter is exist.</returns>
         public bool TryGetValue(string key, out object value)
         {
-            return table.TryGetValue(key, out value);
+            return collection.TryGetValue(key, out value);
         }
     }
 }

@@ -440,8 +440,8 @@ namespace CatLib.Container
         /// <returns>Returns the method bind instance.</returns>
         public static IMethodBind BindMethod(this IContainer container, string method, object target, string call = null)
         {
-            Guard.NotEmptyOrNull(method, nameof(method));
-            Guard.Requires<ArgumentNullException>(target != null);
+            Guard.ParameterNotNull(method, nameof(method));
+            Guard.ParameterNotNull(target, nameof(target));
 
             return container.BindMethod(method, target, target.GetType().GetMethod(call ?? Str.Method(method)));
         }
@@ -662,10 +662,16 @@ namespace CatLib.Container
         /// <returns>The return value of method.</returns>
         public static object Call(this IContainer container, object target, string method, params object[] userParams)
         {
-            Guard.Requires<ArgumentNullException>(target != null);
-            Guard.NotEmptyOrNull(method, nameof(method));
+            Guard.ParameterNotNull(method, nameof(method));
+            Guard.ParameterNotNull(target, nameof(target));
 
             var methodInfo = target.GetType().GetMethod(method);
+
+            if (methodInfo == null)
+            {
+                throw new LogicException($"Function \"{method}\" not found.");
+            }
+
             return container.Call(target, methodInfo, userParams);
         }
 

@@ -18,6 +18,7 @@ namespace CatLib.Support
     /// <summary>
     /// Represents a logical exception encountered during execution.
     /// </summary>
+    /// <remarks>Logical exceptions are caused by logical errors during runtime.</remarks>
     [ExcludeFromCodeCoverage]
     public class LogicException : RuntimeException
     {

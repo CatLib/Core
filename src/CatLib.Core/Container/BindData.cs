@@ -60,7 +60,7 @@ namespace CatLib.Container
             lock (Locker)
             {
                 AssertDestroyed();
-                Guard.NotEmptyOrNull(alias, nameof(alias));
+                Guard.ParameterNotNull(alias, nameof(alias));
                 Container.Alias(alias, Service);
                 return this;
             }
@@ -72,7 +72,7 @@ namespace CatLib.Container
             lock (Locker)
             {
                 AssertDestroyed();
-                Guard.NotEmptyOrNull(tag, nameof(tag));
+                Guard.ParameterNotNull(tag, nameof(tag));
                 Container.Tag(tag, Service);
                 return this;
             }

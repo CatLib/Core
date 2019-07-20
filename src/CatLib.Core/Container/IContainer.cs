@@ -145,8 +145,8 @@ namespace CatLib.Container
         /// Assign a set of tags to a given binding.
         /// </summary>
         /// <param name="tag">The tag name.</param>
-        /// <param name="service">The array of service name or alias.</param>
-        void Tag(string tag, params string[] service);
+        /// <param name="services">The array of service name or alias.</param>
+        void Tag(string tag, params string[] services);
 
         /// <summary>
         /// Resolve all of the bindings for a given tag.

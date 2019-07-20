@@ -36,7 +36,8 @@ namespace CatLib.Container
         /// <inheritdoc />
         public TReturn Given(string service)
         {
-            Guard.NotEmptyOrNull(service, nameof(service));
+            Guard.ParameterNotNull(service, nameof(service));
+
             bindable.AddContextual(needs, service);
             return bindable as TReturn;
         }
