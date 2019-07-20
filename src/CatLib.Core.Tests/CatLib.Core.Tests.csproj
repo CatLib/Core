@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.0</TargetFramework>
@@ -16,10 +16,6 @@
     <WarningsAsErrors />
     <GenerateSerializationAssemblies>Off</GenerateSerializationAssemblies>
   </PropertyGroup>
-
-  <ItemGroup>
-    <None Remove="Container\TestsContainer.cs~RF7b3751a9.TMP" />
-  </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\CatLib.Core\CatLib.Core.csproj" />
