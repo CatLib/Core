@@ -27,7 +27,7 @@ namespace CatLib
     public abstract class Facade<TService>
     {
         private static readonly string Service;
-        private static TService instance;
+        private static TService that;
         private static IBindData binder;
         private static bool inited;
         private static bool released;
@@ -42,21 +42,21 @@ namespace CatLib
             Service = App.Type2Service(typeof(TService));
             App.OnNewApplication += app =>
             {
-                instance = default(TService);
+                that = default(TService);
                 binder = null;
                 inited = false;
                 released = false;
             };
         }
 
-        /// <inheritdoc cref="instance"/>
-        public static TService Instance => HasInstance ? instance : Resolve();
+        /// <inheritdoc cref="that"/>
+        public static TService That => HasInstance ? that : Resolve();
 
         /// <summary>
         /// Gets a value indicating whether the resolved instance is exists in the facade.
         /// <para>If it is a non-static binding then return forever false.</para>
         /// </summary>
-        internal static bool HasInstance => binder != null && binder.IsStatic && !released && instance != null;
+        internal static bool HasInstance => binder != null && binder.IsStatic && !released && that != null;
 
         /// <summary>
         /// Resolve the object instance.
@@ -65,7 +65,7 @@ namespace CatLib
         /// <returns>The resolved object.</returns>
         internal static TService Make(params object[] userParams)
         {
-            return HasInstance ? instance : Resolve(userParams);
+            return HasInstance ? that : Resolve(userParams);
         }
 
         /// <inheritdoc cref="Make"/>
@@ -94,7 +94,7 @@ namespace CatLib
             }
 
             Rebind(newBinder);
-            return instance = Build(userParams);
+            return that = Build(userParams);
         }
 
         /// <summary>
@@ -109,7 +109,7 @@ namespace CatLib
                 return;
             }
 
-            Facade<TService>.instance = default(TService);
+            that = default(TService);
             released = true;
         }
 
@@ -121,7 +121,7 @@ namespace CatLib
         {
             var newBinder = App.GetBind(Service);
             Rebind(newBinder);
-            instance = (newBinder == null || !newBinder.IsStatic) ? default(TService) : newService;
+            that = (newBinder == null || !newBinder.IsStatic) ? default(TService) : newService;
         }
 
         /// <summary>

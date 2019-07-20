@@ -29,7 +29,7 @@ namespace CatLib
         /// <summary>
         /// The <see cref="IApplication"/> instance.
         /// </summary>
-        private static IApplication instance;
+        private static IApplication that;
 
         /// <summary>
         /// Callback when a new <see cref="IApplication"/> instance is created.
@@ -39,9 +39,9 @@ namespace CatLib
             add
             {
                 RaiseOnNewApplication += value;
-                if (instance != null)
+                if (That != null)
                 {
-                    value?.Invoke(instance);
+                    value?.Invoke(That);
                 }
             }
             remove => RaiseOnNewApplication -= value;
@@ -59,13 +59,13 @@ namespace CatLib
         {
             get
             {
-                return instance;
+                return that;
             }
 
             set
             {
-                instance = value;
-                RaiseOnNewApplication?.Invoke(instance);
+                that = value;
+                RaiseOnNewApplication?.Invoke(that);
             }
         }
 
