@@ -31,20 +31,20 @@ namespace CatLib.Tests
         public void TestFacade()
         {
             application.Singleton<IFoo, Foo>();
-            var foo = Facade<IFoo>.Instance;
+            var foo = Facade<IFoo>.That;
 
-            Assert.AreSame(foo, Facade<IFoo>.Instance);
+            Assert.AreSame(foo, Facade<IFoo>.That);
         }
 
         [TestMethod]
         public void TestAlwaysWatchNewer()
         {
             application.Singleton<IFoo, Foo>();
-            var older = Facade<IFoo>.Instance;
+            var older = Facade<IFoo>.That;
 
             application.Unbind<IFoo>();
             application.Singleton<IFoo, Foo>();
-            var newer = Facade<IFoo>.Instance;
+            var newer = Facade<IFoo>.That;
 
             Assert.AreNotSame(older, newer);
         }
@@ -53,11 +53,11 @@ namespace CatLib.Tests
         public void TestAlwaysWatchWithInstance()
         {
             application.Singleton<IFoo, Foo>();
-            Assert.AreNotEqual(null, Facade<IFoo>.Instance);
+            Assert.AreNotEqual(null, Facade<IFoo>.That);
 
             var foo = new Foo();
             application.Instance<IFoo>(foo);
-            Assert.AreSame(foo, Facade<IFoo>.Instance);
+            Assert.AreSame(foo, Facade<IFoo>.That);
         }
 
         [TestMethod]
@@ -65,10 +65,10 @@ namespace CatLib.Tests
         public void TestFacadeMakeFaild()
         {
             application.Singleton<IFoo, Foo>();
-            Assert.AreNotEqual(null, Facade<IFoo>.Instance);
+            Assert.AreNotEqual(null, Facade<IFoo>.That);
 
             application.Unbind<IFoo>();
-            _ = Facade<IFoo>.Instance;
+            _ = Facade<IFoo>.That;
         }
 
         [TestMethod]
@@ -76,11 +76,11 @@ namespace CatLib.Tests
         {
             application.Singleton<IFoo, Foo>();
 
-            var foo = Facade<IFoo>.Instance;
-            Assert.AreSame(foo, Facade<IFoo>.Instance);
+            var foo = Facade<IFoo>.That;
+            Assert.AreSame(foo, Facade<IFoo>.That);
 
             application.Release<IFoo>();
-            Assert.AreNotSame(foo, Facade<IFoo>.Instance);
+            Assert.AreNotSame(foo, Facade<IFoo>.That);
         }
 
         [TestMethod]
@@ -88,8 +88,8 @@ namespace CatLib.Tests
         {
             application.Bind<IFoo, Foo>();
 
-            var foo = Facade<IFoo>.Instance;
-            Assert.AreNotSame(foo, Facade<IFoo>.Instance);
+            var foo = Facade<IFoo>.That;
+            Assert.AreNotSame(foo, Facade<IFoo>.That);
         }
 
         [TestMethod]
@@ -97,14 +97,14 @@ namespace CatLib.Tests
         {
             application.Singleton<IFoo, Foo>();
 
-            var foo = Facade<IFoo>.Instance;
-            Assert.AreSame(foo, Facade<IFoo>.Instance);
+            var foo = Facade<IFoo>.That;
+            Assert.AreSame(foo, Facade<IFoo>.That);
 
             application.Unbind<IFoo>();
             application.Bind<IFoo, Foo>();
 
-            Assert.AreNotSame(foo, Facade<IFoo>.Instance);
-            Assert.AreNotSame(Facade<IFoo>.Instance, Facade<IFoo>.Instance);
+            Assert.AreNotSame(foo, Facade<IFoo>.That);
+            Assert.AreNotSame(Facade<IFoo>.That, Facade<IFoo>.That);
         }
 
         [TestMethod]
@@ -112,14 +112,14 @@ namespace CatLib.Tests
         {
             application.Bind<IFoo, Foo>();
 
-            var foo = Facade<IFoo>.Instance;
-            Assert.AreNotSame(foo, Facade<IFoo>.Instance);
+            var foo = Facade<IFoo>.That;
+            Assert.AreNotSame(foo, Facade<IFoo>.That);
 
             application.Unbind<IFoo>();
             application.Singleton<IFoo, Foo>();
 
-            Assert.AreNotSame(foo, Facade<IFoo>.Instance);
-            Assert.AreSame(Facade<IFoo>.Instance, Facade<IFoo>.Instance);
+            Assert.AreNotSame(foo, Facade<IFoo>.That);
+            Assert.AreSame(Facade<IFoo>.That, Facade<IFoo>.That);
         }
 
         [TestMethod]
@@ -127,8 +127,8 @@ namespace CatLib.Tests
         {
             application.Instance<IFoo>(new Foo());
 
-            var foo = Facade<IFoo>.Instance;
-            Assert.AreSame(foo, Facade<IFoo>.Instance);
+            var foo = Facade<IFoo>.That;
+            Assert.AreSame(foo, Facade<IFoo>.That);
         }
     }
 }
