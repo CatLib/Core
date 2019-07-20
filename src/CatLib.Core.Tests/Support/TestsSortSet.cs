@@ -216,7 +216,7 @@ namespace CatLib.Tests.Support
             Assert.AreEqual(0, sortset.GetRangeCount(0, 5));
             Assert.AreEqual(1, sortset.GetRangeCount(6, 100));
 
-            ExceptionAssert.Throws<ArgumentOutOfRangeException>(() =>
+            Assert.ThrowsException<ArgumentOutOfRangeException>(() =>
             {
                 Assert.AreEqual(0, sortset.GetRangeCount(800, 100));
             });

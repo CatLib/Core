@@ -150,12 +150,12 @@ namespace CatLib.Tests.Support
             var ringBuffer = new RingBufferStream(4);
             var buffer = new byte[5];
 
-            ExceptionAssert.Throws<ArgumentOutOfRangeException>(() =>
+            Assert.ThrowsException<ArgumentOutOfRangeException>(() =>
             {
                 ringBuffer.Read(buffer, 2, 10);
             });
 
-            ExceptionAssert.Throws<ArgumentOutOfRangeException>(() =>
+            Assert.ThrowsException<ArgumentOutOfRangeException>(() =>
             {
                 ringBuffer.Write(buffer, 2, 10);
             });
@@ -169,7 +169,7 @@ namespace CatLib.Tests.Support
             Assert.AreEqual(16, ringBuffer.GetBuffer().Length);
 
             ringBuffer = new RingBufferStream(12, false);
-            ExceptionAssert.Throws<UnauthorizedAccessException>(() =>
+            Assert.ThrowsException<UnauthorizedAccessException>(() =>
             {
                 ringBuffer.GetBuffer();
             });

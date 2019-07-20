@@ -166,29 +166,30 @@ namespace CatLib.Tests.Container
         public void TestBindIllegal()
         {
             container.Bind("foo", (container, args) => "foo", true);
-            ExceptionAssert.Throws<LogicException>(() =>
+
+            Assert.ThrowsException<LogicException>(() =>
             {
                 container.Bind("foo", (container, args) => "repeat bind", false);
             });
 
             container.Instance("bar", "bar");
-            ExceptionAssert.Throws<LogicException>(() =>
+            Assert.ThrowsException<LogicException>(() =>
             {
                 container.Bind("bar", (container, args) => "instance repeat bind", false);
             });
 
             container.Alias("foo-alias", "foo");
-            ExceptionAssert.Throws<LogicException>(() =>
+            Assert.ThrowsException<LogicException>(() =>
             {
                 container.Bind("foo-alias", (container, args) => "alias repeat bind", false);
             });
 
-            ExceptionAssert.Throws<ArgumentNullException>(() =>
+            Assert.ThrowsException<ArgumentNullException>(() =>
             {
                 container.Bind(null, (container, args) => "invalid service name", false);
             });
 
-            ExceptionAssert.Throws<CodeStandardException>(() =>
+            Assert.ThrowsException<CodeStandardException>(() =>
             {
                 container.Bind("$foo", (container, args) => "Illegal placeholder", false);
             });
@@ -732,17 +733,17 @@ namespace CatLib.Tests.Container
 
             container.Flush();
 
-            ExceptionAssert.Throws<UnresolvableException>(() =>
+            Assert.ThrowsException<UnresolvableException>(() =>
             {
                 container.Make("foo");
             });
 
-            ExceptionAssert.Throws<UnresolvableException>(() =>
+            Assert.ThrowsException<UnresolvableException>(() =>
             {
                 container.Make("bar");
             });
 
-            ExceptionAssert.Throws<UnresolvableException>(() =>
+            Assert.ThrowsException<UnresolvableException>(() =>
             {
                 container.Make("baz");
             });

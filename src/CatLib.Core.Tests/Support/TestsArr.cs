@@ -296,12 +296,12 @@ namespace CatLib.Tests.Support
         [TestMethod]
         public void TestFillThrowException()
         {
-            ExceptionAssert.Throws<ArgumentOutOfRangeException>(() =>
+            Assert.ThrowsException<ArgumentOutOfRangeException>(() =>
             {
                 Arr.Fill(-1, 3, "foo");
             });
 
-            ExceptionAssert.Throws<ArgumentOutOfRangeException>(() =>
+            Assert.ThrowsException<ArgumentOutOfRangeException>(() =>
             {
                 Arr.Fill(0, 0, "foo");
             });

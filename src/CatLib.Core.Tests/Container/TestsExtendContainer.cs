@@ -437,7 +437,7 @@ namespace CatLib.Tests.Container
 
             container.UnbindMethod("foo");
 
-            ExceptionAssert.Throws<LogicException>(() =>
+            Assert.ThrowsException<LogicException>(() =>
             {
                 container.Invoke("foo");
             });
@@ -474,12 +474,12 @@ namespace CatLib.Tests.Container
             container.UnbindMethod(foo1);
             container.UnbindMethod("unknow-method");
 
-            ExceptionAssert.Throws<LogicException>(() =>
+            Assert.ThrowsException<LogicException>(() =>
             {
                 container.Invoke("Foo1.EchoInt", 100);
             });
 
-            ExceptionAssert.Throws<LogicException>(() =>
+            Assert.ThrowsException<LogicException>(() =>
             {
                 container.Invoke("Foo1.EchoFloat", 0.5f);
             });
