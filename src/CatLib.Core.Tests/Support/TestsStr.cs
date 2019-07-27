@@ -66,6 +66,8 @@ namespace CatLib.Tests.Support
         public void TestRepeat()
         {
             Assert.AreEqual("foofoo", Str.Repeat("foo", 2));
+            Assert.AreEqual("foo", Str.Repeat("foo", 1));
+            Assert.AreEqual(string.Empty, Str.Repeat("foo", 0));
         }
 
         [TestMethod]
