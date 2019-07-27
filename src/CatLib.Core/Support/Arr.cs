@@ -12,6 +12,7 @@
 using CatLib.Exception;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace CatLib.Support
 {
@@ -30,7 +31,28 @@ namespace CatLib.Support
         public static T[] Merge<T>(params T[][] sources)
 #pragma warning restore S2368
         {
-            Guard.Requires<ArgumentNullException>(sources != null);
+            if (sources == null || sources.Length <= 0)
+            {
+                return Array.Empty<T>();
+            }
+
+            var totalSize = 0;
+            foreach (var source in sources)
+            {
+                if (source == null || source.Length <= 0)
+                {
+                    continue;
+                }
+
+                totalSize += source.Length;
+            }
+
+            if (totalSize <= 0)
+            {
+                return Array.Empty<T>();
+            }
+
+            var merged = new T[totalSize];
             var length = 0;
             foreach (var source in sources)
             {
@@ -39,69 +61,46 @@ namespace CatLib.Support
                     continue;
                 }
 
+                Array.Copy(source, 0, merged, length, source.Length);
                 length += source.Length;
             }
 
-            if (length <= 0)
-            {
-                return Array.Empty<T>();
-            }
-
-            var merge = new T[length];
-            var current = 0;
-            foreach (var source in sources)
-            {
-                if (source == null || source.Length <= 0)
-                {
-                    continue;
-                }
-
-                Array.Copy(source, 0, merge, current, source.Length);
-                current += source.Length;
-            }
-
-            return merge;
+            return merged;
         }
 
         /// <summary>
         /// Get a specified number of random values from a specified array.
         /// </summary>
         /// <typeparam name="T">The type of array.</typeparam>
-        /// <param name="source">The specified array.</param>
+        /// <param name="sources">The specified array.</param>
         /// <param name="number">The specified number.</param>
         /// <returns>An array of the random value.</returns>
-        public static T[] Rand<T>(T[] source, int number = 1)
+        public static T[] Rand<T>(T[] sources, int number = 1)
         {
-            Guard.Requires<ArgumentNullException>(source != null);
-            number = Math.Max(number, 1);
-            source = Shuffle(source);
-            var requested = new T[number];
-            var i = 0;
-            foreach (var result in source)
+            if (sources == null || sources.Length <= 0)
             {
-                if (i >= number)
-                {
-                    break;
-                }
-
-                requested[i++] = result;
+                return new T[number];
             }
 
-            return requested;
+            return Slice(Shuffle(sources), 0, Math.Max(number, 1));
         }
 
         /// <summary>
         /// Disrupt the elements in the specified array.
         /// </summary>
         /// <typeparam name="T">The type of array.</typeparam>
-        /// <param name="source">The specified array.</param>
+        /// <param name="sources">The specified array.</param>
         /// <param name="seed">The random seed.</param>
         /// <returns>Return the disrupted array.</returns>
-        public static T[] Shuffle<T>(T[] source, int? seed = null)
+        public static T[] Shuffle<T>(T[] sources, int? seed = null)
         {
-            Guard.Requires<ArgumentNullException>(source != null);
-            var requested = new T[source.Length];
-            Array.Copy(source, requested, source.Length);
+            if (sources == null || sources.Length <= 0)
+            {
+                return Array.Empty<T>();
+            }
+
+            var requested = new T[sources.Length];
+            Array.Copy(sources, requested, sources.Length);
 
             var random = Helper.MakeRandom(seed);
             for (var i = 0; i < requested.Length; i++)
@@ -112,9 +111,9 @@ namespace CatLib.Support
                     continue;
                 }
 
-                var temp = requested[i];
+                var temporary = requested[i];
                 requested[i] = requested[index];
-                requested[index] = temp;
+                requested[index] = temporary;
             }
 
             return requested;
@@ -122,11 +121,11 @@ namespace CatLib.Support
 
         /// <summary>
         /// Removes an element of the specified length from the array. If
-        /// the <paramref name="replSource"/> parameter is given, the new
+        /// the <paramref name="replaceSource"/> parameter is given, the new
         /// element is inserted from the <paramref name="start"/> position.
         /// </summary>
         /// <typeparam name="T">The type of array.</typeparam>
-        /// <param name="source">The specified array.</param>
+        /// <param name="sources">The specified array.</param>
         /// <param name="start">
         /// Delete the start position of the element.
         /// <para>If the value is set to a positive number, delete it from the beginning of the trip.</para>
@@ -138,51 +137,53 @@ namespace CatLib.Support
         /// <para>If the value is set to a negative number, then remove the <paramref name="length"/> absolute position from the back to the front to delete.</para>
         /// <para>If the value is not set, then all elements from the position set by the <paramref name="start"/> parameter to the end of the array are returned.</para>
         /// </param>
-        /// <param name="replSource">An array inserted at the start position.</param>
+        /// <param name="replaceSource">An array inserted at the start position.</param>
         /// <returns>An removed array.</returns>
-        public static T[] Splice<T>(ref T[] source, int start, int? length = null, T[] replSource = null)
+        public static T[] Splice<T>(ref T[] sources, int start, int? length = null, T[] replaceSource = null)
         {
-            Guard.Requires<ArgumentNullException>(source != null);
-
-            Helper.NormalizationPosition(source.Length, ref start, ref length);
-
-            var requested = new T[length.Value];
-
-            if (length.Value == source.Length)
+            if (sources == null || sources.Length <= 0)
             {
-                Array.Copy(source, requested, source.Length);
-                source = replSource ?? Array.Empty<T>();
-                return requested;
+                return Array.Empty<T>();
             }
 
-            Array.Copy(source, start, requested, 0, length.Value);
+            Helper.NormalizationPosition(sources.Length, ref start, ref length);
 
-            if (replSource == null || replSource.Length == 0)
+            var candidates = new T[length.Value];
+            if (length.Value == sources.Length)
             {
-                var newSource = new T[source.Length - length.Value];
+                Array.Copy(sources, candidates, sources.Length);
+                sources = replaceSource ?? Array.Empty<T>();
+                return candidates;
+            }
+
+            Array.Copy(sources, start, candidates, 0, length.Value);
+
+            if (replaceSource == null || replaceSource.Length == 0)
+            {
+                var newSource = new T[sources.Length - length.Value];
                 if (start > 0)
                 {
-                    Array.Copy(source, 0, newSource, 0, start);
+                    Array.Copy(sources, 0, newSource, 0, start);
                 }
 
-                Array.Copy(source, start + length.Value, newSource, start, source.Length - (start + length.Value));
-                source = newSource;
+                Array.Copy(sources, start + length.Value, newSource, start, sources.Length - (start + length.Value));
+                sources = newSource;
             }
             else
             {
-                var newSource = new T[source.Length - length.Value + replSource.Length];
+                var newSource = new T[sources.Length - length.Value + replaceSource.Length];
                 if (start > 0)
                 {
-                    Array.Copy(source, 0, newSource, 0, start);
+                    Array.Copy(sources, 0, newSource, 0, start);
                 }
 
-                Array.Copy(replSource, 0, newSource, start, replSource.Length);
-                Array.Copy(source, start + length.Value, newSource, start + replSource.Length,
-                    source.Length - (start + length.Value));
-                source = newSource;
+                Array.Copy(replaceSource, 0, newSource, start, replaceSource.Length);
+                Array.Copy(sources, start + length.Value, newSource, start + replaceSource.Length,
+                    sources.Length - (start + length.Value));
+                sources = newSource;
             }
 
-            return requested;
+            return candidates;
         }
 
         /// <summary>
@@ -226,39 +227,42 @@ namespace CatLib.Support
         /// the <paramref name="size"/> parameter. The number of cells in the last array may be a few.</para>
         /// </summary>
         /// <typeparam name="T">The type of array.</typeparam>
-        /// <param name="source">The specified array.</param>
+        /// <param name="sources">The specified array.</param>
         /// <param name="size">The size of the block.</param>
         /// <returns>Return an array of the block.</returns>
-        public static T[][] Chunk<T>(T[] source, int size)
+        public static T[][] Chunk<T>(T[] sources, int size)
         {
-            Guard.Requires<ArgumentNullException>(source != null);
-            size = Math.Max(1, size);
-            var requested = new T[(source.Length / size) + (source.Length % size == 0 ? 0 : 1)][];
-
-            T[] chunk = null;
-            for (var i = 0; i < source.Length; i++)
+            if (sources == null || sources.Length <= 0)
             {
-                var pos = i / size;
+                return Array.Empty<T[]>();
+            }
+
+            size = Math.Max(1, size);
+            var requested = new T[(sources.Length / size) + (sources.Length % size == 0 ? 0 : 1)][];
+
+            T[] chunks = null;
+            for (var i = 0; i < sources.Length; i++)
+            {
+                var position = i / size;
                 if (i % size == 0)
                 {
-                    if (chunk != null)
+                    if (chunks != null)
                     {
-                        requested[pos - 1] = chunk;
+                        requested[position - 1] = chunks;
                     }
 
-                    chunk = new T[(i + size) <= source.Length ? size : source.Length - i];
+                    chunks = new T[(i + size) <= sources.Length ? size : sources.Length - i];
                 }
 
-                if (chunk == null)
+                if (chunks == null)
                 {
                     throw new AssertException("Unexpected exception");
                 }
 
-                chunk[i - (pos * size)] = source[i];
+                chunks[i - (position * size)] = sources[i];
             }
 
-            requested[requested.Length - 1] = chunk;
-
+            requested[requested.Length - 1] = chunks;
             return requested;
         }
 
@@ -269,19 +273,19 @@ namespace CatLib.Support
         /// <param name="start">The starting index.</param>
         /// <param name="length">The filling length.</param>
         /// <param name="value">The filling value.</param>
-        /// <param name="source">The specified array.</param>
+        /// <param name="sources">The specified array.</param>
         /// <returns>Returns an filled array.</returns>
-        public static T[] Fill<T>(int start, int length, T value, T[] source = null)
+        public static T[] Fill<T>(int start, int length, T value, T[] sources = null)
         {
             Guard.Requires<ArgumentOutOfRangeException>(start >= 0);
             Guard.Requires<ArgumentOutOfRangeException>(length > 0);
 
             var count = start + length;
-            var requested = new T[Math.Max(source?.Length + length ?? count, count)];
+            var requested = new T[Math.Max(sources?.Length + length ?? count, count)];
 
-            if (start > 0 && source != null)
+            if (start > 0 && sources != null)
             {
-                Array.Copy(source, requested, Math.Min(source.Length, start));
+                Array.Copy(sources, requested, Math.Min(sources.Length, start));
             }
 
             for (var i = start; i < count; i++)
@@ -289,9 +293,9 @@ namespace CatLib.Support
                 requested[i] = value;
             }
 
-            if (source != null && start < source.Length)
+            if (sources != null && start < sources.Length)
             {
-                Array.Copy(source, start, requested, count, source.Length - start);
+                Array.Copy(sources, start, requested, count, sources.Length - start);
             }
 
             return requested;
@@ -303,35 +307,35 @@ namespace CatLib.Support
         /// and return the removed element.
         /// </summary>
         /// <typeparam name="T">The type of array.</typeparam>
-        /// <param name="source">The specified array.</param>
+        /// <param name="sources">The specified array.</param>
         /// <param name="predicate">The callback.</param>
+        /// <param name="expected">The predicate expected to removed.</param>
         /// <returns>Returns an removed array.</returns>
-        public static T[] Remove<T>(ref T[] source, Predicate<T> predicate)
+        public static T[] Remove<T>(ref T[] sources, Predicate<T> predicate, bool expected = true)
         {
-            Guard.Requires<ArgumentNullException>(source != null);
-            Guard.Requires<ArgumentNullException>(predicate != null);
+            Guard.Requires<ArgumentNullException>(predicate != null, $"Must set a {predicate}.");
 
-            if (source.Length <= 0)
+            if (sources == null || sources.Length <= 0)
             {
                 return Array.Empty<T>();
             }
 
-            var results = new T[source.Length];
-            var n = 0;
-            for (var i = source.Length - 1; i >= 0; i--)
+            var candidateIndex = 0;
+            var candidates = new T[sources.Length];
+            for (var i = sources.Length - 1; i >= 0; i--)
             {
-                if (!predicate.Invoke(source[i]))
+                if (predicate.Invoke(sources[i]) != expected)
                 {
                     continue;
                 }
 
-                results[n++] = source[i];
-                RemoveAt(ref source, i);
+                candidates[candidateIndex++] = sources[i];
+                RemoveAt(ref sources, i);
             }
 
-            Array.Reverse(results, 0, n);
-            Array.Resize(ref results, n);
-            return results;
+            Array.Reverse(candidates, 0, candidateIndex);
+            Array.Resize(ref candidates, candidateIndex);
+            return candidates;
         }
 
         /// <summary>
@@ -340,27 +344,31 @@ namespace CatLib.Support
         /// value, the current value in the input array is added to the result array.
         /// </summary>
         /// <typeparam name="T">The type of array.</typeparam>
-        /// <param name="source">The specified array.</param>
+        /// <param name="sources">The specified array.</param>
         /// <param name="predicate">The callback.</param>
         /// <param name="expected">The expected value.</param>
         /// <returns>Returns an filtered array.</returns>
-        public static T[] Filter<T>(T[] source, Predicate<T> predicate, bool expected = true)
+        public static T[] Filter<T>(T[] sources, Predicate<T> predicate, bool expected = true)
         {
-            Guard.Requires<ArgumentNullException>(source != null);
-            Guard.Requires<ArgumentNullException>(predicate != null);
-            var elements = new T[source.Length];
+            Guard.Requires<ArgumentNullException>(predicate != null, $"Must set a {predicate}.");
 
-            var i = 0;
-            foreach (var result in source)
+            if (sources == null || sources.Length <= 0)
+            {
+                return Array.Empty<T>();
+            }
+
+            var candidateIndex = 0;
+            var candidates = new T[sources.Length];
+            foreach (var result in sources)
             {
                 if (predicate.Invoke(result) == expected)
                 {
-                    elements[i++] = result;
+                    candidates[candidateIndex++] = result;
                 }
             }
 
-            Array.Resize(ref elements, i);
-            return elements;
+            Array.Resize(ref candidates, candidateIndex);
+            return candidates;
         }
 
         /// <summary>
@@ -369,25 +377,29 @@ namespace CatLib.Support
         /// value, the current value in the input array is added to the result array.
         /// </summary>
         /// <typeparam name="T">The type of array.</typeparam>
-        /// <param name="source">The specified array.</param>
+        /// <param name="sources">The specified array.</param>
         /// <param name="predicate">The callback.</param>
         /// <param name="expected">The expected value.</param>
         /// <returns>Returns an filtered array.</returns>
-        public static T[] Filter<T>(IEnumerable<T> source, Predicate<T> predicate, bool expected = true)
+        public static T[] Filter<T>(IEnumerable<T> sources, Predicate<T> predicate, bool expected = true)
         {
-            Guard.Requires<ArgumentNullException>(source != null);
-            Guard.Requires<ArgumentNullException>(predicate != null);
+            Guard.Requires<ArgumentNullException>(predicate != null, $"Must set a {predicate}.");
 
-            var results = new List<T>();
-            foreach (var result in source)
+            if (sources == null)
+            {
+                return Array.Empty<T>();
+            }
+
+            var candidates = new LinkedList<T>();
+            foreach (var result in sources)
             {
                 if (predicate.Invoke(result) == expected)
                 {
-                    results.Add(result);
+                    candidates.AddLast(result);
                 }
             }
 
-            return results.ToArray();
+            return candidates.ToArray();
         }
 
         /// <summary>
@@ -397,13 +409,13 @@ namespace CatLib.Support
         /// <typeparam name="T">The type of array.</typeparam>
         /// <typeparam name="TReturn">The type of return value.</typeparam>
         /// <param name="source">The specified array.</param>
-        /// <param name="callback">The callback.</param>
+        /// <param name="closure">The closure to process.</param>
         /// <returns>Returns an new array.</returns>
-        public static TReturn[] Map<T, TReturn>(T[] source, Func<T, TReturn> callback)
+        public static TReturn[] Map<T, TReturn>(T[] source, Func<T, TReturn> closure)
         {
-            Guard.Requires<ArgumentNullException>(callback != null);
+            Guard.Requires<ArgumentNullException>(closure != null, $"Must set a {closure}.");
 
-            if (source == null)
+            if (source == null || source.Length <= 0)
             {
                 return Array.Empty<TReturn>();
             }
@@ -411,7 +423,7 @@ namespace CatLib.Support
             var requested = new TReturn[source.Length];
             for (var i = 0; i < source.Length; i++)
             {
-                requested[i] = callback.Invoke(source[i]);
+                requested[i] = closure.Invoke(source[i]);
             }
 
             return requested;
@@ -424,11 +436,11 @@ namespace CatLib.Support
         /// <typeparam name="T">The type of array.</typeparam>
         /// <typeparam name="TReturn">The type of return value.</typeparam>
         /// <param name="source">The source iterator.</param>
-        /// <param name="callback">The callback.</param>
+        /// <param name="closure">The closure to process.</param>
         /// <returns>Returns an new array.</returns>
-        public static TReturn[] Map<T, TReturn>(IEnumerable<T> source, Func<T, TReturn> callback)
+        public static TReturn[] Map<T, TReturn>(IEnumerable<T> source, Func<T, TReturn> closure)
         {
-            Guard.Requires<ArgumentNullException>(callback != null);
+            Guard.Requires<ArgumentNullException>(closure != null, $"Must set a {closure}.");
 
             if (source == null)
             {
@@ -438,7 +450,7 @@ namespace CatLib.Support
             var requested = new List<TReturn>();
             foreach (var value in source)
             {
-                requested.Add(callback.Invoke(value));
+                requested.Add(closure.Invoke(value));
             }
 
             return requested.ToArray();
@@ -449,34 +461,36 @@ namespace CatLib.Support
         /// as the return value.
         /// </summary>
         /// <typeparam name="T">The type of the array.</typeparam>
-        /// <param name="source">The specified array.</param>
+        /// <param name="sources">The specified array.</param>
         /// <returns>Returns removed element.</returns>
-        public static T Pop<T>(ref T[] source)
+        public static T Pop<T>(ref T[] sources)
         {
-            Guard.Requires<ArgumentNullException>(source != null);
-            Guard.Requires<InvalidOperationException>(source.Length > 0);
+            Guard.Requires<ArgumentNullException>(sources != null, $"{nameof(sources)} should not be null.");
+            Guard.Requires<InvalidOperationException>(sources.Length > 0, $"The number of elements needs to be greater than 0.");
 
-            T result = source[source.Length - 1];
-            Array.Resize(ref source, source.Length - 1);
-            return result;
+            var candidate = sources[sources.Length - 1];
+            Array.Resize(ref sources, sources.Length - 1);
+            return candidate;
         }
 
         /// <summary>
         /// Add one or more elements to the end of the array.
         /// </summary>
         /// <typeparam name="T">The type of array.</typeparam>
-        /// <param name="source">The specified array.</param>
+        /// <param name="sources">The specified array.</param>
         /// <param name="elements">The added elements.</param>
         /// <returns>Returns the length of the new array.</returns>
-        public static int Push<T>(ref T[] source, params T[] elements)
+        public static int Push<T>(ref T[] sources, params T[] elements)
         {
-            Guard.Requires<ArgumentNullException>(source != null);
-            Guard.Requires<InvalidOperationException>(elements != null);
+            sources = sources ?? Array.Empty<T>();
+            if (elements == null || elements.Length <= 0)
+            {
+                return sources.Length;
+            }
 
-            Array.Resize(ref source, source.Length + elements.Length);
-            Array.Copy(elements, 0, source, source.Length - elements.Length, elements.Length);
-
-            return source.Length;
+            Array.Resize(ref sources, sources.Length + elements.Length);
+            Array.Copy(elements, 0, sources, sources.Length - elements.Length, elements.Length);
+            return sources.Length;
         }
 
         /// <summary>
@@ -486,19 +500,23 @@ namespace CatLib.Support
         /// in the array, and if the array is empty, it will be the final return value (string).</para>
         /// </summary>
         /// <typeparam name="T">The type of array.</typeparam>
-        /// <param name="source">The specified array.</param>
-        /// <param name="callback">The callback.</param>
+        /// <param name="sources">The specified array.</param>
+        /// <param name="closure">The closure process.</param>
         /// <param name="initial">The initial value.</param>
         /// <returns>Returnd the processed string.</returns>
-        public static string Reduce<T>(T[] source, Func<object, T, string> callback, object initial = null)
+        public static string Reduce<T>(T[] sources, Func<object, T, string> closure, object initial = null)
         {
-            Guard.Requires<ArgumentNullException>(source != null);
-            Guard.Requires<ArgumentNullException>(callback != null);
+            Guard.Requires<ArgumentNullException>(closure != null, $"Must set a {closure}.");
+
+            if (sources == null || sources.Length <= 0)
+            {
+                return initial?.ToString();
+            }
 
             var requested = initial;
-            foreach (var segments in source)
+            foreach (var segments in sources)
             {
-                requested = callback.Invoke(requested, segments);
+                requested = closure.Invoke(requested, segments);
             }
 
             return requested?.ToString();
@@ -508,7 +526,7 @@ namespace CatLib.Support
         /// Take a value from the array according to the condition and return.
         /// </summary>
         /// <typeparam name="T">The type of array.</typeparam>
-        /// <param name="source">The specified array.</param>
+        /// <param name="sources">The specified array.</param>
         /// <param name="start">
         /// Remove the starting position of the element.
         /// <para>If the value is set to a positive number, it will be taken from the beginning of the trip.</para>
@@ -521,15 +539,17 @@ namespace CatLib.Support
         /// <para>If the value is not set, then all elements from the position set by the <paramref name="start"/> parameter to the end of the array are returned.</para>
         /// </param>
         /// <returns>Returns an new array.</returns>
-        public static T[] Slice<T>(T[] source, int start, int? length = null)
+        public static T[] Slice<T>(T[] sources, int start, int? length = null)
         {
-            Guard.Requires<ArgumentNullException>(source != null);
+            if (sources == null || sources.Length <= 0)
+            {
+                return Array.Empty<T>();
+            }
 
-            Helper.NormalizationPosition(source.Length, ref start, ref length);
+            Helper.NormalizationPosition(sources.Length, ref start, ref length);
 
             var requested = new T[length.Value];
-            Array.Copy(source, start, requested, 0, length.Value);
-
+            Array.Copy(sources, start, requested, 0, length.Value);
             return requested;
         }
 
@@ -537,49 +557,51 @@ namespace CatLib.Support
         /// Removed the first element in the array and return the value of the removed element.
         /// </summary>
         /// <typeparam name="T">The type of array.</typeparam>
-        /// <param name="source">The specified array.</param>
+        /// <param name="sources">The specified array.</param>
         /// <returns>Returns the removed value.</returns>
-        public static T Shift<T>(ref T[] source)
+        public static T Shift<T>(ref T[] sources)
         {
-            Guard.Requires<ArgumentNullException>(source != null);
-            Guard.Requires<InvalidOperationException>(source.Length > 0);
+            Guard.Requires<ArgumentNullException>(sources != null, $"{nameof(sources)} should not be null.");
+            Guard.Requires<InvalidOperationException>(sources.Length > 0, $"The number of elements needs to be greater than 0.");
 
-            var requested = source[0];
-            var newSource = new T[source.Length - 1];
+            var candidate = sources[0];
+            var newSource = new T[sources.Length - 1];
 
-            Array.Copy(source, 1, newSource, 0, source.Length - 1);
-            source = newSource;
-
-            return requested;
+            Array.Copy(sources, 1, newSource, 0, sources.Length - 1);
+            sources = newSource;
+            return candidate;
         }
 
         /// <summary>
         /// Add a new element at the beginning of the array.
         /// </summary>
         /// <typeparam name="T">The type of array.</typeparam>
-        /// <param name="source">The specified array.</param>
+        /// <param name="sources">The specified array.</param>
         /// <param name="elements">The added element.</param>
         /// <returns>Returns the length of the new array.</returns>
-        public static int Unshift<T>(ref T[] source, params T[] elements)
+        public static int Unshift<T>(ref T[] sources, params T[] elements)
         {
-            Guard.Requires<ArgumentNullException>(source != null);
-            Guard.Requires<ArgumentNullException>(elements != null);
+            sources = sources ?? Array.Empty<T>();
+            if (elements == null || elements.Length <= 0)
+            {
+                return sources.Length;
+            }
 
-            var newSource = new T[source.Length + elements.Length];
+            var newSources = new T[sources.Length + elements.Length];
 
-            Array.Copy(elements, newSource, elements.Length);
-            Array.Copy(source, 0, newSource, elements.Length, source.Length);
+            Array.Copy(elements, newSources, elements.Length);
+            Array.Copy(sources, 0, newSources, elements.Length, sources.Length);
 
-            source = newSource;
+            sources = newSources;
 
-            return source.Length;
+            return sources.Length;
         }
 
         /// <summary>
         /// Return arrays in reverse order.
         /// </summary>
         /// <typeparam name="T">The type of array.</typeparam>
-        /// <param name="source">The specified array.</param>
+        /// <param name="sources">The specified array.</param>
         /// <param name="start">
         /// The starting position of the starting element.
         /// <para>If the value is set to a positive number, it will be taken from the beginning of the trip.</para>
@@ -591,22 +613,25 @@ namespace CatLib.Support
         /// <para>If the value is not set, then all elements from the position set by the <paramref name="start"/> parameter to the end of the array are returned.</para>
         /// </param>
         /// <returns>Returns inverted array.</returns>
-        public static T[] Reverse<T>(T[] source, int start = 0, int? length = null)
+        public static T[] Reverse<T>(T[] sources, int start = 0, int? length = null)
         {
-            Guard.Requires<ArgumentNullException>(source != null);
-
-            if (source.Length == 1)
+            if (sources == null || sources.Length <= 0)
             {
-                return source;
+                return Array.Empty<T>();
             }
 
-            Helper.NormalizationPosition(source.Length, ref start, ref length);
-            var tmpSource = new T[source.Length];
-            Array.Copy(source, tmpSource, source.Length);
-            Array.Reverse(tmpSource, start, length.Value);
+            if (sources.Length == 1)
+            {
+                return sources;
+            }
+
+            Helper.NormalizationPosition(sources.Length, ref start, ref length);
+            var temporarySource = new T[sources.Length];
+            Array.Copy(sources, temporarySource, sources.Length);
+            Array.Reverse(temporarySource, start, length.Value);
 
             var resquested = new T[length.Value];
-            Array.Copy(tmpSource, start, resquested, 0, length.Value);
+            Array.Copy(temporarySource, start, resquested, 0, length.Value);
             return resquested;
         }
 
@@ -626,19 +651,19 @@ namespace CatLib.Support
                 return -1;
             }
 
-            for (var i = 0; i < source.Length; i++)
+            for (var sourceIndex = 0; sourceIndex < source.Length; sourceIndex++)
             {
-                if (!source[i].Equals(match[0]))
+                if (!source[sourceIndex].Equals(match[0]))
                 {
                     continue;
                 }
 
                 var isFinded = true;
 
-                for (var n = 0; n < match.Length; n++)
+                for (var matchIndex = 0; matchIndex < match.Length; matchIndex++)
                 {
-                    if ((i + n) < source.Length &&
-                          source[i + n].Equals(match[n]))
+                    if ((sourceIndex + matchIndex) < source.Length &&
+                          source[sourceIndex + matchIndex].Equals(match[matchIndex]))
                     {
                         continue;
                     }
@@ -649,7 +674,7 @@ namespace CatLib.Support
 
                 if (isFinded)
                 {
-                    return i;
+                    return sourceIndex;
                 }
             }
 
@@ -672,13 +697,13 @@ namespace CatLib.Support
                 return -1;
             }
 
-            for (var i = 0; i < source.Length; i++)
+            for (var sourceIndex = 0; sourceIndex < source.Length; sourceIndex++)
             {
-                for (var n = 0; n < match.Length; n++)
+                for (var matchIndex = 0; matchIndex < match.Length; matchIndex++)
                 {
-                    if (source[i].Equals(match[n]))
+                    if (source[sourceIndex].Equals(match[matchIndex]))
                     {
-                        return i;
+                        return sourceIndex;
                     }
                 }
             }
@@ -690,22 +715,21 @@ namespace CatLib.Support
         /// Exclude the specified value in the array.
         /// </summary>
         /// <typeparam name="T">The type of array.</typeparam>
-        /// <param name="source">The source array.</param>
-        /// <param name="match">An array of exclude value.</param>
+        /// <param name="sources">The source array.</param>
+        /// <param name="matches">An array of exclude value.</param>
         /// <returns>Returns an array of processed.</returns>
-        public static T[] Difference<T>(T[] source, params T[] match)
+        public static T[] Difference<T>(T[] sources, params T[] matches)
         {
-            Guard.Requires<ArgumentNullException>(source != null);
-            if (match == null)
+            if (sources == null || sources.Length <= 0 || matches == null || matches.Length <= 0)
             {
-                return source;
+                return sources;
             }
 
-            return Filter(source, (val) =>
+            return Filter(sources, (source) =>
             {
-                foreach (var t in match)
+                foreach (var match in matches)
                 {
-                    if (val.Equals(t))
+                    if (source.Equals(match))
                     {
                         return false;
                     }
@@ -720,16 +744,19 @@ namespace CatLib.Support
         /// <para>If the index is passed a negative number then it will be removed from the end.</para>
         /// </summary>
         /// <typeparam name="T">The type of array.</typeparam>
-        /// <param name="source">The specified array.</param>
+        /// <param name="sources">The specified array.</param>
         /// <param name="index">The index of array.</param>
+        /// <param name="defaultValue">Default value if index not found.</param>
         /// <returns>Returns removed element.</returns>
-        public static T RemoveAt<T>(ref T[] source, int index)
+        public static T RemoveAt<T>(ref T[] sources, int index, T defaultValue = default)
         {
-            Guard.Requires<ArgumentNullException>(source != null);
-            Guard.Requires<ArgumentException>(index < source.Length);
+            if (sources == null || sources.Length <= 0 || index >= sources.Length)
+            {
+                return defaultValue;
+            }
 
-            var result = Splice(ref source, index, 1);
-            return result.Length > 0 ? result[0] : default;
+            var candidates = Splice(ref sources, index, 1);
+            return candidates.Length > 0 ? candidates[0] : defaultValue;
         }
 
         /// <summary>
@@ -737,17 +764,21 @@ namespace CatLib.Support
         /// <para>The function returns false only if all elements pass the checker are false.</para>
         /// </summary>
         /// <typeparam name="T">The type of array.</typeparam>
-        /// <param name="source">The specified array.</param>
+        /// <param name="sources">The specified array.</param>
         /// <param name="predicate">The callback.</param>
         /// <returns>True if pass the test.</returns>
-        public static bool Test<T>(T[] source, Predicate<T> predicate)
+        public static bool Test<T>(T[] sources, Predicate<T> predicate)
         {
-            Guard.Requires<ArgumentNullException>(source != null);
-            Guard.Requires<ArgumentNullException>(predicate != null);
+            Guard.Requires<ArgumentNullException>(predicate != null, $"Must set a {predicate}.");
 
-            foreach (var result in source)
+            if (sources == null)
             {
-                if (predicate(result))
+                return false;
+            }
+
+            foreach (var source in sources)
+            {
+                if (predicate(source))
                 {
                     return true;
                 }
@@ -761,27 +792,27 @@ namespace CatLib.Support
         /// otherwise adds a replacement value at the end of the specified array.
         /// </summary>
         /// <typeparam name="T">The type of array.</typeparam>
-        /// <param name="source">The specified array.</param>
+        /// <param name="sources">The specified array.</param>
         /// <param name="predicate">The callback to find element.</param>
         /// <param name="value">The replacement value.</param>
-        public static void Set<T>(ref T[] source, Predicate<T> predicate, T value)
+        public static void Set<T>(ref T[] sources, Predicate<T> predicate, T value)
         {
-            Guard.Requires<ArgumentNullException>(predicate != null);
+            Guard.Requires<ArgumentNullException>(predicate != null, $"Must set a {predicate}.");
 
-            source = source ?? Array.Empty<T>();
+            sources = sources ?? Array.Empty<T>();
 
-            for (var index = 0; index < source.Length; index++)
+            for (var index = 0; index < sources.Length; index++)
             {
-                if (!predicate(source[index]))
+                if (!predicate(sources[index]))
                 {
                     continue;
                 }
 
-                source[index] = value;
+                sources[index] = value;
                 return;
             }
 
-            Push(ref source, value);
+            Push(ref sources, value);
         }
     }
 }

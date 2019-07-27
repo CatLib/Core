@@ -564,10 +564,9 @@ namespace CatLib.Tests.Support
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
-        public void TestRemoveAtOutOfRange()
+        public void TestRemoveAtWithDefault()
         {
-            Arr.RemoveAt(ref foobar, 10);
+            Assert.AreEqual("foo", Arr.RemoveAt(ref foobar, 999, "foo"));
         }
 
         [TestMethod]
