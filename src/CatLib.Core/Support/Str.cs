@@ -177,7 +177,7 @@ namespace CatLib.Support
 
             if (string.IsNullOrEmpty(str) || num == 0)
             {
-                return str ?? string.Empty;
+                return string.Empty;
             }
 
             var requested = new StringBuilder();
