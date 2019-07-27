@@ -180,13 +180,13 @@ namespace CatLib.Support
                 return string.Empty;
             }
 
-            var requested = new StringBuilder();
+            var ret = new StringBuilder();
             for (var i = 0; i < num; i++)
             {
-                requested.Append(str);
+                ret.Append(str);
             }
 
-            return requested.ToString();
+            return ret.ToString();
         }
 
         /// <summary>
