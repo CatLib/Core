@@ -72,9 +72,6 @@ namespace CatLib
         /// <inheritdoc cref="IApplication.IsMainThread"/>
         public static bool IsMainThread => That.IsMainThread;
 
-        /// <inheritdoc cref="Application.Version"/>
-        public static string Version => Application.Version;
-
         /// <inheritdoc cref="IApplication.DebugLevel"/>
         public static DebugLevel DebugLevel
         {
