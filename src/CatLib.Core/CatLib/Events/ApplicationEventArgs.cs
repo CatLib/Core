@@ -11,7 +11,7 @@
 
 using System;
 
-namespace CatLib
+namespace CatLib.Events
 {
     /// <summary>
     /// Represents an application event.

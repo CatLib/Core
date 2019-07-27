@@ -19,115 +19,48 @@ namespace CatLib.EventDispatcher
     /// <inheritdoc />
     public sealed class EventDispatcher : IEventDispatcher
     {
-        private readonly bool inheritancePropagation;
-        private readonly IDictionary<Type, SortSet<WrappedListener, int>> listeners;
+        private readonly IDictionary<string, SortSet<Action<EventArgs>, int>> listeners;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="EventDispatcher"/> class.
         /// </summary>
-        /// <param name="inheritancePropagation">Whether to trigger an event based on the inheritance chain.</param>
-        public EventDispatcher(bool inheritancePropagation = true)
+        public EventDispatcher()
         {
-            this.inheritancePropagation = inheritancePropagation;
-            listeners = new Dictionary<Type, SortSet<WrappedListener, int>>();
+            listeners = new Dictionary<string, SortSet<Action<EventArgs>, int>>();
         }
 
         /// <inheritdoc />
-        public void AddListener<T>(Action<T> listener, int priority = 0)
-            where T : EventArgs
+        public bool AddListener(string eventName, Action<EventArgs> listener, int priority = 0)
         {
-            Guard.Requires<ArgumentNullException>(listener != null);
-            DoAddListener(typeof(T), new WrappedListener<T>(listener), priority);
+            if (string.IsNullOrEmpty(eventName) || listener == null)
+            {
+                return false;
+            }
+
+            if (!listeners.TryGetValue(eventName, out SortSet<Action<EventArgs>, int> collection))
+            {
+                listeners[eventName] = collection = new SortSet<Action<EventArgs>, int>();
+            }
+            else if (collection.Contains(listener))
+            {
+                return false;
+            }
+
+            collection.Add(listener, priority);
+            return true;
         }
 
         /// <inheritdoc />
-        public T Dispatch<T>(T eventArgs)
-            where T : EventArgs
+        public EventArgs Dispatch(string eventName, EventArgs eventArgs)
         {
-            DoDispatch(eventArgs);
-            return eventArgs;
-        }
-
-        /// <inheritdoc />
-        public Action<T>[] GetListeners<T>()
-            where T : EventArgs
-        {
-            if (!listeners.TryGetValue(typeof(T), out SortSet<WrappedListener, int> collection))
+            if (!listeners.TryGetValue(eventName, out SortSet<Action<EventArgs>, int> collection))
             {
-                return Array.Empty<Action<T>>();
+                return eventArgs;
             }
 
-            return Arr.Map(collection, (wrappedListener) =>
-                ((WrappedListener<T>)wrappedListener).GetAction());
-        }
-
-        /// <inheritdoc />
-        public bool HasListeners<T>()
-             where T : EventArgs
-        {
-            return listeners.ContainsKey(typeof(T));
-        }
-
-        /// <inheritdoc />
-        public void RemoveListener<T>(Action<T> listener = null)
-             where T : EventArgs
-        {
-            DoRemoveListener(typeof(T), listener == null ?
-                null : new WrappedListener<T>(listener));
-        }
-
-        private void DoDispatch(EventArgs eventArgs)
-        {
-            var eventType = eventArgs.GetType();
-            do
-            {
-                CallListener(eventType, eventArgs);
-                eventType = eventType.BaseType;
-            }
-            while (inheritancePropagation && eventType.BaseType != null);
-        }
-
-        private void DoAddListener(Type eventType, WrappedListener wrappedListener, int priority)
-        {
-            if (!listeners.TryGetValue(eventType, out SortSet<WrappedListener, int> collection))
-            {
-                listeners[eventType] = collection = new SortSet<WrappedListener, int>();
-            }
-            else if (collection.Contains(wrappedListener))
-            {
-                throw new RuntimeException($"Unable to add multiple times to the same listener: \"{wrappedListener}\"");
-            }
-
-            collection.Add(wrappedListener, priority);
-        }
-
-        private void DoRemoveListener(Type eventType, WrappedListener wrappedListener)
-        {
-            if (wrappedListener == null)
-            {
-                listeners.Remove(eventType);
-                return;
-            }
-
-            if (!listeners.TryGetValue(eventType, out SortSet<WrappedListener, int> collection))
-            {
-                return;
-            }
-
-            collection.Remove(wrappedListener);
-
-            if (collection.Count <= 0)
-            {
-                listeners.Remove(eventType);
-            }
-        }
-
-        private void CallListener(Type eventType, EventArgs eventArgs)
-        {
-            if (!listeners.TryGetValue(eventType, out SortSet<WrappedListener, int> collection))
-            {
-                return;
-            }
+            Guard.Requires<AssertException>(
+                collection.Count > 0,
+                "Assertion error: The number of listeners should be greater than 0.");
 
             foreach (var listener in collection)
             {
@@ -139,52 +72,48 @@ namespace CatLib.EventDispatcher
 
                 listener.Invoke(eventArgs);
             }
+
+            return eventArgs;
         }
 
-        private abstract class WrappedListener
+        /// <inheritdoc />
+        public Action<EventArgs>[] GetListeners(string eventName)
         {
-            public abstract void Invoke(EventArgs eventArgs);
+            if (!listeners.TryGetValue(eventName, out SortSet<Action<EventArgs>, int> collection))
+            {
+                return Array.Empty<Action<EventArgs>>();
+            }
+
+            return collection.ToArray();
         }
 
-        private sealed class WrappedListener<T> : WrappedListener
-            where T : EventArgs
+        /// <inheritdoc />
+        public bool HasListeners(string eventName)
         {
-            private readonly Action<T> listener;
+            return listeners.ContainsKey(eventName);
+        }
 
-            public WrappedListener(Action<T> listener)
+        /// <inheritdoc />
+        public bool RemoveListener(string eventName, Action<EventArgs> listener = null)
+        {
+            if (listener == null)
             {
-                this.listener = listener;
+                return listeners.Remove(eventName);
             }
 
-            public Action<T> GetAction()
+            if (!listeners.TryGetValue(eventName, out SortSet<Action<EventArgs>, int> collection))
             {
-                return listener;
-            }
-
-            public override void Invoke(EventArgs eventArgs)
-            {
-                listener.Invoke((T)eventArgs);
-            }
-
-            public override int GetHashCode()
-            {
-                return listener.GetHashCode();
-            }
-
-            public override bool Equals(object obj)
-            {
-                if (obj is WrappedListener<T> wrappedListener)
-                {
-                    return listener.Equals(wrappedListener.listener);
-                }
-
                 return false;
             }
 
-            public override string ToString()
+            var status = collection.Remove(listener);
+
+            if (collection.Count <= 0)
             {
-                return listener.ToString();
+                status = listeners.Remove(eventName);
             }
+
+            return status;
         }
     }
 }

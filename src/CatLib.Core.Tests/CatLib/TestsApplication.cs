@@ -11,6 +11,7 @@
 
 using CatLib.Container;
 using CatLib.EventDispatcher;
+using CatLib.Events;
 using CatLib.Exception;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
@@ -71,9 +72,10 @@ namespace CatLib.Tests
             var foo = new Mock<IBootstrap>();
             var bar = new Mock<IBootstrap>();
 
-            dispatcher.AddListener<BootingEventArgs>(args =>
+            dispatcher.AddListener(ApplicationEvents.OnBooting, eventArgs =>
             {
-                if (args.GetBootstrap() == foo.Object)
+                if (eventArgs is BootingEventArgs args &&
+                    args.GetBootstrap() == foo.Object)
                 {
                     args.Skip();
                 }
@@ -91,9 +93,10 @@ namespace CatLib.Tests
             var foo = new Mock<IServiceProvider>();
             var bar = new Mock<IServiceProvider>();
 
-            dispatcher.AddListener<RegisterProviderEventArgs>((args) =>
+            dispatcher.AddListener(ApplicationEvents.OnRegisterProvider, (eventArgs) =>
             {
-                if (args.GetServiceProvider() == foo.Object)
+                if (eventArgs is RegisterProviderEventArgs args &&
+                    args.GetServiceProvider() == foo.Object)
                 {
                     args.Skip();
                 }
@@ -122,7 +125,7 @@ namespace CatLib.Tests
             var foo = new Mock<IServiceProvider>();
             var bar = new Mock<IServiceProvider>();
 
-            dispatcher.AddListener<InitProviderEventArgs>((args) =>
+            dispatcher.AddListener(ApplicationEvents.OnInitProvider, (args) =>
             {
                 application.Register(foo.Object);
             });
@@ -138,7 +141,7 @@ namespace CatLib.Tests
         {
             var foo = new Mock<IServiceProvider>();
 
-            dispatcher.AddListener<BeforeTerminateEventArgs>((args) =>
+            dispatcher.AddListener(ApplicationEvents.OnBeforeTerminate, (args) =>
             {
                 application.Register(foo.Object);
             });
@@ -152,12 +155,12 @@ namespace CatLib.Tests
         public void TestTerminateSequenceOfEvents()
         {
             var count = 0;
-            dispatcher.AddListener<BeforeTerminateEventArgs>((args) =>
+            dispatcher.AddListener(ApplicationEvents.OnBeforeTerminate, (args) =>
             {
                 Assert.AreEqual(0, count++);
             });
 
-            dispatcher.AddListener<AfterTerminateEventArgs>((args) =>
+            dispatcher.AddListener(ApplicationEvents.OnAfterTerminate, (args) =>
             {
                 Assert.AreEqual(1, count++);
             });
