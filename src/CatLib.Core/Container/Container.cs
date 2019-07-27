@@ -152,7 +152,6 @@ namespace CatLib.Container
             findTypeCache = new Dictionary<string, Type>(prime * 4);
             rebound = new Dictionary<string, List<Action<object>>>(prime);
             instanceTiming = new SortSet<string, int>();
-            instanceTiming.ReverseIterator(false);
             BuildStack = new Stack<string>(32);
             UserParamsStack = new Stack<object[]>(32);
             skipped = new object();
@@ -748,7 +747,7 @@ namespace CatLib.Container
                 try
                 {
                     flushing = true;
-                    foreach (var service in instanceTiming)
+                    foreach (var service in instanceTiming.GetIterator(false))
                     {
                         Release(service);
                     }

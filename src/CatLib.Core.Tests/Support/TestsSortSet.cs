@@ -198,10 +198,8 @@ namespace CatLib.Tests.Support
                 sortset.Add(i, i);
             }
 
-            sortset.ReverseIterator();
-
             int n = 0;
-            foreach (var i in sortset)
+            foreach (var i in sortset.GetIterator(false))
             {
                 Assert.AreEqual(count - (++n), i);
             }
@@ -374,9 +372,7 @@ namespace CatLib.Tests.Support
                 Assert.Fail("Iteration is not allowed.");
             }
 
-            sortset.ReverseIterator();
-
-            foreach (var item in sortset)
+            foreach (var item in sortset.GetIterator(false))
             {
                 Assert.Fail("Iteration is not allowed.");
             }

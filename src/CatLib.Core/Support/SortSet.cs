@@ -14,6 +14,10 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 
+#pragma warning disable S2589
+#pragma warning disable S2583
+#pragma warning disable S2259
+
 namespace CatLib.Support
 {
     /// <summary>
@@ -30,10 +34,9 @@ namespace CatLib.Support
         private readonly int maxLevel;
         private readonly SkipNode header;
         private readonly double probability;
-        private readonly System.Random random = new System.Random();
+        private readonly Random random = new Random();
         private readonly IComparer<TScore> comparer;
         private readonly Dictionary<TElement, TScore> elementMapping = new Dictionary<TElement, TScore>();
-        private bool forward;
         private int level;
         private SkipNode tail;
 
@@ -42,17 +45,16 @@ namespace CatLib.Support
         /// </summary>
         /// <param name="probable">Probability coefficient of possible number of level(0-1).</param>
         /// <param name="maxLevel">The max level.</param>
-        /// <exception cref="ArgumentOutOfRangeException"><paramref name="probable"/>或<paramref name="maxLevel"/>不是有效值时引发.</exception>
         public SortSet(double probable = 0.25, int maxLevel = 32)
         {
-            Guard.Requires<ArgumentOutOfRangeException>(maxLevel > 0);
             Guard.Requires<ArgumentOutOfRangeException>(probable < 1);
             Guard.Requires<ArgumentOutOfRangeException>(probable > 0);
 
-            forward = true;
+            maxLevel = Math.Max(1, maxLevel);
+
             probability = probable * 0xFFFF;
-            this.maxLevel = maxLevel;
             level = 1;
+            this.maxLevel = maxLevel;
             header = new SkipNode
             {
                 Level = new SkipNode.SkipNodeLevel[maxLevel],
@@ -78,11 +80,6 @@ namespace CatLib.Support
         public int Count { get; private set; }
 
         /// <summary>
-        /// Gets the sync lock.
-        /// </summary>
-        public object SyncRoot { get; } = new object();
-
-        /// <summary>
         /// Get the element of the specified ranking.
         /// </summary>
         /// <param name="rank">The ranking(0 is the bottom).</param>
@@ -90,7 +87,7 @@ namespace CatLib.Support
         public TElement this[int rank] => GetElementByRank(rank);
 
         /// <summary>
-        /// Clear the sortset.
+        /// Clear the <see cref="SortSet{TElement, TScore}"/>.
         /// </summary>
         public void Clear()
         {
@@ -102,46 +99,30 @@ namespace CatLib.Support
 
             tail = null;
             level = 1;
-            elementMapping.Clear();
             Count = 0;
+            elementMapping.Clear();
         }
 
         /// <summary>
-        /// Reverse traversal order.
+        /// Get <see cref="SortSet{TElement, TScore}"/> iterator.
         /// </summary>
-        public void ReverseIterator()
+        /// <param name="forward">True if iterator element forward.</param>
+        /// <returns>Returns iterator instance.</returns>
+        public IEnumerable<TElement> GetIterator(bool forward)
         {
-            ReverseIterator(!forward);
-        }
-
-        /// <summary>
-        /// Reverse traversal order.
-        /// </summary>
-        /// <param name="forward">Whether to traverse from the forward.</param>
-        public void ReverseIterator(bool forward)
-        {
-            this.forward = forward;
-        }
-
-        /// <summary>
-        /// Gets the enumerator classes.
-        /// </summary>
-        /// <returns>Returns the enumerator classes.</returns>
-        public Enumerator GetEnumerator()
-        {
-            return new Enumerator(this, forward);
+            return new Iterator(this, forward);
         }
 
         /// <inheritdoc />
         IEnumerator<TElement> IEnumerable<TElement>.GetEnumerator()
         {
-            return GetEnumerator();
+            return new Iterator(this, true);
         }
 
         /// <inheritdoc />
         IEnumerator IEnumerable.GetEnumerator()
         {
-            return GetEnumerator();
+            return new Iterator(this, true);
         }
 
         /// <summary>
@@ -173,7 +154,7 @@ namespace CatLib.Support
                 return header.Level[0].Forward.Element;
             }
 
-            throw new InvalidOperationException("SortSet is Null");
+            throw new InvalidOperationException($"{nameof(SortSet<TElement, TScore>)} is empty.");
         }
 
         /// <summary>
@@ -187,7 +168,7 @@ namespace CatLib.Support
                 return tail.Element;
             }
 
-            throw new InvalidOperationException("SortSet is Null");
+            throw new InvalidOperationException($"{nameof(SortSet<TElement, TScore>)} is empty");
         }
 
         /// <summary>
@@ -196,12 +177,12 @@ namespace CatLib.Support
         /// <returns>The first element.</returns>
         public TElement Shift()
         {
-            if (!Remove(header.Level[0].Forward, out TElement result))
+            if (!Remove(header.Level[0].Forward, out TElement ret))
             {
-                throw new InvalidOperationException("SortSet is Null");
+                throw new InvalidOperationException($"{nameof(SortSet<TElement, TScore>)} is empty");
             }
 
-            return result;
+            return ret;
         }
 
         /// <summary>
@@ -210,12 +191,12 @@ namespace CatLib.Support
         /// <returns>The last element.</returns>
         public TElement Pop()
         {
-            if (!Remove(tail, out TElement result))
+            if (!Remove(tail, out TElement ret))
             {
-                throw new InvalidOperationException("SortSet is Null");
+                throw new InvalidOperationException($"{nameof(SortSet<TElement, TScore>)} is empty");
             }
 
-            return result;
+            return ret;
         }
 
         /// <summary>
@@ -225,8 +206,12 @@ namespace CatLib.Support
         /// <param name="score">The score.</param>
         public void Add(TElement element, TScore score)
         {
-            Guard.Requires<ArgumentNullException>(element != null);
-            Guard.Requires<ArgumentNullException>(score != null);
+            Guard.Requires<ArgumentNullException>(
+                element != null,
+                $"{nameof(element)} should not be null.");
+            Guard.Requires<ArgumentNullException>(
+                score != null,
+                $"{nameof(score)} should not be null.");
 
             if (elementMapping.TryGetValue(element, out TScore dictScore))
             {
@@ -243,7 +228,9 @@ namespace CatLib.Support
         /// <returns>True if contains the specided element.</returns>
         public bool Contains(TElement element)
         {
-            Guard.Requires<ArgumentNullException>(element != null);
+            Guard.Requires<ArgumentNullException>(
+                element != null,
+                $"{nameof(element)} should not be null.");
             return elementMapping.ContainsKey(element);
         }
 
@@ -254,7 +241,10 @@ namespace CatLib.Support
         /// <returns>The element's score.</returns>
         public TScore GetScore(TElement element)
         {
-            Guard.Requires<ArgumentNullException>(element != null);
+            Guard.Requires<ArgumentNullException>(
+                element != null,
+                $"{nameof(element)} should not be null.");
+
             if (!elementMapping.TryGetValue(element, out TScore score))
             {
                 throw new KeyNotFoundException();
@@ -271,9 +261,15 @@ namespace CatLib.Support
         /// <returns>The number of elements in the score range.</returns>
         public int GetRangeCount(TScore start, TScore end)
         {
-            Guard.Requires<ArgumentNullException>(start != null);
-            Guard.Requires<ArgumentNullException>(end != null);
-            Guard.Requires<ArgumentOutOfRangeException>(Compare(start, end) <= 0);
+            Guard.Requires<ArgumentNullException>(
+                start != null,
+                $"{nameof(start)} should not be null.");
+            Guard.Requires<ArgumentNullException>(
+                end != null,
+                $"{nameof(end)} should not be null.");
+            Guard.Requires<ArgumentOutOfRangeException>(
+                Compare(start, end) <= 0,
+                $"{nameof(start)} should not larger than {nameof(end)}.");
 
             int rank = 0, leftRank = 0;
             SkipNode leftCursor = null;
@@ -285,15 +281,9 @@ namespace CatLib.Support
             {
                 for (var i = level - 1; i >= 0; --i)
                 {
-#pragma warning disable S2589
-#pragma warning disable S2583
-#pragma warning disable S2259
                     while (cursor.Level[i].Forward != null &&
                            ((!isRight && Compare(cursor.Level[i].Forward.Score, start) < 0) ||
                             (isRight && Compare(cursor.Level[i].Forward.Score, end) <= 0)))
-#pragma warning disable S2589
-#pragma warning disable S2583
-#pragma warning disable S2259
                     {
                         rank += cursor.Level[i].Span;
                         cursor = cursor.Level[i].Forward;
@@ -320,13 +310,6 @@ namespace CatLib.Support
                 var foo = rank;
                 rank = leftRank;
                 leftRank = foo;
-
-#pragma warning disable S125
-
-                // todo: removed it in new version.
-                // leftRank ^= (rank ^= leftRank);
-                // rank ^= leftRank;
-#pragma warning restore S125
             }
 #pragma warning disable S1121
             while (isRight = !isRight);
@@ -342,9 +325,11 @@ namespace CatLib.Support
         /// <returns>Whether is removed the element.</returns>
         public bool Remove(TElement element)
         {
-            Guard.Requires<ArgumentNullException>(element != null);
+            Guard.Requires<ArgumentNullException>(
+                element != null,
+                $"{nameof(element)} should not be null.");
 
-            return elementMapping.TryGetValue(element, out TScore dictScore) && Remove(element, dictScore);
+            return elementMapping.TryGetValue(element, out TScore score) && Remove(element, score);
         }
 
         /// <summary>
@@ -356,7 +341,9 @@ namespace CatLib.Support
         public int RemoveRangeByRank(int startRank, int stopRank)
         {
             startRank = Math.Max(startRank, 0);
-            Guard.Requires<ArgumentOutOfRangeException>(startRank <= stopRank);
+            Guard.Requires<ArgumentOutOfRangeException>(
+                startRank <= stopRank,
+                $"{nameof(startRank)} should not larger than {nameof(stopRank)}.");
 
             int traversed = 0, removed = 0;
             var update = new SkipNode[maxLevel];
@@ -397,9 +384,15 @@ namespace CatLib.Support
         /// <returns>Returns removed elements count.</returns>
         public int RemoveRangeByScore(TScore startScore, TScore stopScore)
         {
-            Guard.Requires<ArgumentNullException>(startScore != null);
-            Guard.Requires<ArgumentNullException>(stopScore != null);
-            Guard.Requires<ArgumentOutOfRangeException>(Compare(startScore, stopScore) <= 0);
+            Guard.Requires<ArgumentNullException>(
+                startScore != null,
+                $"{nameof(startScore)} should not be null.");
+            Guard.Requires<ArgumentNullException>(
+                stopScore != null,
+                $"{nameof(stopScore)} should not be null.");
+            Guard.Requires<ArgumentOutOfRangeException>(
+                Compare(startScore, stopScore) <= 0,
+                $"{nameof(startScore)} should not larger than {nameof(stopScore)}.");
 
             var removed = 0;
             var update = new SkipNode[maxLevel];
@@ -437,7 +430,9 @@ namespace CatLib.Support
         /// <returns>Returns the element rank(0 bottom) -1 means not found element.</returns>
         public int GetRank(TElement element)
         {
-            Guard.Requires<ArgumentNullException>(element != null);
+            Guard.Requires<ArgumentNullException>(
+                element != null,
+                $"{nameof(element)} should not be null.");
             return elementMapping.TryGetValue(element, out TScore dictScore) ? GetRank(element, dictScore) : -1;
         }
 
@@ -448,7 +443,9 @@ namespace CatLib.Support
         /// <returns>The element's rank(0 bottom)-1 means not found element.</returns>
         public int GetRevRank(TElement element)
         {
-            Guard.Requires<ArgumentNullException>(element != null);
+            Guard.Requires<ArgumentNullException>(
+                element != null,
+                $"{nameof(element)} should not be null.");
             var rank = GetRank(element);
             return rank < 0 ? rank : Count - rank - 1;
         }
@@ -462,7 +459,9 @@ namespace CatLib.Support
         public TElement[] GetElementRangeByRank(int startRank, int stopRank)
         {
             startRank = Math.Max(startRank, 0);
-            Guard.Requires<ArgumentOutOfRangeException>(startRank <= stopRank);
+            Guard.Requires<ArgumentOutOfRangeException>(
+                startRank <= stopRank,
+                $"{nameof(startRank)} should not larger than {nameof(stopRank)}.");
 
             int traversed = 0;
             var cursor = header;
@@ -498,9 +497,15 @@ namespace CatLib.Support
         /// <returns>An array of the elements.</returns>
         public TElement[] GetElementRangeByScore(TScore startScore, TScore stopScore)
         {
-            Guard.Requires<ArgumentNullException>(startScore != null);
-            Guard.Requires<ArgumentNullException>(stopScore != null);
-            Guard.Requires<ArgumentOutOfRangeException>(Compare(startScore, stopScore) <= 0);
+            Guard.Requires<ArgumentNullException>(
+                startScore != null,
+                $"{nameof(startScore)} should not be null.");
+            Guard.Requires<ArgumentNullException>(
+                stopScore != null,
+                $"{nameof(stopScore)} should not be null.");
+            Guard.Requires<ArgumentOutOfRangeException>(
+                Compare(startScore, stopScore) <= 0,
+                $"{nameof(startScore)} should not larger than {nameof(stopScore)}.");
 
             var cursor = header;
             for (var i = level - 1; i >= 0; --i)
@@ -681,8 +686,12 @@ namespace CatLib.Support
         /// <returns>Whether is removed the element.</returns>
         private bool Remove(TElement element, TScore score)
         {
-            Guard.Requires<ArgumentNullException>(element != null);
-            Guard.Requires<ArgumentNullException>(score != null);
+            Guard.Requires<ArgumentNullException>(
+                element != null,
+                $"{nameof(element)} should not be null.");
+            Guard.Requires<ArgumentNullException>(
+                score != null,
+                $"{nameof(score)} should not be null.");
 
             var update = new SkipNode[maxLevel];
             var cursor = header;
@@ -844,14 +853,16 @@ namespace CatLib.Support
         }
 
         /// <summary>
-        /// The default enumerator.
+        /// The default iterator.
         /// </summary>
-        public struct Enumerator : IEnumerator<TElement>
+#pragma warning disable CA1710
+        public struct Iterator : IEnumerator<TElement>, IEnumerable<TElement>
+#pragma warning restore CA1710
         {
             /// <summary>
             /// The sorset instance.
             /// </summary>
-            private readonly SortSet<TElement, TScore> sortSet;
+            private readonly SortSet<TElement, TScore> collection;
 
             /// <summary>
             /// Whether to traverse from the forward.
@@ -864,15 +875,15 @@ namespace CatLib.Support
             private SkipNode current;
 
             /// <summary>
-            /// Initializes a new instance of the <see cref="Enumerator"/> struct.
+            /// Initializes a new instance of the <see cref="Iterator"/> struct.
             /// </summary>
-            /// <param name="sortSet">The sortset instnace.</param>
+            /// <param name="collection">The sortset instnace.</param>
             /// <param name="forward">Whether to traverse from the forward.</param>
-            internal Enumerator(SortSet<TElement, TScore> sortSet, bool forward)
+            internal Iterator(SortSet<TElement, TScore> collection, bool forward)
             {
-                this.sortSet = sortSet;
+                this.collection = collection;
                 this.forward = forward;
-                current = forward ? sortSet.header : null;
+                current = forward ? collection.header : null;
             }
 
             /// <inheritdoc />
@@ -900,6 +911,18 @@ namespace CatLib.Support
             }
 
             /// <inheritdoc />
+            public IEnumerator<TElement> GetEnumerator()
+            {
+                return this;
+            }
+
+            /// <inheritdoc />
+            IEnumerator IEnumerable.GetEnumerator()
+            {
+                return GetEnumerator();
+            }
+
+            /// <inheritdoc />
             public bool MoveNext()
             {
                 if (forward)
@@ -916,7 +939,7 @@ namespace CatLib.Support
                 {
                     do
                     {
-                        current = sortSet.tail;
+                        current = collection.tail;
                     }
                     while (current != null && current.IsDeleted);
                     return current != null;
@@ -933,7 +956,7 @@ namespace CatLib.Support
             /// <inheritdoc />
             void IEnumerator.Reset()
             {
-                current = forward ? sortSet.header : null;
+                current = forward ? collection.header : null;
             }
         }
 
