@@ -9,7 +9,7 @@
  * Document: https://catlib.io/
  */
 
-namespace CatLib
+namespace CatLib.Events
 {
     /// <summary>
     /// Indicates that the framework ready.

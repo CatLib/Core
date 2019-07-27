@@ -9,7 +9,7 @@
  * Document: https://catlib.io/
  */
 
-namespace CatLib
+namespace CatLib.Events
 {
     /// <summary>
     /// It indicates that the <see cref="IServiceProvider.Init"/> method will be called.

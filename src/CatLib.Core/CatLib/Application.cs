@@ -11,6 +11,7 @@
 
 using CatLib.Container;
 using CatLib.EventDispatcher;
+using CatLib.Events;
 using CatLib.Exception;
 using CatLib.Support;
 using System;
@@ -29,6 +30,7 @@ namespace CatLib
         private static string version;
         private readonly IList<IServiceProvider> loadedProviders;
         private readonly int mainThreadId;
+        private readonly IDictionary<Type, string> dispatchMapping;
         private bool bootstrapped;
         private bool inited;
         private bool registering;
@@ -46,6 +48,20 @@ namespace CatLib
 
             mainThreadId = Thread.CurrentThread.ManagedThreadId;
             RegisterBaseBindings();
+
+            dispatchMapping = new Dictionary<Type, string>()
+            {
+                { typeof(AfterBootEventArgs), ApplicationEvents.OnAfterBoot },
+                { typeof(AfterInitEventArgs), ApplicationEvents.OnAfterInit },
+                { typeof(AfterTerminateEventArgs), ApplicationEvents.OnAfterTerminate },
+                { typeof(BeforeBootEventArgs), ApplicationEvents.OnBeforeBoot },
+                { typeof(BeforeInitEventArgs), ApplicationEvents.OnBeforeInit },
+                { typeof(BeforeTerminateEventArgs), ApplicationEvents.OnBeforeTerminate },
+                { typeof(BootingEventArgs), ApplicationEvents.OnBooting },
+                { typeof(InitProviderEventArgs), ApplicationEvents.OnInitProvider },
+                { typeof(RegisterProviderEventArgs), ApplicationEvents.OnRegisterProvider },
+                { typeof(StartCompletedEventArgs), ApplicationEvents.OnStartCompleted },
+            };
 
             // We use closures to save the current context state
             // Do not change to: OnFindType(Type.GetType) This
@@ -292,7 +308,18 @@ namespace CatLib
         private T Dispatch<T>(T eventArgs)
             where T : EventArgs
         {
-            return dispatcher?.Dispatch(eventArgs) ?? eventArgs;
+            if (!dispatchMapping.TryGetValue(eventArgs.GetType(), out string eventName))
+            {
+                throw new AssertException($"Assertion error: Undefined event {eventArgs}");
+            }
+
+            if (dispatcher == null)
+            {
+                return eventArgs;
+            }
+
+            dispatcher.Dispatch(eventName, eventArgs);
+            return eventArgs;
         }
     }
 }

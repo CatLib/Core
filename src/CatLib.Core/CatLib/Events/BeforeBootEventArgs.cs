@@ -9,7 +9,7 @@
  * Document: https://catlib.io/
  */
 
-namespace CatLib
+namespace CatLib.Events
 {
     /// <summary>
     /// It indicates that the bootstrap will be bootstrapped.
