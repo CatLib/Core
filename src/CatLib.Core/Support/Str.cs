@@ -47,9 +47,9 @@ namespace CatLib.Support
         }
 
         /// <summary>
-        /// Get the function name expressed by the string.
+        /// Get the method name expressed by the string.
         /// </summary>
-        /// <param name="pattern">The string.</param>
+        /// <param name="pattern">The string will extract method name.</param>
         /// <returns>The method name.</returns>
         public static string Method(string pattern)
         {
@@ -91,7 +91,6 @@ namespace CatLib.Support
 
             Array.Resize(ref chars, count);
             Array.Reverse(chars);
-
             return new string(chars);
         }
 
@@ -99,8 +98,8 @@ namespace CatLib.Support
         /// Translate the specified string into an asterisk match expression and test.
         /// </summary>
         /// <param name="pattern">The match pattern.</param>
-        /// <param name="value">The. </param>
-        /// <returns>True if matches.</returns>
+        /// <param name="value">The match value.</param>
+        /// <returns>True if value is matched.</returns>
         public static bool Is(string pattern, string value)
         {
             return pattern == value || Regex.IsMatch(value, "^" + AsteriskWildcard(pattern) + "$");
@@ -112,16 +111,18 @@ namespace CatLib.Support
         /// </summary>
         /// <typeparam name="T">The type of source array.</typeparam>
         /// <param name="patterns">The match pattern.</param>
-        /// <param name="source">The source array.</param>
+        /// <param name="value">The match value.</param>
         /// <returns>True if matches.</returns>
-        public static bool Is<T>(string[] patterns, T source)
+        public static bool Is<T>(string[] patterns, T value)
         {
-            Guard.Requires<ArgumentNullException>(source != null);
-            Guard.Requires<ArgumentNullException>(patterns != null);
+            if (patterns == null || value == null)
+            {
+                return false;
+            }
 
             foreach (var pattern in patterns)
             {
-                if (Is(pattern, source.ToString()))
+                if (Is(pattern, value.ToString()))
                 {
                     return true;
                 }
@@ -138,9 +139,7 @@ namespace CatLib.Support
         public static string AsteriskWildcard(string pattern)
         {
             pattern = Regex.Escape(pattern);
-            pattern = pattern.Replace(@"\*", ".*?");
-
-            return pattern;
+            return pattern.Replace(@"\*", ".*?");
         }
 
         /// <summary>
@@ -151,16 +150,19 @@ namespace CatLib.Support
         /// <returns>Returns an array of the string.</returns>
         public static string[] Split(string str, int length = 1)
         {
-            Guard.Requires<ArgumentNullException>(str != null);
-            Guard.Requires<ArgumentOutOfRangeException>(length > 0);
-            var requested = new string[(str.Length / length) + (str.Length % length == 0 ? 0 : 1)];
-
-            for (var i = 0; i < str.Length; i += length)
+            if (string.IsNullOrEmpty(str))
             {
-                requested[i / length] = str.Substring(i, Math.Min(str.Length - i, length));
+                return Array.Empty<string>();
             }
 
-            return requested;
+            length = Math.Max(1, length);
+            var ret = new string[(str.Length / length) + (str.Length % length == 0 ? 0 : 1)];
+            for (var i = 0; i < str.Length; i += length)
+            {
+                ret[i / length] = str.Substring(i, Math.Min(str.Length - i, length));
+            }
+
+            return ret;
         }
 
         /// <summary>
@@ -171,12 +173,11 @@ namespace CatLib.Support
         /// <returns>Return the repeated string.</returns>
         public static string Repeat(string str, int num)
         {
-            Guard.Requires<ArgumentNullException>(str != null);
-            Guard.Requires<ArgumentOutOfRangeException>(num >= 0);
+            num = Math.Max(0, num);
 
-            if (num == 0)
+            if (string.IsNullOrEmpty(str) || num == 0)
             {
-                return str;
+                return str ?? string.Empty;
             }
 
             var requested = new StringBuilder();
@@ -196,16 +197,19 @@ namespace CatLib.Support
         /// <returns>Returns disrupted string.</returns>
         public static string Shuffle(string str, int? seed = null)
         {
-            Guard.Requires<ArgumentNullException>(str != null);
-            var random = Helper.MakeRandom(seed);
+            if (string.IsNullOrEmpty(str))
+            {
+                return string.Empty;
+            }
 
-            var requested = new string[str.Length];
+            var random = Helper.MakeRandom(seed);
+            var ret = new string[str.Length];
             for (var i = 0; i < str.Length; i++)
             {
                 var index = random.Next(0, str.Length - 1);
 
-                requested[i] = requested[i] ?? str.Substring(i, 1);
-                requested[index] = requested[index] ?? str.Substring(index, 1);
+                ret[i] = ret[i] ?? str.Substring(i, 1);
+                ret[index] = ret[index] ?? str.Substring(index, 1);
 
                 if (index == i)
                 {
@@ -213,13 +217,13 @@ namespace CatLib.Support
                 }
 
 #pragma warning disable S4143
-                var temp = requested[i];
-                requested[i] = requested[index];
-                requested[index] = temp;
+                var temporary = ret[i];
+                ret[i] = ret[index];
+                ret[index] = temporary;
 #pragma warning restore S4143
             }
 
-            return Arr.Reduce(requested, (v1, v2) => v1 + v2, string.Empty);
+            return Arr.Reduce(ret, (a, b) => a + b, string.Empty);
         }
 
         /// <summary>
@@ -227,15 +231,17 @@ namespace CatLib.Support
         /// <para>This function does not count overlapping substrings.</para>
         /// </summary>
         /// <param name="str">The specified string.</param>
-        /// <param name="subStr">The substring.</param>
+        /// <param name="substr">The substring.</param>
         /// <param name="start">The starting position.</param>
         /// <param name="length">The length to calculate.</param>
         /// <param name="comparison">The string comparison.</param>
-        /// <returns>Returns the number of times a substring appears.</returns>
-        public static int SubstringCount(string str, string subStr, int start = 0, int? length = null, StringComparison comparison = StringComparison.CurrentCultureIgnoreCase)
+        /// <returns>Returns the number of times a substring appears. -1 means unable to calculate.</returns>
+        public static int SubstringCount(string str, string substr, int start = 0, int? length = null, StringComparison comparison = StringComparison.CurrentCultureIgnoreCase)
         {
-            Guard.Requires<ArgumentNullException>(str != null);
-            Guard.Requires<ArgumentNullException>(subStr != null);
+            if (string.IsNullOrEmpty(str) || string.IsNullOrEmpty(substr))
+            {
+                return 0;
+            }
 
             Helper.NormalizationPosition(str.Length, ref start, ref length);
 
@@ -243,14 +249,14 @@ namespace CatLib.Support
             while (length.Value > 0)
             {
                 int index;
-                if ((index = str.IndexOf(subStr, start, length.Value, comparison)) < 0)
+                if ((index = str.IndexOf(substr, start, length.Value, comparison)) < 0)
                 {
                     break;
                 }
 
                 count++;
-                length -= index + subStr.Length - start;
-                start = index + subStr.Length;
+                length -= index + substr.Length - start;
+                start = index + substr.Length;
             }
 
             return count;
@@ -265,7 +271,6 @@ namespace CatLib.Support
         {
             var chars = str.ToCharArray();
             Array.Reverse(chars);
-
             return new string(chars);
         }
 
@@ -286,8 +291,8 @@ namespace CatLib.Support
         {
             str = str ?? string.Empty;
 
-            var needPadding = length - str.Length;
-            if (needPadding <= 0)
+            var needlePadding = length - str.Length;
+            if (needlePadding <= 0)
             {
                 return str;
             }
@@ -297,16 +302,16 @@ namespace CatLib.Support
 
             if (type == PadType.Both)
             {
-                leftPadding = needPadding >> 1;
-                rightPadding = (needPadding >> 1) + (needPadding % 2 == 0 ? 0 : 1);
+                leftPadding = needlePadding >> 1;
+                rightPadding = (needlePadding >> 1) + (needlePadding % 2 == 0 ? 0 : 1);
             }
             else if (type == PadType.Right)
             {
-                rightPadding = needPadding;
+                rightPadding = needlePadding;
             }
             else
             {
-                leftPadding = needPadding;
+                leftPadding = needlePadding;
             }
 
             padStr = padStr ?? Space;
@@ -328,8 +333,15 @@ namespace CatLib.Support
         /// <returns>The remaining part.</returns>
         public static string After(string str, string search)
         {
-            Guard.Requires<ArgumentNullException>(str != null);
-            Guard.Requires<ArgumentNullException>(search != null);
+            if (string.IsNullOrEmpty(str))
+            {
+                return string.Empty;
+            }
+
+            if (string.IsNullOrEmpty(search))
+            {
+                return str ?? string.Empty;
+            }
 
             var index = str.IndexOf(search, StringComparison.Ordinal);
             return index < 0 ? str : str.Substring(index + search.Length, str.Length - index - search.Length);
@@ -345,12 +357,11 @@ namespace CatLib.Support
         /// <returns>True if contains substring.</returns>
         public static bool Contains(string str, params string[] needles)
         {
-            Guard.Requires<ArgumentNullException>(str != null);
-            Guard.Requires<ArgumentNullException>(needles != null);
+            needles = needles ?? Array.Empty<string>();
 
             foreach (var needle in needles)
             {
-                if (str.Contains(needle))
+                if (str == needle || str.Contains(needle))
                 {
                     return true;
                 }
@@ -368,12 +379,21 @@ namespace CatLib.Support
         /// <returns>Returns the replacement string.</returns>
         public static string Replace(string[] matches, string replace, string str)
         {
-            Guard.Requires<ArgumentNullException>(matches != null);
-            Guard.Requires<ArgumentNullException>(replace != null);
-            Guard.Requires<ArgumentNullException>(str != null);
+            matches = matches ?? Array.Empty<string>();
+            replace = replace ?? string.Empty;
+
+            if (string.IsNullOrEmpty(str))
+            {
+                return string.Empty;
+            }
 
             foreach (var match in matches)
             {
+                if (match == null)
+                {
+                    continue;
+                }
+
                 str = str.Replace(match, replace);
             }
 
@@ -390,10 +410,12 @@ namespace CatLib.Support
         /// <returns>Returns the replacement string.</returns>
         public static string ReplaceFirst(string match, string replace, string str)
         {
-            Guard.Requires<ArgumentNullException>(match != null);
-            Guard.Requires<ArgumentNullException>(replace != null);
-            Guard.Requires<ArgumentNullException>(str != null);
+            if (string.IsNullOrEmpty(match) || string.IsNullOrEmpty(str))
+            {
+                return str ?? string.Empty;
+            }
 
+            replace = replace ?? string.Empty;
             var index = str.IndexOf(match, StringComparison.Ordinal);
             return index < 0 ? str : str.Remove(index, match.Length).Insert(index, replace);
         }
@@ -408,10 +430,12 @@ namespace CatLib.Support
         /// <returns>Returns the replacement string.</returns>
         public static string ReplaceLast(string match, string replace, string str)
         {
-            Guard.Requires<ArgumentNullException>(match != null);
-            Guard.Requires<ArgumentNullException>(replace != null);
-            Guard.Requires<ArgumentNullException>(str != null);
+            if (string.IsNullOrEmpty(match) || string.IsNullOrEmpty(str))
+            {
+                return str ?? string.Empty;
+            }
 
+            replace = replace ?? string.Empty;
             var index = str.LastIndexOf(match, StringComparison.Ordinal);
             return index < 0 ? str : str.Remove(index, match.Length).Insert(index, replace);
         }
@@ -424,21 +448,21 @@ namespace CatLib.Support
         /// <returns>The random string.</returns>
         public static string Random(int length = 16, int? seed = null)
         {
-            Guard.Requires<ArgumentOutOfRangeException>(length > 0);
+            length = Math.Max(1, length);
 
-            var requested = new StringBuilder();
+            var ret = new StringBuilder();
             var random = Helper.MakeRandom(seed);
-            for (int len; (len = requested.Length) < length;)
+            for (int len; (len = ret.Length) < length;)
             {
                 var size = length - len;
                 var bytes = new byte[size];
                 random.NextBytes(bytes);
 
                 var code = Replace(new[] { "/", "+", "=" }, string.Empty, Convert.ToBase64String(bytes));
-                requested.Append(code.Substring(0, Math.Min(size, code.Length)));
+                ret.Append(code.Substring(0, Math.Min(size, code.Length)));
             }
 
-            return requested.ToString();
+            return ret.ToString();
         }
 
         /// <summary>
@@ -466,69 +490,69 @@ namespace CatLib.Support
                 return mission;
             }
 
-            var result = str.Substring(0, end);
+            var ret = str.Substring(0, end);
 
             if (separator == null)
             {
-                return result + mission;
+                return ret + mission;
             }
 
             var separatorStr = separator.ToString();
             var index = -1;
             if (separator is Regex separatorRegex)
             {
-                if (separatorRegex.IsMatch(result))
+                if (separatorRegex.IsMatch(ret))
                 {
                     index = (separatorRegex.RightToLeft
-                        ? separatorRegex.Match(result)
-                        : Regex.Match(result, separatorRegex.ToString(),
+                        ? separatorRegex.Match(ret)
+                        : Regex.Match(ret, separatorRegex.ToString(),
                             separatorRegex.Options | RegexOptions.RightToLeft)).Index;
                 }
             }
             else if (!string.IsNullOrEmpty(separatorStr) && str.IndexOf(separatorStr, StringComparison.Ordinal) != end)
             {
-                index = result.LastIndexOf(separatorStr, StringComparison.Ordinal);
+                index = ret.LastIndexOf(separatorStr, StringComparison.Ordinal);
             }
 
             if (index > -1)
             {
-                result = result.Substring(0, index);
+                ret = ret.Substring(0, index);
             }
 
-            return result + mission;
+            return ret + mission;
         }
 
         /// <summary>
         /// Calculate Levenshtein distance between two strings.
         /// </summary>
-        /// <param name="str1">The string 1.</param>
-        /// <param name="str2">The string 2.</param>
+        /// <param name="a">The string 1.</param>
+        /// <param name="b">The string 2.</param>
         /// <returns>
         /// This function returns the Levenshtein-Distance between the two argument
         /// strings or -1, if one of the argument strings is longer than the limit
         /// of 255 characters.
         /// </returns>
-        public static int Levenshtein(string str1, string str2)
+        public static int Levenshtein(string a, string b)
         {
-            if (str1 == null || str2 == null)
+            if (a == null || b == null)
             {
                 return -1;
             }
 
-            var length1 = str1.Length;
-            var length2 = str2.Length;
+            var lengthA = a.Length;
+            var lengthB = b.Length;
 
-            if (length1 > 255 || length2 > 255)
+            if (lengthA > 255 || lengthB > 255)
             {
                 return -1;
             }
 
-            var p1 = new int[length2 + 1];
-            var p2 = new int[length2 + 1];
+            var pA = new int[lengthB + 1];
+            var pB = new int[lengthB + 1];
 
-            for (var i = 0; i <= length2; i++)
+            for (var i = 0; i <= lengthB; i++)
             {
-                p1[i] = i;
+                pA[i] = i;
             }
 
             int Min(int num1, int num2, int num3)
@@ -547,23 +571,23 @@ namespace CatLib.Support
                 return min;
             }
 
-            for (var i = 0; i < length1; i++)
+            for (var i = 0; i < lengthA; i++)
             {
-                p2[0] = p1[0] + 1;
-                for (var n = 0; n < length2; n++)
+                pB[0] = pA[0] + 1;
+                for (var n = 0; n < lengthB; n++)
                 {
-                    var distance = str1[i] == str2[n]
-                        ? Min(p1[n], p1[n + 1] + 1, p2[n] + 1)
-                        : Min(p1[n] + 1, p1[n + 1] + 1, p2[n] + 1);
-                    p2[n + 1] = distance;
+                    var distance = a[i] == b[n]
+                        ? Min(pA[n], pA[n + 1] + 1, pB[n] + 1)
+                        : Min(pA[n] + 1, pA[n + 1] + 1, pB[n] + 1);
+                    pB[n + 1] = distance;
                 }
 
-                var temp = p1;
-                p1 = p2;
-                p2 = temp;
+                var temp = pA;
+                pA = pB;
+                pB = temp;
             }
 
-            return p1[length2];
+            return pA[lengthB];
         }
 
         /// <summary>
@@ -576,27 +600,27 @@ namespace CatLib.Support
         /// result[0] == "hello";
         /// result[1] == "hello/world";.
         /// </remarks>
-        /// <param name="source">The source array.</param>
+        /// <param name="sources">The source array.</param>
         /// <param name="separator">The separator.</param>
         /// <returns>The sequential combination array.</returns>
-        public static string[] JoinList(string[] source, string separator = null)
+        public static string[] JoinList(string[] sources, string separator = null)
         {
-            Guard.Requires<ArgumentNullException>(source != null);
-            var builder = new StringBuilder();
-            for (var index = 1; index < source.Length; index++)
+            sources = sources ?? Array.Empty<string>();
+            var ret = new StringBuilder();
+            for (var index = 1; index < sources.Length; index++)
             {
-                builder.Append(source[index - 1]);
+                ret.Append(sources[index - 1]);
                 if (!string.IsNullOrEmpty(separator))
                 {
-                    builder.Append(separator);
+                    ret.Append(separator);
                 }
 
-                builder.Append(source[index]);
-                source[index] = builder.ToString();
-                builder.Remove(0, source[index].Length);
+                ret.Append(sources[index]);
+                sources[index] = ret.ToString();
+                ret.Remove(0, sources[index].Length);
             }
 
-            return source;
+            return sources;
         }
 
         /// <inheritdoc cref="JoinList(string[], char)"/>
