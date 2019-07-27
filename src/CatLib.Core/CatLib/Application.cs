@@ -42,7 +42,7 @@ namespace CatLib
         /// Initializes a new instance of the <see cref="Application"/> class.
         /// </summary>
         /// <param name="global">True if sets the instance to <see cref="App"/> facade.</param>
-        public Application(bool global = true)
+        public Application()
         {
             loadedProviders = new List<IServiceProvider>();
 
@@ -70,11 +70,6 @@ namespace CatLib
 
             DebugLevel = DebugLevel.Production;
             Process = StartProcess.Construct;
-
-            if (global)
-            {
-                App.That = this;
-            }
         }
 
         /// <summary>
@@ -106,7 +101,13 @@ namespace CatLib
         /// <returns>The CatLib <see cref="Application"/> instance.</returns>
         public static Application New(bool global = true)
         {
-            return new Application(global);
+            var application = new Application();
+            if (global)
+            {
+                App.That = application;
+            }
+
+            return application;
         }
 
         /// <summary>
