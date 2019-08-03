@@ -240,6 +240,11 @@ namespace CatLib
                 throw new LogicException($"Unable to {nameof(Terminate)} in-process registration service provider");
             }
 
+            if (provider is ServiceProvider baseProvider)
+            {
+                baseProvider.SetApplication(this);
+            }
+
             var skipped = Dispatch(new RegisterProviderEventArgs(provider, this))
                             .IsSkip;
             if (skipped)
