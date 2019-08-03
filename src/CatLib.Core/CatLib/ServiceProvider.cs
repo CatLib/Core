@@ -20,6 +20,11 @@ namespace CatLib
     [ExcludeFromCodeCoverage]
     public abstract class ServiceProvider : IServiceProvider
     {
+        /// <summary>
+        /// Gets application instance.
+        /// </summary>
+        protected IApplication App { get; private set; }
+
         /// <inheritdoc />
         public virtual void Init()
         {
@@ -28,6 +33,11 @@ namespace CatLib
         /// <inheritdoc />
         public virtual void Register()
         {
+        }
+
+        internal void SetApplication(IApplication application)
+        {
+            App = application;
         }
     }
 }

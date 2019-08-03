@@ -13,7 +13,6 @@ using CatLib.Tests.Fixture;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using System;
-using System.Linq;
 using Dispatcher = CatLib.EventDispatcher.EventDispatcher;
 
 namespace CatLib.EventDispatcher.Tests

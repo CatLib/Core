@@ -348,39 +348,6 @@ namespace CatLib.Support
         /// <param name="predicate">The callback.</param>
         /// <param name="expected">The expected value.</param>
         /// <returns>Returns an filtered array.</returns>
-        public static T[] Filter<T>(T[] sources, Predicate<T> predicate, bool expected = true)
-        {
-            Guard.Requires<ArgumentNullException>(predicate != null, $"Must set a {predicate}.");
-
-            if (sources == null || sources.Length <= 0)
-            {
-                return Array.Empty<T>();
-            }
-
-            var candidateIndex = 0;
-            var candidates = new T[sources.Length];
-            foreach (var result in sources)
-            {
-                if (predicate.Invoke(result) == expected)
-                {
-                    candidates[candidateIndex++] = result;
-                }
-            }
-
-            Array.Resize(ref candidates, candidateIndex);
-            return candidates;
-        }
-
-        /// <summary>
-        /// Each value in the source array is passed to the callback function.
-        /// If the callback function is equal to the <paramref name="expected"/>
-        /// value, the current value in the input array is added to the result array.
-        /// </summary>
-        /// <typeparam name="T">The type of array.</typeparam>
-        /// <param name="sources">The specified array.</param>
-        /// <param name="predicate">The callback.</param>
-        /// <param name="expected">The expected value.</param>
-        /// <returns>Returns an filtered array.</returns>
         public static T[] Filter<T>(IEnumerable<T> sources, Predicate<T> predicate, bool expected = true)
         {
             Guard.Requires<ArgumentNullException>(predicate != null, $"Must set a {predicate}.");
@@ -400,33 +367,6 @@ namespace CatLib.Support
             }
 
             return candidates.ToArray();
-        }
-
-        /// <summary>
-        /// Pass the array value into the callback function, the value returned
-        /// by the custom function as the new array value.
-        /// </summary>
-        /// <typeparam name="T">The type of array.</typeparam>
-        /// <typeparam name="TReturn">The type of return value.</typeparam>
-        /// <param name="source">The specified array.</param>
-        /// <param name="closure">The closure to process.</param>
-        /// <returns>Returns an new array.</returns>
-        public static TReturn[] Map<T, TReturn>(T[] source, Func<T, TReturn> closure)
-        {
-            Guard.Requires<ArgumentNullException>(closure != null, $"Must set a {closure}.");
-
-            if (source == null || source.Length <= 0)
-            {
-                return Array.Empty<TReturn>();
-            }
-
-            var requested = new TReturn[source.Length];
-            for (var i = 0; i < source.Length; i++)
-            {
-                requested[i] = closure.Invoke(source[i]);
-            }
-
-            return requested;
         }
 
         /// <summary>
@@ -504,11 +444,11 @@ namespace CatLib.Support
         /// <param name="closure">The closure process.</param>
         /// <param name="initial">The initial value.</param>
         /// <returns>Returnd the processed string.</returns>
-        public static string Reduce<T>(T[] sources, Func<object, T, string> closure, object initial = null)
+        public static string Reduce<T>(IEnumerable<T> sources, Func<object, T, string> closure, object initial = null)
         {
             Guard.Requires<ArgumentNullException>(closure != null, $"Must set a {closure}.");
 
-            if (sources == null || sources.Length <= 0)
+            if (sources == null)
             {
                 return initial?.ToString();
             }
@@ -767,7 +707,7 @@ namespace CatLib.Support
         /// <param name="sources">The specified array.</param>
         /// <param name="predicate">The callback.</param>
         /// <returns>True if pass the test.</returns>
-        public static bool Test<T>(T[] sources, Predicate<T> predicate)
+        public static bool Test<T>(IEnumerable<T> sources, Predicate<T> predicate)
         {
             Guard.Requires<ArgumentNullException>(predicate != null, $"Must set a {predicate}.");
 

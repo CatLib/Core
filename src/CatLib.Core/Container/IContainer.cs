@@ -129,8 +129,8 @@ namespace CatLib.Container
         /// </summary>
         /// <param name="target">
         /// The target.
-        /// <para>A. <code>string</code> will be taken as the method name.</para>
-        /// <para>A. <code>IMethodBind</code> will be taken as a given method.</para>
+        /// <para><code>string</code> will be taken as the method name.</para>
+        /// <para><code>IMethodBind</code> will be taken as a given method.</para>
         /// <para>Other object will be taken as the invoking target.</para>
         /// </param>
         void UnbindMethod(object target);
