@@ -111,11 +111,6 @@ namespace CatLib.Container
         private readonly MethodContainer methodContainer;
 
         /// <summary>
-        /// Synchronous locking object.
-        /// </summary>
-        private readonly object syncRoot = new object();
-
-        /// <summary>
         /// Represents a skipped object to skip some dependency injection.
         /// </summary>
         private readonly object skipped;
@@ -176,11 +171,8 @@ namespace CatLib.Container
             get => Make(service);
             set
             {
-                lock (syncRoot)
-                {
-                    GetBind(service)?.Unbind();
-                    Bind(service, (container, args) => value, false);
-                }
+                GetBind(service)?.Unbind();
+                Bind(service, (container, args) => value, false);
             }
         }
 
@@ -188,27 +180,21 @@ namespace CatLib.Container
         public void Tag(string tag, params string[] services)
         {
             Guard.ParameterNotNull(tag, nameof(tag));
+            GuardFlushing();
 
-            services = services ?? Array.Empty<string>();
-
-            lock (syncRoot)
+            if (!tags.TryGetValue(tag, out List<string> collection))
             {
-                GuardFlushing();
+                tags[tag] = collection = new List<string>();
+            }
 
-                if (!tags.TryGetValue(tag, out List<string> collection))
+            foreach (var service in services ?? Array.Empty<string>())
+            {
+                if (string.IsNullOrEmpty(service))
                 {
-                    tags[tag] = collection = new List<string>();
+                    continue;
                 }
 
-                foreach (var service in services)
-                {
-                    if (string.IsNullOrEmpty(service))
-                    {
-                        continue;
-                    }
-
-                    collection.Add(service);
-                }
+                collection.Add(service);
             }
         }
 
@@ -217,15 +203,12 @@ namespace CatLib.Container
         {
             Guard.ParameterNotNull(tag, nameof(tag));
 
-            lock (syncRoot)
+            if (!tags.TryGetValue(tag, out List<string> services))
             {
-                if (!tags.TryGetValue(tag, out List<string> services))
-                {
-                    throw new LogicException($"Tag \"{tag}\" is not exist.");
-                }
-
-                return Arr.Map(services, (service) => Make(service));
+                throw new LogicException($"Tag \"{tag}\" is not exist.");
             }
+
+            return Arr.Map(services, (service) => Make(service));
         }
 
         /// <inheritdoc />
@@ -236,12 +219,9 @@ namespace CatLib.Container
                 return null;
             }
 
-            lock (syncRoot)
-            {
-                service = AliasToService(service);
-                return bindings.TryGetValue(service, out BindData bindData)
-                    ? bindData : null;
-            }
+            service = AliasToService(service);
+            return bindings.TryGetValue(service, out BindData bindData)
+                ? bindData : null;
         }
 
         /// <inheritdoc />
@@ -255,11 +235,8 @@ namespace CatLib.Container
         {
             Guard.ParameterNotNull(service, nameof(service));
 
-            lock (syncRoot)
-            {
-                service = AliasToService(service);
-                return instances.ContainsKey(service);
-            }
+            service = AliasToService(service);
+            return instances.ContainsKey(service);
         }
 
         /// <inheritdoc />
@@ -267,11 +244,8 @@ namespace CatLib.Container
         {
             Guard.ParameterNotNull(service, nameof(service));
 
-            lock (syncRoot)
-            {
-                service = AliasToService(service);
-                return resolved.Contains(service) || instances.ContainsKey(service);
-            }
+            service = AliasToService(service);
+            return resolved.Contains(service) || instances.ContainsKey(service);
         }
 
         /// <inheritdoc />
@@ -279,18 +253,14 @@ namespace CatLib.Container
         {
             Guard.ParameterNotNull(service, nameof(service));
 
-            lock (syncRoot)
+            service = AliasToService(service);
+            if (HasBind(service) || HasInstance(service))
             {
-                service = AliasToService(service);
-
-                if (HasBind(service) || HasInstance(service))
-                {
-                    return true;
-                }
-
-                var type = SpeculatedServiceType(service);
-                return !IsBasicType(type) && !IsUnableType(type);
+                return true;
             }
+
+            var type = SpeculatedServiceType(service);
+            return !IsBasicType(type) && !IsUnableType(type);
         }
 
         /// <inheritdoc />
@@ -318,38 +288,35 @@ namespace CatLib.Container
                 throw new LogicException($"Alias is same as service: \"{alias}\".");
             }
 
+            GuardFlushing();
+
             alias = FormatService(alias);
             service = AliasToService(service);
 
-            lock (syncRoot)
+            if (aliases.ContainsKey(alias))
             {
-                GuardFlushing();
-
-                if (aliases.ContainsKey(alias))
-                {
-                    throw new LogicException($"Alias \"{alias}\" is already exists.");
-                }
-
-                if (bindings.ContainsKey(alias))
-                {
-                    throw new LogicException($"Alias \"{alias}\" has been used for service name.");
-                }
-
-                if (!bindings.ContainsKey(service) && !instances.ContainsKey(service))
-                {
-                    throw new LogicException(
-                        $"You must {nameof(Bind)}() or {nameof(Instance)}() serivce before and you be able to called {nameof(Alias)}().");
-                }
-
-                aliases.Add(alias, service);
-
-                if (!aliasesReverse.TryGetValue(service, out List<string> collection))
-                {
-                    aliasesReverse[service] = collection = new List<string>();
-                }
-
-                collection.Add(alias);
+                throw new LogicException($"Alias \"{alias}\" is already exists.");
             }
+
+            if (bindings.ContainsKey(alias))
+            {
+                throw new LogicException($"Alias \"{alias}\" has been used for service name.");
+            }
+
+            if (!bindings.ContainsKey(service) && !instances.ContainsKey(service))
+            {
+                throw new LogicException(
+                    $"You must {nameof(Bind)}() or {nameof(Instance)}() serivce before and you be able to called {nameof(Alias)}().");
+            }
+
+            aliases.Add(alias, service);
+
+            if (!aliasesReverse.TryGetValue(service, out List<string> collection))
+            {
+                aliasesReverse[service] = collection = new List<string>();
+            }
+
+            collection.Add(alias);
 
             return this;
         }
@@ -401,48 +368,44 @@ namespace CatLib.Container
             Guard.ParameterNotNull(service, nameof(service));
             Guard.ParameterNotNull(concrete, nameof(concrete));
             GuardServiceName(service);
+            GuardFlushing();
 
             service = FormatService(service);
-            lock (syncRoot)
+            if (bindings.ContainsKey(service))
             {
-                GuardFlushing();
+                throw new LogicException($"Bind [{service}] already exists.");
+            }
 
-                if (bindings.ContainsKey(service))
-                {
-                    throw new LogicException($"Bind [{service}] already exists.");
-                }
+            if (instances.ContainsKey(service))
+            {
+                throw new LogicException($"Instances [{service}] is already exists.");
+            }
 
-                if (instances.ContainsKey(service))
-                {
-                    throw new LogicException($"Instances [{service}] is already exists.");
-                }
+            if (aliases.ContainsKey(service))
+            {
+                throw new LogicException($"Aliase [{service}] is already exists.");
+            }
 
-                if (aliases.ContainsKey(service))
-                {
-                    throw new LogicException($"Aliase [{service}] is already exists.");
-                }
+            var bindData = new BindData(this, service, concrete, isStatic);
+            bindings.Add(service, bindData);
 
-                var bindData = new BindData(this, service, concrete, isStatic);
-                bindings.Add(service, bindData);
-
-                if (!IsResolved(service))
-                {
-                    return bindData;
-                }
-
-                if (isStatic)
-                {
-                    // If it is "static" then solve this service directly
-                    // The process of staticizing the service triggers TriggerOnRebound
-                    Make(service);
-                }
-                else
-                {
-                    TriggerOnRebound(service);
-                }
-
+            if (!IsResolved(service))
+            {
                 return bindData;
             }
+
+            if (isStatic)
+            {
+                // If it is "static" then solve this service directly
+                // The process of staticizing the service triggers TriggerOnRebound
+                Make(service);
+            }
+            else
+            {
+                TriggerOnRebound(service);
+            }
+
+            return bindData;
         }
 
         /// <inheritdoc />
@@ -478,13 +441,9 @@ namespace CatLib.Container
             GuardConstruct(nameof(Call));
 
             var parameter = methodInfo.GetParameters();
-
-            lock (syncRoot)
-            {
-                var bindData = GetBindFillable(target != null ? Type2Service(target.GetType()) : null);
-                userParams = GetDependencies(bindData, parameter, userParams) ?? Array.Empty<object>();
-                return methodInfo.Invoke(target, userParams);
-            }
+            var bindData = GetBindFillable(target != null ? Type2Service(target.GetType()) : null);
+            userParams = GetDependencies(bindData, parameter, userParams) ?? Array.Empty<object>();
+            return methodInfo.Invoke(target, userParams);
         }
 
         /// <inheritdoc />
@@ -498,41 +457,37 @@ namespace CatLib.Container
         public void Extend(string service, Func<object, IContainer, object> closure)
         {
             Guard.Requires<ArgumentNullException>(closure != null);
+            GuardFlushing();
 
-            lock (syncRoot)
+            service = string.IsNullOrEmpty(service) ? string.Empty : AliasToService(service);
+
+            if (!string.IsNullOrEmpty(service) && instances.TryGetValue(service, out object instance))
             {
-                GuardFlushing();
+                // If the instance already exists then apply the extension.
+                // Extensions will no longer be added to the permanent extension list.
+                var old = instance;
+                instances[service] = instance = closure(instance, this);
 
-                service = string.IsNullOrEmpty(service) ? string.Empty : AliasToService(service);
-
-                if (!string.IsNullOrEmpty(service) && instances.TryGetValue(service, out object instance))
+                if (!old.Equals(instance))
                 {
-                    // If the instance already exists then apply the extension.
-                    // Extensions will no longer be added to the permanent extension list.
-                    var old = instance;
-                    instances[service] = instance = closure(instance, this);
-
-                    if (!old.Equals(instance))
-                    {
-                        instancesReverse.Remove(old);
-                        instancesReverse.Add(instance, service);
-                    }
-
-                    TriggerOnRebound(service, instance);
-                    return;
+                    instancesReverse.Remove(old);
+                    instancesReverse.Add(instance, service);
                 }
 
-                if (!extenders.TryGetValue(service, out List<Func<object, IContainer, object>> extender))
-                {
-                    extenders[service] = extender = new List<Func<object, IContainer, object>>();
-                }
+                TriggerOnRebound(service, instance);
+                return;
+            }
 
-                extender.Add(closure);
+            if (!extenders.TryGetValue(service, out List<Func<object, IContainer, object>> extender))
+            {
+                extenders[service] = extender = new List<Func<object, IContainer, object>>();
+            }
 
-                if (!string.IsNullOrEmpty(service) && IsResolved(service))
-                {
-                    TriggerOnRebound(service);
-                }
+            extender.Add(closure);
+
+            if (!string.IsNullOrEmpty(service) && IsResolved(service))
+            {
+                TriggerOnRebound(service);
             }
         }
 
@@ -542,78 +497,71 @@ namespace CatLib.Container
         /// <param name="service">The service name or alias.</param>
         public void ClearExtenders(string service)
         {
-            lock (syncRoot)
+            GuardFlushing();
+            service = AliasToService(service);
+            extenders.Remove(service);
+
+            if (!IsResolved(service))
             {
-                GuardFlushing();
-                service = AliasToService(service);
-                extenders.Remove(service);
-
-                if (!IsResolved(service))
-                {
-                    return;
-                }
-
-                Release(service);
-                TriggerOnRebound(service);
+                return;
             }
+
+            Release(service);
+            TriggerOnRebound(service);
         }
 
         /// <inheritdoc />
         public object Instance(string service, object instance)
         {
             Guard.ParameterNotNull(service, nameof(service));
+            GuardFlushing();
+            GuardServiceName(service);
 
-            lock (syncRoot)
+            service = AliasToService(service);
+
+            var bindData = GetBind(service);
+            if (bindData != null)
             {
-                GuardFlushing();
-                GuardServiceName(service);
-
-                service = AliasToService(service);
-
-                var bindData = GetBind(service);
-                if (bindData != null)
+                if (!bindData.IsStatic)
                 {
-                    if (!bindData.IsStatic)
-                    {
-                        throw new LogicException($"Service [{service}] is not Singleton(Static) Bind.");
-                    }
+                    throw new LogicException($"Service [{service}] is not Singleton(Static) Bind.");
                 }
-                else
-                {
-                    bindData = MakeEmptyBindData(service);
-                }
-
-                instance = TriggerOnResolving((BindData)bindData, instance);
-
-                if (instance != null
-                    && instancesReverse.TryGetValue(instance, out string realService)
-                    && realService != service)
-                {
-                    throw new LogicException($"The instance has been registered as a singleton in {realService}");
-                }
-
-                var isResolved = IsResolved(service);
-                Release(service);
-
-                instances.Add(service, instance);
-
-                if (instance != null)
-                {
-                    instancesReverse.Add(instance, service);
-                }
-
-                if (!instanceTiming.Contains(service))
-                {
-                    instanceTiming.Add(service, instanceId++);
-                }
-
-                if (isResolved)
-                {
-                    TriggerOnRebound(service, instance);
-                }
-
-                return instance;
             }
+            else
+            {
+                bindData = MakeEmptyBindData(service);
+            }
+
+            instance = TriggerOnResolving((BindData)bindData, instance);
+
+            if (instance != null
+                && instancesReverse.TryGetValue(instance, out string realService)
+                && realService != service)
+            {
+                throw new LogicException($"The instance has been registered as a singleton in {realService}");
+            }
+
+            var isResolved = IsResolved(service);
+            Release(service);
+
+            instances.Add(service, instance);
+
+            if (instance != null)
+            {
+                instancesReverse.Add(instance, service);
+            }
+
+            if (!instanceTiming.Contains(service))
+            {
+                instanceTiming.Add(service, instanceId++);
+            }
+
+            if (isResolved)
+            {
+                TriggerOnRebound(service, instance);
+            }
+
+            return instance;
         }
 
         /// <inheritdoc />
@@ -624,62 +572,54 @@ namespace CatLib.Container
                 return false;
             }
 
-            lock (syncRoot)
+            string service;
+            object instance = null;
+            if (!(mixed is string))
             {
-                string service;
-                object instance = null;
-                if (!(mixed is string))
+                service = GetServiceWithInstanceObject(mixed);
+            }
+            else
+            {
+                service = AliasToService(mixed.ToString());
+                if (!instances.TryGetValue(service, out instance))
                 {
+                    // Prevent the use of a string as a service name.
                     service = GetServiceWithInstanceObject(mixed);
                 }
-                else
-                {
-                    service = AliasToService(mixed.ToString());
-                    if (!instances.TryGetValue(service, out instance))
-                    {
-                        // Prevent the use of a string as a service name.
-                        service = GetServiceWithInstanceObject(mixed);
-                    }
-                }
-
-                if (instance == null &&
-                    (string.IsNullOrEmpty(service) || !instances.TryGetValue(service, out instance)))
-                {
-                    return false;
-                }
-
-                var bindData = GetBindFillable(service);
-                bindData.TriggerRelease(instance);
-                TriggerOnRelease(bindData, instance);
-
-                if (instance != null)
-                {
-                    DisposeInstance(instance);
-                    instancesReverse.Remove(instance);
-                }
-
-                instances.Remove(service);
-
-                if (!HasOnReboundCallbacks(service))
-                {
-                    instanceTiming.Remove(service);
-                }
-
-                return true;
             }
+
+            if (instance == null &&
+                (string.IsNullOrEmpty(service) || !instances.TryGetValue(service, out instance)))
+            {
+                return false;
+            }
+
+            var bindData = GetBindFillable(service);
+            bindData.TriggerRelease(instance);
+            TriggerOnRelease(bindData, instance);
+
+            if (instance != null)
+            {
+                DisposeInstance(instance);
+                instancesReverse.Remove(instance);
+            }
+
+            instances.Remove(service);
+
+            if (!HasOnReboundCallbacks(service))
+            {
+                instanceTiming.Remove(service);
+            }
+
+            return true;
         }
 
         /// <inheritdoc />
         public IContainer OnFindType(Func<string, Type> func, int priority = int.MaxValue)
         {
             Guard.Requires<ArgumentNullException>(func != null);
-
-            lock (syncRoot)
-            {
-                GuardFlushing();
-                findType.Add(func, priority);
-            }
-
+            GuardFlushing();
+            findType.Add(func, priority);
             return this;
         }
 
@@ -708,26 +648,21 @@ namespace CatLib.Container
         public IContainer OnRebound(string service, Action<object> callback)
         {
             Guard.Requires<ArgumentNullException>(callback != null);
+            GuardFlushing();
 
-            lock (syncRoot)
+            service = AliasToService(service);
+            if (!IsResolved(service) && !CanMake(service))
             {
-                GuardFlushing();
-                service = AliasToService(service);
-
-                if (!IsResolved(service) && !CanMake(service))
-                {
-                    throw new LogicException(
-                        $"If you want use Rebound(Watch) , please {nameof(Bind)} or {nameof(Instance)} service first.");
-                }
-
-                if (!rebound.TryGetValue(service, out List<Action<object>> list))
-                {
-                    rebound[service] = list = new List<Action<object>>();
-                }
-
-                list.Add(callback);
+                throw new LogicException(
+                    $"If you want use Rebound(Watch) , please {nameof(Bind)} or {nameof(Instance)} service first.");
             }
 
+            if (!rebound.TryGetValue(service, out List<Action<object>> list))
+            {
+                rebound[service] = list = new List<Action<object>>();
+            }
+
+            list.Add(callback);
             return this;
         }
 
@@ -742,40 +677,37 @@ namespace CatLib.Container
         /// <inheritdoc />
         public virtual void Flush()
         {
-            lock (syncRoot)
+            try
             {
-                try
+                flushing = true;
+                foreach (var service in instanceTiming.GetIterator(false))
                 {
-                    flushing = true;
-                    foreach (var service in instanceTiming.GetIterator(false))
-                    {
-                        Release(service);
-                    }
-
-                    Guard.Requires<AssertException>(instances.Count <= 0);
-
-                    tags.Clear();
-                    aliases.Clear();
-                    aliasesReverse.Clear();
-                    instances.Clear();
-                    bindings.Clear();
-                    resolving.Clear();
-                    release.Clear();
-                    extenders.Clear();
-                    resolved.Clear();
-                    findType.Clear();
-                    findTypeCache.Clear();
-                    BuildStack.Clear();
-                    UserParamsStack.Clear();
-                    rebound.Clear();
-                    methodContainer.Flush();
-                    instanceTiming.Clear();
-                    instanceId = 0;
+                    Release(service);
                 }
-                finally
-                {
-                    flushing = false;
-                }
+
+                Guard.Requires<AssertException>(instances.Count <= 0);
+
+                tags.Clear();
+                aliases.Clear();
+                aliasesReverse.Clear();
+                instances.Clear();
+                bindings.Clear();
+                resolving.Clear();
+                release.Clear();
+                extenders.Clear();
+                resolved.Clear();
+                findType.Clear();
+                findTypeCache.Clear();
+                BuildStack.Clear();
+                UserParamsStack.Clear();
+                rebound.Clear();
+                methodContainer.Flush();
+                instanceTiming.Clear();
+                instanceId = 0;
+            }
+            finally
+            {
+                flushing = false;
             }
         }
 
@@ -813,22 +745,19 @@ namespace CatLib.Container
         /// <param name="bindable">The bindable instance.</param>
         internal void Unbind(IBindable bindable)
         {
-            lock (syncRoot)
+            GuardFlushing();
+            Release(bindable.Service);
+            if (aliasesReverse.TryGetValue(bindable.Service, out List<string> serviceList))
             {
-                GuardFlushing();
-                Release(bindable.Service);
-                if (aliasesReverse.TryGetValue(bindable.Service, out List<string> serviceList))
+                foreach (var alias in serviceList)
                 {
-                    foreach (var alias in serviceList)
-                    {
-                        aliases.Remove(alias);
-                    }
-
-                    aliasesReverse.Remove(bindable.Service);
+                    aliases.Remove(alias);
                 }
 
-                bindings.Remove(bindable.Service);
+                aliasesReverse.Remove(bindable.Service);
             }
+
+            bindings.Remove(bindable.Service);
         }
 
         /// <summary>
@@ -1601,47 +1530,43 @@ namespace CatLib.Container
         {
             Guard.ParameterNotNull(service, nameof(service));
 
-            lock (syncRoot)
+            service = AliasToService(service);
+            if (instances.TryGetValue(service, out object instance))
             {
-                service = AliasToService(service);
+                return instance;
+            }
 
-                if (instances.TryGetValue(service, out object instance))
-                {
-                    return instance;
-                }
+            if (BuildStack.Contains(service))
+            {
+                throw MakeCircularDependencyException(service);
+            }
 
-                if (BuildStack.Contains(service))
-                {
-                    throw MakeCircularDependencyException(service);
-                }
+            BuildStack.Push(service);
+            UserParamsStack.Push(userParams);
+            try
+            {
+                var bindData = GetBindFillable(service);
 
-                BuildStack.Push(service);
-                UserParamsStack.Push(userParams);
-                try
-                {
-                    var bindData = GetBindFillable(service);
+                // We will start building a service instance，
+                // For the built service we will try to do dependency injection。
+                instance = Build(bindData, userParams);
 
-                    // We will start building a service instance，
-                    // For the built service we will try to do dependency injection。
-                    instance = Build(bindData, userParams);
+                // If we define an extender for the specified service, then we need
+                // to execute the expander in turn，And allow the extender to modify
+                // or overwrite the original service。
+                instance = Extend(service, instance);
 
-                    // If we define an extender for the specified service, then we need
-                    // to execute the expander in turn，And allow the extender to modify
-                    // or overwrite the original service。
-                    instance = Extend(service, instance);
+                instance = bindData.IsStatic
+                    ? Instance(bindData.Service, instance)
+                    : TriggerOnResolving(bindData, instance);
 
-                    instance = bindData.IsStatic
-                        ? Instance(bindData.Service, instance)
-                        : TriggerOnResolving(bindData, instance);
-
-                    resolved.Add(bindData.Service);
-                    return instance;
-                }
-                finally
-                {
-                    UserParamsStack.Pop();
-                    BuildStack.Pop();
-                }
+                resolved.Add(bindData.Service);
+                return instance;
+            }
+            finally
+            {
+                UserParamsStack.Pop();
+                BuildStack.Pop();
             }
         }
 
@@ -1934,12 +1859,8 @@ namespace CatLib.Container
         private void AddClosure(Action<IBindData, object> closure, List<Action<IBindData, object>> list)
         {
             Guard.Requires<ArgumentNullException>(closure != null);
-
-            lock (syncRoot)
-            {
-                GuardFlushing();
-                list.Add(closure);
-            }
+            GuardFlushing();
+            list.Add(closure);
         }
     }
 }

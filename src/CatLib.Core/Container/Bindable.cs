@@ -46,19 +46,11 @@ namespace CatLib.Container
         /// </summary>
         public IContainer Container => container;
 
-        /// <summary>
-        /// Gets synchronize locking object.
-        /// </summary>
-        protected object Locker { get; } = new object();
-
         /// <inheritdoc />
         public void Unbind()
         {
-            lock (Locker)
-            {
-                isDestroy = true;
-                ReleaseBind();
-            }
+            isDestroy = true;
+            ReleaseBind();
         }
 
         /// <summary>
@@ -68,44 +60,38 @@ namespace CatLib.Container
         /// <param name="given">Given speified service or alias.</param>
         internal void AddContextual(string needs, string given)
         {
-            lock (Locker)
+            AssertDestroyed();
+            if (contextual == null)
             {
-                AssertDestroyed();
-                if (contextual == null)
-                {
-                    contextual = new Dictionary<string, string>();
-                }
-
-                if (contextual.ContainsKey(needs)
-                    || (contextualClosure != null && contextualClosure.ContainsKey(needs)))
-                {
-                    throw new LogicException($"Needs [{needs}] is already exist.");
-                }
-
-                contextual.Add(needs, given);
+                contextual = new Dictionary<string, string>();
             }
+
+            if (contextual.ContainsKey(needs)
+                || (contextualClosure != null && contextualClosure.ContainsKey(needs)))
+            {
+                throw new LogicException($"Needs [{needs}] is already exist.");
+            }
+
+            contextual.Add(needs, given);
         }
 
         /// <inheritdoc cref="AddContextual(string, string)"/>
         /// <param name="given">The closure return the given service instance.</param>
         internal void AddContextual(string needs, Func<object> given)
         {
-            lock (Locker)
+            AssertDestroyed();
+            if (contextualClosure == null)
             {
-                AssertDestroyed();
-                if (contextualClosure == null)
-                {
-                    contextualClosure = new Dictionary<string, Func<object>>();
-                }
-
-                if (contextualClosure.ContainsKey(needs)
-                    || (contextual != null && contextual.ContainsKey(needs)))
-                {
-                    throw new LogicException($"Needs [{needs}] is already exist.");
-                }
-
-                contextualClosure.Add(needs, given);
+                contextualClosure = new Dictionary<string, Func<object>>();
             }
+
+            if (contextualClosure.ContainsKey(needs)
+                || (contextual != null && contextual.ContainsKey(needs)))
+            {
+                throw new LogicException($"Needs [{needs}] is already exist.");
+            }
+
+            contextualClosure.Add(needs, given);
         }
 
         /// <summary>
@@ -176,17 +162,13 @@ namespace CatLib.Container
         {
             Guard.ParameterNotNull(service, nameof(service));
 
-            lock (Locker)
+            AssertDestroyed();
+            if (given == null)
             {
-                AssertDestroyed();
-                if (given == null)
-                {
-                    given = new GivenData<TReturn>((Container)Container, this);
-                }
-
-                given.Needs(service);
+                given = new GivenData<TReturn>((Container)Container, this);
             }
 
+            given.Needs(service);
             return given;
         }
 

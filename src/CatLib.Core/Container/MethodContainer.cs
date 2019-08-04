@@ -25,7 +25,6 @@ namespace CatLib.Container
         private readonly Dictionary<object, List<string>> targetToMethodsMappings;
         private readonly Dictionary<string, MethodBind> methodMappings;
         private readonly Container container;
-        private readonly object syncRoot;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MethodContainer"/> class.
@@ -36,7 +35,6 @@ namespace CatLib.Container
             this.container = container;
             targetToMethodsMappings = new Dictionary<object, List<string>>();
             methodMappings = new Dictionary<string, MethodBind>();
-            syncRoot = new object();
         }
 
         /// <summary>
@@ -56,29 +54,26 @@ namespace CatLib.Container
                 Guard.Requires<ArgumentNullException>(target != null);
             }
 
-            lock (syncRoot)
+            if (methodMappings.ContainsKey(method))
             {
-                if (methodMappings.ContainsKey(method))
-                {
-                    throw new LogicException($"Method [{method}] is already {nameof(Bind)}");
-                }
+                throw new LogicException($"Method [{method}] is already {nameof(Bind)}");
+            }
 
-                var methodBind = new MethodBind(this, container, method, target, methodInfo);
-                methodMappings[method] = methodBind;
+            var methodBind = new MethodBind(this, container, method, target, methodInfo);
+            methodMappings[method] = methodBind;
 
-                if (target == null)
-                {
-                    return methodBind;
-                }
-
-                if (!targetToMethodsMappings.TryGetValue(target, out List<string> targetMappings))
-                {
-                    targetToMethodsMappings[target] = targetMappings = new List<string>();
-                }
-
-                targetMappings.Add(method);
+            if (target == null)
+            {
                 return methodBind;
             }
+
+            if (!targetToMethodsMappings.TryGetValue(target, out List<string> targetMappings))
+            {
+                targetToMethodsMappings[target] = targetMappings = new List<string>();
+            }
+
+            targetMappings.Add(method);
+            return methodBind;
         }
 
         /// <summary>
@@ -91,17 +86,14 @@ namespace CatLib.Container
         {
             Guard.ParameterNotNull(method, nameof(method));
 
-            lock (syncRoot)
+            if (!methodMappings.TryGetValue(method, out MethodBind methodBind))
             {
-                if (!methodMappings.TryGetValue(method, out MethodBind methodBind))
-                {
-                    throw MakeMethodNotFoundException(method);
-                }
-
-                var injectParams = container.GetDependencies(methodBind, methodBind.ParameterInfos, userParams) ??
-                                   Array.Empty<object>();
-                return methodBind.MethodInfo.Invoke(methodBind.Target, injectParams);
+                throw MakeMethodNotFoundException(method);
             }
+
+            var injectParams = container.GetDependencies(methodBind, methodBind.ParameterInfos, userParams) ??
+                               Array.Empty<object>();
+            return methodBind.MethodInfo.Invoke(methodBind.Target, injectParams);
         }
 
         /// <summary>
@@ -117,27 +109,24 @@ namespace CatLib.Container
         {
             Guard.Requires<ArgumentNullException>(target != null);
 
-            lock (syncRoot)
+            if (target is MethodBind methodBind)
             {
-                if (target is MethodBind methodBind)
-                {
-                    methodBind.Unbind();
-                    return;
-                }
-
-                if (target is string)
-                {
-                    if (!methodMappings.TryGetValue(target.ToString(), out methodBind))
-                    {
-                        return;
-                    }
-
-                    methodBind.Unbind();
-                    return;
-                }
-
-                UnbindWithObject(target);
+                methodBind.Unbind();
+                return;
             }
+
+            if (target is string)
+            {
+                if (!methodMappings.TryGetValue(target.ToString(), out methodBind))
+                {
+                    return;
+                }
+
+                methodBind.Unbind();
+                return;
+            }
+
+            UnbindWithObject(target);
         }
 
         /// <summary>
@@ -145,11 +134,8 @@ namespace CatLib.Container
         /// </summary>
         public void Flush()
         {
-            lock (syncRoot)
-            {
-                targetToMethodsMappings.Clear();
-                methodMappings.Clear();
-            }
+            targetToMethodsMappings.Clear();
+            methodMappings.Clear();
         }
 
         /// <summary>
@@ -158,26 +144,23 @@ namespace CatLib.Container
         /// <param name="methodBind">The method binding data.</param>
         internal void Unbind(MethodBind methodBind)
         {
-            lock (syncRoot)
+            methodMappings.Remove(methodBind.Service);
+
+            if (methodBind.Target == null)
             {
-                methodMappings.Remove(methodBind.Service);
+                return;
+            }
 
-                if (methodBind.Target == null)
-                {
-                    return;
-                }
+            if (!targetToMethodsMappings.TryGetValue(methodBind.Target, out List<string> methods))
+            {
+                return;
+            }
 
-                if (!targetToMethodsMappings.TryGetValue(methodBind.Target, out List<string> methods))
-                {
-                    return;
-                }
+            methods.Remove(methodBind.Service);
 
-                methods.Remove(methodBind.Service);
-
-                if (methods.Count <= 0)
-                {
-                    targetToMethodsMappings.Remove(methodBind.Target);
-                }
+            if (methods.Count <= 0)
+            {
+                targetToMethodsMappings.Remove(methodBind.Target);
             }
         }
 
