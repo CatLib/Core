@@ -58,25 +58,21 @@ namespace CatLib.Container
         /// <inheritdoc />
         public IBindData Alias(string alias)
         {
-            lock (Locker)
-            {
-                AssertDestroyed();
-                Guard.ParameterNotNull(alias, nameof(alias));
-                Container.Alias(alias, Service);
-                return this;
-            }
+            AssertDestroyed();
+            Guard.ParameterNotNull(alias, nameof(alias));
+
+            Container.Alias(alias, Service);
+            return this;
         }
 
         /// <inheritdoc />
         public IBindData Tag(string tag)
         {
-            lock (Locker)
-            {
-                AssertDestroyed();
-                Guard.ParameterNotNull(tag, nameof(tag));
-                Container.Tag(tag, Service);
-                return this;
-            }
+            AssertDestroyed();
+            Guard.ParameterNotNull(tag, nameof(tag));
+
+            Container.Tag(tag, Service);
+            return this;
         }
 
         /// <inheritdoc />
@@ -127,21 +123,17 @@ namespace CatLib.Container
             ((CatLibContainer)Container).Unbind(this);
         }
 
-        private void AddClosure(Action<IBindData, object> closure, ref List<Action<IBindData, object>> list)
+        private void AddClosure(Action<IBindData, object> closure, ref List<Action<IBindData, object>> collection)
         {
             Guard.Requires<ArgumentNullException>(closure != null);
+            AssertDestroyed();
 
-            lock (Locker)
+            if (collection == null)
             {
-                AssertDestroyed();
-
-                if (list == null)
-                {
-                    list = new List<Action<IBindData, object>>();
-                }
-
-                list.Add(closure);
+                collection = new List<Action<IBindData, object>>();
             }
+
+            collection.Add(closure);
         }
     }
 }
