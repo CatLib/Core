@@ -48,7 +48,7 @@ namespace CatLib.EventDispatcher
         /// </summary>
         /// <param name="eventName">The event name.</param>
         /// <returns>True if the event has any registered listeners.</returns>
-        bool HasListeners(string eventName);
+        bool HasListener(string eventName);
 
         /// <summary>
         /// Provide all relevant listeners with an event to process.

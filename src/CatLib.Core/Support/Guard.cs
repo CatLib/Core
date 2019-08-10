@@ -22,7 +22,16 @@ namespace CatLib.Support
     public sealed class Guard
     {
         private static Guard that;
-        private static IDictionary<Type, Func<string, SException, object, SException>> exceptionFactory;
+        private static IDictionary<Type, ExtendException> exceptionFactory;
+
+        /// <summary>
+        /// Indicates an extended exception factory.
+        /// </summary>
+        /// <param name="message">The exception message.</param>
+        /// <param name="innerException">The inner exception instance.</param>
+        /// <param name="state">The user object.</param>
+        /// <returns>An exception instance.</returns>
+        public delegate SException ExtendException(string message, SException innerException, object state);
 
         /// <summary>
         /// Gets the singleton instance of the Guard functionality.
@@ -107,7 +116,7 @@ namespace CatLib.Support
         /// <typeparam name="T">The type of exception.</typeparam>
         /// <param name="factory">The exception factory.</param>
         [System.Diagnostics.DebuggerNonUserCode]
-        public static void Extend<T>(Func<string, SException, object, SException> factory)
+        public static void Extend<T>(ExtendException factory)
         {
             Extend(typeof(T), factory);
         }
@@ -118,7 +127,7 @@ namespace CatLib.Support
         /// <param name="exception">The type of exception.</param>
         /// <param name="factory">The exception factory.</param>
         [System.Diagnostics.DebuggerNonUserCode]
-        public static void Extend(Type exception, Func<string, SException, object, SException> factory)
+        public static void Extend(Type exception, ExtendException factory)
         {
             VerfiyExceptionFactory();
             exceptionFactory[exception] = factory;
@@ -135,9 +144,13 @@ namespace CatLib.Support
 
             VerfiyExceptionFactory();
 
-            if (exceptionFactory.TryGetValue(exceptionType, out Func<string, SException, object, SException> factory))
+            if (exceptionFactory.TryGetValue(exceptionType, out ExtendException factory))
             {
-                return factory(message, innerException, state);
+                var ret = factory(message, innerException, state);
+                if (ret != null)
+                {
+                    return ret;
+                }
             }
 
             var exception = Activator.CreateInstance(exceptionType);
@@ -158,7 +171,7 @@ namespace CatLib.Support
         {
             if (exceptionFactory == null)
             {
-                exceptionFactory = new Dictionary<Type, Func<string, SException, object, SException>>();
+                exceptionFactory = new Dictionary<Type, ExtendException>();
             }
         }
 

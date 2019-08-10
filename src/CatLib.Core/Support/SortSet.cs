@@ -108,7 +108,7 @@ namespace CatLib.Support
         /// </summary>
         /// <param name="forward">True if iterator element forward.</param>
         /// <returns>Returns iterator instance.</returns>
-        public IEnumerable<TElement> GetIterator(bool forward)
+        public IEnumerable<TElement> GetIterator(bool forward = true)
         {
             return new Iterator(this, forward);
         }
