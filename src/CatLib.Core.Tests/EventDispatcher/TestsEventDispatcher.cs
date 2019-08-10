@@ -88,9 +88,9 @@ namespace CatLib.EventDispatcher.Tests
             eventDispatcher.AddListener("foo", foo.Object.Foo);
             eventDispatcher.AddListener("bar", bar.Object.Foo);
 
-            Assert.IsTrue(eventDispatcher.HasListeners("foo"));
-            Assert.IsTrue(eventDispatcher.HasListeners("bar"));
-            Assert.IsFalse(eventDispatcher.HasListeners("baz"));
+            Assert.IsTrue(eventDispatcher.HasListener("foo"));
+            Assert.IsTrue(eventDispatcher.HasListener("bar"));
+            Assert.IsFalse(eventDispatcher.HasListener("baz"));
         }
 
         [TestMethod]

@@ -88,7 +88,7 @@ namespace CatLib.EventDispatcher
         }
 
         /// <inheritdoc />
-        public bool HasListeners(string eventName)
+        public bool HasListener(string eventName)
         {
             return listeners.ContainsKey(eventName);
         }
