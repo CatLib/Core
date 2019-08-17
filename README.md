@@ -16,10 +16,10 @@
 
 `CatLib Core` is the Dependency injection container and helper functions library for `CatLib`. 
 
-- [Service Provider](https://catlib.io/v1/architecture/service-provider.html)
-- [CatLib Application](https://catlib.io/v1/architecture/application.html)
-- [IOC Container](https://catlib.io/v1/architecture/container.html).
-- [Facades](https://catlib.io/v1/architecture/facade.html).
+- [Service Provider](https://catlib.io/lasted/architecture/service-provider.html)
+- [CatLib Application](https://catlib.io/lasted/architecture/application.html)
+- [IOC Container](https://catlib.io/lasted/architecture/container.html).
+- [Facades](https://catlib.io/lasted/architecture/facade.html).
 
 ## Install CatLib Core
 
