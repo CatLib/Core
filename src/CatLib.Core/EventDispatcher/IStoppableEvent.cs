@@ -17,9 +17,9 @@ namespace CatLib.EventDispatcher
     public interface IStoppableEvent
     {
         /// <summary>
-        /// Whether propagation stopped.
+        /// Gets a value indicating whether propagation stopped.
         /// </summary>
         /// <returns>True if the propagation stopped.</returns>
-        bool IsPropagationStopped();
+        bool IsPropagationStopped { get; }
     }
 }

@@ -72,7 +72,7 @@ namespace CatLib.Tests
             var foo = new Mock<IBootstrap>();
             var bar = new Mock<IBootstrap>();
 
-            dispatcher.AddListener(ApplicationEvents.OnBooting, eventArgs =>
+            dispatcher.AddListener(ApplicationEvents.OnBooting, (sender, eventArgs) =>
             {
                 if (eventArgs is BootingEventArgs args &&
                     args.GetBootstrap() == foo.Object)
@@ -93,7 +93,7 @@ namespace CatLib.Tests
             var foo = new Mock<IServiceProvider>();
             var bar = new Mock<IServiceProvider>();
 
-            dispatcher.AddListener(ApplicationEvents.OnRegisterProvider, (eventArgs) =>
+            dispatcher.AddListener(ApplicationEvents.OnRegisterProvider, (sender, eventArgs) =>
             {
                 if (eventArgs is RegisterProviderEventArgs args &&
                     args.GetServiceProvider() == foo.Object)
@@ -125,7 +125,7 @@ namespace CatLib.Tests
             var foo = new Mock<IServiceProvider>();
             var bar = new Mock<IServiceProvider>();
 
-            dispatcher.AddListener(ApplicationEvents.OnInitProvider, (args) =>
+            dispatcher.AddListener(ApplicationEvents.OnInitProvider, (sender, eventArgs) =>
             {
                 application.Register(foo.Object);
             });
@@ -141,7 +141,7 @@ namespace CatLib.Tests
         {
             var foo = new Mock<IServiceProvider>();
 
-            dispatcher.AddListener(ApplicationEvents.OnBeforeTerminate, (args) =>
+            dispatcher.AddListener(ApplicationEvents.OnBeforeTerminate, (sender, eventArgs) =>
             {
                 application.Register(foo.Object);
             });
@@ -155,12 +155,12 @@ namespace CatLib.Tests
         public void TestTerminateSequenceOfEvents()
         {
             var count = 0;
-            dispatcher.AddListener(ApplicationEvents.OnBeforeTerminate, (args) =>
+            dispatcher.AddListener(ApplicationEvents.OnBeforeTerminate, (sender, eventArgs) =>
             {
                 Assert.AreEqual(0, count++);
             });
 
-            dispatcher.AddListener(ApplicationEvents.OnAfterTerminate, (args) =>
+            dispatcher.AddListener(ApplicationEvents.OnAfterTerminate, (sender, eventArgs) =>
             {
                 Assert.AreEqual(1, count++);
             });
