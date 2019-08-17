@@ -143,7 +143,8 @@ namespace CatLib.Support
         }
 
         /// <summary>
-        /// Split a string into an array based on length.
+        /// Splits the string into an array based on length, and the
+        /// last element may be less than the required length.
         /// </summary>
         /// <param name="str">The specified string.</param>
         /// <param name="length">Specify the length of each array element.</param>
@@ -190,7 +191,7 @@ namespace CatLib.Support
         }
 
         /// <summary>
-        /// Disrupt all characters in the string.
+        /// Shuffle all characters in the string.
         /// </summary>
         /// <param name="str">The specified string.</param>
         /// <param name="seed">The random seed.</param>
