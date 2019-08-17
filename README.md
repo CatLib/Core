@@ -37,7 +37,7 @@ Install-Package CatLib.Core -Version 2.0.0
 
 CatLib has the most extensive and thorough [documentation](https://catlib.io), making it a breeze to get started with the framework.
 
-> 需要中文支持? 请访问[CatLib中文文档](https://catlib.io)。
+> 需要中文支持? 请访问[CatLib中文文档](https://zh.catlib.io)。
 
 ## Contribution
 
