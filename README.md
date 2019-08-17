@@ -14,7 +14,7 @@
 
 ## About CatLib
 
-`CatLib Core` is the Dependency injection container and helper functions library for `CatLib`. 
+`CatLib` is the lightweight dependency injection container and helper functions library. 
 
 - [Service Provider](https://catlib.io/lasted/architecture/service-provider.html)
 - [CatLib Application](https://catlib.io/lasted/architecture/application.html)
