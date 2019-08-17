@@ -41,7 +41,7 @@ CatLib has the most extensive and thorough [documentation](https://catlib.io), m
 
 ## Contribution
 
-CatLib is still a young framework, and her growth and your contribution are inseparable. If you want to contribute to the project, please refer to: [CatLib Contribution Guide](https://catlib.io/v1/contribution.html) Your contribution will be included in the list of contributors，Welcome Pull Request!
+CatLib is still a young framework, and her growth and your contribution are inseparable. If you want to contribute to the project, please refer to: [CatLib Contribution Guide](https://catlib.io/lasted/contribution.html) Your contribution will be included in the list of contributors，Welcome Pull Request!
 
 ## License
 
