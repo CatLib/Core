@@ -23,9 +23,8 @@ namespace CatLib.EventDispatcher
         /// </summary>
         /// <param name="eventName">The event name.</param>
         /// <param name="listener">The listener.</param>
-        /// <param name="priority">The smaller this value, the earlier an event. listener will be triggered in the chain.</param>
         /// <returns>True if the listener added. otherwise false if listener already exists.</returns>
-        bool AddListener(string eventName, Action<EventArgs> listener, int priority = 0);
+        bool AddListener(string eventName, EventHandler listener);
 
         /// <summary>
         /// Removes an event listener from the specified events.
@@ -33,7 +32,7 @@ namespace CatLib.EventDispatcher
         /// <param name="eventName">The event name.</param>
         /// <param name="listener">Remove the specified listener, otherwise remove all listeners under the event.</param>
         /// <returns>True if removed the listener.</returns>
-        bool RemoveListener(string eventName, Action<EventArgs> listener = null);
+        bool RemoveListener(string eventName, EventHandler listener = null);
 
         /// <summary>
         /// Gets the listeners of a specific event or all listeners sorted by descending priority. Will not return listeners in the inheritance chain.
@@ -41,7 +40,7 @@ namespace CatLib.EventDispatcher
         /// <typeparam name="T">The specified events type.</typeparam>
         /// <param name="eventName">The event name.</param>
         /// <returns>The event listeners for the specified event. Never return null.</returns>
-        Action<EventArgs>[] GetListeners(string eventName);
+        EventHandler[] GetListeners(string eventName);
 
         /// <summary>
         /// Whether an event has any registered listeners. Will not return listeners in the inheritance chain.
@@ -54,8 +53,8 @@ namespace CatLib.EventDispatcher
         /// Provide all relevant listeners with an event to process.
         /// </summary>
         /// <param name="eventName">The event name.</param>
-        /// <param name="eventArgs">The event object to process.</param>
-        /// <returns>True if the pass the listener.</returns>
-        EventArgs Dispatch(string eventName, EventArgs eventArgs);
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="args">The event object to process.</param>
+        void Dispatch(string eventName, object sender, EventArgs args = null);
     }
 }

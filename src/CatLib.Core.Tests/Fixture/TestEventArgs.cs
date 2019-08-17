@@ -16,16 +16,11 @@ namespace CatLib.Tests.Fixture
 {
     public class TestEventArgs : EventArgs, IStoppableEvent
     {
-        private bool isPropagationStopped;
+        public bool IsPropagationStopped { get; private set; }
 
-        public bool IsPropagationStopped()
+        public void StopPropagation()
         {
-            return isPropagationStopped;
-        }
-
-        public void Stop()
-        {
-            isPropagationStopped = true;
+            IsPropagationStopped = true;
         }
     }
 }

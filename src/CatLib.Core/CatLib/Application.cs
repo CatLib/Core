@@ -311,21 +311,21 @@ namespace CatLib
             SetDispatcher(new EventDispatcher.EventDispatcher());
         }
 
-        private T Dispatch<T>(T eventArgs)
+        private T Dispatch<T>(T args)
             where T : EventArgs
         {
-            if (!dispatchMapping.TryGetValue(eventArgs.GetType(), out string eventName))
+            if (!dispatchMapping.TryGetValue(args.GetType(), out string eventName))
             {
-                throw new AssertException($"Assertion error: Undefined event {eventArgs}");
+                throw new AssertException($"Assertion error: Undefined event {args}");
             }
 
             if (dispatcher == null)
             {
-                return eventArgs;
+                return args;
             }
 
-            dispatcher.Dispatch(eventName, eventArgs);
-            return eventArgs;
+            dispatcher.Dispatch(eventName, this, args);
+            return args;
         }
     }
 }
