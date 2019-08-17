@@ -86,7 +86,7 @@ namespace CatLib.Support
         }
 
         /// <summary>
-        /// Disrupt the elements in the specified array.
+        /// Shuffle the elements in the specified array.
         /// </summary>
         /// <typeparam name="T">The type of array.</typeparam>
         /// <param name="sources">The specified array.</param>
