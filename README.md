@@ -16,10 +16,10 @@
 
 `CatLib` is the lightweight dependency injection container and helper functions library. 
 
+- [Application](https://catlib.io/lasted/architecture/application.html)
 - [Service Provider](https://catlib.io/lasted/architecture/service-provider.html)
-- [CatLib Application](https://catlib.io/lasted/architecture/application.html)
-- [IOC Container](https://catlib.io/lasted/architecture/container.html).
-- [Facades](https://catlib.io/lasted/architecture/facade.html).
+- [IOC Container](https://catlib.io/lasted/architecture/container.html)
+- [Facades](https://catlib.io/lasted/architecture/facade.html)
 
 ## Install CatLib Core
 
