@@ -1,6 +1,6 @@
 # Release Notes
 
-## [v2.0.0-alpha.1](https://github.com/CatLib/Core/releases/tag/v2.0.0-alpha.1)
+## [v2.0.0-alpha.1 (Unreleased)](https://github.com/CatLib/Core/releases/tag/v2.0.0-alpha.1) 
 
 #### Added
 
