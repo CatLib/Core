@@ -12,7 +12,7 @@
 using System;
 using System.IO;
 
-namespace CatLib.Support
+namespace CatLib.IO
 {
     /// <summary>
     /// A <see cref="SegmentStream"/> can be used to wrap a stream of a specified slice。

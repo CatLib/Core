@@ -9,13 +9,13 @@
  * Document: https://catlib.io/
  */
 
-using CatLib.Support;
+using CatLib.Util;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace CatLib.Tests.Support
+namespace CatLib.Tests.Util
 {
     [TestClass]
     public class TestsStr

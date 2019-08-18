@@ -10,10 +10,11 @@
  */
 
 using CatLib.Exception;
+using CatLib.Util;
 using System;
 using System.IO;
 
-namespace CatLib.Support
+namespace CatLib.IO
 {
     /// <summary>
     /// Represents a ring buffer.
@@ -35,7 +36,7 @@ namespace CatLib.Support
         public RingBufferStream(int capacity = 8192, bool exposable = true)
         {
             Guard.Requires<ArgumentOutOfRangeException>(capacity > 0);
-            this.capacity = capacity.ToPrime();
+            this.capacity = ToPrime(capacity);
             buffer = new byte[this.capacity];
             mask = this.capacity - 1;
             write = 0;
@@ -245,6 +246,30 @@ namespace CatLib.Support
         private long GetCanWriteSize()
         {
             return Math.Max(0, capacity - GetCanReadSize());
+        }
+
+        /// <summary>
+        /// Calculate the power of the nearest two.
+        /// </summary>
+        /// <param name="min">The starting number.</param>
+        /// <returns>The  power of the nearest two.</returns>
+        private int ToPrime(int min)
+        {
+            min = Math.Max(0, min);
+
+            var result = 0;
+            for (var i = 2; i < int.MaxValue; i <<= 1)
+            {
+                if (i < min)
+                {
+                    continue;
+                }
+
+                result = i;
+                break;
+            }
+
+            return result;
         }
     }
 }

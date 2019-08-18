@@ -11,7 +11,7 @@
 
 using CatLib.EventDispatcher;
 
-namespace CatLib.Events
+namespace CatLib
 {
     /// <summary>
     /// Indicates a service provider that will register.

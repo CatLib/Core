@@ -18,7 +18,7 @@ using System.Diagnostics;
 #pragma warning disable S2583
 #pragma warning disable S2259
 
-namespace CatLib.Support
+namespace CatLib.Util
 {
     /// <summary>
     /// Represents an ordered set, implemented by a jump list.

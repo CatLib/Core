@@ -11,12 +11,12 @@
 
 #pragma warning disable CA1031
 
-using CatLib.Support;
+using CatLib.Util;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using SException = System.Exception;
 
-namespace CatLib.Tests.Support
+namespace CatLib.Tests.Util
 {
     [TestClass]
     public class TestsGuard

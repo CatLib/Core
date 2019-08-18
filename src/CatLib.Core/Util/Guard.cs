@@ -14,7 +14,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using SException = System.Exception;
 
-namespace CatLib.Support
+namespace CatLib.Util
 {
     /// <summary>
     /// Guard the code.

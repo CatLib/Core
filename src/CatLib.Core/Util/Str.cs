@@ -13,7 +13,7 @@ using System;
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace CatLib.Support
+namespace CatLib.Util
 {
     /// <summary>
     /// String helper.
@@ -203,7 +203,7 @@ namespace CatLib.Support
                 return string.Empty;
             }
 
-            var random = Helper.MakeRandom(seed);
+            var random = InternalHelper.MakeRandom(seed);
             var ret = new string[str.Length];
             for (var i = 0; i < str.Length; i++)
             {
@@ -244,7 +244,7 @@ namespace CatLib.Support
                 return 0;
             }
 
-            Helper.NormalizationPosition(str.Length, ref start, ref length);
+            InternalHelper.NormalizationPosition(str.Length, ref start, ref length);
 
             var count = 0;
             while (length.Value > 0)
@@ -452,7 +452,7 @@ namespace CatLib.Support
             length = Math.Max(1, length);
 
             var ret = new StringBuilder();
-            var random = Helper.MakeRandom(seed);
+            var random = InternalHelper.MakeRandom(seed);
             for (int len; (len = ret.Length) < length;)
             {
                 var size = length - len;

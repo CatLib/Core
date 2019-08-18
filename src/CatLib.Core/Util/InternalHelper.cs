@@ -11,12 +11,12 @@
 
 using System;
 
-namespace CatLib.Support
+namespace CatLib.Util
 {
     /// <summary>
     /// Represents an internal generic helper class.
     /// </summary>
-    internal static class Helper
+    internal static class InternalHelper
     {
         internal static Random MakeRandom(int? seed = null)
         {

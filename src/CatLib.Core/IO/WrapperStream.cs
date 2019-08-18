@@ -9,11 +9,12 @@
  * Document: https://catlib.io/
  */
 
+using CatLib.Util;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 
-namespace CatLib.Support
+namespace CatLib.IO
 {
     /// <summary>
     /// The wrapper stream.

@@ -19,7 +19,7 @@ using CContainer = CatLib.Container.Container;
 namespace CatLib.Tests.Container
 {
     [TestClass]
-    public class TestsExtendContainer
+    public class TestsExtensionContainer
     {
         private IContainer container;
 

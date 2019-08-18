@@ -9,7 +9,7 @@
  * Document: https://catlib.io/
  */
 
-using CatLib.Support;
+using CatLib.Util;
 using System;
 
 namespace CatLib.Container
@@ -17,7 +17,7 @@ namespace CatLib.Container
     /// <summary>
     /// An extension function for <see cref="BindData"/>.
     /// </summary>
-    public static class ExtendBindData
+    public static class BindDataExtension
     {
         /// <inheritdoc cref="IBindData.Alias"/>
         /// <typeparam name="TAlias">The type convert to alias name.</typeparam>
