@@ -10,6 +10,7 @@
  */
 
 using CatLib.Container;
+using CatLib.EventDispatcher;
 
 namespace CatLib
 {
@@ -27,6 +28,12 @@ namespace CatLib
         /// Gets or sets the debug level.
         /// </summary>
         DebugLevel DebugLevel { get; set; }
+
+        /// <summary>
+        /// Gets the event dispatcher.
+        /// </summary>
+        /// <returns>Returns event dispatcher instance, null if the dispatcher not found.</returns>
+        IEventDispatcher GetDispatcher();
 
         /// <summary>
         /// Register a service provider with the application.

@@ -92,7 +92,7 @@ namespace CatLib
             set
             {
                 debugLevel = value;
-                Instance(Type2Service(typeof(DebugLevel)), debugLevel);
+                this.Instance<DebugLevel>(debugLevel);
             }
         }
 
@@ -117,6 +117,12 @@ namespace CatLib
         {
             this.dispatcher = dispatcher;
             this.Instance<IEventDispatcher>(dispatcher);
+        }
+
+        /// <inheritdoc />
+        public IEventDispatcher GetDispatcher()
+        {
+            return dispatcher;
         }
 
         /// <inheritdoc />
