@@ -10,16 +10,17 @@
  */
 
 using CatLib.Exception;
+using CatLib.Util;
 using System;
 using System.IO;
 using System.Text;
 
-namespace CatLib.Support
+namespace CatLib.IO
 {
     /// <summary>
     /// The stream extension function.
     /// </summary>
-    public static class ExtendStream
+    public static class StreamExtension
     {
         [ThreadStatic]
         private static byte[] buffer;
@@ -137,6 +138,17 @@ namespace CatLib.Support
                     source.Dispose();
                 }
             }
+        }
+
+        /// <summary>
+        /// Convert the specified string to a stream.
+        /// </summary>
+        /// <param name="str">The specified string.</param>
+        /// <param name="encoding">The string encoding.</param>
+        /// <returns>The stream instance.</returns>
+        public static Stream ToStream(this string str, Encoding encoding = null)
+        {
+            return new MemoryStream((encoding ?? Encoding.Default).GetBytes(str));
         }
     }
 }

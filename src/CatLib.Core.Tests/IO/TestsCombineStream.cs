@@ -9,7 +9,7 @@
  * Document: https://catlib.io/
  */
 
-using CatLib.Support;
+using CatLib.IO;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.IO;
@@ -17,7 +17,7 @@ using System.Text;
 
 #pragma warning disable CA1034
 
-namespace CatLib.Tests.Support
+namespace CatLib.Tests.IO
 {
     [TestClass]
     public class TestsCombineStream

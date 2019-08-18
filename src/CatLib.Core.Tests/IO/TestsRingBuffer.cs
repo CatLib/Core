@@ -10,11 +10,11 @@
  */
 
 using CatLib.Exception;
-using CatLib.Support;
+using CatLib.IO;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 
-namespace CatLib.Tests.Support
+namespace CatLib.Tests.IO
 {
     [TestClass]
     public class TestsRingBuffer

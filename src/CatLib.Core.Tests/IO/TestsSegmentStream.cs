@@ -9,13 +9,13 @@
  * Document: https://catlib.io/
  */
 
-using CatLib.Support;
+using CatLib.IO;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.IO;
 using System.Text;
 
-namespace CatLib.Tests.Support
+namespace CatLib.Tests.IO
 {
     [TestClass]
     public class TestsSegmentStream

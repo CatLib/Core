@@ -10,12 +10,12 @@
  */
 
 using CatLib.Core.Tests.Framework;
-using CatLib.Support;
+using CatLib.Util;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
 
-namespace CatLib.Tests.Support
+namespace CatLib.Tests.Util
 {
     [TestClass]
     public class TestsSortSet

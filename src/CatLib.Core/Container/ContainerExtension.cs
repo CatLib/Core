@@ -12,7 +12,7 @@
 #pragma warning disable SA1618
 
 using CatLib.Exception;
-using CatLib.Support;
+using CatLib.Util;
 using System;
 
 namespace CatLib.Container
@@ -20,7 +20,7 @@ namespace CatLib.Container
     /// <summary>
     /// An extension function for <see cref="Container"/>.
     /// </summary>
-    public static class ExtendContainer
+    public static class ContainerExtension
     {
         /// <summary>
         /// Gets the binding data of the given service.

@@ -14,7 +14,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace CatLib.Support
+namespace CatLib.Util
 {
     /// <summary>
     /// Array helper.
@@ -102,7 +102,7 @@ namespace CatLib.Support
             var requested = new T[sources.Length];
             Array.Copy(sources, requested, sources.Length);
 
-            var random = Helper.MakeRandom(seed);
+            var random = InternalHelper.MakeRandom(seed);
             for (var i = 0; i < requested.Length; i++)
             {
                 var index = random.Next(0, requested.Length - 1);
@@ -146,7 +146,7 @@ namespace CatLib.Support
                 return Array.Empty<T>();
             }
 
-            Helper.NormalizationPosition(sources.Length, ref start, ref length);
+            InternalHelper.NormalizationPosition(sources.Length, ref start, ref length);
 
             var candidates = new T[length.Value];
             if (length.Value == sources.Length)
@@ -486,7 +486,7 @@ namespace CatLib.Support
                 return Array.Empty<T>();
             }
 
-            Helper.NormalizationPosition(sources.Length, ref start, ref length);
+            InternalHelper.NormalizationPosition(sources.Length, ref start, ref length);
 
             var requested = new T[length.Value];
             Array.Copy(sources, start, requested, 0, length.Value);
@@ -565,7 +565,7 @@ namespace CatLib.Support
                 return sources;
             }
 
-            Helper.NormalizationPosition(sources.Length, ref start, ref length);
+            InternalHelper.NormalizationPosition(sources.Length, ref start, ref length);
             var temporarySource = new T[sources.Length];
             Array.Copy(sources, temporarySource, sources.Length);
             Array.Reverse(temporarySource, start, length.Value);

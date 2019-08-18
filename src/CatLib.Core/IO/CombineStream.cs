@@ -10,10 +10,11 @@
  */
 
 using CatLib.Exception;
+using CatLib.Util;
 using System;
 using System.IO;
 
-namespace CatLib.Support
+namespace CatLib.IO
 {
     /// <summary>
     /// <see cref="CombineStream"/> allow multiple different streams to be combined into one stream.
