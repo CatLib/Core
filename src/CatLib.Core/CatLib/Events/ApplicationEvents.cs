@@ -9,7 +9,7 @@
  * Document: https://catlib.io/
  */
 
-namespace CatLib.Events
+namespace CatLib
 {
     /// <summary>
     /// Contains all events dispatched by an Application.

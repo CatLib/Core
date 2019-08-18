@@ -11,7 +11,6 @@
 
 using CatLib.Container;
 using CatLib.EventDispatcher;
-using CatLib.Events;
 using CatLib.Exception;
 using CatLib.Util;
 using System;
