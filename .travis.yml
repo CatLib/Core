@@ -1,6 +1,6 @@
 language: csharp
 mono: none
-dotnet: 2.1.602
+dotnet: 3.0.100
 
 stages:
   - compile
