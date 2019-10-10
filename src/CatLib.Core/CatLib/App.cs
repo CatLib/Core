@@ -103,160 +103,16 @@ namespace CatLib
             return That.GetRuntimeId();
         }
 
-        /// <inheritdoc cref="IContainer.GetBind"/>
-        public static IBindData GetBind(string service)
-        {
-            return That.GetBind(service);
-        }
-
-        /// <inheritdoc cref="IContainer.HasBind(string)"/>
-        public static bool HasBind(string service)
-        {
-            return That.HasBind(service);
-        }
-
-        /// <inheritdoc cref="IContainer.HasInstance(string)"/>
-        public static bool HasInstance(string service)
-        {
-            return That.HasInstance(service);
-        }
-
-        /// <inheritdoc cref="IContainer.IsResolved(string)"/>
-        public static bool IsResolved(string service)
-        {
-            return That.IsResolved(service);
-        }
-
-        /// <inheritdoc cref="IContainer.CanMake(string)"/>
-        public static bool CanMake(string service)
-        {
-            return That.CanMake(service);
-        }
-
-        /// <inheritdoc cref="IContainer.IsStatic(string)"/>
-        public static bool IsStatic(string service)
-        {
-            return That.IsStatic(service);
-        }
-
-        /// <inheritdoc cref="IContainer.IsAlias(string)"/>
-        public static bool IsAlias(string name)
-        {
-            return That.IsAlias(name);
-        }
-
-        /// <inheritdoc cref="IContainer.Bind(string, Type, bool)"/>
-        public static IBindData Bind(string service, Type concrete, bool isStatic)
-        {
-            return That.Bind(service, concrete, isStatic);
-        }
-
-        /// <inheritdoc cref="IContainer.Bind(string, Func{IContainer, object[], object}, bool)"/>
-        public static IBindData Bind(string service, Func<IContainer, object[], object> concrete, bool isStatic)
-        {
-            return That.Bind(service, concrete, isStatic);
-        }
-
-        /// <inheritdoc cref="IContainer.BindIf(string, Func{IContainer, object[], object}, bool, out IBindData)"/>
-        public static bool BindIf(string service, Func<IContainer, object[], object> concrete, bool isStatic, out IBindData bindData)
-        {
-            return That.BindIf(service, concrete, isStatic, out bindData);
-        }
-
-        /// <inheritdoc cref="IContainer.BindIf(string, Type, bool, out IBindData)"/>
-        public static bool BindIf(string service, Type concrete, bool isStatic, out IBindData bindData)
-        {
-            return That.BindIf(service, concrete, isStatic, out bindData);
-        }
-
-        /// <inheritdoc cref="IContainer.BindMethod(string, object, MethodInfo)"/>
-        public static IMethodBind BindMethod(string method, object target, MethodInfo call)
-        {
-            return That.BindMethod(method, target, call);
-        }
-
         /// <inheritdoc cref="IContainer.UnbindMethod(object)"/>
         public static void UnbindMethod(object target)
         {
             That.UnbindMethod(target);
         }
 
-        /// <inheritdoc cref="IContainer.Unbind(string)"/>
-        public static void Unbind(string service)
-        {
-            That.Unbind(service);
-        }
-
-        /// <inheritdoc cref="IContainer.Tag(string, string[])"/>
-        public static void Tag(string tag, params string[] service)
-        {
-            That.Tag(tag, service);
-        }
-
-        /// <inheritdoc cref="IContainer.Tagged(string)"/>
-        public static object[] Tagged(string tag)
-        {
-            return That.Tagged(tag);
-        }
-
-        /// <inheritdoc cref="IContainer.Instance(string, object)"/>
-        public static object Instance(string service, object instance)
-        {
-            return That.Instance(service, instance);
-        }
-
-        /// <inheritdoc cref="IContainer.Release(object)"/>
-        public static bool Release(string service)
-        {
-            return That.Release(service);
-        }
-
         /// <inheritdoc cref="IContainer.Invoke(string, object[])"/>
         public static object Invoke(string method, params object[] userParams)
         {
             return That.Invoke(method, userParams);
-        }
-
-        /// <inheritdoc cref="IContainer.Call(object, MethodInfo, object[])"/>
-        public static object Call(object instance, MethodInfo methodInfo, params object[] userParams)
-        {
-            return That.Call(instance, methodInfo, userParams);
-        }
-
-        /// <inheritdoc cref="IContainer.Make(string, object[])"/>
-        public static object Make(string service, params object[] userParams)
-        {
-            return That.Make(service, userParams);
-        }
-
-        /// <inheritdoc cref="IContainer.Alias(string, string)"/>
-        public static IContainer Alias(string alias, string service)
-        {
-            return That.Alias(alias, service);
-        }
-
-        /// <inheritdoc cref="IContainer.Extend(string, Func{object, IContainer, object})"/>
-        public static void Extend(string service, Func<object, IContainer, object> closure)
-        {
-            That.Extend(service, closure);
-        }
-
-        /// <inheritdoc cref="IContainer.OnResolving(Action{IBindData, object})"/>
-        public static IContainer OnResolving(Action<IBindData, object> closure)
-        {
-            return That.OnResolving(closure);
-        }
-
-        /// <inheritdoc cref="IContainer.OnRelease(Action{IBindData, object})"/>
-        public static IContainer OnRelease(Action<IBindData, object> action)
-        {
-            return That.OnRelease(action);
-        }
-
-        /// <inheritdoc cref="IContainer.OnAfterResolving(Action{IBindData, object})"/>
-        public static IContainer OnAfterResolving(Action<IBindData, object> closure)
-        {
-            return That.OnAfterResolving(closure);
         }
 
         /// <inheritdoc cref="IContainer.OnFindType(Func{string, Type}, int)"/>
@@ -271,16 +127,10 @@ namespace CatLib
             return That.OnRebound(service, callback);
         }
 
-        /// <inheritdoc cref="IContainer.Type2Service(Type)"/>
-        public static string Type2Service(Type type)
+        /// <inheritdoc cref="IContainer.GetBind"/>
+        public static IBindData GetBind(string service)
         {
-            return That.Type2Service(type);
-        }
-
-        /// <inheritdoc cref="ExtendContainer.Factory(IContainer, string, object[])"/>
-        public static Func<object> Factory(string service, params object[] userParams)
-        {
-            return That.Factory(service, userParams);
+            return That.GetBind(service);
         }
 
         /// <inheritdoc cref="ExtendContainer.GetBind{TService}(IContainer)"/>
@@ -289,14 +139,26 @@ namespace CatLib
             return That.GetBind<TService>();
         }
 
+        /// <inheritdoc cref="IContainer.HasInstance(string)"/>
+        public static bool HasInstance(string service)
+        {
+            return That.HasInstance(service);
+        }
+
         /// <inheritdoc cref="ExtendContainer.HasInstance{TService}(IContainer)"/>
         public static bool HasInstance<TService>()
         {
-#if CATLIB_PERFORMANCE
+#if GAMEBOX_PERFORMANCE
             return Facade<TService>.HasInstance || Handler.HasInstance<TService>();
 #else
             return That.HasInstance<TService>();
 #endif
+        }
+
+        /// <inheritdoc cref="IContainer.IsResolved(string)"/>
+        public static bool IsResolved(string service)
+        {
+            return That.IsResolved(service);
         }
 
         /// <inheritdoc cref="ExtendContainer.IsResolved{TService}(IContainer)"/>
@@ -305,10 +167,22 @@ namespace CatLib
             return That.IsResolved<TService>();
         }
 
+        /// <inheritdoc cref="IContainer.HasBind(string)"/>
+        public static bool HasBind(string service)
+        {
+            return That.HasBind(service);
+        }
+
         /// <inheritdoc cref="ExtendContainer.HasBind{TService}(IContainer)"/>
         public static bool HasBind<TService>()
         {
             return That.HasBind<TService>();
+        }
+
+        /// <inheritdoc cref="IContainer.CanMake(string)"/>
+        public static bool CanMake(string service)
+        {
+            return That.CanMake(service);
         }
 
         /// <inheritdoc cref="ExtendContainer.CanMake{TService}(IContainer)"/>
@@ -317,10 +191,22 @@ namespace CatLib
             return That.CanMake<TService>();
         }
 
+        /// <inheritdoc cref="IContainer.IsStatic(string)"/>
+        public static bool IsStatic(string service)
+        {
+            return That.IsStatic(service);
+        }
+
         /// <inheritdoc cref="ExtendContainer.IsStatic{TService}(IContainer)"/>
         public static bool IsStatic<TService>()
         {
             return That.IsStatic<TService>();
+        }
+
+        /// <inheritdoc cref="IContainer.IsAlias(string)"/>
+        public static bool IsAlias(string name)
+        {
+            return That.IsAlias(name);
         }
 
         /// <inheritdoc cref="ExtendContainer.IsAlias{TService}(IContainer)"/>
@@ -329,10 +215,22 @@ namespace CatLib
             return That.IsAlias<TService>();
         }
 
+        /// <inheritdoc cref="IContainer.Alias(string, string)"/>
+        public static IContainer Alias(string alias, string service)
+        {
+            return That.Alias(alias, service);
+        }
+
         /// <inheritdoc cref="ExtendContainer.Alias{TAlias, TService}(IContainer)"/>
         public static IContainer Alias<TAlias, TService>()
         {
             return That.Alias<TAlias, TService>();
+        }
+
+        /// <inheritdoc cref="IContainer.Extend(string, Func{object, IContainer, object})"/>
+        public static void Extend(string service, Func<object, IContainer, object> closure)
+        {
+            That.Extend(service, closure);
         }
 
         /// <inheritdoc cref="ExtendContainer.Extend(IContainer, string, Func{object, object})"/>
@@ -377,6 +275,18 @@ namespace CatLib
             return That.Bind<TService, TConcrete>();
         }
 
+        /// <inheritdoc cref="IContainer.Bind(string, Type, bool)"/>
+        public static IBindData Bind(string service, Type concrete, bool isStatic)
+        {
+            return That.Bind(service, concrete, isStatic);
+        }
+
+        /// <inheritdoc cref="IContainer.Bind(string, Func{IContainer, object[], object}, bool)"/>
+        public static IBindData Bind(string service, Func<IContainer, object[], object> concrete, bool isStatic)
+        {
+            return That.Bind(service, concrete, isStatic);
+        }
+
         /// <inheritdoc cref="ExtendContainer.Bind(IContainer, Func{IContainer, object[], object})"/>
         public static IBindData Bind<TService>(Func<IContainer, object[], object> concrete)
         {
@@ -399,6 +309,18 @@ namespace CatLib
         public static IBindData Bind(string service, Func<IContainer, object[], object> concrete)
         {
             return That.Bind(service, concrete);
+        }
+
+        /// <inheritdoc cref="IContainer.BindIf(string, Func{IContainer, object[], object}, bool, out IBindData)"/>
+        public static bool BindIf(string service, Func<IContainer, object[], object> concrete, bool isStatic, out IBindData bindData)
+        {
+            return That.BindIf(service, concrete, isStatic, out bindData);
+        }
+
+        /// <inheritdoc cref="IContainer.BindIf(string, Type, bool, out IBindData)"/>
+        public static bool BindIf(string service, Type concrete, bool isStatic, out IBindData bindData)
+        {
+            return That.BindIf(service, concrete, isStatic, out bindData);
         }
 
         /// <inheritdoc cref="ExtendContainer.BindIf{TService, TConcrete}(IContainer, out IBindData)"/>
@@ -509,6 +431,12 @@ namespace CatLib
             return That.SingletonIf(service, concrete, out bindData);
         }
 
+        /// <inheritdoc cref="IContainer.BindMethod(string, object, MethodInfo)"/>
+        public static IMethodBind BindMethod(string method, object target, MethodInfo call)
+        {
+            return That.BindMethod(method, target, call);
+        }
+
         /// <inheritdoc cref="ExtendContainer.BindMethod(IContainer, string, object, string)"/>
         public static IMethodBind BindMethod(string method, object target,
             string call = null)
@@ -546,10 +474,28 @@ namespace CatLib
             return That.BindMethod(method, callback);
         }
 
+        /// <inheritdoc cref="IContainer.Unbind(string)"/>
+        public static void Unbind(string service)
+        {
+            That.Unbind(service);
+        }
+
         /// <inheritdoc cref="ExtendContainer.Unbind{TService}(IContainer)"/>
         public static void Unbind<TService>()
         {
             That.Unbind<TService>();
+        }
+
+        /// <inheritdoc cref="IContainer.Tagged(string)"/>
+        public static object[] Tagged(string tag)
+        {
+            return That.Tagged(tag);
+        }
+
+        /// <inheritdoc cref="IContainer.Tag(string, string[])"/>
+        public static void Tag(string tag, params string[] service)
+        {
+            That.Tag(tag, service);
         }
 
         /// <inheritdoc cref="ExtendContainer.Tag{TService}(IContainer, string)"/>
@@ -558,10 +504,22 @@ namespace CatLib
             That.Tag<TService>(tag);
         }
 
+        /// <inheritdoc cref="IContainer.Instance(string, object)"/>
+        public static object Instance(string service, object instance)
+        {
+            return That.Instance(service, instance);
+        }
+
         /// <inheritdoc cref="ExtendContainer.Instance{TService}(IContainer, object)"/>
         public static void Instance<TService>(object instance)
         {
             That.Instance<TService>(instance);
+        }
+
+        /// <inheritdoc cref="IContainer.Release(object)"/>
+        public static bool Release(string service)
+        {
+            return That.Release(service);
         }
 
         /// <inheritdoc cref="ExtendContainer.Release{TService}(IContainer)"/>
@@ -574,6 +532,12 @@ namespace CatLib
         public static bool Release(ref object[] instances, bool reverse = true)
         {
             return That.Release(ref instances, reverse);
+        }
+
+        /// <inheritdoc cref="IContainer.Call(object, MethodInfo, object[])"/>
+        public static object Call(object instance, MethodInfo methodInfo, params object[] userParams)
+        {
+            return That.Call(instance, methodInfo, userParams);
         }
 
         /// <inheritdoc cref="ExtendContainer.Call(IContainer, object, string, object[])"/>
@@ -630,10 +594,16 @@ namespace CatLib
             return That.Wrap(method, userParams);
         }
 
+        /// <inheritdoc cref="IContainer.Make(string, object[])"/>
+        public static object Make(string service, params object[] userParams)
+        {
+            return That.Make(service, userParams);
+        }
+
         /// <inheritdoc cref="ExtendContainer.Make{TService}(IContainer, object[])"/>
         public static TService Make<TService>(params object[] userParams)
         {
-#if CATLIB_PERFORMANCE
+#if GAMEBOX_PERFORMANCE
             return Facade<TService>.Make(userParams);
 #else
             return That.Make<TService>(userParams);
@@ -646,10 +616,22 @@ namespace CatLib
             return That.Make(type, userParams);
         }
 
+        /// <inheritdoc cref="ExtendContainer.Factory(IContainer, string, object[])"/>
+        public static Func<object> Factory(string service, params object[] userParams)
+        {
+            return That.Factory(service, userParams);
+        }
+
         /// <inheritdoc cref="ExtendContainer.Factory{TService}(IContainer, object[])"/>
         public static Func<TService> Factory<TService>(params object[] userParams)
         {
             return That.Factory<TService>(userParams);
+        }
+
+        /// <inheritdoc cref="IContainer.OnRelease(Action{IBindData, object})"/>
+        public static IContainer OnRelease(Action<IBindData, object> action)
+        {
+            return That.OnRelease(action);
         }
 
         /// <inheritdoc cref="ExtendContainer.OnRelease(IContainer, Action{object})"/>
@@ -670,6 +652,12 @@ namespace CatLib
             return That.OnRelease(closure);
         }
 
+        /// <inheritdoc cref="IContainer.OnResolving(Action{IBindData, object})"/>
+        public static IContainer OnResolving(Action<IBindData, object> closure)
+        {
+            return That.OnResolving(closure);
+        }
+
         /// <inheritdoc cref="ExtendContainer.OnRelease(IContainer, Action{object})"/>
         public static IContainer OnResolving(Action<object> callback)
         {
@@ -686,6 +674,12 @@ namespace CatLib
         public static IContainer OnResolving<TWhere>(Action<IBindData, TWhere> closure)
         {
             return That.OnResolving(closure);
+        }
+
+        /// <inheritdoc cref="IContainer.OnAfterResolving(Action{IBindData, object})"/>
+        public static IContainer OnAfterResolving(Action<IBindData, object> closure)
+        {
+            return That.OnAfterResolving(closure);
         }
 
         /// <inheritdoc cref="ExtendContainer.OnAfterResolving(IContainer, Action{object})"/>
@@ -716,6 +710,12 @@ namespace CatLib
         public static void Watch<TService>(Action<TService> method)
         {
             That.Watch(method);
+        }
+
+        /// <inheritdoc cref="IContainer.Type2Service(Type)"/>
+        public static string Type2Service(Type type)
+        {
+            return That.Type2Service(type);
         }
 
         /// <inheritdoc cref="ExtendContainer.Type2Service{TService}(IContainer)"/>

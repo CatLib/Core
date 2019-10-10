@@ -775,18 +775,6 @@ namespace CatLib.Container
         }
 
         /// <summary>
-        /// Lazially resolve a service that is built when the call returns a callback.
-        /// </summary>
-        /// <typeparam name="TService">The service name.</typeparam>
-        /// <param name="container">The <see cref="IContainer"/> instance.</param>
-        /// <param name="userParams">The user parameters.</param>
-        /// <returns>The callback.</returns>
-        public static Func<TService> Factory<TService>(this IContainer container, params object[] userParams)
-        {
-            return () => (TService)container.Make(container.Type2Service(typeof(TService)), userParams);
-        }
-
-        /// <summary>
         /// <see cref="Extend"/> an abstract type in the container.
         /// <para>Allow configuration or replacement of services during service resolving.</para>
         /// </summary>
@@ -1053,6 +1041,18 @@ namespace CatLib.Container
         public static string Type2Service<TService>(this IContainer container)
         {
             return container.Type2Service(typeof(TService));
+        }
+
+        /// <summary>
+        /// Lazially resolve a service that is built when the call returns a callback.
+        /// </summary>
+        /// <typeparam name="TService">The service name.</typeparam>
+        /// <param name="container">The <see cref="IContainer"/> instance.</param>
+        /// <param name="userParams">The user parameters.</param>
+        /// <returns>The callback.</returns>
+        public static Func<TService> Factory<TService>(this IContainer container, params object[] userParams)
+        {
+            return () => (TService)container.Make(container.Type2Service(typeof(TService)), userParams);
         }
 
         /// <summary>

@@ -1,39 +1,13 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<RuleSet Name="GameBox Code Analysis Ruleset" Description="The gamebox code analysis ruleset" ToolsVersion="10.0">
-  <Rules AnalyzerId="Microsoft.NetCore.Analyzers" RuleNamespace="Microsoft.NetCore.Analyzers">
-	<Rule Id="CA1051" Action="Error" /> <!-- Do not declare visible instance fields -->
-	<Rule Id="CA1034" Action="Error" /> <!-- Nested types should not be visible -->
-	<Rule Id="CA1716" Action="Error" /> <!-- Test for empty strings using string length -->
-	<Rule Id="CA1720" Action="Error" /> <!-- Identifiers should not contain type names -->
-	<Rule Id="CA1307" Action="Error" /> <!-- Specify stringcomparison -->
-	<Rule Id="CA1820" Action="Error" /> <!-- Test for empty strings using string length -->
-	
-	<Rule Id="CA1032" Action="None" /> <!-- Implement standard exception constructors -->
-	<Rule Id="CA1304" Action="None" /> <!-- Specify CultureInfo -->
-	<Rule Id="CA1305" Action="None" /> <!-- Specify iformatprovider -->
-	<Rule Id="CA1810" Action="None" /> <!-- Initialize reference type static fields inline -->
-  </Rules>
+<RuleSet Name="CatLib Code Analysis Ruleset" Description="The catlib code analysis ruleset" ToolsVersion="10.0">
+  <Include Path="analysis.ruleset" Action="Default" />
   <Rules AnalyzerId="Microsoft.CodeQuality.Analyzers" RuleNamespace="Microsoft.CodeQuality.Analyzers">
-	<Rule Id="CA1031" Action="Error" /> <!-- Do not catch general exception types -->
-	<Rule Id="CA1052" Action="Error" /> <!-- Static holder types should be sealed -->
-	<Rule Id="CA1710" Action="Error" /> <!-- Identifiers should have correct suffix -->
-	<Rule Id="CA1819" Action="Error" /> <!-- Properties should not return arrays -->
-    <Rule Id="CA1825" Action="Error" /> <!-- Avoid zero-length array allocations -->
-	<Rule Id="CA1724" Action="None" /> <!-- Type names should not match the names of namespaces -->
+	<Rule Id="CA2000" Action="None" /> <!-- Call IDisposable.Dispose -->
   </Rules>
   <Rules AnalyzerId="StyleCop.Analyzers" RuleNamespace="StyleCop.Analyzers">
-	<Rule Id="SA1101" Action="None" /> <!-- A call to an instance member of the local class or a base class is not prefixed with this -->
-	<Rule Id="SA1117" Action="None" /> <!-- Parameters must be on same line or separate lines -->
-	<Rule Id="SA1118" Action="None" /> <!-- Parameter must not span multiple lines -->
-	<Rule Id="SA1208" Action="None" /> <!-- System using directives must be placed before other using directives -->
-	<Rule Id="SA1633" Action="None" /> <!-- File must have header -->
 	<Rule Id="SA1600" Action="None" /> <!-- Elements must be documented -->
-	<Rule Id="SA0001" Action="None" /> <!-- Xml comment analys is disabled -->
   </Rules>
   <Rules AnalyzerId="SonarAnalyzer.CSharp" RuleNamespace="SonarAnalyzer.CSharp">
-	<Rule Id="S907" Action="None" /> <!-- "goto" statement should not be used -->
-	<Rule Id="S1135" Action="None" /> <!-- Track uses of "TODO" tags -->
-	<Rule Id="S3925" Action="None" /> <!-- "ISerializable" should be implemented correctly -->
 	<Rule Id="S1121" Action="None" /> <!-- Assignments should not be made from within sub-expressions -->
 	<Rule Id="S2699" Action="None" /> <!-- Tests should include assertions -->
 	<Rule Id="S2187" Action="None" /> <!-- Add some tests in the file -->
