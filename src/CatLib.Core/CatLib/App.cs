@@ -148,7 +148,7 @@ namespace CatLib
         /// <inheritdoc cref="ExtendContainer.HasInstance{TService}(IContainer)"/>
         public static bool HasInstance<TService>()
         {
-#if GAMEBOX_PERFORMANCE
+#if CATLIB_PERFORMANCE
             return Facade<TService>.HasInstance || Handler.HasInstance<TService>();
 #else
             return That.HasInstance<TService>();
@@ -603,7 +603,7 @@ namespace CatLib
         /// <inheritdoc cref="ExtendContainer.Make{TService}(IContainer, object[])"/>
         public static TService Make<TService>(params object[] userParams)
         {
-#if GAMEBOX_PERFORMANCE
+#if CATLIB_PERFORMANCE
             return Facade<TService>.Make(userParams);
 #else
             return That.Make<TService>(userParams);
