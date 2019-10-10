@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<RuleSet Name="GameBox Code Analysis Ruleset" Description="The gamebox code analysis ruleset" ToolsVersion="10.0">
+<RuleSet Name="CatLib Code Analysis Ruleset" Description="The catlib code analysis ruleset" ToolsVersion="10.0">
   <Rules AnalyzerId="Microsoft.NetCore.Analyzers" RuleNamespace="Microsoft.NetCore.Analyzers">
 	<Rule Id="CA1051" Action="Error" /> <!-- Do not declare visible instance fields -->
 	<Rule Id="CA1034" Action="Error" /> <!-- Nested types should not be visible -->
@@ -9,6 +9,8 @@
 	<Rule Id="CA1820" Action="Error" /> <!-- Test for empty strings using string length -->
 	
 	<Rule Id="CA1032" Action="None" /> <!-- Implement standard exception constructors -->
+	<Rule Id="CA1062" Action="None" /> <!-- Validate arguments of public methods -->
+	<Rule Id="CA1303" Action="None" /> <!-- Do not pass literals as localized parameters -->
 	<Rule Id="CA1304" Action="None" /> <!-- Specify CultureInfo -->
 	<Rule Id="CA1305" Action="None" /> <!-- Specify iformatprovider -->
 	<Rule Id="CA1810" Action="None" /> <!-- Initialize reference type static fields inline -->
