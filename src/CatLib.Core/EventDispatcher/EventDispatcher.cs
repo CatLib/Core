@@ -31,9 +31,9 @@ namespace CatLib.EventDispatcher
         }
 
         /// <inheritdoc />
-        public virtual bool AddListener(string eventName, EventHandler listener)
+        public virtual bool AddListener(string eventName, EventHandler handler)
         {
-            if (string.IsNullOrEmpty(eventName) || listener == null)
+            if (string.IsNullOrEmpty(eventName) || handler == null)
             {
                 return false;
             }
@@ -42,21 +42,21 @@ namespace CatLib.EventDispatcher
             {
                 listeners[eventName] = handlers = new List<EventHandler>();
             }
-            else if (handlers.Contains(listener))
+            else if (handlers.Contains(handler))
             {
                 return false;
             }
 
-            handlers.Add(listener);
+            handlers.Add(handler);
             return true;
         }
 
         /// <inheritdoc />
-        public virtual void Dispatch(string eventName, object sender, EventArgs args = null)
+        public virtual void Raise(string eventName, object sender, EventArgs e = null)
         {
             Guard.Requires<LogicException>(!(sender is EventArgs), $"Passed event args for the parameter {sender}, Did you make a wrong method call?");
 
-            args = args ?? EventArgs.Empty;
+            e = e ?? EventArgs.Empty;
             if (!listeners.TryGetValue(eventName, out IList<EventHandler> handlers))
             {
                 return;
@@ -64,13 +64,13 @@ namespace CatLib.EventDispatcher
 
             foreach (var listener in handlers)
             {
-                if (args is IStoppableEvent stoppableEvent
+                if (e is IStoppableEvent stoppableEvent
                     && stoppableEvent.IsPropagationStopped)
                 {
                     break;
                 }
 
-                listener(sender, args);
+                listener(sender, e);
             }
         }
 
@@ -92,9 +92,9 @@ namespace CatLib.EventDispatcher
         }
 
         /// <inheritdoc />
-        public virtual bool RemoveListener(string eventName, EventHandler listener = null)
+        public virtual bool RemoveListener(string eventName, EventHandler handler = null)
         {
-            if (listener == null)
+            if (handler == null)
             {
                 return listeners.Remove(eventName);
             }
@@ -104,7 +104,7 @@ namespace CatLib.EventDispatcher
                 return false;
             }
 
-            var status = handlers.Remove(listener);
+            var status = handlers.Remove(handler);
             if (handlers.Count <= 0)
             {
                 listeners.Remove(eventName);
