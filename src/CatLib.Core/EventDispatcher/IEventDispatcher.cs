@@ -55,6 +55,8 @@ namespace CatLib.EventDispatcher
         /// <param name="eventName">The event name.</param>
         /// <param name="sender">The source of the event.</param>
         /// <param name="args">The event object to process.</param>
-        void Dispatch(string eventName, object sender, EventArgs args = null);
+#pragma warning disable CA1030
+        void Raise(string eventName, object sender, EventArgs args = null);
+#pragma warning restore CA1030
     }
 }

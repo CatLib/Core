@@ -52,7 +52,7 @@ namespace CatLib.EventDispatcher
         }
 
         /// <inheritdoc />
-        public virtual void Dispatch(string eventName, object sender, EventArgs args = null)
+        public virtual void Raise(string eventName, object sender, EventArgs args = null)
         {
             Guard.Requires<LogicException>(!(sender is EventArgs), $"Passed event args for the parameter {sender}, Did you make a wrong method call?");
 

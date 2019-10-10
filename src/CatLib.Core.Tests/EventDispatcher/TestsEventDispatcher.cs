@@ -29,12 +29,12 @@ namespace CatLib.EventDispatcher.Tests
         }
 
         [TestMethod]
-        public void TestDispatch()
+        public void TestRaise()
         {
             var expected = new TestEventArgs();
             var handler = new Mock<EventHandler>();
             eventDispatcher.AddListener("foo", handler.Object);
-            eventDispatcher.Dispatch("foo", this, expected);
+            eventDispatcher.Raise("foo", this, expected);
             handler.Verify((o) => o.Invoke(this, expected));
         }
 
@@ -88,16 +88,16 @@ namespace CatLib.EventDispatcher.Tests
             eventDispatcher.AddListener("foo", foo.Object);
             eventDispatcher.AddListener("bar", bar.Object);
 
-            eventDispatcher.Dispatch("foo", this, expected);
-            eventDispatcher.Dispatch("bar", this, expected);
+            eventDispatcher.Raise("foo", this, expected);
+            eventDispatcher.Raise("bar", this, expected);
 
             foo.Verify((o) => o.Invoke(this, expected));
             bar.Verify((o) => o.Invoke(this, expected));
 
             eventDispatcher.RemoveListener("foo", foo.Object);
 
-            eventDispatcher.Dispatch("foo", this, expected);
-            eventDispatcher.Dispatch("bar", this, expected);
+            eventDispatcher.Raise("foo", this, expected);
+            eventDispatcher.Raise("bar", this, expected);
 
             foo.Verify((o) => o.Invoke(this, expected), Times.Exactly(1));
             bar.Verify((o) => o.Invoke(this, expected), Times.Exactly(2));
@@ -113,14 +113,14 @@ namespace CatLib.EventDispatcher.Tests
             eventDispatcher.AddListener("foo", foo1.Object);
             eventDispatcher.AddListener("foo", foo2.Object);
 
-            eventDispatcher.Dispatch("foo", this, expected);
+            eventDispatcher.Raise("foo", this, expected);
 
             foo1.Verify((o) => o.Invoke(this, expected));
             foo2.Verify((o) => o.Invoke(this, expected));
 
             eventDispatcher.RemoveListener("foo");
 
-            eventDispatcher.Dispatch("foo", this, expected);
+            eventDispatcher.Raise("foo", this, expected);
 
             foo1.Verify((o) => o.Invoke(this, expected), Times.Exactly(1));
             foo2.Verify((o) => o.Invoke(this, expected), Times.Exactly(1));
@@ -149,7 +149,7 @@ namespace CatLib.EventDispatcher.Tests
             eventDispatcher.AddListener("foo", foo1.Object);
             eventDispatcher.AddListener("foo", foo2.Object);
 
-            eventDispatcher.Dispatch("foo", this, expected);
+            eventDispatcher.Raise("foo", this, expected);
 
             foo1.Verify((o) => o.Invoke(this, expected));
             foo2.Verify((o) => o.Invoke(this, expected), Times.Never);
