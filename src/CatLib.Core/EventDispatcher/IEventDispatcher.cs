@@ -22,17 +22,17 @@ namespace CatLib.EventDispatcher
         /// Adds an event listener that listens on the specified events.
         /// </summary>
         /// <param name="eventName">The event name.</param>
-        /// <param name="listener">The listener.</param>
-        /// <returns>True if the listener added. otherwise false if listener already exists.</returns>
-        bool AddListener(string eventName, EventHandler listener);
+        /// <param name="handler">The event listener.</param>
+        /// <returns>True if the handler added. otherwise false if handler already exists.</returns>
+        bool AddListener(string eventName, EventHandler handler);
 
         /// <summary>
         /// Removes an event listener from the specified events.
         /// </summary>
         /// <param name="eventName">The event name.</param>
-        /// <param name="listener">Remove the specified listener, otherwise remove all listeners under the event.</param>
+        /// <param name="handler">Remove the specified event listener, otherwise remove all listeners under the event.</param>
         /// <returns>True if removed the listener.</returns>
-        bool RemoveListener(string eventName, EventHandler listener = null);
+        bool RemoveListener(string eventName, EventHandler handler = null);
 
         /// <summary>
         /// Gets the listeners of a specific event or all listeners sorted by descending priority. Will not return listeners in the inheritance chain.
@@ -43,7 +43,8 @@ namespace CatLib.EventDispatcher
         EventHandler[] GetListeners(string eventName);
 
         /// <summary>
-        /// Whether an event has any registered listeners. Will not return listeners in the inheritance chain.
+        /// Whether an event has any registered event listener.
+        /// If has inheritance, will not return handler in the inheritance chain.
         /// </summary>
         /// <param name="eventName">The event name.</param>
         /// <returns>True if the event has any registered listeners.</returns>
@@ -54,9 +55,9 @@ namespace CatLib.EventDispatcher
         /// </summary>
         /// <param name="eventName">The event name.</param>
         /// <param name="sender">The source of the event.</param>
-        /// <param name="args">The event object to process.</param>
+        /// <param name="e">The event object to process.</param>
 #pragma warning disable CA1030
-        void Raise(string eventName, object sender, EventArgs args = null);
+        void Raise(string eventName, object sender, EventArgs e = null);
 #pragma warning restore CA1030
     }
 }
