@@ -661,6 +661,13 @@ namespace CatLib.Tests.Util
         }
 
         [TestMethod]
+        public void TestTestOutMatch()
+        {
+            Assert.AreEqual(true, Arr.Test(foobar, (o) => o == "bar", out string match));
+            Assert.AreEqual("bar", match);
+        }
+
+        [TestMethod]
         public void TestSetReplace()
         {
             Arr.Set(ref foobar, (o) => o == "bar", "aux");
