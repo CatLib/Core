@@ -709,8 +709,23 @@ namespace CatLib.Util
         /// <returns>True if pass the test.</returns>
         public static bool Test<T>(IEnumerable<T> sources, Predicate<T> predicate)
         {
+            return Test(sources, predicate, out _);
+        }
+
+        /// <summary>
+        /// Pass the specified array to the callback test.
+        /// <para>The function returns false only if all elements pass the checker are false.</para>
+        /// </summary>
+        /// <typeparam name="T">The type of array.</typeparam>
+        /// <param name="sources">The specified array.</param>
+        /// <param name="predicate">The callback.</param>
+        /// <param name="match">Test passed element.</param>
+        /// <returns>True if pass the test.</returns>
+        public static bool Test<T>(IEnumerable<T> sources, Predicate<T> predicate, out T match)
+        {
             Guard.Requires<ArgumentNullException>(predicate != null, $"Must set a {predicate}.");
 
+            match = default;
             if (sources == null)
             {
                 return false;
@@ -720,6 +735,7 @@ namespace CatLib.Util
             {
                 if (predicate(source))
                 {
+                    match = source;
                     return true;
                 }
             }

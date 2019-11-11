@@ -5,6 +5,7 @@
 #### Added
 
 - `Inject` allowed to be set to optional.(#253 )
+- `Arr.Test` can get matched value of the first match(#280 )
 
 #### Changed
 
