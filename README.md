@@ -29,7 +29,7 @@
 $ Install-Package CatLib.Core -Version 2.0.0
 ```
 
-**Installed with Bucket**
+**Installed with [Bucket](https://github.com/getbucket/bucket)**
 
 ```shell
 $ bucket require catlib/core
