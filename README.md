@@ -26,7 +26,13 @@
 **Installed with Nuget**
 
 ```PM
-Install-Package CatLib.Core -Version 2.0.0
+$ Install-Package CatLib.Core -Version 2.0.0
+```
+
+**Installed with Bucket**
+
+```shell
+$ bucket require catlib/core
 ```
 
 **Installed with Github Release**
