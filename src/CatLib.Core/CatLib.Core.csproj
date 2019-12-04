@@ -3,6 +3,15 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <Version>2.0.0</Version>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Authors>CatLib</Authors>
+    <Company>CatLib</Company>
+    <Description>CatLib lightweight dependency injection container</Description>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/CatLib/Core</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/CatLib/Core</RepositoryUrl>
+    <RepositoryType>github</RepositoryType>
+    <PackageTags>catlib, ioc, inject, framework</PackageTags>
   </PropertyGroup>
 
 </Project>
