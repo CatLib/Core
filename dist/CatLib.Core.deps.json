@@ -7,7 +7,7 @@
   "targets": {
     ".NETStandard,Version=v2.0": {},
     ".NETStandard,Version=v2.0/": {
-      "CatLib.Core/2.0.0-stable+308fed1": {
+      "CatLib.Core/2.0.0-stable+d0525b6": {
         "dependencies": {
           "Microsoft.CodeAnalysis.CSharp": "3.3.1",
           "Microsoft.CodeAnalysis.FxCopAnalyzers": "2.9.6",
@@ -85,7 +85,7 @@
     }
   },
   "libraries": {
-    "CatLib.Core/2.0.0-stable+308fed1": {
+    "CatLib.Core/2.0.0-stable+d0525b6": {
       "type": "project",
       "serviceable": false,
       "sha512": ""
