@@ -1,6 +1,6 @@
 {
 	"name": "catlib/core",
-	"version": "2.0.0-alpha.1",
+	"version": "2.0.0",
 	"description": "catlib framework is the lightweight dependency injection container and helper functions library.",
 	"keywords": ["framework", "catlib"],
 	"license": "MIT",
