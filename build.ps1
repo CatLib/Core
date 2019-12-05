@@ -2,7 +2,7 @@ param(
 [string]$version="master-dev"
 )
 
-$dist = "dist"
+$dist = ".dist"
 $root = (Get-Item -Path ".\").FullName
 $publishDir = $root + "\src\CatLib.Core\bin\Release\netstandard2.0\publish"
 $version = $version.Trim()
@@ -73,7 +73,12 @@ if(Test-Path -Path $dist)
 }
 
 mkdir $dist
-cp $publishDir\* $dist -Recurse
+mkdir $dist\netstandard2.0
+cp $publishDir\* $dist\netstandard2.0 -Recurse
+cp LICENSE $dist
+cp CHANGELOG.md $dist
+cp README.md $dist
+cp bucket.json $dist
 
 $env:CATLIB_PROJECT_VERSION=$versionNormalized.trim()
 $env:CATLIB_FILE_VERSION=$fileVersion.trim()

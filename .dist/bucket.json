@@ -1,0 +1,18 @@
+{
+	"name": "catlib/core",
+	"version": "2.0.0",
+	"description": "catlib framework is the lightweight dependency injection container and helper functions library.",
+	"keywords": ["framework", "catlib"],
+	"license": "MIT",
+	"homepage": "https://catlib.io",
+	"support": {
+		"issues": "https://github.com/CatLib/Core/issues",
+		"source": "https://github.com/CatLib/Core"
+	},
+	"authors": [
+		{
+			"name": "Meng han Yu",
+			"email": "menghanyu1994@gmail.com"
+		}
+	]
+}
