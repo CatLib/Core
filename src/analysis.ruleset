@@ -30,6 +30,7 @@
 	<Rule Id="SA1208" Action="None" /> <!-- System using directives must be placed before other using directives -->
 	<Rule Id="SA1633" Action="None" /> <!-- File must have header -->
 	<Rule Id="SA0001" Action="None" /> <!-- Xml comment analys is disabled -->
+                <Rule Id="SA1611" Action="None" /> <!-- Element parameters must be documented -->
   </Rules>
   <Rules AnalyzerId="SonarAnalyzer.CSharp" RuleNamespace="SonarAnalyzer.CSharp">
 	<Rule Id="S907" Action="None" /> <!-- "goto" statement should not be used -->

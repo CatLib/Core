@@ -27,7 +27,7 @@ namespace CatLib.Tests.Fixture
         public Bar Bar { get; private set; }
 
         [Inject(Required = false)]
-        public Position Position { get; private set; }
+        public Position Position { get; set; }
 
         [Inject(Required = false)]
         public IList<int> Ages { get; set; }

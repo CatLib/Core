@@ -542,11 +542,27 @@ namespace CatLib.Tests.Container
         }
 
         [TestMethod]
-        [ExpectedException(typeof(UnresolvableException))]
         public void TestMakeMissConstructor()
         {
-            container.Bind("quux", typeof(Quux), true);
-            container.Make("quux");
+            try
+            {
+                container.Bind("quux", typeof(Quux), true);
+                container.Make("quux");
+            }
+            catch (UnresolvableException e)
+            {
+                System.Console.WriteLine(e.Message);
+            }
+        }
+
+        [TestMethod]
+        [ExpectedExceptionAndMessage(typeof(AssertException), "marked inject attribute, but the property is not public.")]
+        public void TestPropertyInjectWithProtectedAccessFaild()
+        {
+            var service = container.Type2Service(typeof(Foo));
+            container.Bind(service, typeof(Foo), true);
+            container.Bind("protected", typeof(ProtectedProperty), true);
+            container.Make("protected");
         }
 
         [TestMethod]
