@@ -542,17 +542,11 @@ namespace CatLib.Tests.Container
         }
 
         [TestMethod]
+        [ExpectedException(typeof(UnresolvableException))]
         public void TestMakeMissConstructor()
         {
-            try
-            {
-                container.Bind("quux", typeof(Quux), true);
-                container.Make("quux");
-            }
-            catch (UnresolvableException e)
-            {
-                System.Console.WriteLine(e.Message);
-            }
+            container.Bind("quux", typeof(Quux), true);
+            container.Make("quux");
         }
 
         [TestMethod]
