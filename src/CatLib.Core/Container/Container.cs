@@ -1178,7 +1178,7 @@ namespace CatLib.Container
         protected virtual string GetBuildStackDebugMessage()
         {
             var previous = string.Join(", ", BuildStack.ToArray());
-            return $" While building stack [{previous}].";
+            return $"While building stack [{previous}].";
         }
 
         /// <summary>
@@ -1190,13 +1190,27 @@ namespace CatLib.Container
         /// <returns>The resolve failure exception instance.</returns>
         protected virtual UnresolvableException MakeBuildFaildException(string makeService, Type makeServiceType, SException innerException)
         {
-            var message = makeServiceType != null
-                ? $"Class [{makeServiceType}] build faild. Service is [{makeService}]."
-                : $"Service [{makeService}] is not exists.";
+            var message = new StringBuilder();
 
-            message += GetBuildStackDebugMessage();
-            message += GetInnerExceptionMessage(innerException);
-            return new UnresolvableException(message, innerException);
+            if (makeServiceType != null)
+            {
+                message.AppendLine($"Create {makeServiceType} faild, service name is {makeService}.");
+            }
+            else
+            {
+                message.AppendLine($"Service {makeService} could not be found.");
+            }
+
+            if (innerException is MissingMethodException)
+            {
+                message.AppendLine("This issue may be caused because your constructor is not public.");
+            }
+
+            message.AppendLine(string.Empty);
+            message.AppendLine(GetBuildStackDebugMessage());
+            message.AppendLine(GetInnerExceptionMessage(innerException));
+
+            return new UnresolvableException(message.ToString(), innerException);
         }
 
         /// <summary>
@@ -1222,7 +1236,7 @@ namespace CatLib.Container
                 stack.Append(innerException);
             }
             while ((innerException = innerException.InnerException) != null);
-            return $" InnerException message stack: [{stack}]";
+            return $"InnerException message stack: [{stack}]";
         }
 
         /// <summary>
@@ -1244,8 +1258,7 @@ namespace CatLib.Container
         /// <returns>The circular dependency exception.</returns>
         protected virtual LogicException MakeCircularDependencyException(string service)
         {
-            var message = $"Circular dependency detected while for [{service}].";
-            message += GetBuildStackDebugMessage();
+            var message = $"Circular dependency detected while for [{service}]. {GetBuildStackDebugMessage()}";
             return new LogicException(message);
         }
 
@@ -1331,10 +1344,9 @@ namespace CatLib.Container
                 return;
             }
 
-            foreach (var property in makeServiceInstance.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance))
+            foreach (var property in makeServiceInstance.GetType().GetProperties(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance))
             {
-                if (!property.CanWrite
-                    || !property.IsDefined(typeof(InjectAttribute), false))
+                if (!AssertPropertyCanInject(property))
                 {
                     continue;
                 }
@@ -1365,6 +1377,35 @@ namespace CatLib.Container
 
                 property.SetValue(makeServiceInstance, instance, null);
             }
+        }
+
+        /// <summary>
+        /// Used to determine whether property can be used for dependency injection.
+        /// </summary>
+        /// <returns>True if the property can inject. Throw exception if attribute is used incorrectly.</returns>
+        protected virtual bool AssertPropertyCanInject(PropertyInfo propertyInfo)
+        {
+            if (!propertyInfo.IsDefined(typeof(InjectAttribute), false))
+            {
+                return false;
+            }
+
+            string GetDebugMessage()
+            {
+                return $"Property {propertyInfo.Name} in {propertyInfo.DeclaringType} marked inject attribute";
+            }
+
+            if (!propertyInfo.CanWrite)
+            {
+                throw new AssertException($"{GetDebugMessage()}, but the property is not writable.");
+            }
+
+            if (!propertyInfo.GetSetMethod(true).IsPublic)
+            {
+                throw new AssertException($"{GetDebugMessage()}, but the property is not public.");
+            }
+
+            return true;
         }
 
         /// <summary>
