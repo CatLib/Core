@@ -9,14 +9,16 @@
  * Document: https://catlib.io/
  */
 
+using CatLib.Util;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
+using System.Text.RegularExpressions;
 using SException = System.Exception;
 
 namespace CatLib.Tests
 {
     /// <summary>
-    /// Expectation exception class that allows developers to make exception content decisions.
+    /// Expected exception with the specified message.
     /// </summary>
     public class ExpectedExceptionAndMessageAttribute : ExpectedExceptionBaseAttribute
     {
@@ -24,53 +26,39 @@ namespace CatLib.Tests
         private readonly string expectedExceptionMessage;
         private readonly bool strict;
 
-        public ExpectedExceptionAndMessageAttribute(Type expectedExceptionType)
-        {
-            this.expectedExceptionType = expectedExceptionType;
-            expectedExceptionMessage = string.Empty;
-        }
-
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ExpectedExceptionAndMessageAttribute"/> class.
+        /// </summary>
+        /// <param name="expectedExceptionType">The expected exception.</param>
+        /// <param name="expectedExceptionMessage">The expected exception message.</param>
+        /// <param name="strict">Whether strict match exception message. otherwise it will pass if it contains the exception message.</param>
         public ExpectedExceptionAndMessageAttribute(Type expectedExceptionType, string expectedExceptionMessage, bool strict = false)
         {
             this.expectedExceptionType = expectedExceptionType;
-            this.expectedExceptionMessage = expectedExceptionMessage;
+            this.expectedExceptionMessage = expectedExceptionMessage.Replace(Environment.NewLine, "\n", StringComparison.OrdinalIgnoreCase);
             this.strict = strict;
         }
 
         protected override void Verify(SException exception)
         {
             Assert.IsNotNull(exception);
-
-            do
-            {
-                if (expectedExceptionType.IsAssignableFrom(exception.GetType()))
-                {
-                    break;
-                }
-
-                exception = exception.InnerException;
-            }
-            while (exception != null);
-
             Assert.IsInstanceOfType(exception, expectedExceptionType, "Wrong type of exception was thrown.");
 
-            if (!expectedExceptionMessage.Length.Equals(0))
+            if (expectedExceptionMessage.Length <= 0)
             {
-                var message = exception.Message.Replace(Environment.NewLine, "\n", StringComparison.Ordinal);
-                if (strict)
-                {
-                    Assert.AreEqual(expectedExceptionMessage, message, "Wrong exception message was returned.");
-                }
-                else
-                {
-                    if (message.IndexOf(
-                        expectedExceptionMessage,
-                        StringComparison.InvariantCultureIgnoreCase) < 0)
-                    {
-                        Assert.AreEqual(expectedExceptionMessage, message, "Wrong exception message was returned.");
-                    }
-                }
+                return;
             }
+
+            var message = exception.Message.Replace(Environment.NewLine, "\n", StringComparison.OrdinalIgnoreCase);
+            if (strict || !Is(expectedExceptionMessage, message))
+            {
+                Assert.AreEqual(expectedExceptionMessage, message, "Wrong exception message was returned.");
+            }
+        }
+
+        private static bool Is(string pattern, string value)
+        {
+            return pattern == value || Regex.IsMatch(value, Str.AsteriskWildcard(pattern));
         }
     }
 }

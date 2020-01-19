@@ -118,7 +118,7 @@ namespace CatLib.Tests
         }
 
         [TestMethod]
-        [ExpectedExceptionAndMessage(typeof(LogicException))]
+        [ExpectedException(typeof(LogicException))]
         public void TestInitingRegister()
         {
             var foo = new Mock<IServiceProvider>();
@@ -135,7 +135,7 @@ namespace CatLib.Tests
         }
 
         [TestMethod]
-        [ExpectedExceptionAndMessage(typeof(LogicException))]
+        [ExpectedException(typeof(LogicException))]
         public void TestTerminateRegister()
         {
             var foo = new Mock<IServiceProvider>();
