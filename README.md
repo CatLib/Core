@@ -4,6 +4,7 @@
 <a href="https://github.com/Catlib/Core/blob/master/LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue.svg" title="license-mit" /></a>
 <a href="https://www.nuget.org/packages/catlib.core/"><img src="https://badge.fury.io/nu/catlib.core.svg" title="Nuget Version" /></a>
 <a href="https://travis-ci.com/CatLib/Core"><img src="https://travis-ci.com/CatLib/Core.svg?branch=master" title="Build status"/></a>
+<a href="https://github.com/catlib/core/actions"><img src="https://github.com/catlib/core/workflows/catlib/badge.svg" title="Build status"></a>
 <a href="https://codecov.io/gh/CatLib/Core">
   <img src="https://codecov.io/gh/CatLib/Core/branch/master/graph/badge.svg" alt="Codecov" />
 </a>
