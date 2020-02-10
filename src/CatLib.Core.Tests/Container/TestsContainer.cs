@@ -560,7 +560,7 @@ namespace CatLib.Tests.Container
         }
 
         [TestMethod]
-        [ExpectedExceptionAndMessage(typeof(TestException), "QuuxFoo")]
+        [ExpectedExceptionAndMessage(typeof(UnresolvableException), "QuuxFoo")]
         public void TestMakeConstructorThrowException()
         {
             container.Bind("foo", typeof(QuuxFoo), false);
