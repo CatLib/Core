@@ -9,15 +9,15 @@
  * Document: https://catlib.io/
  */
 
-using CatLib.Container;
-using CatLib.EventDispatcher;
-using CatLib.Exception;
-using CatLib.Util;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Reflection;
 using System.Threading;
+using CatLib.Container;
+using CatLib.EventDispatcher;
+using CatLib.Exception;
+using CatLib.Util;
 
 namespace CatLib
 {
@@ -31,13 +31,11 @@ namespace CatLib
         private readonly IList<Action<IApplication>> bootingCallbacks;
         private readonly IList<Action<IApplication>> bootedCallbacks;
         private readonly IList<Action<IApplication>> terminatingCallbacks;
-        private readonly IList<Action<IApplication>> terminatedCallbacks;
         private readonly int mainThreadId;
         private bool bootstrapped;
         private bool registering;
         private long incrementId;
         private DebugLevel debugLevel;
-        private IEventDispatcher dispatcher;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Application"/> class.
@@ -48,11 +46,11 @@ namespace CatLib
             bootingCallbacks = new List<Action<IApplication>>();
             bootedCallbacks = new List<Action<IApplication>>();
             terminatingCallbacks = new List<Action<IApplication>>();
-            terminatedCallbacks = new List<Action<IApplication>>();
             loadedProviders = new List<IServiceProvider>();
 
             mainThreadId = Thread.CurrentThread.ManagedThreadId;
             RegisterBaseBindings();
+            RegisterBaseProviders();
 
             // We use closures to save the current context state
             // Do not change to: OnFindType(Type.GetType) This
@@ -106,33 +104,13 @@ namespace CatLib
             return application;
         }
 
-        /// <summary>
-        /// Sets the event dispatcher.
-        /// </summary>
-        /// <param name="dispatcher">The event dispatcher instance.</param>
-        public void SetDispatcher(IEventDispatcher dispatcher)
-        {
-            this.dispatcher = dispatcher;
-            this.Instance<IEventDispatcher>(dispatcher);
-        }
-
         /// <inheritdoc />
-        public IEventDispatcher GetDispatcher()
-        {
-            return dispatcher;
-        }
-
-        /// <summary>
-        /// Register a new boot listener.
-        /// </summary>
         public void Booting(Action<IApplication> callback)
         {
             bootingCallbacks.Add(callback);
         }
 
-        /// <summary>
-        /// Register a new "booted" listener.
-        /// </summary>
+        /// <inheritdoc />
         public void Booted(Action<IApplication> callback)
         {
             bootedCallbacks.Add(callback);
@@ -153,32 +131,20 @@ namespace CatLib
 
             Process = StartProcess.Terminate;
 
-            RaiseAppCallbacks(terminatingCallbacks);
-
             Flush();
             if (App.That == this)
             {
                 App.That = null;
             }
 
+            RaiseAppCallbacks(terminatingCallbacks);
             Process = StartProcess.Terminated;
-            RaiseAppCallbacks(terminatedCallbacks);
         }
 
-        /// <summary>
-        /// Register a terminating callback with the application.
-        /// </summary>
+        /// <inheritdoc />
         public void Terminating(Action<IApplication> callback)
         {
-            terminatedCallbacks.Add(callback);
-        }
-
-        /// <summary>
-        /// Register a terminated callback with the application.
-        /// </summary>
-        public void Terminated(Action<IApplication> callback)
-        {
-            terminatedCallbacks.Add(callback);
+            terminatingCallbacks.Add(callback);
         }
 
         /// <summary>
@@ -331,7 +297,11 @@ namespace CatLib
         private void RegisterBaseBindings()
         {
             this.Singleton<IApplication>(() => this).Alias<Application>().Alias<IContainer>();
-            SetDispatcher(new EventDispatcher.EventDispatcher());
+        }
+
+        private void RegisterBaseProviders()
+        {
+            Register(new EventDispatcherProvider());
         }
 
         private void RaiseAppCallbacks(IEnumerable<Action<IApplication>> callbacks)

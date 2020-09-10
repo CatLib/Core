@@ -108,7 +108,7 @@ namespace CatLib.Tests
         }
 
         [TestMethod]
-        public void TestTerminateSequenceOfEvents()
+        public void TestTerminating()
         {
             var count = 0;
 
@@ -117,13 +117,8 @@ namespace CatLib.Tests
                 Assert.AreEqual(0, count++);
             });
 
-            application.Terminated((app) =>
-            {
-                Assert.AreEqual(1, count++);
-            });
-
             application.Terminate();
-            Assert.AreEqual(2, count);
+            Assert.AreEqual(1, count);
         }
 
         [TestMethod]

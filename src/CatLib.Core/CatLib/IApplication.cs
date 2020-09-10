@@ -9,8 +9,8 @@
  * Document: https://catlib.io/
  */
 
+using System;
 using CatLib.Container;
-using CatLib.EventDispatcher;
 
 namespace CatLib
 {
@@ -30,12 +30,6 @@ namespace CatLib
         DebugLevel DebugLevel { get; set; }
 
         /// <summary>
-        /// Gets the event dispatcher.
-        /// </summary>
-        /// <returns>Returns event dispatcher instance, null if the dispatcher not found.</returns>
-        IEventDispatcher GetDispatcher();
-
-        /// <summary>
         /// Register a service provider with the application.
         /// </summary>
         /// <param name="provider">The service provider.</param>
@@ -48,6 +42,21 @@ namespace CatLib
         /// <param name="provider">The service provider.</param>
         /// <returns>True if the service provider is registered.</returns>
         bool IsRegistered(IServiceProvider provider);
+
+        /// <summary>
+        /// Register a new boot listener.
+        /// </summary>
+        void Booting(Action<IApplication> callback);
+
+        /// <summary>
+        /// Register a new "booted" listener.
+        /// </summary>
+        void Booted(Action<IApplication> callback);
+
+        /// <summary>
+        /// Register a terminating callback with the application.
+        /// </summary>
+        void Terminating(Action<IApplication> callback);
 
         /// <summary>
         /// Gets the unique runtime id.
