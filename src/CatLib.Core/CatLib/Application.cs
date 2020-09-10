@@ -50,13 +50,10 @@ namespace CatLib
 
             dispatchMapping = new Dictionary<Type, string>()
             {
-                { typeof(AfterBootEventArgs), ApplicationEvents.OnAfterBoot },
                 { typeof(AfterInitEventArgs), ApplicationEvents.OnAfterInit },
                 { typeof(AfterTerminateEventArgs), ApplicationEvents.OnAfterTerminate },
-                { typeof(BeforeBootEventArgs), ApplicationEvents.OnBeforeBoot },
                 { typeof(BeforeInitEventArgs), ApplicationEvents.OnBeforeInit },
                 { typeof(BeforeTerminateEventArgs), ApplicationEvents.OnBeforeTerminate },
-                { typeof(BootingEventArgs), ApplicationEvents.OnBooting },
                 { typeof(InitProviderEventArgs), ApplicationEvents.OnInitProvider },
                 { typeof(RegisterProviderEventArgs), ApplicationEvents.OnRegisterProvider },
                 { typeof(StartCompletedEventArgs), ApplicationEvents.OnStartCompleted },
@@ -155,10 +152,6 @@ namespace CatLib
             }
 
             Process = StartProcess.Bootstrap;
-            bootstraps = Raise(new BeforeBootEventArgs(bootstraps, this))
-                            .GetBootstraps();
-            Process = StartProcess.Bootstrapping;
-
             var existed = new HashSet<IBootstrap>();
 
             foreach (var bootstrap in bootstraps)
@@ -174,18 +167,10 @@ namespace CatLib
                 }
 
                 existed.Add(bootstrap);
-
-                var skipped = Raise(new BootingEventArgs(bootstrap, this))
-                                .IsSkip;
-                if (!skipped)
-                {
-                    bootstrap.Bootstrap();
-                }
+                bootstrap.Bootstrap();
             }
 
-            Process = StartProcess.Bootstraped;
             bootstrapped = true;
-            Raise(new AfterBootEventArgs(this));
         }
 
         /// <summary>
@@ -198,7 +183,7 @@ namespace CatLib
                 throw new LogicException($"You must call {nameof(BootstrapWith)}() first.");
             }
 
-            if (inited || Process != StartProcess.Bootstraped)
+            if (inited || Process != StartProcess.Bootstrap)
             {
                 throw new LogicException($"Cannot repeatedly trigger the {nameof(Init)}()");
             }

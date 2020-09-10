@@ -17,21 +17,6 @@ namespace CatLib
     public static class ApplicationEvents
     {
         /// <summary>
-        /// Before the <see cref="Application.BootstrapWith"/> call.
-        /// </summary>
-        public static readonly string OnBeforeBoot = $"{BaseEventArgs}.OnBeforeBoot";
-
-        /// <summary>
-        /// When the <see cref="Application.BootstrapWith"/> call is in progress.
-        /// </summary>
-        public static readonly string OnBooting = $"{BaseEventArgs}.BootingEventArgs";
-
-        /// <summary>
-        /// After the <see cref="Application.BootstrapWith"/> called.
-        /// </summary>
-        public static readonly string OnAfterBoot = $"{BaseEventArgs}.AfterBootEventArgs";
-
-        /// <summary>
         /// When registering for a service provider.
         /// </summary>
         public static readonly string OnRegisterProvider = $"{BaseEventArgs}.RegisterProviderEventArgs";

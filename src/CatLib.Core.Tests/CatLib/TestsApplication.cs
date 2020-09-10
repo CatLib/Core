@@ -66,27 +66,6 @@ namespace CatLib.Tests
         }
 
         [TestMethod]
-        public void TestSkipBootstrap()
-        {
-            var foo = new Mock<IBootstrap>();
-            var bar = new Mock<IBootstrap>();
-
-            dispatcher.AddListener(ApplicationEvents.OnBooting, (sender, eventArgs) =>
-            {
-                if (eventArgs is BootingEventArgs args &&
-                    args.GetBootstrap() == foo.Object)
-                {
-                    args.Skip();
-                }
-            });
-
-            application.BootstrapWith(foo.Object, bar.Object);
-
-            foo.Verify((o) => o.Bootstrap(), Times.Never);
-            bar.Verify((o) => o.Bootstrap(), Times.Once);
-        }
-
-        [TestMethod]
         public void TestRegisterSkip()
         {
             var foo = new Mock<IServiceProvider>();
