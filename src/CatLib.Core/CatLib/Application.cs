@@ -93,7 +93,7 @@ namespace CatLib
 
         /// <inheritdoc cref="Application(bool)"/>
         /// <returns>The CatLib <see cref="Application"/> instance.</returns>
-        public static Application New(bool global = true)
+        public static Application Create(bool global = true)
         {
             var application = new Application();
             if (global)

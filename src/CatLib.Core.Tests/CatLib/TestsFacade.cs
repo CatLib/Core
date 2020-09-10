@@ -23,7 +23,7 @@ namespace CatLib.Tests
         [TestInitialize]
         public void Initialize()
         {
-            application = Application.New();
+            application = Application.Create();
             application.BootstrapWith();
         }
 
