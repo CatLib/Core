@@ -51,7 +51,7 @@ namespace CatLib.Tests
 
         [TestMethod]
         [ExpectedException(typeof(LogicException))]
-        public void TestInitRepeat()
+        public void TestBootRepeat()
         {
             application.BootstrapWith();
             application.Boot();
@@ -60,7 +60,7 @@ namespace CatLib.Tests
 
         [TestMethod]
         [ExpectedException(typeof(LogicException))]
-        public void TestInitNoBootstrap()
+        public void TestBootWithNotCallBootstrapWith()
         {
             application.Boot();
         }
@@ -76,7 +76,7 @@ namespace CatLib.Tests
 
         [TestMethod]
         [ExpectedException(typeof(LogicException))]
-        public void TestInitingRegister()
+        public void TestBootRegister()
         {
             var foo = new Mock<IServiceProvider>();
             var bar = new Mock<IServiceProvider>();
@@ -154,7 +154,7 @@ namespace CatLib.Tests
         }
 
         [TestMethod]
-        public void TestInitAfterRegister()
+        public void TestBootAfterRegister()
         {
             var foo = new Mock<IServiceProvider>();
             var bar = new Mock<IServiceProvider>();
