@@ -42,18 +42,18 @@ namespace CatLib.Tests
 
         [TestMethod]
         [ExpectedException(typeof(LogicException))]
-        public void TestBootstrapRepeat()
+        public void TestBootstrapWithRepeat()
         {
-            application.Bootstrap();
+            application.BootstrapWith();
             application.Init();
-            application.Bootstrap();
+            application.BootstrapWith();
         }
 
         [TestMethod]
         [ExpectedException(typeof(LogicException))]
         public void TestInitRepeat()
         {
-            application.Bootstrap();
+            application.BootstrapWith();
             application.Init();
             application.Init();
         }
@@ -66,7 +66,7 @@ namespace CatLib.Tests
         }
 
         [TestMethod]
-        public void TestBootstrapSkip()
+        public void TestSkipBootstrap()
         {
             var foo = new Mock<IBootstrap>();
             var bar = new Mock<IBootstrap>();
@@ -80,7 +80,7 @@ namespace CatLib.Tests
                 }
             });
 
-            application.Bootstrap(foo.Object, bar.Object);
+            application.BootstrapWith(foo.Object, bar.Object);
 
             foo.Verify((o) => o.Bootstrap(), Times.Never);
             bar.Verify((o) => o.Bootstrap(), Times.Once);
@@ -130,7 +130,7 @@ namespace CatLib.Tests
             });
 
             application.Register(bar.Object);
-            application.Bootstrap();
+            application.BootstrapWith();
             application.Init();
         }
 
@@ -145,7 +145,7 @@ namespace CatLib.Tests
                 application.Register(foo.Object);
             });
 
-            application.Bootstrap();
+            application.BootstrapWith();
             application.Init();
             application.Terminate();
         }
@@ -206,7 +206,7 @@ namespace CatLib.Tests
             var foo = new Mock<IServiceProvider>();
             var bar = new Mock<IServiceProvider>();
 
-            application.Bootstrap();
+            application.BootstrapWith();
             application.Register(foo.Object);
             application.Init();
             application.Register(bar.Object);
@@ -230,14 +230,14 @@ namespace CatLib.Tests
 
         [TestMethod]
         [ExpectedException(typeof(LogicException))]
-        public void TestBoostrapRepeat()
+        public void TestBootstrapWithSameBootstrap()
         {
             var foo = new Mock<IBootstrap>().Object;
-            application.Bootstrap(foo, foo);
+            application.BootstrapWith(foo, foo);
         }
 
         [TestMethod]
-        public void TestBoostrapOrder()
+        public void TestBoostrapWithOrder()
         {
             var foo = new Mock<IBootstrap>();
             var bar = new Mock<IBootstrap>();
@@ -259,7 +259,7 @@ namespace CatLib.Tests
                 Assert.AreEqual(2, count++);
             });
 
-            application.Bootstrap(foo.Object, bar.Object, baz.Object);
+            application.BootstrapWith(foo.Object, bar.Object, baz.Object);
             Assert.AreEqual(3, count);
         }
     }

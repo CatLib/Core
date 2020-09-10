@@ -17,17 +17,17 @@ namespace CatLib
     public static class ApplicationEvents
     {
         /// <summary>
-        /// Before the <see cref="Application.Bootstrap"/> call.
+        /// Before the <see cref="Application.BootstrapWith"/> call.
         /// </summary>
         public static readonly string OnBeforeBoot = $"{BaseEventArgs}.OnBeforeBoot";
 
         /// <summary>
-        /// When the <see cref="Application.Bootstrap"/> call is in progress.
+        /// When the <see cref="Application.BootstrapWith"/> call is in progress.
         /// </summary>
         public static readonly string OnBooting = $"{BaseEventArgs}.BootingEventArgs";
 
         /// <summary>
-        /// After the <see cref="Application.Bootstrap"/> called.
+        /// After the <see cref="Application.BootstrapWith"/> called.
         /// </summary>
         public static readonly string OnAfterBoot = $"{BaseEventArgs}.AfterBootEventArgs";
 

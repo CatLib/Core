@@ -24,7 +24,7 @@ namespace CatLib.Tests
         public void Initialize()
         {
             application = Application.New();
-            application.Bootstrap();
+            application.BootstrapWith();
         }
 
         [TestMethod]

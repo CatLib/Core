@@ -145,13 +145,13 @@ namespace CatLib
         /// Bootstrap the given array of bootstrap classes.
         /// </summary>
         /// <param name="bootstraps">The given bootstrap classes.</param>
-        public virtual void Bootstrap(params IBootstrap[] bootstraps)
+        public virtual void BootstrapWith(params IBootstrap[] bootstraps)
         {
             Guard.Requires<ArgumentNullException>(bootstraps != null);
 
             if (bootstrapped || Process != StartProcess.Construct)
             {
-                throw new LogicException($"Cannot repeatedly trigger the {nameof(Bootstrap)}()");
+                throw new LogicException($"Cannot repeatedly trigger the {nameof(BootstrapWith)}()");
             }
 
             Process = StartProcess.Bootstrap;
@@ -195,7 +195,7 @@ namespace CatLib
         {
             if (!bootstrapped)
             {
-                throw new LogicException($"You must call {nameof(Bootstrap)}() first.");
+                throw new LogicException($"You must call {nameof(BootstrapWith)}() first.");
             }
 
             if (inited || Process != StartProcess.Bootstraped)

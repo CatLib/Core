@@ -23,18 +23,18 @@ namespace CatLib
         Construct = 0,
 
         /// <summary>
-        /// Before the <see cref="Application.Bootstrap"/> call.
+        /// Before the <see cref="Application.BootstrapWith"/> call.
         /// </summary>
         Bootstrap = 1,
 
         /// <summary>
-        /// When during <see cref="Application.Bootstrap"/> execution,
+        /// When during <see cref="Application.BootstrapWith"/> execution,
         /// you are in the <see cref="Bootstrapping"/> phase.
         /// </summary>
         Bootstrapping = 2,
 
         /// <summary>
-        /// After the <see cref="Application.Bootstrap"/> called.
+        /// After the <see cref="Application.BootstrapWith"/> called.
         /// </summary>
         Bootstraped = 3,
 
