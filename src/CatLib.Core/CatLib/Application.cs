@@ -55,7 +55,6 @@ namespace CatLib
             {
                 { typeof(AfterTerminateEventArgs), ApplicationEvents.OnAfterTerminate },
                 { typeof(BeforeTerminateEventArgs), ApplicationEvents.OnBeforeTerminate },
-                { typeof(RegisterProviderEventArgs), ApplicationEvents.OnRegisterProvider },
             };
 
             // We use closures to save the current context state
@@ -258,13 +257,6 @@ namespace CatLib
                 baseProvider.SetApplication(this);
             }
 
-            var skipped = Raise(new RegisterProviderEventArgs(provider, this))
-                            .IsSkip;
-            if (skipped)
-            {
-                return;
-            }
-
             try
             {
                 registering = true;
@@ -323,7 +315,7 @@ namespace CatLib
             SetDispatcher(new EventDispatcher.EventDispatcher());
         }
 
-        private T Raise<T>(T args)
+        private void Raise<T>(T args)
             where T : EventArgs
         {
             if (!dispatchMapping.TryGetValue(args.GetType(), out string eventName))
@@ -333,11 +325,10 @@ namespace CatLib
 
             if (dispatcher == null)
             {
-                return args;
+                return;
             }
 
             dispatcher.Raise(eventName, this, args);
-            return args;
         }
 
         private void RaiseAppCallbacks(IEnumerable<Action<IApplication>> callbacks)

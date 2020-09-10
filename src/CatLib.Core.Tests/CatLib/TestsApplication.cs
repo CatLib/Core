@@ -66,28 +66,6 @@ namespace CatLib.Tests
         }
 
         [TestMethod]
-        public void TestRegisterSkip()
-        {
-            var foo = new Mock<IServiceProvider>();
-            var bar = new Mock<IServiceProvider>();
-
-            dispatcher.AddListener(ApplicationEvents.OnRegisterProvider, (sender, eventArgs) =>
-            {
-                if (eventArgs is RegisterProviderEventArgs args &&
-                    args.GetServiceProvider() == foo.Object)
-                {
-                    args.Skip();
-                }
-            });
-
-            application.Register(foo.Object);
-            application.Register(bar.Object);
-
-            foo.Verify((o) => o.Register(), Times.Never);
-            bar.Verify((o) => o.Register(), Times.Once);
-        }
-
-        [TestMethod]
         [ExpectedException(typeof(LogicException))]
         public void TestRegisterRepeat()
         {

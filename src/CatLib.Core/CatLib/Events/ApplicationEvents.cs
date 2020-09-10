@@ -17,11 +17,6 @@ namespace CatLib
     public static class ApplicationEvents
     {
         /// <summary>
-        /// When registering for a service provider.
-        /// </summary>
-        public static readonly string OnRegisterProvider = $"{BaseEventArgs}.RegisterProviderEventArgs";
-
-        /// <summary>
         /// When the framework is started.
         /// </summary>
         public static readonly string OnStartCompleted = $"{BaseEventArgs}.StartCompletedEventArgs";
