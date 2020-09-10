@@ -1,6 +1,4 @@
-﻿using CatLib.Container;
-
-namespace CatLib.EventDispatcher
+﻿namespace CatLib.EventDispatcher
 {
     /// <summary>
     /// Provide the event dispatcher.

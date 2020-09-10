@@ -9,10 +9,11 @@
  * Document: https://catlib.io/
  */
 
+using CatLib.Container;
 using CatLib.Util;
 using System;
 
-namespace CatLib.Container
+namespace CatLib
 {
     /// <summary>
     /// An extension function for <see cref="BindData"/>.

@@ -11,11 +11,12 @@
 
 #pragma warning disable SA1618
 
+using CatLib.Container;
 using CatLib.Exception;
 using CatLib.Util;
 using System;
 
-namespace CatLib.Container
+namespace CatLib
 {
     /// <summary>
     /// An extension function for <see cref="Container"/>.

@@ -15,7 +15,7 @@ using System;
 using System.IO;
 using System.Text;
 
-namespace CatLib.IO
+namespace CatLib
 {
     /// <summary>
     /// The stream extension function.
