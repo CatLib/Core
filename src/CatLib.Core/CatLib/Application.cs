@@ -30,8 +30,9 @@ namespace CatLib
         private readonly IList<IServiceProvider> loadedProviders;
         private readonly IList<Action<IApplication>> bootingCallbacks;
         private readonly IList<Action<IApplication>> bootedCallbacks;
+        private readonly IList<Action<IApplication>> terminatingCallbacks;
+        private readonly IList<Action<IApplication>> terminatedCallbacks;
         private readonly int mainThreadId;
-        private readonly IDictionary<Type, string> dispatchMapping;
         private bool bootstrapped;
         private bool registering;
         private long incrementId;
@@ -46,16 +47,12 @@ namespace CatLib
         {
             bootingCallbacks = new List<Action<IApplication>>();
             bootedCallbacks = new List<Action<IApplication>>();
+            terminatingCallbacks = new List<Action<IApplication>>();
+            terminatedCallbacks = new List<Action<IApplication>>();
             loadedProviders = new List<IServiceProvider>();
 
             mainThreadId = Thread.CurrentThread.ManagedThreadId;
             RegisterBaseBindings();
-
-            dispatchMapping = new Dictionary<Type, string>()
-            {
-                { typeof(AfterTerminateEventArgs), ApplicationEvents.OnAfterTerminate },
-                { typeof(BeforeTerminateEventArgs), ApplicationEvents.OnBeforeTerminate },
-            };
 
             // We use closures to save the current context state
             // Do not change to: OnFindType(Type.GetType) This
@@ -149,9 +146,15 @@ namespace CatLib
         /// <inheritdoc />
         public virtual void Terminate()
         {
+            if (Process == StartProcess.Terminate || Process == StartProcess.Terminated)
+            {
+                return;
+            }
+
             Process = StartProcess.Terminate;
-            Raise(new BeforeTerminateEventArgs(this));
-            Process = StartProcess.Terminating;
+
+            RaiseAppCallbacks(terminatingCallbacks);
+
             Flush();
             if (App.That == this)
             {
@@ -159,7 +162,23 @@ namespace CatLib
             }
 
             Process = StartProcess.Terminated;
-            Raise(new AfterTerminateEventArgs(this));
+            RaiseAppCallbacks(terminatedCallbacks);
+        }
+
+        /// <summary>
+        /// Register a terminating callback with the application.
+        /// </summary>
+        public void Terminating(Action<IApplication> callback)
+        {
+            terminatedCallbacks.Add(callback);
+        }
+
+        /// <summary>
+        /// Register a terminated callback with the application.
+        /// </summary>
+        public void Terminated(Action<IApplication> callback)
+        {
+            terminatedCallbacks.Add(callback);
         }
 
         /// <summary>
@@ -313,22 +332,6 @@ namespace CatLib
         {
             this.Singleton<IApplication>(() => this).Alias<Application>().Alias<IContainer>();
             SetDispatcher(new EventDispatcher.EventDispatcher());
-        }
-
-        private void Raise<T>(T args)
-            where T : EventArgs
-        {
-            if (!dispatchMapping.TryGetValue(args.GetType(), out string eventName))
-            {
-                throw new AssertException($"Assertion error: Undefined event {args}");
-            }
-
-            if (dispatcher == null)
-            {
-                return;
-            }
-
-            dispatcher.Raise(eventName, this, args);
         }
 
         private void RaiseAppCallbacks(IEnumerable<Action<IApplication>> callbacks)

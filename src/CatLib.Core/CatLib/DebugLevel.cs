@@ -17,17 +17,17 @@ namespace CatLib
     public enum DebugLevel
     {
         /// <summary>
-        /// Production environment
+        /// Production environment.
         /// </summary>
         Production,
 
         /// <summary>
-        /// Between the production environment and the developer environment
+        /// Between the production environment and the developer environment.
         /// </summary>
         Staging,
 
         /// <summary>
-        /// Development environment
+        /// Development environment.
         /// </summary>
         Development,
     }

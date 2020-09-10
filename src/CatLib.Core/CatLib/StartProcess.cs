@@ -30,28 +30,21 @@ namespace CatLib
         /// <summary>
         /// When call the <see cref="Application.Boot"/> method.
         /// </summary>
-        Boot = 4,
+        Boot = 2,
 
         /// <summary>
         /// When the framework running.
         /// </summary>
-        Running = 7,
+        Running = 3,
 
         /// <summary>
-        /// Before the <see cref="Application.Terminate"/> call.
+        /// When call the <see cref="Application.Terminate"/>.
         /// </summary>
-        Terminate = 8,
+        Terminate = 4,
 
         /// <summary>
-        /// When during <see cref="Application.Terminate"/> execution,
-        /// you are in the <see cref="Terminating"/> phase.
+        /// When end of the terminate.
         /// </summary>
-        Terminating = 9,
-
-        /// <summary>
-        /// After the <see cref="Application.Terminate"/> called.
-        /// All resources are destroyed.
-        /// </summary>
-        Terminated = 10,
+        Terminated = 5,
     }
 }

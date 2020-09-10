@@ -93,11 +93,11 @@ namespace CatLib.Tests
 
         [TestMethod]
         [ExpectedException(typeof(LogicException))]
-        public void TestTerminateRegister()
+        public void TestTerminateRegisterThrowException()
         {
             var foo = new Mock<IServiceProvider>();
 
-            dispatcher.AddListener(ApplicationEvents.OnBeforeTerminate, (sender, eventArgs) =>
+            application.Terminating((app) =>
             {
                 application.Register(foo.Object);
             });
@@ -111,12 +111,13 @@ namespace CatLib.Tests
         public void TestTerminateSequenceOfEvents()
         {
             var count = 0;
-            dispatcher.AddListener(ApplicationEvents.OnBeforeTerminate, (sender, eventArgs) =>
+
+            application.Terminating((app) =>
             {
                 Assert.AreEqual(0, count++);
             });
 
-            dispatcher.AddListener(ApplicationEvents.OnAfterTerminate, (sender, eventArgs) =>
+            application.Terminated((app) =>
             {
                 Assert.AreEqual(1, count++);
             });
