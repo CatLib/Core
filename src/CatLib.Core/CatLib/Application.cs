@@ -28,10 +28,11 @@ namespace CatLib
     {
         private static string version;
         private readonly IList<IServiceProvider> loadedProviders;
+        private readonly IList<Action<IApplication>> bootingCallbacks;
+        private readonly IList<Action<IApplication>> bootedCallbacks;
         private readonly int mainThreadId;
         private readonly IDictionary<Type, string> dispatchMapping;
         private bool bootstrapped;
-        private bool inited;
         private bool registering;
         private long incrementId;
         private DebugLevel debugLevel;
@@ -43,6 +44,8 @@ namespace CatLib
         /// <param name="global">True if sets the instance to <see cref="App"/> facade.</param>
         public Application()
         {
+            bootingCallbacks = new List<Action<IApplication>>();
+            bootedCallbacks = new List<Action<IApplication>>();
             loadedProviders = new List<IServiceProvider>();
 
             mainThreadId = Thread.CurrentThread.ManagedThreadId;
@@ -50,13 +53,9 @@ namespace CatLib
 
             dispatchMapping = new Dictionary<Type, string>()
             {
-                { typeof(AfterInitEventArgs), ApplicationEvents.OnAfterInit },
                 { typeof(AfterTerminateEventArgs), ApplicationEvents.OnAfterTerminate },
-                { typeof(BeforeInitEventArgs), ApplicationEvents.OnBeforeInit },
                 { typeof(BeforeTerminateEventArgs), ApplicationEvents.OnBeforeTerminate },
-                { typeof(InitProviderEventArgs), ApplicationEvents.OnInitProvider },
                 { typeof(RegisterProviderEventArgs), ApplicationEvents.OnRegisterProvider },
-                { typeof(StartCompletedEventArgs), ApplicationEvents.OnStartCompleted },
             };
 
             // We use closures to save the current context state
@@ -78,6 +77,11 @@ namespace CatLib
         /// Gets indicates the application startup process.
         /// </summary>
         public StartProcess Process { get; private set; }
+
+        /// <summary>
+        /// Gets a value indicating whether if the application has booted.
+        /// </summary>
+        public bool IsBooted { get; private set; }
 
         /// <inheritdoc />
         public bool IsMainThread => mainThreadId == Thread.CurrentThread.ManagedThreadId;
@@ -120,6 +124,27 @@ namespace CatLib
         public IEventDispatcher GetDispatcher()
         {
             return dispatcher;
+        }
+
+        /// <summary>
+        /// Register a new boot listener.
+        /// </summary>
+        public void Booting(Action<IApplication> callback)
+        {
+            bootingCallbacks.Add(callback);
+        }
+
+        /// <summary>
+        /// Register a new "booted" listener.
+        /// </summary>
+        public void Booted(Action<IApplication> callback)
+        {
+            bootedCallbacks.Add(callback);
+
+            if (IsBooted)
+            {
+                RaiseAppCallbacks(new[] { callback });
+            }
         }
 
         /// <inheritdoc />
@@ -174,35 +199,33 @@ namespace CatLib
         }
 
         /// <summary>
-        /// Init all of the registered service provider.
+        /// Boot all of the registered service provider.
         /// </summary>
-        public virtual void Init()
+        public virtual void Boot()
         {
             if (!bootstrapped)
             {
                 throw new LogicException($"You must call {nameof(BootstrapWith)}() first.");
             }
 
-            if (inited || Process != StartProcess.Bootstrap)
+            if (IsBooted || Process != StartProcess.Bootstrap)
             {
-                throw new LogicException($"Cannot repeatedly trigger the {nameof(Init)}()");
+                throw new LogicException($"Cannot repeatedly trigger the {nameof(Boot)}()");
             }
 
-            Process = StartProcess.Init;
-            Raise(new BeforeInitEventArgs(this));
-            Process = StartProcess.Initing;
+            Process = StartProcess.Boot;
+
+            RaiseAppCallbacks(bootingCallbacks);
 
             foreach (var provider in loadedProviders)
             {
-                InitProvider(provider);
+                BootProvider(provider);
             }
 
-            inited = true;
-            Process = StartProcess.Inited;
-            Raise(new AfterInitEventArgs(this));
-
+            IsBooted = true;
             Process = StartProcess.Running;
-            Raise(new StartCompletedEventArgs(this));
+
+            RaiseAppCallbacks(bootedCallbacks);
         }
 
         /// <inheritdoc />
@@ -220,9 +243,9 @@ namespace CatLib
                 loadedProviders.Remove(provider);
             }
 
-            if (Process == StartProcess.Initing)
+            if (Process == StartProcess.Boot)
             {
-                throw new LogicException($"Unable to add service provider during {nameof(StartProcess.Initing)}");
+                throw new LogicException($"Unable to add service provider during {nameof(StartProcess.Boot)}");
             }
 
             if (Process > StartProcess.Running)
@@ -254,9 +277,9 @@ namespace CatLib
 
             loadedProviders.Add(provider);
 
-            if (inited)
+            if (IsBooted)
             {
-                InitProvider(provider);
+                BootProvider(provider);
             }
         }
 
@@ -274,13 +297,12 @@ namespace CatLib
         }
 
         /// <summary>
-        /// Initialize the specified service provider.
+        /// Boot the specified service provider.
         /// </summary>
         /// <param name="provider">The specified service provider.</param>
-        protected virtual void InitProvider(IServiceProvider provider)
+        protected virtual void BootProvider(IServiceProvider provider)
         {
-            Raise(new InitProviderEventArgs(provider, this));
-            provider.Init();
+            provider.Boot();
         }
 
         /// <inheritdoc />
@@ -316,6 +338,14 @@ namespace CatLib
 
             dispatcher.Raise(eventName, this, args);
             return args;
+        }
+
+        private void RaiseAppCallbacks(IEnumerable<Action<IApplication>> callbacks)
+        {
+            foreach (var callback in callbacks)
+            {
+                callback(this);
+            }
         }
     }
 }

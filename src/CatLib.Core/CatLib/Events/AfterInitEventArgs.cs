@@ -12,7 +12,7 @@
 namespace CatLib
 {
     /// <summary>
-    /// Indicates that all the <see cref="IServiceProvider.Init"/> has been called.
+    /// Indicates that all the <see cref="IServiceProvider.Boot"/> has been called.
     /// </summary>
     public class AfterInitEventArgs : ApplicationEventArgs
     {

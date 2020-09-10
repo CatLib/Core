@@ -26,7 +26,7 @@ namespace CatLib
         protected IApplication App { get; private set; }
 
         /// <inheritdoc />
-        public virtual void Init()
+        public virtual void Boot()
         {
         }
 

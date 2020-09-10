@@ -28,20 +28,9 @@ namespace CatLib
         Bootstrap = 1,
 
         /// <summary>
-        /// Before the <see cref="Application.Init"/> call.
+        /// When call the <see cref="Application.Boot"/> method.
         /// </summary>
-        Init = 4,
-
-        /// <summary>
-        /// When during <see cref="Application.Init"/> execution,
-        /// you are in the <see cref="Initing"/> phase.
-        /// </summary>
-        Initing = 5,
-
-        /// <summary>
-        /// After the <see cref="Application.Init"/> called.
-        /// </summary>
-        Inited = 6,
+        Boot = 4,
 
         /// <summary>
         /// When the framework running.

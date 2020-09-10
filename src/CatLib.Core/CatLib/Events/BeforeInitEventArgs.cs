@@ -12,7 +12,7 @@
 namespace CatLib
 {
     /// <summary>
-    /// It indicates that the <see cref="IServiceProvider.Init"/> method will be called.
+    /// It indicates that the <see cref="IServiceProvider.Boot"/> method will be called.
     /// </summary>
     public class BeforeInitEventArgs : ApplicationEventArgs
     {

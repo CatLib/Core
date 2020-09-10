@@ -45,7 +45,7 @@ namespace CatLib.Tests
         public void TestBootstrapWithRepeat()
         {
             application.BootstrapWith();
-            application.Init();
+            application.Boot();
             application.BootstrapWith();
         }
 
@@ -54,15 +54,15 @@ namespace CatLib.Tests
         public void TestInitRepeat()
         {
             application.BootstrapWith();
-            application.Init();
-            application.Init();
+            application.Boot();
+            application.Boot();
         }
 
         [TestMethod]
         [ExpectedException(typeof(LogicException))]
         public void TestInitNoBootstrap()
         {
-            application.Init();
+            application.Boot();
         }
 
         [TestMethod]
@@ -103,14 +103,14 @@ namespace CatLib.Tests
             var foo = new Mock<IServiceProvider>();
             var bar = new Mock<IServiceProvider>();
 
-            dispatcher.AddListener(ApplicationEvents.OnInitProvider, (sender, eventArgs) =>
+            application.Booting((app) =>
             {
                 application.Register(foo.Object);
             });
 
             application.Register(bar.Object);
             application.BootstrapWith();
-            application.Init();
+            application.Boot();
         }
 
         [TestMethod]
@@ -125,7 +125,7 @@ namespace CatLib.Tests
             });
 
             application.BootstrapWith();
-            application.Init();
+            application.Boot();
             application.Terminate();
         }
 
@@ -187,7 +187,7 @@ namespace CatLib.Tests
 
             application.BootstrapWith();
             application.Register(foo.Object);
-            application.Init();
+            application.Boot();
             application.Register(bar.Object);
 
             foo.Verify((o) => o.Register(), Times.Once);

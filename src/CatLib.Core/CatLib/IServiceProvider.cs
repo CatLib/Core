@@ -17,9 +17,9 @@ namespace CatLib
     public interface IServiceProvider
     {
         /// <summary>
-        /// Initialize the application's service providers.
+        /// Boot the application's service providers.
         /// </summary>
-        void Init();
+        void Boot();
 
         /// <summary>
         /// Register any application services.

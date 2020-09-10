@@ -22,21 +22,6 @@ namespace CatLib
         public static readonly string OnRegisterProvider = $"{BaseEventArgs}.RegisterProviderEventArgs";
 
         /// <summary>
-        /// Before the <see cref="Application.Init"/> call.
-        /// </summary>
-        public static readonly string OnBeforeInit = $"{BaseEventArgs}.BeforeInitEventArgs";
-
-        /// <summary>
-        /// Before the <see cref="IServiceProvider.Init"/> call.
-        /// </summary>
-        public static readonly string OnInitProvider = $"{BaseEventArgs}.InitProviderEventArgs";
-
-        /// <summary>
-        /// After the <see cref="Application.Init"/> called.
-        /// </summary>
-        public static readonly string OnAfterInit = $"{BaseEventArgs}.AfterInitEventArgs";
-
-        /// <summary>
         /// When the framework is started.
         /// </summary>
         public static readonly string OnStartCompleted = $"{BaseEventArgs}.StartCompletedEventArgs";
