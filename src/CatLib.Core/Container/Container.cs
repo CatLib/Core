@@ -1681,6 +1681,37 @@ namespace CatLib.Container
         }
 
         /// <summary>
+        /// Get the variable of type <see cref="IParams"/> from <paramref name="userParams"/>.
+        /// </summary>
+        /// <param name="userParams">An array for the user parameter.</param>
+        /// <returns>An array of <see cref="IParams"/> parameters.</returns>
+        private static IParams[] GetParamsTypeInUserParams(ref object[] userParams)
+        {
+            // Filter is used here without using Remove because
+            // the IParams is also one of the types that you might want to inject.
+            var elements = Arr.Filter(userParams, value => value is IParams);
+            var results = new IParams[elements.Length];
+            for (var i = 0; i < elements.Length; i++)
+            {
+                results[i] = (IParams)elements[i];
+            }
+
+            return results;
+        }
+
+        /// <summary>
+        /// Release the specified instance via <see cref="IDisposable"/>.
+        /// </summary>
+        /// <param name="instance">The specified instance.</param>
+        private static void DisposeInstance(object instance)
+        {
+            if (instance is IDisposable disposable)
+            {
+                disposable.Dispose();
+            }
+        }
+
+        /// <summary>
         /// Guaranteed not to be flushing.
         /// </summary>
         private void GuardFlushing()
@@ -1766,18 +1797,6 @@ namespace CatLib.Container
         }
 
         /// <summary>
-        /// Release the specified instance via <see cref="IDisposable"/>.
-        /// </summary>
-        /// <param name="instance">The specified instance.</param>
-        private void DisposeInstance(object instance)
-        {
-            if (instance is IDisposable disposable)
-            {
-                disposable.Dispose();
-            }
-        }
-
-        /// <summary>
         /// Gets the specified service all of the rebound callbacks.
         /// </summary>
         /// <param name="service">The service name.</param>
@@ -1840,25 +1859,6 @@ namespace CatLib.Container
             AttributeInject(bindable, instance);
 
             return instance;
-        }
-
-        /// <summary>
-        /// Get the variable of type <see cref="IParams"/> from <paramref name="userParams"/>.
-        /// </summary>
-        /// <param name="userParams">An array for the user parameter.</param>
-        /// <returns>An array of <see cref="IParams"/> parameters.</returns>
-        private IParams[] GetParamsTypeInUserParams(ref object[] userParams)
-        {
-            // Filter is used here without using Remove because
-            // the IParams is also one of the types that you might want to inject.
-            var elements = Arr.Filter(userParams, value => value is IParams);
-            var results = new IParams[elements.Length];
-            for (var i = 0; i < elements.Length; i++)
-            {
-                results[i] = (IParams)elements[i];
-            }
-
-            return results;
         }
 
         /// <summary>

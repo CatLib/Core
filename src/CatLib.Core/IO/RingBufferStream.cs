@@ -232,28 +232,11 @@ namespace CatLib.IO
         }
 
         /// <summary>
-        /// Get the size of the byte stream that can be read.
-        /// </summary>
-        /// <returns>todo:1.</returns>
-        private long GetCanReadSize()
-        {
-            return write - read;
-        }
-
-        /// <summary>
-        /// Get the size of the byte stream that can be written.
-        /// </summary>
-        private long GetCanWriteSize()
-        {
-            return Math.Max(0, capacity - GetCanReadSize());
-        }
-
-        /// <summary>
         /// Calculate the power of the nearest two.
         /// </summary>
         /// <param name="min">The starting number.</param>
-        /// <returns>The  power of the nearest two.</returns>
-        private int ToPrime(int min)
+        /// <returns>The power of the nearest two.</returns>
+        private static int ToPrime(int min)
         {
             min = Math.Max(0, min);
 
@@ -270,6 +253,23 @@ namespace CatLib.IO
             }
 
             return result;
+        }
+
+        /// <summary>
+        /// Get the size of the byte stream that can be read.
+        /// </summary>
+        /// <returns>todo:1.</returns>
+        private long GetCanReadSize()
+        {
+            return write - read;
+        }
+
+        /// <summary>
+        /// Get the size of the byte stream that can be written.
+        /// </summary>
+        private long GetCanWriteSize()
+        {
+            return Math.Max(0, capacity - GetCanReadSize());
         }
     }
 }

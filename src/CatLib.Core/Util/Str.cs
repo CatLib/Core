@@ -334,14 +334,9 @@ namespace CatLib.Util
         /// <returns>The remaining part.</returns>
         public static string After(string str, string search)
         {
-            if (string.IsNullOrEmpty(str))
+            if (string.IsNullOrEmpty(str) || string.IsNullOrEmpty(search))
             {
                 return string.Empty;
-            }
-
-            if (string.IsNullOrEmpty(search))
-            {
-                return str ?? string.Empty;
             }
 
             var index = str.IndexOf(search, StringComparison.Ordinal);

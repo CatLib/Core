@@ -26,7 +26,7 @@ namespace CatLib.Tests.Fixture
 
         public int? Num { get; private set; }
 
-        public bool Disposed { get; private set; } = false;
+        public bool Disposed { get; private set; }
 
         public override string ToString()
         {
