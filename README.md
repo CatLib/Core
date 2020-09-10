@@ -4,6 +4,7 @@
 <a href="https://github.com/Catlib/Core/blob/master/LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue.svg" title="license-mit" /></a>
 <a href="https://www.nuget.org/packages/catlib.core/"><img src="https://badge.fury.io/nu/catlib.core.svg" title="Nuget Version" /></a>
 <a href="https://travis-ci.com/CatLib/Core"><img src="https://travis-ci.com/CatLib/Core.svg?branch=master" title="Build status"/></a>
+<a href="https://github.com/catlib/core/actions"><img src="https://github.com/catlib/core/workflows/catlib/badge.svg" title="Build status"></a>
 <a href="https://codecov.io/gh/CatLib/Core">
   <img src="https://codecov.io/gh/CatLib/Core/branch/master/graph/badge.svg" alt="Codecov" />
 </a>
@@ -14,19 +15,25 @@
 
 ## About CatLib
 
-`CatLib Core` is the Dependency injection container and helper functions library for `CatLib`. 
+`CatLib` is the lightweight dependency injection container and helper functions library. 
 
-- [Service Provider](https://catlib.io/v1/architecture/service-provider.html)
-- [CatLib Application](https://catlib.io/v1/architecture/application.html)
-- [IOC Container](https://catlib.io/v1/architecture/container.html).
-- [Facades](https://catlib.io/v1/architecture/facade.html).
+- [Service Provider](https://catlib.io/lasted/architecture/service-provider.html)
+- [Application](https://catlib.io/lasted/architecture/application.html)
+- [IOC Container](https://catlib.io/lasted/architecture/container.html)
+- [Facades](https://catlib.io/lasted/architecture/facade.html)
 
 ## Install CatLib Core
 
 **Installed with Nuget**
 
 ```PM
-Install-Package CatLib.Core -Version 2.0.0
+$ Install-Package CatLib.Core -Version 2.0.0
+```
+
+**Installed with [Bucket](https://github.com/getbucket/bucket)**
+
+```shell
+$ bucket require catlib/core
 ```
 
 **Installed with Github Release**
@@ -37,11 +44,11 @@ Install-Package CatLib.Core -Version 2.0.0
 
 CatLib has the most extensive and thorough [documentation](https://catlib.io), making it a breeze to get started with the framework.
 
-> 需要中文支持? 请访问[CatLib中文文档](https://catlib.io)。
+> 需要中文支持? 请访问[CatLib中文文档](https://zh.catlib.io)。
 
 ## Contribution
 
-CatLib is still a young framework, and her growth and your contribution are inseparable. If you want to contribute to the project, please refer to: [CatLib Contribution Guide](https://catlib.io/v1/contribution.html) Your contribution will be included in the list of contributors，Welcome Pull Request!
+CatLib is still a young framework, and her growth and your contribution are inseparable. If you want to contribute to the project, please refer to: [CatLib Contribution Guide](https://catlib.io/lasted/contribution.html) Your contribution will be included in the list of contributors，Welcome Pull Request!
 
 ## License
 

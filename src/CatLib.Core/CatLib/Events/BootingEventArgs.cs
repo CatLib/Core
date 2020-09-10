@@ -11,7 +11,7 @@
 
 using CatLib.EventDispatcher;
 
-namespace CatLib.Events
+namespace CatLib
 {
     /// <summary>
     /// Indicates a boot class that is booting.
@@ -37,6 +37,9 @@ namespace CatLib.Events
         /// </summary>
         public bool IsSkip { get; private set; }
 
+        /// <inheritdoc />
+        public bool IsPropagationStopped => IsSkip;
+
         /// <summary>
         /// Gets the a boot class that is booting.
         /// </summary>
@@ -52,12 +55,6 @@ namespace CatLib.Events
         public void Skip()
         {
             IsSkip = true;
-        }
-
-        /// <inheritdoc />
-        public bool IsPropagationStopped()
-        {
-            return IsSkip;
         }
     }
 }

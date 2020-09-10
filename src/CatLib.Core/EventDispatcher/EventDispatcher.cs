@@ -10,107 +10,104 @@
  */
 
 using CatLib.Exception;
-using CatLib.Support;
+using CatLib.Util;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace CatLib.EventDispatcher
 {
     /// <inheritdoc />
-    public sealed class EventDispatcher : IEventDispatcher
+    public class EventDispatcher : IEventDispatcher
     {
-        private readonly IDictionary<string, SortSet<Action<EventArgs>, int>> listeners;
+        private readonly IDictionary<string, IList<EventHandler>> listeners;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="EventDispatcher"/> class.
         /// </summary>
         public EventDispatcher()
         {
-            listeners = new Dictionary<string, SortSet<Action<EventArgs>, int>>();
+            listeners = new Dictionary<string, IList<EventHandler>>();
         }
 
         /// <inheritdoc />
-        public bool AddListener(string eventName, Action<EventArgs> listener, int priority = 0)
+        public virtual bool AddListener(string eventName, EventHandler handler)
         {
-            if (string.IsNullOrEmpty(eventName) || listener == null)
+            if (string.IsNullOrEmpty(eventName) || handler == null)
             {
                 return false;
             }
 
-            if (!listeners.TryGetValue(eventName, out SortSet<Action<EventArgs>, int> collection))
+            if (!listeners.TryGetValue(eventName, out IList<EventHandler> handlers))
             {
-                listeners[eventName] = collection = new SortSet<Action<EventArgs>, int>();
+                listeners[eventName] = handlers = new List<EventHandler>();
             }
-            else if (collection.Contains(listener))
+            else if (handlers.Contains(handler))
             {
                 return false;
             }
 
-            collection.Add(listener, priority);
+            handlers.Add(handler);
             return true;
         }
 
         /// <inheritdoc />
-        public EventArgs Dispatch(string eventName, EventArgs eventArgs)
+        public virtual void Raise(string eventName, object sender, EventArgs e = null)
         {
-            if (!listeners.TryGetValue(eventName, out SortSet<Action<EventArgs>, int> collection))
+            Guard.Requires<LogicException>(!(sender is EventArgs), $"Passed event args for the parameter {sender}, Did you make a wrong method call?");
+
+            e = e ?? EventArgs.Empty;
+            if (!listeners.TryGetValue(eventName, out IList<EventHandler> handlers))
             {
-                return eventArgs;
+                return;
             }
 
-            Guard.Requires<AssertException>(
-                collection.Count > 0,
-                "Assertion error: The number of listeners should be greater than 0.");
-
-            foreach (var listener in collection)
+            foreach (var listener in handlers)
             {
-                if (eventArgs is IStoppableEvent stoppableEvent
-                    && stoppableEvent.IsPropagationStopped())
+                if (e is IStoppableEvent stoppableEvent
+                    && stoppableEvent.IsPropagationStopped)
                 {
                     break;
                 }
 
-                listener.Invoke(eventArgs);
+                listener(sender, e);
             }
-
-            return eventArgs;
         }
 
         /// <inheritdoc />
-        public Action<EventArgs>[] GetListeners(string eventName)
+        public virtual EventHandler[] GetListeners(string eventName)
         {
-            if (!listeners.TryGetValue(eventName, out SortSet<Action<EventArgs>, int> collection))
+            if (!listeners.TryGetValue(eventName, out IList<EventHandler> handlers))
             {
-                return Array.Empty<Action<EventArgs>>();
+                return Array.Empty<EventHandler>();
             }
 
-            return collection.ToArray();
+            return handlers.ToArray();
         }
 
         /// <inheritdoc />
-        public bool HasListeners(string eventName)
+        public virtual bool HasListener(string eventName)
         {
             return listeners.ContainsKey(eventName);
         }
 
         /// <inheritdoc />
-        public bool RemoveListener(string eventName, Action<EventArgs> listener = null)
+        public virtual bool RemoveListener(string eventName, EventHandler handler = null)
         {
-            if (listener == null)
+            if (handler == null)
             {
                 return listeners.Remove(eventName);
             }
 
-            if (!listeners.TryGetValue(eventName, out SortSet<Action<EventArgs>, int> collection))
+            if (!listeners.TryGetValue(eventName, out IList<EventHandler> handlers))
             {
                 return false;
             }
 
-            var status = collection.Remove(listener);
-
-            if (collection.Count <= 0)
+            var status = handlers.Remove(handler);
+            if (handlers.Count <= 0)
             {
-                status = listeners.Remove(eventName);
+                listeners.Remove(eventName);
             }
 
             return status;

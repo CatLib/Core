@@ -11,7 +11,7 @@
 
 using CatLib.EventDispatcher;
 
-namespace CatLib.Events
+namespace CatLib
 {
     /// <summary>
     /// Indicates a service provider that will register.
@@ -37,6 +37,9 @@ namespace CatLib.Events
         /// </summary>
         public bool IsSkip { get; private set; }
 
+        /// <inheritdoc />
+        public bool IsPropagationStopped => IsSkip;
+
         /// <summary>
         /// Gets the a service provider class that will register.
         /// </summary>
@@ -52,12 +55,6 @@ namespace CatLib.Events
         public void Skip()
         {
             IsSkip = true;
-        }
-
-        /// <inheritdoc />
-        public bool IsPropagationStopped()
-        {
-            return IsSkip;
         }
     }
 }

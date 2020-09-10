@@ -22,11 +22,6 @@ namespace CatLib.EventDispatcher.Tests
     {
         private Dispatcher eventDispatcher;
 
-        internal interface IResponse
-        {
-            void Foo(EventArgs eventArgs);
-        }
-
         [TestInitialize]
         public void Initialize()
         {
@@ -34,150 +29,130 @@ namespace CatLib.EventDispatcher.Tests
         }
 
         [TestMethod]
-        public void TestDispatch()
+        public void TestRaise()
         {
             var expected = new TestEventArgs();
-            var mock = new Mock<IResponse>();
-            eventDispatcher.AddListener("foo", mock.Object.Foo);
-            eventDispatcher.Dispatch("foo", expected);
-            mock.Verify((o) => o.Foo(expected));
+            var handler = new Mock<EventHandler>();
+            eventDispatcher.AddListener("foo", handler.Object);
+            eventDispatcher.Raise("foo", this, expected);
+            handler.Verify((o) => o.Invoke(this, expected));
         }
 
         [TestMethod]
         public void TestAddListener()
         {
-            var first = new Mock<IResponse>();
-            var second = new Mock<IResponse>();
+            var foo1 = new Mock<EventHandler>();
+            var foo2 = new Mock<EventHandler>();
 
-            eventDispatcher.AddListener("foo", first.Object.Foo);
-            eventDispatcher.AddListener("foo", second.Object.Foo);
-
-            CollectionAssert.AreEqual(
-                new Action<EventArgs>[]
-            {
-                second.Object.Foo,
-                first.Object.Foo,
-            }, eventDispatcher.GetListeners("foo"));
-        }
-
-        [TestMethod]
-        public void TestAddListenerBySort()
-        {
-            var first = new Mock<IResponse>();
-            var second = new Mock<IResponse>();
-            var third = new Mock<IResponse>();
-
-            eventDispatcher.AddListener("foo", first.Object.Foo, 10);
-            eventDispatcher.AddListener("foo", second.Object.Foo, -10);
-            eventDispatcher.AddListener("foo", third.Object.Foo);
+            eventDispatcher.AddListener("foo", foo1.Object);
+            eventDispatcher.AddListener("foo", foo2.Object);
 
             CollectionAssert.AreEqual(
-                new Action<EventArgs>[]
+                new[]
                 {
-                    second.Object.Foo, third.Object.Foo, first.Object.Foo,
-                },
-                eventDispatcher.GetListeners("foo"));
+                    foo1.Object,
+                    foo2.Object,
+                }, eventDispatcher.GetListeners("foo"));
         }
 
         [TestMethod]
         public void TestHasListener()
         {
-            var foo = new Mock<IResponse>();
-            var bar = new Mock<IResponse>();
+            var foo = new Mock<EventHandler>();
+            var bar = new Mock<EventHandler>();
 
-            eventDispatcher.AddListener("foo", foo.Object.Foo);
-            eventDispatcher.AddListener("bar", bar.Object.Foo);
+            eventDispatcher.AddListener("foo", foo.Object);
+            eventDispatcher.AddListener("bar", bar.Object);
 
-            Assert.IsTrue(eventDispatcher.HasListeners("foo"));
-            Assert.IsTrue(eventDispatcher.HasListeners("bar"));
-            Assert.IsFalse(eventDispatcher.HasListeners("baz"));
+            Assert.IsTrue(eventDispatcher.HasListener("foo"));
+            Assert.IsTrue(eventDispatcher.HasListener("bar"));
+            Assert.IsFalse(eventDispatcher.HasListener("baz"));
         }
 
         [TestMethod]
         public void TestRepateAddSameListeners()
         {
-            var first = new Mock<IResponse>();
+            var foo = new Mock<EventHandler>();
 
-            Assert.IsTrue(eventDispatcher.AddListener("foo", first.Object.Foo));
-            Assert.IsFalse(eventDispatcher.AddListener("foo", first.Object.Foo));
+            Assert.IsTrue(eventDispatcher.AddListener("foo", foo.Object));
+            Assert.IsFalse(eventDispatcher.AddListener("foo", foo.Object));
         }
 
         [TestMethod]
         public void TestRemoveListeners()
         {
-            var foo = new Mock<IResponse>();
-            var bar = new Mock<IResponse>();
+            var foo = new Mock<EventHandler>();
+            var bar = new Mock<EventHandler>();
             var expected = new TestEventArgs();
 
-            eventDispatcher.AddListener("foo", foo.Object.Foo);
-            eventDispatcher.AddListener("bar", bar.Object.Foo);
+            eventDispatcher.AddListener("foo", foo.Object);
+            eventDispatcher.AddListener("bar", bar.Object);
 
-            eventDispatcher.Dispatch("foo", expected);
-            eventDispatcher.Dispatch("bar", expected);
+            eventDispatcher.Raise("foo", this, expected);
+            eventDispatcher.Raise("bar", this, expected);
 
-            foo.Verify((o) => o.Foo(expected));
-            bar.Verify((o) => o.Foo(expected));
+            foo.Verify((o) => o.Invoke(this, expected));
+            bar.Verify((o) => o.Invoke(this, expected));
 
-            eventDispatcher.RemoveListener("foo", foo.Object.Foo);
+            eventDispatcher.RemoveListener("foo", foo.Object);
 
-            eventDispatcher.Dispatch("foo", expected);
-            eventDispatcher.Dispatch("bar", expected);
+            eventDispatcher.Raise("foo", this, expected);
+            eventDispatcher.Raise("bar", this, expected);
 
-            foo.Verify((o) => o.Foo(expected), Times.Exactly(1));
-            bar.Verify((o) => o.Foo(expected), Times.Exactly(2));
+            foo.Verify((o) => o.Invoke(this, expected), Times.Exactly(1));
+            bar.Verify((o) => o.Invoke(this, expected), Times.Exactly(2));
         }
 
         [TestMethod]
         public void TestRemoveAllListeners()
         {
-            var foo = new Mock<IResponse>();
-            var foobar = new Mock<IResponse>();
+            var foo1 = new Mock<EventHandler>();
+            var foo2 = new Mock<EventHandler>();
             var expected = new TestEventArgs();
 
-            eventDispatcher.AddListener("foo", foo.Object.Foo);
-            eventDispatcher.AddListener("foo", foobar.Object.Foo);
+            eventDispatcher.AddListener("foo", foo1.Object);
+            eventDispatcher.AddListener("foo", foo2.Object);
 
-            eventDispatcher.Dispatch("foo", expected);
+            eventDispatcher.Raise("foo", this, expected);
 
-            foo.Verify((o) => o.Foo(expected));
-            foobar.Verify((o) => o.Foo(expected));
+            foo1.Verify((o) => o.Invoke(this, expected));
+            foo2.Verify((o) => o.Invoke(this, expected));
 
             eventDispatcher.RemoveListener("foo");
 
-            eventDispatcher.Dispatch("foo", expected);
+            eventDispatcher.Raise("foo", this, expected);
 
-            foo.Verify((o) => o.Foo(expected), Times.Exactly(1));
-            foobar.Verify((o) => o.Foo(expected), Times.Exactly(1));
+            foo1.Verify((o) => o.Invoke(this, expected), Times.Exactly(1));
+            foo2.Verify((o) => o.Invoke(this, expected), Times.Exactly(1));
         }
 
         [TestMethod]
         public void TestRemoveNotExistsListener()
         {
-            var foo = new Mock<IResponse>();
-            Assert.IsFalse(eventDispatcher.RemoveListener("foo", foo.Object.Foo));
+            var foo = new Mock<EventHandler>();
+            Assert.IsFalse(eventDispatcher.RemoveListener("foo", foo.Object));
             Assert.IsFalse(eventDispatcher.RemoveListener("bar"));
         }
 
         [TestMethod]
         public void TestStoppableEvent()
         {
-            var first = new Mock<IResponse>();
-            var second = new Mock<IResponse>();
+            var foo1 = new Mock<EventHandler>();
+            var foo2 = new Mock<EventHandler>();
             var expected = new TestEventArgs();
 
-            // Same priority, post-listener priority.
-            second.Setup((o) => o.Foo(expected)).Callback(() =>
+            foo1.Setup((o) => o.Invoke(this, expected)).Callback(() =>
             {
-                expected.Stop();
+                expected.StopPropagation();
             });
 
-            eventDispatcher.AddListener("foo", first.Object.Foo);
-            eventDispatcher.AddListener("foo", second.Object.Foo);
+            eventDispatcher.AddListener("foo", foo1.Object);
+            eventDispatcher.AddListener("foo", foo2.Object);
 
-            eventDispatcher.Dispatch("foo", expected);
+            eventDispatcher.Raise("foo", this, expected);
 
-            first.Verify((o) => o.Foo(expected), Times.Never);
-            second.Verify((o) => o.Foo(expected));
+            foo1.Verify((o) => o.Invoke(this, expected));
+            foo2.Verify((o) => o.Invoke(this, expected), Times.Never);
         }
     }
 }

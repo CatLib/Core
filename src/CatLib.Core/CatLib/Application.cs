@@ -11,9 +11,8 @@
 
 using CatLib.Container;
 using CatLib.EventDispatcher;
-using CatLib.Events;
 using CatLib.Exception;
-using CatLib.Support;
+using CatLib.Util;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -93,7 +92,7 @@ namespace CatLib
             set
             {
                 debugLevel = value;
-                Instance(Type2Service(typeof(DebugLevel)), debugLevel);
+                this.Instance<DebugLevel>(debugLevel);
             }
         }
 
@@ -121,10 +120,16 @@ namespace CatLib
         }
 
         /// <inheritdoc />
+        public IEventDispatcher GetDispatcher()
+        {
+            return dispatcher;
+        }
+
+        /// <inheritdoc />
         public virtual void Terminate()
         {
             Process = StartProcess.Terminate;
-            Dispatch(new BeforeTerminateEventArgs(this));
+            Raise(new BeforeTerminateEventArgs(this));
             Process = StartProcess.Terminating;
             Flush();
             if (App.That == this)
@@ -133,7 +138,7 @@ namespace CatLib
             }
 
             Process = StartProcess.Terminated;
-            Dispatch(new AfterTerminateEventArgs(this));
+            Raise(new AfterTerminateEventArgs(this));
         }
 
         /// <summary>
@@ -150,7 +155,7 @@ namespace CatLib
             }
 
             Process = StartProcess.Bootstrap;
-            bootstraps = Dispatch(new BeforeBootEventArgs(bootstraps, this))
+            bootstraps = Raise(new BeforeBootEventArgs(bootstraps, this))
                             .GetBootstraps();
             Process = StartProcess.Bootstrapping;
 
@@ -170,7 +175,7 @@ namespace CatLib
 
                 existed.Add(bootstrap);
 
-                var skipped = Dispatch(new BootingEventArgs(bootstrap, this))
+                var skipped = Raise(new BootingEventArgs(bootstrap, this))
                                 .IsSkip;
                 if (!skipped)
                 {
@@ -180,7 +185,7 @@ namespace CatLib
 
             Process = StartProcess.Bootstraped;
             bootstrapped = true;
-            Dispatch(new AfterBootEventArgs(this));
+            Raise(new AfterBootEventArgs(this));
         }
 
         /// <summary>
@@ -199,7 +204,7 @@ namespace CatLib
             }
 
             Process = StartProcess.Init;
-            Dispatch(new BeforeInitEventArgs(this));
+            Raise(new BeforeInitEventArgs(this));
             Process = StartProcess.Initing;
 
             foreach (var provider in loadedProviders)
@@ -209,10 +214,10 @@ namespace CatLib
 
             inited = true;
             Process = StartProcess.Inited;
-            Dispatch(new AfterInitEventArgs(this));
+            Raise(new AfterInitEventArgs(this));
 
             Process = StartProcess.Running;
-            Dispatch(new StartCompletedEventArgs(this));
+            Raise(new StartCompletedEventArgs(this));
         }
 
         /// <inheritdoc />
@@ -245,7 +250,7 @@ namespace CatLib
                 baseProvider.SetApplication(this);
             }
 
-            var skipped = Dispatch(new RegisterProviderEventArgs(provider, this))
+            var skipped = Raise(new RegisterProviderEventArgs(provider, this))
                             .IsSkip;
             if (skipped)
             {
@@ -289,7 +294,7 @@ namespace CatLib
         /// <param name="provider">The specified service provider.</param>
         protected virtual void InitProvider(IServiceProvider provider)
         {
-            Dispatch(new InitProviderEventArgs(provider, this));
+            Raise(new InitProviderEventArgs(provider, this));
             provider.Init();
         }
 
@@ -311,21 +316,21 @@ namespace CatLib
             SetDispatcher(new EventDispatcher.EventDispatcher());
         }
 
-        private T Dispatch<T>(T eventArgs)
+        private T Raise<T>(T args)
             where T : EventArgs
         {
-            if (!dispatchMapping.TryGetValue(eventArgs.GetType(), out string eventName))
+            if (!dispatchMapping.TryGetValue(args.GetType(), out string eventName))
             {
-                throw new AssertException($"Assertion error: Undefined event {eventArgs}");
+                throw new AssertException($"Assertion error: Undefined event {args}");
             }
 
             if (dispatcher == null)
             {
-                return eventArgs;
+                return args;
             }
 
-            dispatcher.Dispatch(eventName, eventArgs);
-            return eventArgs;
+            dispatcher.Raise(eventName, this, args);
+            return args;
         }
     }
 }
