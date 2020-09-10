@@ -9,10 +9,9 @@
  * Document: https://catlib.io/
  */
 
-using CatLib.IO;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.IO;
 using System.Text;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace CatLib.Tests.IO
 {
