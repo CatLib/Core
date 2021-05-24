@@ -43,7 +43,7 @@ $ bucket require catlib/core
 
 CatLib has the most extensive and thorough [documentation](https://catlib.io), making it a breeze to get started with the framework.
 
-> 需要中文支持? 请访问[CatLib中文文档](https://zh.catlib.io)。
+> 需要中文支持? 请访问[CatLib中文文档](https://cn.catlib.io)。
 
 ## Contribution
 
